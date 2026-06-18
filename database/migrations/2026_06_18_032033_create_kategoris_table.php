@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign_update', function (Blueprint $table) {
+        Schema::create('kategori', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('campaign_id')
-                ->constrained('campaign')
-                ->cascadeOnDelete();
-            $table->text('isi_update');
+            $table->string('nama_kategori');
+            $table->string('slug')->unique();
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign_update');
+        Schema::dropIfExists('kategori');
     }
 };

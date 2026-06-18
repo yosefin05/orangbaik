@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('komentar', function (Blueprint $table) {
+        Schema::create('campaign_filter', function (Blueprint $table) {
             $table->id();
-            $table->text('isi_komentar');
-            $table->foreignId('berita_id')
-                ->constrained('berita')
-                ->cascadeOnDelete();
-            $table->foreignId('user_id')
-                ->constrained('users')
-                ->cascadeOnDelete();
+            $table->foreignId('campaign_id')->constrained('campaign')->onDelete('cascade');
+            $table->foreignId('filter_id')->constrained('filter')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -29,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('komentar');
+        Schema::dropIfExists('campaign_filter');
     }
 };

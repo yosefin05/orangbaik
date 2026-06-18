@@ -10,6 +10,26 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    public function berita()
+    {
+        return $this->hasMany(Berita::class);
+    }
+    public function testimoni()
+    {
+        return $this->hasMany(Testimoni::class);
+    }
+    public function campaignUpdates()
+    {
+        return $this->hasMany(Campaign_Update::class);
+    }
+    public function campaignFundraisers()
+    {
+        return $this->hasMany(Campaign_Fundraiser::class);
+    }
+    public function penggalangDana()
+    {
+        return $this->hasOne(Penggalang_Dana::class);
+    }
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
@@ -25,7 +45,7 @@ class User extends Authenticatable
         'nomor',
         'foto_profil',
         'jenis_kelamin',
-        'role', 
+        'role',
     ];
 
     /**

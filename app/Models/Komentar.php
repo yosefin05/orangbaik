@@ -6,10 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Komentar extends Model
 {
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function berita()
+    {
+        return $this->belongsTo(Berita::class);
+    }
+
     protected $table = 'komentar';
     protected $fillable = [
-        'isi_komentar',
-        'berita_id',
-        'user_id'
+        'komentar',
+        'user_id',
+        'berita_id'
     ];
 }

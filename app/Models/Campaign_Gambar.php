@@ -4,19 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Campaign_Fundraiser extends Model
+class Campaign_Gambar extends Model
 {
     public function campaign()
     {
         return $this->belongsTo(Campaign::class);
     }
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-    protected $table = 'campaign_fundraiser';
+    protected $table = 'campaign_gambar';
     protected $fillable = [
-        'user_id',
+        'foto',
         'campaign_id'
     ];
 }
