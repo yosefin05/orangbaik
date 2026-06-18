@@ -1,0 +1,340 @@
+.main {
+    overflow: hidden;
+}
+
+.hero-section {
+    padding-top: 36px;
+}
+
+.hero-slider {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+}
+
+.hero-card {
+    height: 390px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    background: #ddd;
+}
+
+.hero-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.side-card {
+    opacity: .9;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 28px 36px;
+}
+
+.category-grid.small {
+    margin-bottom: 36px;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-icon {
+    width: 74px;
+    height: 74px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+}
+
+.category-icon img {
+    width: 48px;
+}
+
+.category-item p {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.campaign-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.campaign-image {
+    width: 100%;
+    height: 145px;
+    object-fit: cover;
+}
+
+.campaign-body {
+    padding: 14px;
+}
+
+.campaign-body h3 {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+
+.campaign-body p,
+.list-body p {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.campaign-body p span,
+.list-body p span {
+    color: var(--primary);
+}
+
+.campaign-price {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.campaign-price strong,
+.list-body strong {
+    color: var(--primary);
+    font-size: 16px;
+}
+
+.campaign-price span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.progress {
+    width: 100%;
+    height: 7px;
+    background: #d9dce1;
+    border-radius: 999px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 55%;
+    height: 100%;
+    background: var(--primary);
+    border-radius: inherit;
+}
+
+.campaign-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 10px;
+}
+
+.new-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 34px;
+}
+
+.new-grid img {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.testimonial {
+    background: #f5f9ff;
+}
+
+.testimonial-content {
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    gap: 20px;
+}
+
+.slider-btn {
+    border: none;
+    background: transparent;
+    color: var(--primary);
+    font-size: 42px;
+    cursor: pointer;
+}
+
+.testimonial-text {
+    text-align: center;
+    max-width: 850px;
+    margin: auto;
+}
+
+.testimonial-text p {
+    font-size: 20px;
+    font-style: italic;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+.testimonial-text img {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 14px;
+}
+
+.testimonial-text h3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.testimonial-text span {
+    font-size: 14px;
+    font-style: italic;
+}
+
+.list-campaign {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.list-card {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 22px;
+}
+
+.list-card img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.list-body {
+    padding-top: 4px;
+}
+
+.list-body h3 {
+    font-size: 18px;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.list-body strong {
+    display: inline-block;
+    margin-top: 12px;
+}
+
+@media (max-width: 1000px) {
+    .hero-slider {
+        grid-template-columns: 1fr;
+    }
+
+    .side-card {
+        display: none;
+    }
+
+    .campaign-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .list-card {
+        grid-template-columns: 260px 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .container {
+        width: min(100% - 28px, 1180px);
+    }
+
+    .hero-card {
+        height: 210px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px 14px;
+    }
+
+    .category-icon {
+        width: 58px;
+        height: 58px;
+    }
+
+    .category-icon img {
+        width: 38px;
+    }
+
+    .category-item p {
+        font-size: 12px;
+    }
+
+    .campaign-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .new-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .new-grid img {
+        height: 150px;
+    }
+
+    .testimonial-content {
+        grid-template-columns: 20px 1fr 20px;
+    }
+
+    .testimonial-text p {
+        font-size: 14px;
+    }
+
+    .list-card {
+        grid-template-columns: 130px 1fr;
+        gap: 12px;
+    }
+
+    .list-card img {
+        height: 100px;
+    }
+
+    .list-body h3 {
+        font-size: 13px;
+    }
+
+    .campaign-price strong,
+    .list-body strong {
+        font-size: 13px;
+    }
+}
