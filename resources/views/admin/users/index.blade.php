@@ -2,75 +2,100 @@
 
 @section('content')
 
-<h1 class="text-2xl font-bold mb-6">
-    Data User
-</h1>
+<div class="page-header">
+    <div>
+        <h2>Data User</h2>
+        <p>Kelola seluruh pengguna terdaftar di platform OrangBaik.id</p>
+    </div>
+</div>
 
-<table class="w-full bg-white shadow rounded">
+<div class="card">
 
-    <thead>
+    <div class="table-wrapper">
+        <table class="data-table">
 
-        <tr class="bg-gray-100">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Nomor</th>
+                    <th>Jenis Kelamin</th>
+                    <th>Foto Profil</th>
+                    <th>Role</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
 
-            <th class="p-3 text-left">
-                Nama
-            </th>
+            <tbody>
 
-            <th class="p-3 text-left">
-                Email
-            </th>
+                @forelse($users as $user)
 
-            <th class="p-3 text-left">
-                Role
-            </th>
+                <tr>
+                    <td>{{ $user->name }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->nomor }}</td>
+                    <td>{{ $user->jenis_kelamin }}</td>
 
-            <th class="p-3 text-left">
-                Aksi
-            </th>
+                    <td>
+                        @if($user->foto_profil)
+                            <img
+                                src="{{ asset('storage/' . $user->foto_profil) }}"
+                                alt="Foto Profil"
+                                class="table-avatar"
+                            >
+                        @else
+                            <span class="text-muted">Tidak ada</span>
+                        @endif
+                    </td>
 
-        </tr>
+                    <td>
+                        <span class="badge badge-{{ $user->role === 'admin' ? 'red' : 'blue' }}">
+                            {{ $user->role }}
+                        </span>
+                    </td>
 
-    </thead>
+                    <td>
+                        <div class="action-group">
+                            <a href="{{ route('admin.users.edit', $user) }}" class="action-link link-yellow">
+                                Edit
+                            </a>
 
-    <tbody>
+                            <form
+                                action="{{ route('admin.users.destroy', $user) }}"
+                                method="POST"
+                                onsubmit="return confirm('Hapus user ini?')"
+                                class="inline-form"
+                            >
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="action-link link-red">
+                                    Hapus
+                                </button>
+                            </form>
 
-        @foreach($users as $user)
+                        </div>
+                    </td>
+                </tr>
 
-        <tr class="border-t">
+                @empty
 
-            <td class="p-3">
-                {{ $user->name }}
-            </td>
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        Belum ada data user.
+                    </td>
+                </tr>
 
-            <td class="p-3">
-                {{ $user->email }}
-            </td>
+                @endforelse
 
-            <td class="p-3">
-                {{ $user->role }}
-            </td>
+            </tbody>
 
-            <td class="p-3">
+        </table>
+    </div>
 
-                <a
-                    href="{{ route('admin.users.show', $user) }}"
-                    class="text-blue-500"
-                >
-                    Detail
-                </a>
+    <div class="pagination-wrapper">
+        {{ $users->links() }}
+    </div>
 
-            </td>
-
-        </tr>
-
-        @endforeach
-
-    </tbody>
-
-</table>
-
-<div class="mt-4">
-    {{ $users->links() }}
 </div>
 
 @endsection

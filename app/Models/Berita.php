@@ -23,6 +23,7 @@ class Berita extends Model
         'thumbnail',
         'judul',
         'isi',
-        'slug'
+        'slug',
+        'user_id'
     ];
 }

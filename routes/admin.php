@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\admin\FilterController;
+use App\Http\Controllers\admin\BeritaController;
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -13,20 +15,12 @@ Route::middleware(['auth', 'admin'])
             '/dashboard',
             [DashboardController::class, 'index']
         )->name('dashboard');
+Route::resource('filter', FilterController::class)
+    ->except(['show']);
 
-    });
+Route::resource('users', UserController::class)
+    ->except(['show']);
 
-Route::get('/users', [UserController::class, 'index'])
-    ->name('users.index');
+Route::resource('berita', BeritaController::class);
 
-Route::get('/users/{user}', [UserController::class, 'show'])
-    ->name('users.show');
-
-Route::get('/users/{user}/edit', [UserController::class, 'edit'])
-    ->name('users.edit');
-
-Route::put('/users/{user}', [UserController::class, 'update'])
-    ->name('users.update');
-
-Route::delete('/users/{user}', [UserController::class, 'destroy'])
-    ->name('users.destroy');
+});

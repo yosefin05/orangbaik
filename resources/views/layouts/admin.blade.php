@@ -31,12 +31,17 @@
                 class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}">
                 👤 User
             </a>
-            <a href="#">👥 Penggalang Dana</a>
-            <a href="#">📰 Berita</a>
-            <a href="#">📢 Campaign</a>
-            <a href="#">📂 Filter</a>
-            
-            
+
+            <a href="{{ route('admin.berita.index') }}"
+                class="{{ request()->routeIs('admin.berita.index') ? 'active' : '' }}">
+                📂 Berita
+            </a>
+
+            <a href="{{ route('admin.filter.index') }}"
+                class="{{ request()->routeIs('admin.filter.index') ? 'active' : '' }}">
+                📂 Filter
+            </a>
+
         </nav>
 
         <div class="sidebar-footer">

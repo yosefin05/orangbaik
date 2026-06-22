@@ -1,67 +1,75 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Filter;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class FilterController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $filters = Filter::all();
-        return view('admin.filters.index', compact('filters'));
+        $filters = Filter::latest()->paginate(10);
+
+        return view(
+            'admin.filter.index',
+            compact('filters')
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view('admin.filters.create');
+        return view('admin.filter.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_filter' => 'required|max:255'
+        ]);
+
+        Filter::create([
+            'nama_filter' => $request->nama_filter,
+            'slug' => Str::slug($request->nama_filter)
+        ]);
+
+        return redirect()
+            ->route('admin.filter.index')
+            ->with('success', 'Filter berhasil ditambahkan');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Filter $filter)
     {
-        //
+        return view(
+            'admin.filter.edit',
+            compact('filter')
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Filter $filter)
     {
-        //
+        $request->validate([
+            'nama_filter' => 'required|max:255'
+        ]);
+
+        $filter->update([
+            'nama_filter' => $request->nama_filter,
+            'slug' => Str::slug($request->nama_filter)
+        ]);
+
+        return redirect()
+            ->route('admin.filter.index')
+            ->with('success', 'Filter berhasil diperbarui');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Filter $filter)
     {
-        //
-    }
+        $filter->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()
+            ->route('admin.filter.index')
+            ->with('success', 'Filter berhasil dihapus');
     }
 }
