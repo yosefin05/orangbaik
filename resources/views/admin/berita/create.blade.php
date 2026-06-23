@@ -68,7 +68,7 @@
             >
 
             <small>
-                Bisa upload lebih dari satu gambar.
+                Maksimal 3 gambar dan ukuran tiap gambar maksimal 2 MB.
             </small>
         </div>
 
@@ -105,5 +105,38 @@
     </form>
 
 </div>
+
+<script>
+document.getElementById('gambar')
+    .addEventListener('change', function () {
+
+        const files = this.files;
+
+        if (files.length > 3) {
+
+            alert(
+                'Maksimal hanya boleh upload 3 gambar.'
+            );
+
+            this.value = '';
+
+            return;
+        }
+
+        for (let i = 0; i < files.length; i++) {
+
+            if (files[i].size > 2 * 1024 * 1024) {
+
+                alert(
+                    'Ukuran gambar maksimal 2 MB.'
+                );
+
+                this.value = '';
+
+                return;
+            }
+        }
+    });
+</script>
 
 @endsection

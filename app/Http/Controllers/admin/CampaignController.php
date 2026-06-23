@@ -1,65 +1,75 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Campaign;
 
 class CampaignController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $campaign = Campaign::with([
+            'kategori',
+            'penggalangDana',
+            'campaignGambar',
+            'campaignFilter',
+            'campaignUpdates'
+        ])
+            ->latest()
+            ->paginate(10);
+
+        return view(
+            'admin.campaign.index',
+            compact('campaign')
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(Campaign $campaign)
     {
-        //
+        $campaign->load([
+            'kategori',
+            'penggalangDana',
+            'campaignGambar',
+            'campaignFilter.filter',
+            'campaignUpdates.user',
+            'campaignFundraisers.user',
+            'verifier'
+        ]);
+
+        return view(
+            'admin.campaign.show',
+            compact('campaign')
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function approve(
+        Campaign $campaign
+    ) {
+        $campaign->update([
+            'status' => 'approved',
+            'verified_by' => auth()->id(),
+            'verified_at' => now(),
+        ]);
+
+        return back()->with(
+            'success',
+            'Campaign berhasil disetujui.'
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    public function reject(
+        Campaign $campaign
+    ) {
+        $campaign->update([
+            'status' => 'rejected',
+            'verified_by' => auth()->id(),
+            'verified_at' => now(),
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return back()->with(
+            'success',
+            'Campaign berhasil ditolak.'
+        );
     }
 }

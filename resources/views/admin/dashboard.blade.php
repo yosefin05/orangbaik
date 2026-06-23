@@ -77,22 +77,22 @@
 
     <div class="menu-grid">
 
-        <a href="#" class="menu-item">
+        <a href="{{ route('admin.filter.index') }}" class="menu-item">
             <span class="menu-icon">📂</span>
             <span>Filter</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="{{ route('admin.campaign.index') }}" class="menu-item">
             <span class="menu-icon">📢</span>
             <span>Campaign</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="{{ route('admin.penggalang_dana.index') }}" class="menu-item">
             <span class="menu-icon">👤</span>
             <span>Penggalang Dana</span>
         </a>
 
-        <a href="#" class="menu-item">
+        <a href="{{ route('admin.berita.index') }}" class="menu-item">
             <span class="menu-icon">📰</span>
             <span>Berita</span>
         </a>

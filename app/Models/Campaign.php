@@ -8,11 +8,14 @@ class Campaign extends Model
 {
     public function kategori()
     {
-        return $this->belongsTo(Kategori::class);
+        return $this->belongsTo(
+            Kategori::class,
+            'kategori_id'
+        );
     }
     public function penggalangDana()
     {
-        return $this->belongsTo(Penggalang_Dana::class);
+        return $this->belongsTo(Penggalang_Dana::class, 'penggalang_dana_id');
     }
     public function campaignGambar()
     {
@@ -30,6 +33,14 @@ class Campaign extends Model
     {
         return $this->hasMany(Campaign_Fundraiser::class);
     }
+
+    public function verifier()
+    {
+        return $this->belongsTo(
+            User::class,
+            'verified_by'
+        );
+    }
     protected $table = 'campaign';
     protected $fillable = [
         'thumbnail',
@@ -38,9 +49,15 @@ class Campaign extends Model
         'deskripsi',
         'tanggal_mulai',
         'tanggal_berakhir',
-        'sedekah rutin?',
         'target_donasi',
         'kategori_id',
-        'penggalang_dana_id'
+        'penggalang_dana_id',
+        'status',
+        'verified_by',
+        'verified_at'
+    ];
+
+    protected $casts = [
+        'verified_at' => 'datetime',
     ];
 }

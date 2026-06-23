@@ -19,7 +19,6 @@ return new class extends Migration
             $table->text('deskripsi');
             $table->date('tanggal_mulai');
             $table->date('tanggal_berakhir');
-            $table->enum('sedekah rutin?', ['ya', 'tidak'])->default('tidak');
             $table->string('target_donasi');
             $table->foreignId('kategori_id')->constrained('kategori')->onDelete('cascade');
             $table->foreignId('penggalang_dana_id')->constrained('penggalang_dana')->onDelete('cascade');

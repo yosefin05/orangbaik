@@ -42,6 +42,15 @@
                 📂 Filter
             </a>
 
+            <a href="{{ route('admin.penggalang_dana.index') }}"
+                class="{{ request()->routeIs('admin.penggalang_dana.index') ? 'active' : '' }}">
+                👥 Penggalang Dana
+            </a>
+
+            <a href="{{ route('admin.campaign.index') }}"
+                class="{{ request()->routeIs('admin.campaign.index') ? 'active' : '' }}">
+                📢 Campaign
+            </a>
         </nav>
 
         <div class="sidebar-footer">
