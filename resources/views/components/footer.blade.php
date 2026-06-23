@@ -3,8 +3,7 @@
 
         <div class="footer-brand">
             <div class="footer-logo">
-                <img src="{{ asset('assets/logo-icon.png') }}" alt="OrangBaik.id">
-                <h3>orangbaik.id</h3>
+                <img src="{{ asset('assets/logo-header.png') }}" alt="OrangBaik.id">
             </div>
 
             <p>

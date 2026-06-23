@@ -21,7 +21,6 @@
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: #ffffff;
     display: grid;
     place-items: center;
     overflow: hidden;
@@ -92,7 +91,7 @@
     background: var(--primary);
     color: #ffffff;
     margin-top: 30px;
-    padding-top: 38px;
+    padding-top: 60px;
 }
 
 .footer-inner {
@@ -109,16 +108,8 @@
 }
 
 .footer-logo img {
-    width: 34px;
-    height: 34px;
-    background: #ffffff;
-    border-radius: 50%;
-    padding: 5px;
-}
-
-.footer-logo h3 {
-    font-size: 22px;
-    font-weight: 600;
+    width: 140px;
+    height: 30px;
 }
 
 .footer-brand p,

@@ -15,9 +15,9 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/campaign/sedekah-pendidikan-anak', function () {
-    return view('pages.campaign.show');
-})->name('campaign.show');
+Route::get('/penggalang-dana-organisasi', function () {
+    return view('pages.penggalangdana-organisasi');
+})->name('penggalangdana-organisasi');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

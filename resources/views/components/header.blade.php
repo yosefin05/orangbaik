@@ -3,7 +3,7 @@
 
         <a href="{{ url('/') }}" class="brand">
             <div class="brand-logo">
-                <img src="{{ asset('assets/logo-icon.png') }}" alt="OrangBaik.id">
+                <img src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id">
             </div>
         </a>
 

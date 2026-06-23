@@ -1,35 +1,40 @@
 .main {
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
+/* HERO */
 .hero-section {
     padding-top: 36px;
 }
 
 .hero-slider {
     display: grid;
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: minmax(0, 1fr) 320px;
     gap: 32px;
+    align-items: stretch;
 }
 
 .hero-card {
-    height: 390px;
-    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     overflow: hidden;
     box-shadow: var(--shadow);
-    background: #ddd;
 }
 
-.hero-card img {
+.main-hero-card {
+    aspect-ratio: 1200 / 650;
+}
+
+.main-hero-card img,
+.side-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
 }
 
-.side-card {
-    opacity: .9;
-}
-
+/* CATEGORY */
 .category-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -51,10 +56,11 @@
     width: 74px;
     height: 74px;
     border: 1px solid var(--border);
-    border-radius: 50%;
-    background: #ffffff;
+    border-radius: var(--radius-full);
+    background: var(--bg);
     display: grid;
     place-items: center;
+    box-shadow: var(--shadow-soft);
 }
 
 .category-icon img {
@@ -62,10 +68,13 @@
 }
 
 .category-item p {
-    font-size: 15px;
-    font-weight: 500;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    text-align: center;
 }
 
+/* CAMPAIGN CARD */
 .campaign-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -73,10 +82,17 @@
 }
 
 .campaign-card {
-    background: #ffffff;
+    background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius);
     overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: .2s ease;
+}
+
+.campaign-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
 }
 
 .campaign-image {
@@ -90,15 +106,18 @@
 }
 
 .campaign-body h3 {
-    font-size: 14px;
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
     line-height: 1.4;
     margin-bottom: 6px;
 }
 
 .campaign-body p,
 .list-body p {
-    font-size: 11px;
     color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
 }
 
 .campaign-body p span,
@@ -116,19 +135,20 @@
 .campaign-price strong,
 .list-body strong {
     color: var(--primary);
-    font-size: 16px;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
 }
 
 .campaign-price span {
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--fs-xxs);
 }
 
 .progress {
     width: 100%;
     height: 7px;
-    background: #d9dce1;
-    border-radius: 999px;
+    background: var(--primary-light);
+    border-radius: var(--radius-full);
     margin-top: 8px;
     overflow: hidden;
 }
@@ -145,10 +165,11 @@
     justify-content: space-between;
     align-items: center;
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--fs-xxs);
     margin-top: 10px;
 }
 
+/* NEW SECTION */
 .new-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -157,13 +178,16 @@
 
 .new-grid img {
     width: 100%;
-    height: 210px;
+    aspect-ratio: 18 / 7;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
 }
 
+/* TESTIMONIAL */
 .testimonial {
-    background: #f5f9ff;
+    background: var(--primary-light);
 }
 
 .testimonial-content {
@@ -177,8 +201,12 @@
     border: none;
     background: transparent;
     color: var(--primary);
-    font-size: 42px;
-    cursor: pointer;
+    font-size: var(--fs-xxl);
+    line-height: 1;
+}
+
+.slider-btn:hover {
+    color: var(--primary-hover);
 }
 
 .testimonial-text {
@@ -188,8 +216,10 @@
 }
 
 .testimonial-text p {
-    font-size: 20px;
+    color: var(--text);
+    font-size: var(--fs-md);
     font-style: italic;
+    font-weight: var(--fw-regular);
     line-height: 1.7;
     margin-bottom: 30px;
 }
@@ -197,21 +227,26 @@
 .testimonial-text img {
     width: 86px;
     height: 86px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     margin: 0 auto 14px;
+    border: 3px solid var(--bg);
+    box-shadow: var(--shadow);
 }
 
 .testimonial-text h3 {
-    font-size: 18px;
-    font-weight: 700;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
 }
 
 .testimonial-text span {
-    font-size: 14px;
+    color: var(--muted);
+    font-size: var(--fs-xs);
     font-style: italic;
 }
 
+/* LIST CAMPAIGN */
 .list-campaign {
     display: flex;
     flex-direction: column;
@@ -222,13 +257,18 @@
     display: grid;
     grid-template-columns: 360px 1fr;
     gap: 22px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow-card);
 }
 
 .list-card img {
     width: 100%;
     height: 170px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
 }
 
 .list-body {
@@ -236,7 +276,9 @@
 }
 
 .list-body h3 {
-    font-size: 18px;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
     line-height: 1.4;
     margin-bottom: 4px;
 }
@@ -246,6 +288,7 @@
     margin-top: 12px;
 }
 
+/* TABLET */
 @media (max-width: 1000px) {
     .hero-slider {
         grid-template-columns: 1fr;
@@ -268,17 +311,15 @@
     }
 }
 
+/* MOBILE */
 @media (max-width: 640px) {
-    .container {
-        width: min(100% - 28px, 1180px);
+    .hero-section {
+        padding-top: 20px;
     }
 
-    .hero-card {
-        height: 210px;
-    }
-
-    .section-title {
-        font-size: 18px;
+    .hero-card,
+    .main-hero-card {
+        border-radius: var(--radius-md);
     }
 
     .category-grid {
@@ -296,7 +337,7 @@
     }
 
     .category-item p {
-        font-size: 12px;
+        font-size: var(--fs-xs);
     }
 
     .campaign-grid {
@@ -308,33 +349,40 @@
         gap: 18px;
     }
 
-    .new-grid img {
-        height: 150px;
-    }
-
     .testimonial-content {
         grid-template-columns: 20px 1fr 20px;
     }
 
+    .slider-btn {
+        font-size: var(--fs-xl);
+    }
+
     .testimonial-text p {
-        font-size: 14px;
+        font-size: var(--fs-xs);
+    }
+
+    .testimonial-text img {
+        width: 72px;
+        height: 72px;
     }
 
     .list-card {
         grid-template-columns: 130px 1fr;
         gap: 12px;
+        padding: 10px;
     }
 
     .list-card img {
         height: 100px;
+        border-radius: var(--radius-sm);
     }
 
     .list-body h3 {
-        font-size: 13px;
+        font-size: var(--fs-xs);
     }
 
     .campaign-price strong,
     .list-body strong {
-        font-size: 13px;
+        font-size: var(--fs-xs);
     }
 }

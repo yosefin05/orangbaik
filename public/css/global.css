@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root {
+    /* COLOR */
     --primary: #3365af;
     --primary-hover: #28528f;
     --primary-light: #e8f0fb;
@@ -12,13 +13,50 @@
     --danger: #ef4444;
 
     --text: #1f2937;
+    --text-dark: #111827;
     --muted: #6b7280;
+    --muted-light: #a3a3a3;
+
     --bg: #ffffff;
     --bg-soft: #f3f7fc;
-    --border: #dbe3ef;
+    --bg-blue-soft: #f5f9ff;
 
+    --border: #dbe3ef;
+    --border-soft: #e8eef7;
+
+    /* GOLDEN RATIO FONT SCALE */
+    --fs-xxs: 10px;
+    --fs-xs: 13px;
+    --fs-sm: 16px;
+    --fs-md: 21px;
+    --fs-lg: 26px;
+    --fs-xl: 34px;
+    --fs-xxl: 42px;
+
+    /* FONT WEIGHT */
+    --fw-light: 300;
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+    --fw-extrabold: 800;
+
+    /* RADIUS */
+    --radius-sm: 8px;
+    --radius-md: 12px;
     --radius: 16px;
+    --radius-lg: 22px;
+    --radius-full: 999px;
+
+    /* SHADOW */
+    --shadow-soft: 0 6px 16px rgba(51, 101, 175, .08);
     --shadow: 0 10px 30px rgba(0, 0, 0, .08);
+    --shadow-card: 0 8px 22px rgba(0, 0, 0, .045);
+
+    /* LAYOUT */
+    --container: 1180px;
+    --container-form: 1120px;
+    --section-space: 34px;
 }
 
 * {
@@ -35,6 +73,8 @@ body {
     font-family: 'Poppins', sans-serif;
     background: var(--bg-soft);
     color: var(--text);
+    font-size: var(--fs-xs);
+    line-height: 1.6;
 }
 
 a {
@@ -47,22 +87,51 @@ img {
     display: block;
 }
 
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
 .container {
-    width: min(100% - 40px, 1180px);
+    width: min(100% - 40px, var(--container));
     margin-inline: auto;
 }
 
 .section {
-    padding: 34px 0;
+    padding: var(--section-space) 0;
 }
 
 .section-title {
-    font-size: 22px;
-    font-weight: 700;
+    color: var(--text-dark);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    line-height: 1.35;
     margin-bottom: 22px;
 }
 
 .section-border {
+    background: var(--bg);
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+    :root {
+        --section-space: 30px;
+    }
+
+    .container {
+        width: min(100% - 28px, var(--container));
+    }
+
+    .section-title {
+        font-size: var(--fs-sm);
+        margin-bottom: 18px;
+    }
 }
