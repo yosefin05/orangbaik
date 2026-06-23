@@ -8,17 +8,33 @@ class Penggalang_Dana extends Model
 {
     public function penggalangDanaDokumen()
     {
-        return $this->hasMany(Penggalang_Dana_Dokumen::class);
+        return $this->hasMany(
+            Penggalang_Dana_Dokumen::class,
+            'penggalang_dana_id',
+            'id'
+        );
     }
+
     public function campaign()
     {
         return $this->hasMany(Campaign::class);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function verifier()
+    {
+        return $this->belongsTo(
+            User::class,
+            'verified_by'
+        );
+    }
+
     protected $table = 'penggalang_dana';
+
     protected $fillable = [
         'jenis_penggalang',
         'foto_profil',
@@ -32,6 +48,14 @@ class Penggalang_Dana extends Model
         'instagram',
         'facebook',
         'youtube',
-        'tiktok'
+        'tiktok',
+        'status',
+        'user_id',
+        'verified_by',
+        'verified_at'
+    ];
+
+    protected $casts = [
+        'verified_at' => 'datetime',
     ];
 }

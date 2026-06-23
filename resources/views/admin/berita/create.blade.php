@@ -1,0 +1,142 @@
+@extends('layouts.admin')
+
+@section('content')
+
+<div class="page-header">
+    <div>
+        <h2>Tambah Berita</h2>
+        <p>Buat artikel atau berita baru</p>
+    </div>
+</div>
+
+<div class="card form-card">
+
+    @if ($errors->any())
+        <div class="alert alert-error">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form
+        action="{{ route('admin.berita.store') }}"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+        @csrf
+
+        <div class="form-group">
+            <label for="judul">Judul</label>
+            <input
+                type="text"
+                id="judul"
+                name="judul"
+                value="{{ old('judul') }}"
+                class="form-control"
+                placeholder="Judul berita"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="thumbnail">Thumbnail</label>
+            <input
+                type="file"
+                id="thumbnail"
+                name="thumbnail"
+                class="form-control"
+                accept="image/*"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="gambar">
+                Galeri Gambar
+            </label>
+
+            <input
+                type="file"
+                id="gambar"
+                name="gambar[]"
+                class="form-control"
+                accept="image/*"
+                multiple
+            >
+
+            <small>
+                Maksimal 3 gambar dan ukuran tiap gambar maksimal 2 MB.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="isi">Isi Berita</label>
+            <textarea
+                id="isi"
+                name="isi"
+                rows="8"
+                class="form-control"
+                placeholder="Tulis isi berita di sini..."
+                required
+            >{{ old('isi') }}</textarea>
+        </div>
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+                Simpan
+            </button>
+
+            <a
+                href="{{ route('admin.berita.index') }}"
+                class="btn-secondary"
+            >
+                Batal
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+document.getElementById('gambar')
+    .addEventListener('change', function () {
+
+        const files = this.files;
+
+        if (files.length > 3) {
+
+            alert(
+                'Maksimal hanya boleh upload 3 gambar.'
+            );
+
+            this.value = '';
+
+            return;
+        }
+
+        for (let i = 0; i < files.length; i++) {
+
+            if (files[i].size > 2 * 1024 * 1024) {
+
+                alert(
+                    'Ukuran gambar maksimal 2 MB.'
+                );
+
+                this.value = '';
+
+                return;
+            }
+        }
+    });
+</script>
+
+@endsection
