@@ -37,8 +37,10 @@ class Penggalang_Dana extends Model
 
     protected $fillable = [
         'jenis_penggalang',
+        'thumbnail',
         'foto_profil',
         'nama_penggalang',
+        'tahun_berdiri',
         'alamat',
         'deskripsi',
         'visi',
