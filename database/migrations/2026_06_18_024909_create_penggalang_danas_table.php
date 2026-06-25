@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('youtube')->nullable();
             $table->string('tiktok')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('verified_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('verified_by')->constrained('users')->onDelete('cascade')->nullable();
             $table->timestamps();
         });
     }

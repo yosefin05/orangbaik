@@ -97,6 +97,11 @@
             <span>Berita</span>
         </a>
 
+        <a href="{{ route('admin.testimoni.index') }}" class="menu-item">
+            <span class="menu-icon">🤳</span>
+            <span>Testimoni</span>
+        </a>
+
     </div>
 
 </div>

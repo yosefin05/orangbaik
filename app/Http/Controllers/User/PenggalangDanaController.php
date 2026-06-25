@@ -3,170 +3,120 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Penggalang_Dana;
 use App\Models\Penggalang_Dana_Dokumen;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PenggalangDanaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function createOrganisasi()
     {
         return view(
             'pages.penggalang_dana.create_organisasi'
         );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function createOrganisasi()
+    public function storeOrganisasi(Request $request)
     {
-        return view ('pages.penggalang_dana.create_organisasi');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function storeOrganisasi(
-        Request $request
-    ) {
-         dd('masuk');
         $request->validate([
 
-            'thumbnail' =>
-                'required|image|max:2048',
+            'thumbnail' => 'required|image|max:2048',
+            'foto_profil' => 'required|image|max:2048',
 
-            'foto_profil' =>
-                'required|image|max:2048',
+            'nama_penggalang' => 'required|max:255',
+            'tahun_berdiri' => 'required|digits:4',
+            'alamat' => 'required',
+            'deskripsi' => 'required',
+            'visi' => 'required',
+            'misi' => 'required',
 
-            'nama_penggalang' =>
-                'required|max:255',
+            'email' => 'required|email',
+            'no_telepon' => 'required',
 
-            'tahun_berdiri' =>
-                'required|digits:4',
+            'nama_dokumen.0' => 'required',
+            'nama_dokumen.1' => 'required',
 
-            'alamat' =>
-                'required',
-
-            'deskripsi' =>
-                'required',
-
-            'visi' =>
-                'required',
-
-            'misi' =>
-                'required',
-
-            'email' =>
-                'required|email',
-
-            'no_telepon' =>
-                'required',
-
-            'nama_dokumen.0' =>
-                'required',
-
-            'nama_dokumen.1' =>
-                'required',
-
-            'file_dokumen.0' =>
-                'required|url',
-
-            'file_dokumen.1' =>
-                'required|url',
-
+            'file_dokumen.0' => 'required|url',
+            'file_dokumen.1' => 'required|url',
         ]);
 
-        DB::transaction(function () use ($request) {
+        DB::beginTransaction();
 
-            $thumbnail =
-                $request->file('thumbnail')
-                    ->store(
-                        'penggalang_dana/thumbnail',
-                        'public'
-                    );
+        try {
 
-            $fotoProfil =
-                $request->file('foto_profil')
-                    ->store(
-                        'penggalang_dana/profil',
-                        'public'
-                    );
+            $thumbnail = $request
+                ->file('thumbnail')
+                ->store(
+                    'penggalang_dana/thumbnail',
+                    'public'
+                );
 
-            $penggalangDana =
-                Penggalang_Dana::create([
+            $fotoProfil = $request
+                ->file('foto_profil')
+                ->store(
+                    'penggalang_dana/profil',
+                    'public'
+                );
 
-                    'user_id' =>
-                        auth()->id(),
+            $penggalangDana = Penggalang_Dana::create([
 
-                    'jenis_penggalang' =>
-                        'organisasi',
+                'user_id' => auth()->id(),
 
-                    'thumbnail' =>
-                        $thumbnail,
+                'jenis_penggalang' =>
+                    $request->jenis_penggalang,
 
-                    'foto_profil' =>
-                        $fotoProfil,
+                'thumbnail' =>
+                    $thumbnail,
 
-                    'nama_penggalang' =>
-                        $request->nama_penggalang,
+                'foto_profil' =>
+                    $fotoProfil,
 
-                    'tahun_berdiri' =>
-                        $request->tahun_berdiri,
+                'nama_penggalang' =>
+                    $request->nama_penggalang,
 
-                    'alamat' =>
-                        $request->alamat,
+                'tahun_berdiri' =>
+                    $request->tahun_berdiri,
 
-                    'deskripsi' =>
-                        $request->deskripsi,
+                'alamat' =>
+                    $request->alamat,
 
-                    'visi' =>
-                        $request->visi,
+                'deskripsi' =>
+                    $request->deskripsi,
 
-                    'misi' =>
-                        $request->misi,
+                'visi' =>
+                    $request->visi,
 
-                    'email' =>
-                        $request->email,
+                'misi' =>
+                    $request->misi,
 
-                    'no_telepon' =>
-                        $request->no_telepon,
+                'email' =>
+                    $request->email,
 
-                    'instagram' =>
-                        $request->instagram,
+                'no_telepon' =>
+                    $request->no_telepon,
 
-                    'facebook' =>
-                        $request->facebook,
+                'instagram' =>
+                    $request->instagram,
 
-                    'youtube' =>
-                        $request->youtube,
+                'facebook' =>
+                    $request->facebook,
 
-                    'tiktok' =>
-                        $request->tiktok,
+                'youtube' =>
+                    $request->youtube,
 
-                    'status' =>
-                        'pending',
-                ]);
+                'tiktok' =>
+                    $request->tiktok,
 
-            foreach (
-                $request->nama_dokumen ?? []
-                as $index => $namaDokumen
-            ) {
+                'status' =>
+                    'pending',
+            ]);
+
+            foreach ($request->nama_dokumen as $index => $namaDokumen) {
 
                 if (
-                    empty($namaDokumen)
-                ) {
-                    continue;
-                }
-
-                if (
-                    empty(
-                    $request->file_dokumen[$index]
-                )
+                    empty($namaDokumen) ||
+                    empty($request->file_dokumen[$index])
                 ) {
                     continue;
                 }
@@ -179,52 +129,26 @@ class PenggalangDanaController extends Controller
                     'nama_dokumen' =>
                         $namaDokumen,
 
-                    // walaupun nama kolom file_dokumen
-                    // isinya URL legalitas
                     'file_dokumen' =>
                         $request->file_dokumen[$index],
-
                 ]);
             }
-        });
 
-        return redirect()
-            ->route('home')
-            ->with(
-                'success',
-                'Pengajuan penggalang dana berhasil dikirim.'
-            );
-    }
+            DB::commit();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+            return redirect()
+                ->route('home')
+                ->with(
+                    'success',
+                    'Pengajuan penggalang dana berhasil dikirim.'
+                );
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        } catch (\Exception $e) {
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            DB::rollBack();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            dd($e->getMessage());
+        }
+
     }
 }

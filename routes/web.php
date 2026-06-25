@@ -15,34 +15,24 @@ Route::get('/donasi', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware([
-    'auth',
-    'verified'
-])->name('dashboard');
+            'auth',
+            'verified'
+        ])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Penggalang Dana
-    |--------------------------------------------------------------------------
-    */
-
+    // Penggalang Dana
     Route::get(
         '/penggalang_dana_organisasi',
         [PenggalangDanaController::class, 'createOrganisasi']
-    )->name('penggalang_dana.organisasi');
+    )->name('penggalang_dana.organisasi.create');
 
     Route::post(
         '/penggalang_dana_organisasi',
         [PenggalangDanaController::class, 'storeOrganisasi']
     )->name('penggalang_dana.organisasi.store');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Profile
-    |--------------------------------------------------------------------------
-    */
-
+    // profil
     Route::get(
         '/profile',
         [ProfileController::class, 'edit']

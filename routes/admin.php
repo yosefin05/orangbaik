@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Testimoni;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\UserController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\admin\FilterController;
 use App\Http\Controllers\admin\BeritaController;
 use App\Http\Controllers\admin\PenggalangDanaController;
 use App\Http\Controllers\admin\CampaignController;
+use App\Http\Controllers\admin\TestimoniController;
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -67,4 +69,6 @@ Route::middleware(['auth', 'admin'])
             '/campaign/{campaign}/reject',
             [CampaignController::class, 'reject']
         )->name('campaign.reject');
+
+        Route::resource('testimoni', TestimoniController::class);
     });

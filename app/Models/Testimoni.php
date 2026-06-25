@@ -15,6 +15,7 @@ class Testimoni extends Model
         'foto_profil',
         'nama',
         'jabatan',
-        'isi_testimoni'
+        'isi_testimoni',
+        'user_id'
     ];
 }
