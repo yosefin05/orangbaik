@@ -23,15 +23,20 @@
 }
 
 .main-hero-card {
-    aspect-ratio: 1200 / 650;
+    aspect-ratio: 16 / 9;
 }
 
 .main-hero-card img,
 .side-card img {
     width: 100%;
     height: 100%;
+    display: block;
     object-fit: cover;
     object-position: center;
+}
+
+.side-card {
+    opacity: .95;
 }
 
 /* CATEGORY */
@@ -39,6 +44,7 @@
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 28px 36px;
+    align-items: start;
 }
 
 .category-grid.small {
@@ -46,38 +52,46 @@
 }
 
 .category-item {
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    justify-content: flex-start;
+
+    gap: 12px;
+    text-align: center;
 }
 
 .category-icon {
     width: 74px;
     height: 74px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-full);
-    background: var(--bg);
+
     display: grid;
     place-items: center;
-    box-shadow: var(--shadow-soft);
+
+    margin-inline: auto;
 }
 
 .category-icon img {
-    width: 48px;
+    width: 60px;
+    height: 60px;
+    display: block;
+    object-fit: contain;
+    object-position: center;
 }
 
 .category-item p {
     color: var(--text-dark);
     font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-regular);
+    line-height: 1.35;
     text-align: center;
 }
 
 /* CAMPAIGN CARD */
 .campaign-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 24px;
 }
 
@@ -97,8 +111,10 @@
 
 .campaign-image {
     width: 100%;
-    height: 145px;
+    aspect-ratio: 16 / 9;
+    display: block;
     object-fit: cover;
+    object-position: center;
 }
 
 .campaign-body {
@@ -178,8 +194,10 @@
 
 .new-grid img {
     width: 100%;
-    aspect-ratio: 18 / 7;
+    aspect-ratio: 16 / 9;
+    display: block;
     object-fit: cover;
+    object-position: center;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     box-shadow: var(--shadow);
@@ -304,7 +322,7 @@
 
 .list-card {
     display: grid;
-    grid-template-columns: 360px 1fr;
+    grid-template-columns: 380px 1fr;
     gap: 22px;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -315,8 +333,10 @@
 
 .list-card img {
     width: 100%;
-    height: 170px;
+    aspect-ratio: 16 / 9;
+    display: block;
     object-fit: cover;
+    object-position: center;
     border-radius: var(--radius-md);
 }
 
@@ -353,10 +373,11 @@
 
     .category-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 28px 24px;
     }
 
     .list-card {
-        grid-template-columns: 260px 1fr;
+        grid-template-columns: 280px 1fr;
     }
 }
 
@@ -373,7 +394,11 @@
 
     .category-grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px 14px;
+        gap: 22px 14px;
+    }
+
+    .category-item {
+        gap: 9px;
     }
 
     .category-icon {
@@ -382,7 +407,8 @@
     }
 
     .category-icon img {
-        width: 38px;
+        width: 46px;
+        height: 46px;
     }
 
     .category-item p {
@@ -422,7 +448,7 @@
     }
 
     .list-card img {
-        height: 100px;
+        aspect-ratio: 4 / 3;
         border-radius: var(--radius-sm);
     }
 
