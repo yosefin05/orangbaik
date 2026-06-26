@@ -7,6 +7,7 @@
     <title>OrangBaik Admin</title>
 
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 </head>
 
 <body>
