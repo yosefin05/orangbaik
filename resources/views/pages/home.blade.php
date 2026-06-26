@@ -224,7 +224,7 @@
 
                     <div class="testimonial-text">
                         <p>
-                            “DQ adalah lembaga resmi dari pemerintah, serta Zakat Infaq dan Sedekah
+                            “DQ adalah ....lembaga resmi dari pemerintah, serta Zakat Infaq dan Sedekah
                             yang diberikan oleh saudara muslimin-muslimat sekalian Insya Allah akan
                             disalurkan dengan amanah dan tepat sasaran.”
                         </p>

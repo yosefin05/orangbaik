@@ -159,13 +159,13 @@
                             <div class="field">
                                 <label>Nama Legalitas</label>
                                 <input type="text" name="nama_dokumen[]"
-                                    placeholder="Masukkan Nama Legalitas. Contoh: BAZNAS" required>
+                                    placeholder="Masukkan Nama Legalitas. Contoh: BAZNAS">
                             </div>
 
                             <div class="field">
                                 <label>Link Legalitas</label>
                                 <input type="url" name="file_dokumen[]"
-                                    placeholder="Masukkan Link Legalitas. Contoh: Google Drive" required>
+                                    placeholder="Masukkan Link Legalitas. Contoh: Google Drive">
                                 <span class="field-icon edit">✎</span>
                             </div>
                         </div>
@@ -177,14 +177,14 @@
                             <div class="field">
                                 <label>Nama Legalitas</label>
                                 <input type="text" name="nama_dokumen[]"
-                                    placeholder="Masukkan Nama Legalitas. Contoh: BAZNAS" required>
+                                    placeholder="Masukkan Nama Legalitas. Contoh: BAZNAS">
                                 <span class="field-icon edit">✎</span>
                             </div>
 
                             <div class="field">
                                 <label>Link Legalitas</label>
                                 <input type="url" name="file_dokumen[]"
-                                    placeholder="Masukkan Link Legalitas. Contoh: Google Drive" required>
+                                    placeholder="Masukkan Link Legalitas. Contoh: Google Drive">
                                 <span class="field-icon edit">✎</span>
                             </div>
                         </div>
