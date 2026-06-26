@@ -1,11 +1,18 @@
 <?php
 
+use App\Models\Testimoni;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\PenggalangDanaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('pages.home');
+
+    $testimoni = Testimoni::inRandomOrder()
+        ->take(5)
+        ->get();
+
+    return view('pages.home', compact('testimoni'));
+
 })->name('home');
 
 Route::get('/donasi', function () {

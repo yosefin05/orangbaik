@@ -217,25 +217,45 @@
         {{-- TESTIMONIAL --}}
         <section class="testimonial section-border">
             <div class="container section">
-                <h2 class="section-title">Apa Kata Mereka?</h2>
+                <h2 class="section-title">
+                    Apa Kata Mereka?
+                </h2>
 
                 <div class="testimonial-content">
-                    <button class="slider-btn" type="button">‹</button>
 
-                    <div class="testimonial-text">
-                        <p>
-                            “DQ adalah ....lembaga resmi dari pemerintah, serta Zakat Infaq dan Sedekah
-                            yang diberikan oleh saudara muslimin-muslimat sekalian Insya Allah akan
-                            disalurkan dengan amanah dan tepat sasaran.”
-                        </p>
+                    <button class="slider-btn" id="prevBtn" type="button">
+                        ‹
+                    </button>
 
-                        <img src="{{ asset('assets/testimoni.jpg') }}" alt="Elis Masitoh" loading="lazy">
+                    <div class="testimonial-wrapper">
 
-                        <h3>Elis Masitoh, S.SiT, MM.</h3>
-                        <span>Direktur TTIKK Kementerian Perindustrian RI</span>
+                        @foreach($testimoni as $item)
+                            <div class="testimonial-item">
+
+                                <p class="testimonial-description">
+                                    "{{ $item->isi_testimoni }}"
+                                </p>
+
+                                <img src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama }}"
+                                    loading="lazy">
+
+                                <h3>
+                                    {{ $item->nama }}
+                                </h3>
+
+                                <span>
+                                    {{ $item->jabatan }}
+                                </span>
+
+                            </div>
+                        @endforeach
+
                     </div>
 
-                    <button class="slider-btn" type="button">›</button>
+                    <button class="slider-btn" id="nextBtn" type="button">
+                        ›
+                    </button>
+
                 </div>
             </div>
         </section>
@@ -283,7 +303,57 @@
     </main>
 
     @include('components.footer')
+    <script>
+        const slides = document.querySelectorAll('.testimonial-item');
 
-</body>
+        let current = 0;
+
+        function showSlide(index) {
+
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            slides[index].classList.add('active');
+        }
+
+        document.getElementById('nextBtn')
+            .addEventListener('click', () => {
+
+                current++;
+
+                if (current >= slides.length) {
+                    current = 0;
+                }
+
+                showSlide(current);
+            });
+
+        document.getElementById('prevBtn')
+            .addEventListener('click', () => {
+
+                current--;
+
+                if (current < 0) {
+                    current = slides.length - 1;
+                }
+
+                showSlide(current);
+            });
+
+        setInterval(() => {
+
+            current++;
+
+            if (current >= slides.length) {
+                current = 0;
+            }
+
+            showSlide(current);
+
+        }, 5000);
+
+        showSlide(0);
+    </script>
 
 </html>

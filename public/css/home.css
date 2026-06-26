@@ -246,6 +246,55 @@
     font-style: italic;
 }
 
+.testimonial-content {
+    position: relative;
+}
+
+.testimonial-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 300px; /* sesuaikan */
+}
+
+.testimonial-item {
+    position: absolute;
+    inset: 0;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform: translateX(20px);
+
+    transition:
+        opacity 0.5s ease,
+        transform 0.5s ease;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+.testimonial-item.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.testimonial-item img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.testimonial-description {
+    max-width: 700px;
+    min-height: 120px;
+}
+
 /* LIST CAMPAIGN */
 .list-campaign {
     display: flex;
