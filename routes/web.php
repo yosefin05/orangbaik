@@ -19,6 +19,30 @@ Route::get('/donasi', function () {
     return view('pages.donasi');
 })->name('donasi');
 
+Route::get('/campaign/detail', function () {
+    return view('pages.detail-campaign');
+})->name('campaign.detail');
+
+Route::get('/donasi/bayar', function () {
+    return view('pages.donasi-bayar');
+})->name('donasi.bayar');
+
+Route::get('/donasi/bayar-login', function () {
+    return view('pages.donasi-bayar-login');
+})->middleware('auth')->name('donasi.bayar.login');
+
+Route::get('/berita', function () {
+    return view('pages.berita');
+})->name('berita');
+
+Route::get('/berita/detail', function () {
+    return view('pages.detail-berita');
+})->name('berita.detail');
+
+Route::get('/tentang', function () {
+    return view('pages.tentang');
+})->name('tentang');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware([
