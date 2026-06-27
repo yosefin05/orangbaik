@@ -43,6 +43,14 @@ Route::get('/tentang', function () {
     return view('pages.tentang');
 })->name('tentang');
 
+Route::get('/profile-user', function () {
+    return view('pages.profile-user');
+})->middleware('auth')->name('profile.user');
+
+Route::get('/verifikasi-penggalang', function () {
+    return view('pages.create_individu');
+})->name('verifikasi.penggalang');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware([

@@ -10,8 +10,8 @@
         <nav class="nav-menu">
             <a href="{{ url('/') }}" class="active">Beranda</a>
             <a href="{{ url('donasi') }}">Donasi</a>
-            <a href="#">Kalkulator</a>
-            <a href="#">Berita</a>
+            <a href="{{ url('kalkulator') }}">Kalkulator</a>
+            <a href="{{ url('berita') }}">Berita</a>
         </nav>
 
         <div class="header-actions">
