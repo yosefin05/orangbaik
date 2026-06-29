@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\Testimoni;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -16,7 +17,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        $testimoni = Testimoni::inRandomOrder()->first();
+
+        return view('auth.login', [
+            'testimoni' => $testimoni,
+        ]);
     }
 
     /**

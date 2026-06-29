@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Models\Testimoni;
 
 class RegisteredUserController extends Controller
 {
@@ -20,8 +21,13 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        $testimoni = Testimoni::inRandomOrder()->first();
+
+        return view('auth.register', [
+            'testimoni' => $testimoni,
+        ]);
     }
+
 
     /**
      * Handle an incoming registration request.
@@ -32,7 +38,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 

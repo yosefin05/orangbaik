@@ -48,7 +48,7 @@ Route::get('/profile-user', function () {
 })->middleware('auth')->name('profile.user');
 
 Route::get('/verifikasi-penggalang', function () {
-    return view('pages.create_individu');
+    return view('pages.penggalang_dana.create_individu');
 })->name('verifikasi.penggalang');
 
 Route::get('/ubah-profil', function () {

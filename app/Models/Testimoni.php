@@ -10,6 +10,24 @@ class Testimoni extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function showLoginForm()
+    {
+        $testimoni = Testimoni::inRandomOrder()->first();
+
+        return view('auth.login', [
+            'testimoni' => $testimoni,
+        ]);
+    }
+
+    public function showRegistrationForm()
+    {
+        $testimoni = Testimoni::inRandomOrder()->first();
+
+        return view('auth.register', [
+            'testimoni' => $testimoni,
+        ]);
+    }
     protected $table = 'testimoni';
     protected $fillable = [
         'foto_profil',
