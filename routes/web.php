@@ -51,6 +51,30 @@ Route::get('/verifikasi-penggalang', function () {
     return view('pages.create_individu');
 })->name('verifikasi.penggalang');
 
+Route::get('/ubah-profil', function () {
+    return view('pages.profile.ubah-profile');
+})->middleware('auth')->name('ubah.profile');
+
+Route::get('/syarat-ketentuan', function () {
+    return view('pages.syarat-ketentuan');
+})->name('syarat.ketentuan');
+
+Route::get('/riwayat-donasi', function () {
+    return view('pages.riwayat-donasi');
+})->middleware('auth')->name('riwayat.donasi');
+
+Route::get('/pusat-bantuan', function () {
+    return view('pages.pusat-bantuan');
+})->name('pusat.bantuan');
+
+Route::get('/profil-penggalang', function () {
+    return view('pages.profil-penggalang');
+})->name('profil.penggalang');
+
+Route::get('/ubah-profile', function () {
+    return view('pages.ubah-profile');
+})->middleware('auth')->name('ubah.profile');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware([

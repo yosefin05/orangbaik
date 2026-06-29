@@ -1,0 +1,260 @@
+.terms-page {
+    min-height: 100vh;
+    background: var(--bg-soft);
+    color: var(--text-dark);
+}
+
+.terms-container {
+    width: min(100% - 72px, 1180px);
+    margin-inline: auto;
+}
+
+/* BACK */
+.terms-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+
+    border: none;
+    background: transparent;
+    color: #050505;
+
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+
+    padding-top: 28px;
+    margin-bottom: 24px;
+    cursor: pointer;
+}
+
+.terms-back svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* HERO */
+.terms-hero {
+    background: var(--primary);
+    overflow: hidden;
+}
+
+.hero-inner {
+    min-height: 230px;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    align-items: center;
+    gap: 40px;
+}
+
+.hero-text {
+    color: var(--bg);
+}
+
+.hero-text h1 {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.25;
+    margin-bottom: 8px;
+}
+
+.hero-text p {
+    max-width: 520px;
+    color: rgba(255, 255, 255, .92);
+    font-size: var(--fs-xs);
+    line-height: 1.45;
+    font-weight: var(--fw-medium);
+}
+
+.hero-image {
+    height: 230px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.hero-image img {
+    width: 100%;
+    max-width: 380px;
+    height: 100%;
+    object-fit: contain;
+    object-position: right bottom;
+}
+
+/* CONTENT */
+.terms-content {
+    padding: 34px 0 48px;
+    background: var(--bg-soft);
+}
+
+.terms-block {
+    margin-bottom: 20px;
+}
+
+.terms-block h2 {
+    color: #111111;
+    font-size: 12px;
+    font-weight: var(--fw-bold);
+    line-height: 1.35;
+    margin-bottom: 5px;
+}
+
+.terms-block p {
+    color: #111111;
+    font-size: 10.5px;
+    font-weight: var(--fw-regular);
+    line-height: 1.4;
+    margin-bottom: 6px;
+    text-align: left;
+}
+
+/* FAQ */
+.terms-faq {
+    background: #eef1f5;
+    padding: 58px 0 70px;
+}
+
+.terms-faq h2 {
+    color: #9a9a9a;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    margin-bottom: 34px;
+}
+
+.faq-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.faq-item {
+    border-bottom: 1px solid #ffffff;
+}
+
+.faq-item summary {
+    min-height: 82px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    list-style: none;
+    cursor: pointer;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary span {
+    color: var(--primary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.25;
+}
+
+.faq-item summary b {
+    color: var(--primary);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-medium);
+    transition: .2s ease;
+}
+
+.faq-item[open] summary b {
+    transform: rotate(45deg);
+}
+
+.faq-item p {
+    color: var(--text);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+    padding: 0 54px 24px 0;
+}
+
+/* TABLET */
+@media (max-width: 900px) {
+    .hero-inner {
+        grid-template-columns: 1fr 300px;
+    }
+
+    .hero-image img {
+        max-width: 300px;
+    }
+}
+
+/* MOBILE */
+@media (max-width: 640px) {
+    .terms-container {
+        width: min(100% - 30px, 520px);
+    }
+
+    .terms-back {
+        gap: 14px;
+        font-size: var(--fs-xs);
+        padding-top: 24px;
+        margin-bottom: 18px;
+    }
+
+    .terms-back svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .hero-inner {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 30px 0 0;
+    }
+
+    .hero-text h1 {
+        font-size: var(--fs-xs);
+    }
+
+    .hero-text p {
+        font-size: var(--fs-xxs);
+    }
+
+    .hero-image {
+        height: 180px;
+        justify-content: center;
+    }
+
+    .hero-image img {
+        max-width: 260px;
+    }
+
+    .terms-content {
+        padding: 28px 0 38px;
+    }
+
+    .terms-block h2 {
+        font-size: 11px;
+    }
+
+    .terms-block p {
+        font-size: 9.5px;
+        line-height: 1.45;
+    }
+
+    .terms-faq {
+        padding: 42px 0 54px;
+    }
+
+    .terms-faq h2 {
+        font-size: var(--fs-xs);
+    }
+
+    .faq-item summary {
+        min-height: 72px;
+    }
+
+    .faq-item summary span {
+        font-size: var(--fs-xxs);
+    }
+}

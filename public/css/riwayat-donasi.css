@@ -1,0 +1,280 @@
+.history-page {
+    min-height: 100vh;
+    background: var(--bg-soft);
+    color: var(--text-dark);
+}
+
+.history-container {
+    width: min(100% - 120px, 1180px);
+    margin-inline: auto;
+    padding: 42px 0 230px;
+}
+
+/* BACK */
+.history-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 32px;
+
+    border: none;
+    background: transparent;
+    color: #050505;
+
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+
+    margin-bottom: 92px;
+    cursor: pointer;
+}
+
+.history-back svg {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* TITLE */
+.history-title {
+    color: #4b4b4b;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    margin-bottom: 24px;
+}
+
+/* GRID */
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px 44px;
+}
+
+/* CARD */
+.history-card {
+    background: var(--bg);
+    border: 1px solid #cfd4dc;
+    border-radius: var(--radius);
+    padding: 28px 30px 24px;
+    box-shadow: var(--shadow-card);
+    transition: .2s ease;
+}
+
+.history-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: rgba(51, 101, 175, .32);
+}
+
+.history-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 26px;
+}
+
+.history-type {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.history-icon {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    color: var(--primary);
+}
+
+.history-icon svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.history-type strong {
+    display: block;
+    color: #050505;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.15;
+}
+
+.history-type small {
+    display: block;
+    color: #111111;
+    font-size: 10px;
+    font-weight: var(--fw-regular);
+    line-height: 1.15;
+}
+
+.status-badge {
+    min-width: 70px;
+    height: 24px;
+    padding: 0 12px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 4px;
+    background: #3b82f6;
+    color: var(--bg);
+
+    font-size: 10px;
+    font-weight: var(--fw-bold);
+}
+
+/* CAMPAIGN BOX */
+.campaign-box {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+    margin-bottom: 22px;
+}
+
+.campaign-image {
+    width: 100%;
+    aspect-ratio: 16 / 8.6;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+}
+
+.campaign-body {
+    padding: 16px 18px 14px;
+}
+
+.campaign-body h2 {
+    color: #050505;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.25;
+    margin-bottom: 8px;
+}
+
+.campaign-body p {
+    color: #9ca3af;
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+    line-height: 1.2;
+}
+
+.campaign-body p span {
+    color: #2e9dfb;
+    font-size: 9px;
+    margin-left: 6px;
+}
+
+/* BOTTOM */
+.history-card-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.history-card-bottom span {
+    display: block;
+    color: #9ca3af;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.2;
+    margin-bottom: 3px;
+}
+
+.history-card-bottom strong {
+    display: block;
+    color: #050505;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+}
+
+.receipt-button {
+    min-width: 92px;
+    height: 32px;
+    padding: 0 16px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1.5px solid var(--primary);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--primary);
+
+    font-size: 10px;
+    font-weight: var(--fw-bold);
+
+    transition: .2s ease;
+}
+
+.receipt-button:hover {
+    background: var(--primary);
+    color: var(--bg);
+}
+
+/* TABLET */
+@media (max-width: 1000px) {
+    .history-container {
+        width: min(100% - 54px, 820px);
+        padding-bottom: 100px;
+    }
+
+    .history-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+    }
+}
+
+/* MOBILE */
+@media (max-width: 640px) {
+    .history-container {
+        width: min(100% - 30px, 520px);
+        padding: 28px 0 64px;
+    }
+
+    .history-back {
+        gap: 14px;
+        font-size: var(--fs-xs);
+        margin-bottom: 48px;
+    }
+
+    .history-back svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .history-title {
+        font-size: var(--fs-sm);
+        margin-bottom: 20px;
+    }
+
+    .history-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .history-card {
+        padding: 22px;
+    }
+
+    .history-card-top {
+        margin-bottom: 20px;
+    }
+
+    .campaign-body h2 {
+        font-size: var(--fs-xs);
+    }
+}
