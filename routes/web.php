@@ -75,12 +75,12 @@ Route::get('/ubah-profile', function () {
     return view('pages.ubah-profile');
 })->middleware('auth')->name('ubah.profile');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
+Route::get('/home', function () {
+    return view('home');
 })->middleware([
             'auth',
             'verified'
-        ])->name('dashboard');
+        ])->name('home');
 
 Route::middleware('auth')->group(function () {
 
