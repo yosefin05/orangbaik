@@ -1,5 +1,5 @@
-<header class="site-header">
-    <div class="container header-inner">
+<header class="site-header" id="siteHeader">
+    <div class="container header-inner desktop-header">
 
         <a href="{{ url('/') }}" class="brand">
             <div class="brand-logo">
@@ -27,7 +27,7 @@
 
         <div class="header-actions">
             <button class="search-btn" type="button">
-                Pencarian ⌕
+                Pencarian <i class="bi bi-search"></i>
             </button>
 
             <span class="divider"></span>
@@ -71,4 +71,42 @@
         </div>
 
     </div>
+
+    {{-- MOBILE HEADER --}}
+    <div class="container mobile-header-inner">
+
+        <form action="{{ url('donasi') }}" method="GET" class="mobile-search-form">
+            <button type="submit" aria-label="Cari">
+                <i class="bi bi-search"></i>
+            </button>
+
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Cari Program Unggulan Lainnya"
+            >
+        </form>
+
+        @guest
+            <a href="{{ route('login') }}" class="mobile-profile-button" aria-label="Login">
+                <i class="bi bi-person-fill"></i>
+            </a>
+        @endguest
+
+        @auth
+            <a href="{{ route('profile.user') }}" class="mobile-profile-button" aria-label="Profil">
+                @if (!empty(auth()->user()->foto_profile))
+                    <img 
+                        src="{{ asset('storage/' . auth()->user()->foto_profile) }}" 
+                        alt="{{ auth()->user()->name }}"
+                    >
+                @else
+                    <i class="bi bi-person-fill"></i>
+                @endif
+            </a>
+        @endauth
+
+    </div>
 </header>
+
+<script src="{{ asset('js/header.js') }}"></script>

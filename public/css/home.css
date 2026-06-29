@@ -271,7 +271,7 @@
 .testimonial-wrapper {
     position: relative;
     width: 100%;
-    min-height: 300px; /* sesuaikan */
+    min-height: 300px;
 }
 
 .testimonial-item {
@@ -392,27 +392,54 @@
         border-radius: var(--radius-md);
     }
 
+    /* CATEGORY MOBILE: HORIZONTAL 1 BARIS */
     .category-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 22px 14px;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 20px;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        padding-bottom: 12px;
+
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .category-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-grid.small {
+        margin-bottom: 36px;
     }
 
     .category-item {
+        flex: 0 0 88px;
+        min-width: 88px;
+
+        scroll-snap-align: start;
+
         gap: 9px;
+        text-align: center;
     }
 
     .category-icon {
-        width: 58px;
-        height: 58px;
+        width: 52px;
+        height: 52px;
     }
 
     .category-icon img {
-        width: 46px;
-        height: 46px;
+        width: 52px;
+        height: 52px;
     }
 
     .category-item p {
         font-size: var(--fs-xs);
+        margin-top: 0;
+        white-space: normal;
     }
 
     .campaign-grid {
