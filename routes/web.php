@@ -3,6 +3,8 @@
 use App\Models\Testimoni;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\PenggalangDanaController;
+use App\Http\Controllers\User\BeritaController;
+use App\Http\Controllers\User\KomentarController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,6 +16,17 @@ Route::get('/', function () {
     return view('pages.home', compact('testimoni'));
 
 })->name('home');
+
+Route::get('/berita', [BeritaController::class, 'index'])
+    ->name('berita.index');
+
+Route::get('/berita/{slug}', [BeritaController::class, 'show'])
+    ->name('berita.show');
+
+    Route::post(
+    '/berita/{berita}/komentar',
+    [KomentarController::class, 'store']
+)->name('berita.komentar.store');
 
 Route::get('/donasi', function () {
     return view('pages.donasi');
@@ -31,13 +44,7 @@ Route::get('/donasi/bayar-login', function () {
     return view('pages.donasi-bayar-login');
 })->middleware('auth')->name('donasi.bayar.login');
 
-Route::get('/berita', function () {
-    return view('pages.berita');
-})->name('berita');
 
-Route::get('/berita/detail', function () {
-    return view('pages.detail-berita');
-})->name('berita.detail');
 
 Route::get('/tentang', function () {
     return view('pages.tentang');
@@ -50,10 +57,6 @@ Route::get('/profile-user', function () {
 Route::get('/verifikasi-penggalang', function () {
     return view('pages.penggalang_dana.create_individu');
 })->name('verifikasi.penggalang');
-
-Route::get('/ubah-profil', function () {
-    return view('pages.profile.ubah-profile');
-})->middleware('auth')->name('ubah.profile');
 
 Route::get('/syarat-ketentuan', function () {
     return view('pages.syarat-ketentuan');
@@ -70,10 +73,6 @@ Route::get('/pusat-bantuan', function () {
 Route::get('/profil-penggalang', function () {
     return view('pages.profil-penggalang');
 })->name('profil.penggalang');
-
-Route::get('/ubah-profile', function () {
-    return view('pages.ubah-profile');
-})->middleware('auth')->name('ubah.profile');
 
 Route::get('/home', function () {
     return view('home');

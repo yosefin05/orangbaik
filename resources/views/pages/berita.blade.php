@@ -13,110 +13,53 @@
 
 @include('components.header')
 
-@php
-    $beritas = [
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-    ];
-@endphp
-
 <main class="berita-page">
     <section class="container berita-section">
-        <div class="berita-grid">
-            @foreach ($beritas as $berita)
-                <article class="berita-card">
-                    <img 
-                        src="{{ asset($berita['image']) }}" 
-                        alt="{{ $berita['title'] }}"
-                        class="berita-image"
-                        loading="lazy"
-                    >
 
-                    <div class="berita-body">
-                        <h2>{{ $berita['title'] }}</h2>
-                        <p>{{ $berita['date'] }}</p>
-                    </div>
+        <div class="berita-grid">
+
+            @forelse ($beritas as $berita)
+
+                <article class="berita-card">
+
+                    <a href="{{ route('berita.show', $berita->slug) }}">
+
+                        <img
+                            src="{{ asset('storage/' . $berita->thumbnail) }}"
+                            alt="{{ $berita->judul }}"
+                            class="berita-image"
+                            loading="lazy">
+
+                        <div class="berita-body">
+
+                            <h2>
+                                {{ $berita->judul }}
+                            </h2>
+
+                            <p>
+                                {{ $berita->created_at->translatedFormat('d F Y') }}
+                            </p>
+
+                        </div>
+
+                    </a>
+
                 </article>
-            @endforeach
+
+            @empty
+
+                <p>Belum ada berita.</p>
+
+            @endforelse
+
         </div>
+
+        <div class="pagination-wrapper">
+            @if (is_object($beritas) && method_exists($beritas, 'links'))
+                {{ $beritas->links() }}
+            @endif
+        </div>
+
     </section>
 </main>
 

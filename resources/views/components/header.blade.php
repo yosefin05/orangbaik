@@ -42,10 +42,8 @@
                     <button class="header-user-button" type="button">
                         <span class="header-user-avatar">
                             @if (!empty(auth()->user()->foto_profile))
-                                <img 
-                                    src="{{ asset('storage/' . auth()->user()->foto_profile) }}" 
-                                    alt="{{ auth()->user()->name }}"
-                                >
+                                <img src="{{ asset('storage/' . auth()->user()->foto_profile) }}"
+                                    alt="{{ auth()->user()->name }}">
                             @else
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             @endif
@@ -58,9 +56,6 @@
 
                     <div class="header-user-dropdown">
                         <a href="{{ route('profile.user') }}">Profil Saya</a>
-                        <a href="{{ route('riwayat.donasi') }}">Riwayat Donasi</a>
-                        <a href="{{ route('ubah.profile') }}">Ubah Profil</a>
-
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit">Keluar</button>
@@ -80,11 +75,7 @@
                 <i class="bi bi-search"></i>
             </button>
 
-            <input 
-                type="text" 
-                name="q" 
-                placeholder="Cari Program Unggulan Lainnya"
-            >
+            <input type="text" name="q" placeholder="Cari Program Unggulan Lainnya">
         </form>
 
         @guest
@@ -96,10 +87,7 @@
         @auth
             <a href="{{ route('profile.user') }}" class="mobile-profile-button" aria-label="Profil">
                 @if (!empty(auth()->user()->foto_profile))
-                    <img 
-                        src="{{ asset('storage/' . auth()->user()->foto_profile) }}" 
-                        alt="{{ auth()->user()->name }}"
-                    >
+                    <img src="{{ asset('storage/' . auth()->user()->foto_profile) }}" alt="{{ auth()->user()->name }}">
                 @else
                     <i class="bi bi-person-fill"></i>
                 @endif

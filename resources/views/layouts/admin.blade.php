@@ -34,19 +34,19 @@
                     👤 User
                 </a>
 
+                <a href="{{ route('admin.penggalang_dana.index') }}"
+                    class="{{ request()->routeIs('admin.penggalang_dana.index') ? 'active' : '' }}">
+                    👥 Penggalang Dana
+                </a>
+
                 <a href="{{ route('admin.berita.index') }}"
                     class="{{ request()->routeIs('admin.berita.index') ? 'active' : '' }}">
-                    📂 Berita
+                    📰 Berita
                 </a>
 
                 <a href="{{ route('admin.filter.index') }}"
                     class="{{ request()->routeIs('admin.filter.index') ? 'active' : '' }}">
                     📂 Filter
-                </a>
-
-                <a href="{{ route('admin.penggalang_dana.index') }}"
-                    class="{{ request()->routeIs('admin.penggalang_dana.index') ? 'active' : '' }}">
-                    👥 Penggalang Dana
                 </a>
 
                 <a href="{{ route('admin.campaign.index') }}"
@@ -57,6 +57,11 @@
                 <a href="{{ route('admin.testimoni.index') }}"
                     class="{{ request()->routeIs('admin.testimoni.index') ? 'active' : ''}}">
                     🤳 Testimoni
+                </a>
+
+                <a href="{{ route('admin.komentar.index') }}"
+                    class="{{ request()->routeIs('admin.komentar.index') ? 'active' : ''}}">
+                    💬 Komentar
                 </a>
             </nav>
 
@@ -74,12 +79,27 @@
                 <h1>@yield('page-title', 'Dashboard Control Panel')</h1>
 
                 <div class="topbar-user">
+                    <button class="topbar-user-button" type="button">
                     <div class="user-info">
                         <p class="user-name">{{ auth()->user()->name }}</p>
                         <p class="user-role">Administrator</p>
                     </div>
                     <div class="user-avatar">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+
+                        @if(auth()->user()->foto_profil)
+                            <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
+                                alt="{{ auth()->user()->name }}">
+                        @else
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        @endif
+                    </div>
+                    </button>
+                    <div class="topbar-user-dropdown">
+                        <a href="{{ route('profile.user') }}">Profil Saya</a>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit">Keluar</button>
+                        </form>
                     </div>
                 </div>
             </header>

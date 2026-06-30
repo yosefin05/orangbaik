@@ -9,6 +9,7 @@ use App\Http\Controllers\admin\BeritaController;
 use App\Http\Controllers\admin\PenggalangDanaController;
 use App\Http\Controllers\admin\CampaignController;
 use App\Http\Controllers\admin\TestimoniController;
+use App\Http\Controllers\admin\KomentarController;
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -26,10 +27,15 @@ Route::middleware(['auth', 'admin'])
             ->except(['show']);
 
         Route::resource('berita', BeritaController::class);
+
         Route::delete(
             '/berita-gambar/{gambar}',
             [BeritaController::class, 'destroyImage']
         )->name('berita-gambar.destroy');
+
+        Route::resource('komentar', KomentarController::class)
+            ->only(['index', 'show', 'destroy']);
+
         Route::get(
             '/penggalang_dana',
             [PenggalangDanaController::class, 'index']

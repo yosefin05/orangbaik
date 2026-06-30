@@ -204,17 +204,143 @@ button {
     font-weight: var(--fw-medium);
 }
 
-.user-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: var(--bg);
-    display: grid;
-    place-items: center;
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    box-shadow: var(--shadow-soft);
+.topbar-user{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:0px 5px;      /* lebih kecil */
+    border:1px solid #ddd;
+    border-radius:999px;
+
+    width:fit-content;
+}
+
+.topbar-user-dropdown {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    z-index: 200;
+
+    width: 220px;
+    padding: 10px;
+
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 14px 38px rgba(0, 0, 0, .14);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+
+    transition: .2s ease;
+}
+
+.topbar-user:hover .topbar-user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.topbar-user-dropdown a,
+.topbar-user-dropdown button {
+    width: 100%;
+
+    display: block;
+
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.topbar-user-dropdown a:hover,
+.topbar-user-dropdown button:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.topbar-user-dropdown form {
+    margin: 0;
+}
+
+.topbar-user-dropdown form button {
+    color: #ef4444;
+}
+
+.topbar-user-dropdown form button:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.topbar-user-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 8px 12px;
+
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.topbar-user-button:hover {
+    background: #f8fafc;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+}
+
+.user-name {
+    margin: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.user-role {
+    margin: 2px 0 0;
+
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.user-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+}
+
+.user-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
 /* ============================
@@ -395,7 +521,7 @@ button {
     margin-top: 24px;
 }
 
-.card-header {
+.card-topbar {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -404,7 +530,7 @@ button {
     margin-bottom: 20px;
 }
 
-.card-header h2 {
+.card-topbar h2 {
     color: var(--text-dark);
     font-size: var(--fs-sm);
     font-weight: var(--fw-extrabold);
@@ -473,10 +599,10 @@ button {
 }
 
 /* ============================
-   PAGE HEADER
+   PAGE topbar
    ============================ */
 
-.page-header {
+.page-topbar {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -485,7 +611,7 @@ button {
     margin-bottom: 24px;
 }
 
-.page-header h2 {
+.page-topbar h2 {
     color: var(--text-dark);
     font-size: var(--fs-lg);
     font-weight: var(--fw-extrabold);
@@ -494,7 +620,7 @@ button {
     letter-spacing: -.03em;
 }
 
-.page-header p {
+.page-topbar p {
     color: var(--muted);
     font-size: var(--fs-xs);
 }
@@ -1063,7 +1189,7 @@ input[type="file"].form-control {
     flex-direction: column;
 }
 
-.info-grid > .card .card-header {
+.info-grid > .card .card-topbar {
     margin-bottom: 12px;
 }
 
@@ -1197,7 +1323,7 @@ select:focus-visible {
         padding: 18px;
     }
 
-    .page-header h2 {
+    .page-topbar h2 {
         font-size: var(--fs-md);
     }
 
