@@ -370,6 +370,20 @@
     font-size: var(--fs-xxs);
     font-weight: var(--fw-semibold);
 }
+.verified-text{
+    color:#27ae60;
+    font-weight:600;
+}
+
+.pending-text{
+    color:#f39c12;
+    font-weight:600;
+}
+
+.rejected-text{
+    color:#e74c3c;
+    font-weight:600;
+}
 
 /* RESPONSIVE */
 @media (max-width: 800px) {

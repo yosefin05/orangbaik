@@ -66,4 +66,20 @@ class PenggalangDanaController extends Controller
             'Penggalang dana berhasil ditolak.'
         );
     }
+    public function destroy(
+        Penggalang_Dana $penggalangDana
+    ) {
+        DB::transaction(function () use ($penggalangDana) {
+            // Hapus dokumen terkait
+            $penggalangDana->penggalangDanaDokumen()->delete();
+
+            // Hapus penggalang dana
+            $penggalangDana->delete();
+        });
+
+        return back()->with(
+            'success',
+            'Penggalang dana berhasil dihapus.'
+        );
+    }
 }

@@ -46,6 +46,11 @@ Route::middleware(['auth', 'admin'])
             [PenggalangDanaController::class, 'show']
         )->name('penggalang_dana.show');
 
+        Route::delete(
+            '/penggalang_dana/{penggalangDana}',
+            [PenggalangDanaController::class, 'destroy']
+        )->name('penggalang_dana.destroy');
+
         Route::patch(
             '/penggalang_dana/{penggalangDana}/approve',
             [PenggalangDanaController::class, 'approve']

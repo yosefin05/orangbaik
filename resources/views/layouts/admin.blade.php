@@ -17,10 +17,10 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
 
-            <div class="sidebar-brand">
+            <a href="{{ route('home') }}" class="sidebar-brand">
                 <h1>OrangBaik<span>.id</span></h1>
                 <p>Admin Panel</p>
-            </div>
+            </a>
 
             <nav class="sidebar-nav">
 
@@ -80,19 +80,19 @@
 
                 <div class="topbar-user">
                     <button class="topbar-user-button" type="button">
-                    <div class="user-info">
-                        <p class="user-name">{{ auth()->user()->name }}</p>
-                        <p class="user-role">Administrator</p>
-                    </div>
-                    <div class="user-avatar">
+                        <div class="user-info">
+                            <p class="user-name">{{ auth()->user()->name }}</p>
+                            <p class="user-role">Administrator</p>
+                        </div>
+                        <div class="user-avatar">
 
-                        @if(auth()->user()->foto_profil)
-                            <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
-                                alt="{{ auth()->user()->name }}">
-                        @else
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                        @endif
-                    </div>
+                            @if(auth()->user()->foto_profil)
+                                <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
+                                    alt="{{ auth()->user()->name }}">
+                            @else
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            @endif
+                        </div>
                     </button>
                     <div class="topbar-user-dropdown">
                         <a href="{{ route('profile.user') }}">Profil Saya</a>

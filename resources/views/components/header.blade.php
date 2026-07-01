@@ -56,6 +56,11 @@
 
                     <div class="header-user-dropdown">
                         <a href="{{ route('profile.user') }}">Profil Saya</a>
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.dashboard') }}">
+                                Dashboard Admin
+                            </a>
+                        @endif
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit">Keluar</button>
