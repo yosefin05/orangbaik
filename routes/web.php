@@ -7,6 +7,7 @@ use App\Http\Controllers\User\BeritaController;
 use App\Http\Controllers\User\KomentarController;
 use Illuminate\Support\Facades\Route;
 
+// login register
 Route::get('/', function () {
 
     $testimoni = Testimoni::inRandomOrder()
@@ -17,17 +18,26 @@ Route::get('/', function () {
 
 })->name('home');
 
+// berita
 Route::get('/berita', [BeritaController::class, 'index'])
     ->name('berita.index');
 
 Route::get('/berita/{slug}', [BeritaController::class, 'show'])
     ->name('berita.show');
 
-    Route::post(
+Route::post(
     '/berita/{berita}/komentar',
     [KomentarController::class, 'store']
 )->name('berita.komentar.store');
 
+Route::get('/home', function () {
+    return view('home');
+})->middleware([
+            'auth',
+            'verified'
+        ])->name('home');
+
+// donasi dan campaign
 Route::get('/donasi', function () {
     return view('pages.donasi');
 })->name('donasi');
@@ -44,46 +54,40 @@ Route::get('/donasi/bayar-login', function () {
     return view('pages.donasi-bayar-login');
 })->middleware('auth')->name('donasi.bayar.login');
 
-
-
+// pusat informasi
 Route::get('/tentang', function () {
     return view('pages.tentang');
 })->name('tentang');
-
-Route::get('/profile-user', function () {
-    return view('pages.profile-user');
-})->middleware('auth')->name('profile.user');
-
-Route::get('/verifikasi-penggalang', function () {
-    return view('pages.penggalang_dana.create_individu');
-})->name('verifikasi.penggalang');
 
 Route::get('/syarat-ketentuan', function () {
     return view('pages.syarat-ketentuan');
 })->name('syarat.ketentuan');
 
-Route::get('/riwayat-donasi', function () {
-    return view('pages.riwayat-donasi');
-})->middleware('auth')->name('riwayat.donasi');
-
 Route::get('/pusat-bantuan', function () {
     return view('pages.pusat-bantuan');
 })->name('pusat.bantuan');
 
-Route::get('/profil-penggalang', function () {
-    return view('pages.profil-penggalang');
-})->name('profil.penggalang');
+// profile pengguna
 
-Route::get('/home', function () {
-    return view('home');
-})->middleware([
-            'auth',
-            'verified'
-        ])->name('home');
+Route::get('/profile-user', function () {
+    return view('pages.profile-user');
+})->middleware('auth')->name('profile.user');
 
+Route::get('/riwayat-donasi', function () {
+    return view('pages.riwayat-donasi');
+})->middleware('auth')->name('riwayat.donasi');
+
+ Route::get(
+        '/profil-penggalang',
+        [PenggalangDanaController::class,'profile']
+    )->name('profil.penggalang');
+
+// penggalang dana 
 Route::middleware('auth')->group(function () {
 
-    // Penggalang Dana
+   
+
+
     Route::get(
         '/penggalang_dana_organisasi',
         [PenggalangDanaController::class, 'createOrganisasi']
@@ -93,6 +97,10 @@ Route::middleware('auth')->group(function () {
         '/penggalang_dana_organisasi',
         [PenggalangDanaController::class, 'storeOrganisasi']
     )->name('penggalang_dana.organisasi.store');
+
+    Route::get('/verifikasi-penggalang', function () {
+        return view('pages.penggalang_dana.create_individu');
+    })->name('verifikasi.penggalang');
 
     // profil
     Route::get(

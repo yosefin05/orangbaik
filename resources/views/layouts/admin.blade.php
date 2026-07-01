@@ -21,10 +21,10 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
 
-            <div class="sidebar-brand">
+            <a href="{{ route('home') }}" class="sidebar-brand">
                 <h1>OrangBaik<span>.id</span></h1>
                 <p>Admin Panel</p>
-            </div>
+            </a>
 
             <nav class="sidebar-nav">
 
@@ -93,6 +93,7 @@
 
                 <div class="topbar-user">
                     <button class="topbar-user-button" type="button">
+<<<<<<< HEAD
 
                         <div class="user-info">
                             <p class="user-name">{{ auth()->user()->name }}</p>
@@ -100,6 +101,14 @@
                         </div>
 
                         <div class="user-avatar">
+=======
+                        <div class="user-info">
+                            <p class="user-name">{{ auth()->user()->name }}</p>
+                            <p class="user-role">Administrator</p>
+                        </div>
+                        <div class="user-avatar">
+
+>>>>>>> 19d734966aa2f48159d28fa1be08d7cc42fbdbdb
                             @if(auth()->user()->foto_profil)
                                 <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                                     alt="{{ auth()->user()->name }}">
@@ -107,9 +116,12 @@
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             @endif
                         </div>
+<<<<<<< HEAD
 
                         <i class="bi bi-chevron-down user-dropdown-icon"></i>
 
+=======
+>>>>>>> 19d734966aa2f48159d28fa1be08d7cc42fbdbdb
                     </button>
 
                     <div class="topbar-user-dropdown">

@@ -151,4 +151,19 @@ class PenggalangDanaController extends Controller
         }
 
     }
+    public function profile()
+    {
+        $penggalang = auth()->user()
+            ->penggalangDana()
+            ->with([
+                'campaign',
+                'penggalangDanaDokumen'
+            ])
+            ->firstOrFail();
+
+        return view(
+            'pages.profil-penggalang',
+            compact('penggalang')
+        );
+    }
 }
