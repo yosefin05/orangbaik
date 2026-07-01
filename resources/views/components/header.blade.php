@@ -102,4 +102,27 @@
     </div>
 </header>
 
+{{-- MOBILE BOTTOM NAV --}}
+<nav class="mobile-bottom-nav">
+    <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Beranda</span>
+    </a>
+
+    <a href="{{ url('donasi') }}" class="{{ request()->is('donasi*') ? 'active' : '' }}">
+        <i class="bi bi-heart-fill"></i>
+        <span>Donasi</span>
+    </a>
+
+    <a href="{{ url('kalkulator') }}" class="{{ request()->is('kalkulator*') ? 'active' : '' }}">
+        <i class="bi bi-calculator-fill"></i>
+        <span>Kalkulator</span>
+    </a>
+
+    <a href="{{ url('berita') }}" class="{{ request()->is('berita*') ? 'active' : '' }}">
+        <i class="bi bi-file-earmark-text-fill"></i>
+        <span>Berita</span>
+    </a>
+</nav>
+
 <script src="{{ asset('js/header.js') }}"></script>

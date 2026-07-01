@@ -379,7 +379,7 @@
 }
 
 /* =========================
-   FOOTER
+   FOOTER DESKTOP
 ========================= */
 .site-footer {
     background: var(--primary);
@@ -404,6 +404,7 @@
 .footer-logo img {
     width: 140px;
     height: 30px;
+    object-fit: contain;
 }
 
 .footer-brand p,
@@ -645,7 +646,201 @@
         height: 20px;
     }
 
+    /* =========================
+       FOOTER MOBILE STYLE
+    ========================= */
+    .site-footer {
+        margin-top: 30px;
+        padding: 36px 0 0;
+        background: var(--primary);
+        color: #ffffff;
+    }
+
     .footer-inner {
-        grid-template-columns: 1fr;
+        width: min(100% - 42px, 420px);
+        margin-inline: auto;
+
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .footer-brand {
+        text-align: center;
+        padding-bottom: 24px;
+    }
+
+    .footer-logo {
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .footer-logo img {
+        width: 160px;
+        height: auto;
+        object-fit: contain;
+    }
+
+    .footer-brand p {
+        max-width: 330px;
+        margin-inline: auto;
+
+        color: rgba(255, 255, 255, .9);
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .socials {
+        justify-content: center;
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .socials span {
+        width: 34px;
+        height: 34px;
+
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, .72);
+        color: #ffffff;
+
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .footer-col {
+        display: grid;
+        grid-template-columns: 112px 1fr;
+        align-items: start;
+        column-gap: 16px;
+
+        padding: 18px 0;
+        border-top: 1px solid rgba(255, 255, 255, .14);
+    }
+
+    .footer-col h4 {
+        grid-column: 1;
+        grid-row: 1 / span 10;
+
+        margin: 0;
+
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .footer-col a,
+    .footer-col p {
+        grid-column: 2;
+
+        color: rgba(255, 255, 255, .9);
+        font-size: 13px;
+        line-height: 1.7;
+        margin: 0 0 8px;
+    }
+
+    .footer-col a:last-child,
+    .footer-col p:last-child {
+        margin-bottom: 0;
+    }
+
+    .copyright {
+        width: min(100% - 42px, 420px);
+        margin: 0 auto;
+        padding: 20px 0 22px;
+
+        border-top: 1px solid rgba(255, 255, 255, .14);
+
+        color: rgba(255, 255, 255, .86);
+        font-size: 12px;
+        line-height: 1.5;
+        text-align: center;
+    }
+}
+
+/* MOBILE BOTTOM NAV */
+.mobile-bottom-nav {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    body {
+        padding-bottom: 82px;
+    }
+
+    .mobile-bottom-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 150;
+
+        height: 76px;
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+
+        background: rgba(255, 255, 255, .94);
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -8px 24px rgba(15, 23, 42, .08);
+
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+
+    .mobile-bottom-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        gap: 5px;
+
+        color: #8a8a8a;
+        font-size: 11px;
+        font-weight: 500;
+
+        transition: .2s ease;
+    }
+
+    .mobile-bottom-nav a i {
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .mobile-bottom-nav a span {
+        line-height: 1;
+    }
+
+    .mobile-bottom-nav a.active {
+        color: var(--primary);
+        font-weight: 700;
+    }
+
+    .mobile-bottom-nav a:hover {
+        color: var(--primary);
+    }
+
+    .site-footer {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    body {
+        padding-bottom: 76px;
+    }
+
+    .mobile-bottom-nav {
+        height: 72px;
+    }
+
+    .mobile-bottom-nav a i {
+        font-size: 22px;
+    }
+
+    .mobile-bottom-nav a {
+        font-size: 10px;
     }
 }
