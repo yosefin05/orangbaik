@@ -379,7 +379,7 @@
 }
 
 /* =========================
-   FOOTER
+   FOOTER DESKTOP
 ========================= */
 .site-footer {
     background: var(--primary);
@@ -404,6 +404,7 @@
 .footer-logo img {
     width: 140px;
     height: 30px;
+    object-fit: contain;
 }
 
 .footer-brand p,
@@ -645,7 +646,115 @@
         height: 20px;
     }
 
+    /* =========================
+       FOOTER MOBILE STYLE
+    ========================= */
+    .site-footer {
+        margin-top: 30px;
+        padding: 36px 0 0;
+        background: var(--primary);
+        color: #ffffff;
+    }
+
     .footer-inner {
-        grid-template-columns: 1fr;
+        width: min(100% - 42px, 420px);
+        margin-inline: auto;
+
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .footer-brand {
+        text-align: center;
+        padding-bottom: 24px;
+    }
+
+    .footer-logo {
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .footer-logo img {
+        width: 160px;
+        height: auto;
+        object-fit: contain;
+    }
+
+    .footer-brand p {
+        max-width: 330px;
+        margin-inline: auto;
+
+        color: rgba(255, 255, 255, .9);
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .socials {
+        justify-content: center;
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .socials span {
+        width: 34px;
+        height: 34px;
+
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, .72);
+        color: #ffffff;
+
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .footer-col {
+        display: grid;
+        grid-template-columns: 112px 1fr;
+        align-items: start;
+        column-gap: 16px;
+
+        padding: 18px 0;
+        border-top: 1px solid rgba(255, 255, 255, .14);
+    }
+
+    .footer-col h4 {
+        grid-column: 1;
+        grid-row: 1 / span 10;
+
+        margin: 0;
+
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .footer-col a,
+    .footer-col p {
+        grid-column: 2;
+
+        color: rgba(255, 255, 255, .9);
+        font-size: 13px;
+        line-height: 1.7;
+        margin: 0 0 8px;
+    }
+
+    .footer-col a:last-child,
+    .footer-col p:last-child {
+        margin-bottom: 0;
+    }
+
+    .copyright {
+        width: min(100% - 42px, 420px);
+        margin: 0 auto;
+        padding: 20px 0 22px;
+
+        border-top: 1px solid rgba(255, 255, 255, .14);
+
+        color: rgba(255, 255, 255, .86);
+        font-size: 12px;
+        line-height: 1.5;
+        text-align: center;
     }
 }
