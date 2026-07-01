@@ -3,6 +3,8 @@
    Pakai root dari global.css
    ============================ */
 
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
 body {
     background:
         radial-gradient(circle at 10% 0%, rgba(51, 101, 175, .12), transparent 28%),
@@ -99,7 +101,7 @@ button {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 
     width: 100%;
     padding: 14px 16px;
@@ -111,6 +113,18 @@ button {
     line-height: 1.2;
 
     transition: .2s ease;
+}
+
+.sidebar-nav a i {
+    width: 20px;
+    font-size: 18px;
+    line-height: 1;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.sidebar-nav a span {
+    flex: 1;
 }
 
 .sidebar-nav a::before {
@@ -181,39 +195,91 @@ button {
 }
 
 .topbar-user {
+    position: relative;
+
     display: flex;
     align-items: center;
     gap: 12px;
 
-    padding: 8px 10px 8px 14px;
+    width: fit-content;
+    padding: 0 5px;
+
+    border: 1px solid var(--border);
     border-radius: var(--radius-full);
     background: var(--bg-soft);
-    border: 1px solid var(--border);
 }
 
-.user-name {
-    color: var(--text-dark);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
+.topbar-user-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 8px 12px;
+
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+
+    transition: .2s ease;
+}
+
+.topbar-user-button:hover {
+    background: #f8fafc;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     line-height: 1.2;
 }
 
-.user-role {
-    color: var(--muted);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-medium);
+.user-name {
+    margin: 0;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
 }
 
-.topbar-user{
-    display:flex;
-    align-items:center;
-    gap:12px;
+.user-role {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
 
-    padding:0px 5px;      /* lebih kecil */
-    border:1px solid #ddd;
-    border-radius:999px;
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
 
-    width:fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-dropdown-icon {
+    color: var(--muted);
+    font-size: 13px;
+    transition: .2s ease;
+}
+
+.topbar-user:hover .user-dropdown-icon {
+    transform: rotate(180deg);
 }
 
 .topbar-user-dropdown {
@@ -247,7 +313,9 @@ button {
 .topbar-user-dropdown button {
     width: 100%;
 
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
     padding: 12px;
     border: none;
@@ -259,8 +327,14 @@ button {
     font-size: 13px;
     font-weight: 500;
     text-align: left;
+}
 
-    cursor: pointer;
+.topbar-user-dropdown a i,
+.topbar-user-dropdown button i {
+    width: 18px;
+    font-size: 16px;
+    line-height: 1;
+    text-align: center;
 }
 
 .topbar-user-dropdown a:hover,
@@ -280,67 +354,6 @@ button {
 .topbar-user-dropdown form button:hover {
     background: #fee2e2;
     color: #dc2626;
-}
-
-.topbar-user-button {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    padding: 8px 12px;
-
-    background: transparent;
-    border: none;
-    border-radius: 12px;
-
-    cursor: pointer;
-    transition: .2s ease;
-}
-
-.topbar-user-button:hover {
-    background: #f8fafc;
-}
-
-.user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    line-height: 1.2;
-}
-
-.user-name {
-    margin: 0;
-
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.user-role {
-    margin: 2px 0 0;
-
-    font-size: 12px;
-    font-weight: 500;
-    color: #6b7280;
-}
-
-.user-avatar{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    overflow:hidden;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    flex-shrink:0;
-}
-
-.user-avatar img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
 }
 
 /* ============================
@@ -401,6 +414,11 @@ button {
 .btn-logout {
     position: relative;
     z-index: 1;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
     border: 1px solid rgba(255, 255, 255, .36);
     background: rgba(255, 255, 255, .13);
@@ -474,6 +492,11 @@ button {
     flex-shrink: 0;
 }
 
+.stat-icon i {
+    font-size: 24px;
+    line-height: 1;
+}
+
 .stat-label {
     color: var(--muted);
     font-size: var(--fs-xs);
@@ -487,7 +510,9 @@ button {
     line-height: 1.1;
 }
 
-/* VARIANTS */
+/* ============================
+   COLOR VARIANTS
+   ============================ */
 
 .icon-blue   { background: var(--primary-light); }
 .icon-green  { background: rgba(34, 197, 94, .13); }
@@ -511,7 +536,7 @@ button {
     background: var(--bg);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
-    padding: 26px;
+    padding: 32px 38px;
     box-shadow: var(--shadow-card);
 }
 
@@ -521,33 +546,71 @@ button {
     margin-top: 24px;
 }
 
-.card-topbar {
+/* ============================
+   PAGE HEADER / TAMBAH DATA
+   ============================ */
+
+.page-topbar,
+.card-topbar,
+.card-header {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
+    justify-content: space-between;
+    gap: 24px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 28px;
 }
 
-.card-topbar h2 {
+.page-topbar > div,
+.card-topbar > div,
+.card-header > div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.page-topbar h2,
+.card-topbar h2,
+.card-header h2 {
+    margin: 0;
     color: var(--text-dark);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-lg);
     font-weight: var(--fw-extrabold);
-    line-height: 1.35;
-    margin-bottom: 2px;
-    letter-spacing: -.02em;
+    line-height: 1.2;
+    letter-spacing: -.03em;
 }
 
+.page-topbar p,
+.card-topbar p,
+.card-header p,
 .card-subtitle {
+    margin: 0;
     color: var(--muted);
-    font-size: var(--fs-xxs);
+    font-size: var(--fs-xs);
+    line-height: 1.6;
 }
 
-.card-text {
-    color: var(--text);
-    font-size: var(--fs-xs);
-    line-height: 1.7;
+/* Tombol tambah kalau posisinya di kanan header */
+.page-topbar > .btn,
+.page-topbar > .btn-primary,
+.card-topbar > .btn,
+.card-topbar > .btn-primary,
+.card-header > .btn,
+.card-header > .btn-primary {
+    margin-top: 4px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Tombol tambah kalau masih ditaruh satu div dengan judul/subtitle */
+.page-topbar div .btn,
+.page-topbar div .btn-primary,
+.card-topbar div .btn,
+.card-topbar div .btn-primary,
+.card-header div .btn,
+.card-header div .btn-primary {
+    width: fit-content;
+    margin-top: 12px;
 }
 
 /* ============================
@@ -594,35 +657,12 @@ button {
     transition: .2s ease;
 }
 
+.menu-item i.menu-icon {
+    font-size: 30px;
+}
+
 .menu-item:hover .menu-icon {
     transform: scale(1.12) rotate(-4deg);
-}
-
-/* ============================
-   PAGE topbar
-   ============================ */
-
-.page-topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-}
-
-.page-topbar h2 {
-    color: var(--text-dark);
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-extrabold);
-    line-height: 1.2;
-    margin-bottom: 4px;
-    letter-spacing: -.03em;
-}
-
-.page-topbar p {
-    color: var(--muted);
-    font-size: var(--fs-xs);
 }
 
 /* ============================
@@ -633,6 +673,7 @@ button {
     width: 100%;
     overflow-x: auto;
     border-radius: var(--radius-md);
+    border: 1px solid var(--border-soft);
 }
 
 .data-table {
@@ -647,7 +688,7 @@ button {
 
 .data-table th {
     text-align: left;
-    padding: 15px 16px;
+    padding: 16px 18px;
     color: var(--muted);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
@@ -657,7 +698,7 @@ button {
 }
 
 .data-table td {
-    padding: 15px 16px;
+    padding: 16px 18px;
     color: var(--text);
     font-size: var(--fs-xs);
     vertical-align: middle;
@@ -670,6 +711,10 @@ button {
 
 .data-table tbody tr:hover {
     background: var(--primary-light);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .data-table-kv {
@@ -865,7 +910,8 @@ button {
 
 .form-control,
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid var(--border);
@@ -879,7 +925,8 @@ button {
 
 .form-control:focus,
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(51, 101, 175, .13);
@@ -948,14 +995,26 @@ input[type="file"].form-control {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+
     min-height: 42px;
     padding: 11px 22px;
     border: none;
     border-radius: var(--radius-full);
+
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     line-height: 1;
+
     transition: .2s ease;
+}
+
+.btn i,
+.btn-primary i,
+.btn-secondary i,
+.btn-danger i {
+    font-size: 15px;
+    line-height: 1;
 }
 
 .btn:hover,
@@ -1275,6 +1334,10 @@ select:focus-visible {
         padding: 22px;
     }
 
+    .card {
+        padding: 26px;
+    }
+
     .info-grid,
     .detail-meta {
         grid-template-columns: 1fr;
@@ -1301,6 +1364,16 @@ select:focus-visible {
         justify-content: space-between;
     }
 
+    .topbar-user-button {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .topbar-user-dropdown {
+        width: 100%;
+        top: calc(100% + 10px);
+    }
+
     .welcome-banner {
         padding: 22px;
     }
@@ -1320,10 +1393,36 @@ select:focus-visible {
     }
 
     .card {
-        padding: 18px;
+        padding: 22px;
     }
 
-    .page-topbar h2 {
+    .page-topbar,
+    .card-topbar,
+    .card-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .page-topbar > .btn,
+    .page-topbar > .btn-primary,
+    .card-topbar > .btn,
+    .card-topbar > .btn-primary,
+    .card-header > .btn,
+    .card-header > .btn-primary,
+    .page-topbar div .btn,
+    .page-topbar div .btn-primary,
+    .card-topbar div .btn,
+    .card-topbar div .btn-primary,
+    .card-header div .btn,
+    .card-header div .btn-primary {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .page-topbar h2,
+    .card-topbar h2,
+    .card-header h2 {
         font-size: var(--fs-md);
     }
 
