@@ -458,6 +458,31 @@
     color: var(--muted);
 }
 
+.mobile-login-button {
+    min-height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    padding: 0 var(--space-4, 16px);
+
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: var(--bg);
+
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+}
+
+.mobile-login-button:hover {
+    background: var(--primary-hover);
+    color: var(--bg);
+}
+
 .mobile-profile-button {
     width: 42px;
     height: 42px;
@@ -481,6 +506,12 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.mobile-profile-button span {
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-extrabold);
 }
 
 /* ============================
@@ -731,6 +762,11 @@
         min-width: 0;
     }
 
+    .mobile-login-button {
+        min-height: 42px;
+        padding: 0 var(--space-4, 16px);
+    }
+
     .mobile-bottom-nav {
         position: fixed;
         left: 0;
@@ -825,6 +861,13 @@
     }
 
     .mobile-search-form input {
+        font-size: var(--fs-xxs);
+    }
+
+    .mobile-login-button {
+        min-height: 40px;
+        padding: 0 var(--space-4, 16px);
+
         font-size: var(--fs-xxs);
     }
 
