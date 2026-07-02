@@ -4,12 +4,14 @@
 
 @section('content')
 
-    <div class="card">
+    <section class="ob-card ob-card-lg">
 
-        <div class="card-header">
+        <div class="card-topbar">
             <div>
                 <h2>Kelola Komentar</h2>
-                <span class="card-subtitle">Daftar seluruh komentar pengguna pada berita</span>
+                <p class="card-subtitle">
+                    Daftar seluruh komentar pengguna pada berita OrangBaik.id.
+                </p>
             </div>
         </div>
 
@@ -32,31 +34,60 @@
                     @forelse($komentar as $item)
 
                         <tr>
-                            <td>{{ $komentar->firstItem() + $loop->index }}</td>
+                            <td class="text-muted-strong">
+                                {{ $komentar->firstItem() + $loop->index }}
+                            </td>
 
-                            <td>{{ $item->user?->name ?? 'Pengguna' }}</td>
+                            <td>
+                                <p class="cell-title">
+                                    {{ $item->user?->name ?? 'Pengguna' }}
+                                </p>
+                            </td>
 
-                            <td class="cell-excerpt">{{ $item->berita->judul }}</td>
+                            <td>
+                                <p class="cell-excerpt">
+                                    {{ $item->berita?->judul ?? 'Berita tidak ditemukan' }}
+                                </p>
+                            </td>
 
-                            <td class="cell-excerpt">{{ Str::limit($item->komentar, 60) }}</td>
+                            <td>
+                                <p class="cell-excerpt">
+                                    {{ \Illuminate\Support\Str::limit($item->komentar, 60) }}
+                                </p>
+                            </td>
 
-                            <td class="text-muted-strong">{{ $item->created_at->format('d M Y') }}</td>
+                            <td class="text-muted-strong">
+                                {{ $item->created_at->format('d M Y') }}
+                            </td>
 
                             <td class="text-center">
-                                <div class="action-group">
+                                <div class="action-group action-group-center">
 
-                                    <a href="{{ route('berita.show', $item->berita->slug) }}#komentar-{{ $item->id }}"
-                                        class="action-link link-blue" target="_blank">
+                                    @if($item->berita)
+                                        <a
+                                            href="{{ route('berita.show', $item->berita->slug) }}#komentar-{{ $item->id }}"
+                                            class="action-link link-blue"
+                                            target="_blank">
+                                            <i class="bi bi-eye"></i>
+                                            Lihat
+                                        </a>
+                                    @else
+                                        <span class="text-muted">
+                                            Tidak tersedia
+                                        </span>
+                                    @endif
 
-                                        Lihat
+                                    <form
+                                        action="{{ route('admin.komentar.destroy', $item) }}"
+                                        method="POST"
+                                        class="inline-form"
+                                        onsubmit="return confirm('Yakin ingin menghapus komentar ini?')">
 
-                                    </a>
-
-                                    <form action="{{ route('admin.komentar.destroy', $item) }}" method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus komentar ini?')" class="inline-form">
                                         @csrf
                                         @method('DELETE')
+
                                         <button type="submit" class="action-link link-red">
+                                            <i class="bi bi-trash"></i>
                                             Hapus
                                         </button>
                                     </form>
@@ -84,6 +115,6 @@
             {{ $komentar->links() }}
         </div>
 
-    </div>
+    </section>
 
 @endsection

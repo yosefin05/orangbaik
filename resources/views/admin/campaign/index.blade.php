@@ -1,174 +1,136 @@
 @extends('layouts.admin')
 
+@section('page-title', 'Campaign')
+
 @section('content')
 
-<div class="card">
+    <section class="ob-card ob-card-lg">
 
-    <div class="card-header">
-
-        <div>
-            <h2>Data Campaign</h2>
-            <span class="card-subtitle">
-                Kelola seluruh campaign donasi
-            </span>
+        <div class="card-topbar">
+            <div>
+                <h2>Data Campaign</h2>
+                <p class="card-subtitle">
+                    Kelola seluruh campaign donasi yang ada di platform OrangBaik.id.
+                </p>
+            </div>
         </div>
 
-    </div>
+        <div class="table-wrapper">
 
-    <div class="table-wrapper">
+            <table class="data-table">
 
-        <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Thumbnail</th>
+                        <th>Judul</th>
+                        <th>Kategori</th>
+                        <th>Penggalang Dana</th>
+                        <th>Target</th>
+                        <th>Status</th>
+                        <th>Galeri</th>
+                        <th>Update</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
 
-            <thead>
+                <tbody>
 
-                <tr>
-                    <th>Thumbnail</th>
-                    <th>Judul</th>
-                    <th>Kategori</th>
-                    <th>Penggalang Dana</th>
-                    <th>Target</th>
-                    <th>Status</th>
-                    <th>Galeri</th>
-                    <th>Update</th>
-                    <th class="text-center">
-                        Aksi
-                    </th>
-                </tr>
+                    @forelse($campaign as $item)
 
-            </thead>
+                        <tr>
+                            <td>
+                                @if($item->thumbnail)
+                                    <img
+                                        src="{{ asset('storage/' . $item->thumbnail) }}"
+                                        alt="{{ $item->judul }}"
+                                        class="table-thumbnail">
+                                @else
+                                    <span class="text-muted">Tidak ada</span>
+                                @endif
+                            </td>
 
-            <tbody>
+                            <td>
+                                <p class="cell-title">
+                                    {{ $item->judul }}
+                                </p>
+                            </td>
 
-                @forelse($campaign as $item)
+                            <td>
+                                {{ $item->kategori->nama_kategori ?? '-' }}
+                            </td>
 
-                <tr>
+                            <td>
+                                {{ $item->penggalangDana->nama_penggalang ?? '-' }}
+                            </td>
 
-                    <td>
+                            <td>
+                                <span class="text-muted-strong">
+                                    Rp {{ number_format($item->target_donasi, 0, ',', '.') }}
+                                </span>
+                            </td>
 
-                        <img
-                            src="{{ asset('storage/' . $item->thumbnail) }}"
-                            alt="{{ $item->judul }}"
-                            class="table-thumbnail"
-                        >
+                            <td>
+                                @if($item->status === 'pending')
+                                    <span class="badge badge-yellow">
+                                        Pending
+                                    </span>
+                                @elseif($item->status === 'approved')
+                                    <span class="badge badge-green">
+                                        Approved
+                                    </span>
+                                @else
+                                    <span class="badge badge-red">
+                                        Rejected
+                                    </span>
+                                @endif
+                            </td>
 
-                    </td>
+                            <td>
+                                <span class="badge badge-blue">
+                                    {{ $item->campaignGambar->count() }} gambar
+                                </span>
+                            </td>
 
-                    <td class="cell-title">
+                            <td>
+                                <span class="badge badge-green">
+                                    {{ $item->campaignUpdates->count() }} update
+                                </span>
+                            </td>
 
-                        {{ $item->judul }}
+                            <td class="text-center">
+                                <div class="action-group action-group-center">
 
-                    </td>
+                                    <a
+                                        href="{{ route('admin.campaign.show', $item) }}"
+                                        class="action-link link-blue">
+                                        <i class="bi bi-eye"></i>
+                                        Detail
+                                    </a>
 
-                    <td>
+                                </div>
+                            </td>
+                        </tr>
 
-                        {{ $item->kategori->nama_kategori ?? '-' }}
+                    @empty
 
-                    </td>
+                        <tr>
+                            <td colspan="9" class="empty-state">
+                                Belum ada campaign.
+                            </td>
+                        </tr>
 
-                    <td>
+                    @endforelse
 
-                        {{ $item->penggalangDana->nama_penggalang ?? '-' }}
+                </tbody>
 
-                    </td>
+            </table>
 
-                    <td>
+        </div>
 
-                        Rp {{ number_format($item->target_donasi, 0, ',', '.') }}
+        <div class="pagination-wrapper">
+            {{ $campaign->links() }}
+        </div>
 
-                    </td>
-
-                    <td>
-
-                        @if($item->status == 'pending')
-
-                            <span class="badge badge-yellow">
-                                Pending
-                            </span>
-
-                        @elseif($item->status == 'approved')
-
-                            <span class="badge badge-green">
-                                Approved
-                            </span>
-
-                        @else
-
-                            <span class="badge badge-red">
-                                Rejected
-                            </span>
-
-                        @endif
-
-                    </td>
-
-                    <td>
-
-                        <span class="badge badge-blue">
-
-                            {{ $item->campaignGambar->count() }}
-                            gambar
-
-                        </span>
-
-                    </td>
-
-                    <td>
-
-                        <span class="badge badge-green">
-
-                            {{ $item->campaignUpdates->count() }}
-                            update
-
-                        </span>
-
-                    </td>
-
-                    <td class="text-center">
-
-                        <div
-                            class="action-group action-group-center"
-                        >
-
-                            <a
-                                href="{{ route('admin.campaign.show', $item) }}"
-                                class="action-link link-blue"
-                            >
-                                Detail
-                            </a>
-
-                        </div>
-
-                    </td>
-
-                </tr>
-
-                @empty
-
-                <tr>
-
-                    <td
-                        colspan="9"
-                        class="empty-state"
-                    >
-                        Belum ada campaign.
-                    </td>
-
-                </tr>
-
-                @endforelse
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-    <div class="pagination-wrapper">
-
-        {{ $campaign->links() }}
-
-    </div>
-
-</div>
+    </section>
 
 @endsection

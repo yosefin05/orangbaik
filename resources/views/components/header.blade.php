@@ -1,14 +1,14 @@
 <header class="site-header" id="siteHeader">
     <div class="container header-inner desktop-header">
 
-        <a href="{{ url('/') }}" class="brand">
+        <a href="{{ route('home') }}" class="brand" aria-label="OrangBaik.id">
             <div class="brand-logo">
                 <img src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id">
             </div>
         </a>
 
         <nav class="nav-menu">
-            <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">
+            <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}">
                 Beranda
             </a>
 
@@ -26,23 +26,35 @@
         </nav>
 
         <div class="header-actions">
-            <button class="search-btn" type="button">
-                Pencarian <i class="bi bi-search"></i>
-            </button>
+
+            <form action="{{ url('donasi') }}" method="GET" class="desktop-search-form">
+                <input type="text" name="q" placeholder="Cari campaign...">
+
+                <button type="submit" aria-label="Cari">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
 
             <span class="divider"></span>
 
             @guest
-                <a href="{{ route('login') }}" class="login-link">Masuk</a>
-                <a href="{{ route('register') }}" class="register-btn">Daftar</a>
+                <a href="{{ route('login') }}" class="login-link">
+                    Masuk
+                </a>
+
+                <a href="{{ route('register') }}" class="register-btn">
+                    Daftar
+                </a>
             @endguest
 
             @auth
                 <div class="header-user">
                     <button class="header-user-button" type="button">
+
                         <span class="header-user-avatar">
-                            @if (!empty(auth()->user()->foto_profile))
-                                <img src="{{ asset('storage/' . auth()->user()->foto_profile) }}"
+                            @if(!empty(auth()->user()->foto_profil))
+                                <img
+                                    src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                                     alt="{{ auth()->user()->name }}">
                             @else
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -52,22 +64,36 @@
                         <span class="header-user-name">
                             {{ auth()->user()->name }}
                         </span>
+
+                        <i class="bi bi-chevron-down header-user-icon"></i>
+
                     </button>
 
                     <div class="header-user-dropdown">
-                        <a href="{{ route('profile.user') }}">Profil Saya</a>
+                        <a href="{{ route('profile.user') }}">
+                            <i class="bi bi-person-circle"></i>
+                            <span>Profil Saya</span>
+                        </a>
+
                         @if(auth()->user()->role === 'admin')
                             <a href="{{ route('admin.dashboard') }}">
-                                Dashboard Admin
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard Admin</span>
                             </a>
                         @endif
+
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit">Keluar</button>
+
+                            <button type="submit">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Keluar</span>
+                            </button>
                         </form>
                     </div>
                 </div>
             @endauth
+
         </div>
 
     </div>
@@ -75,12 +101,16 @@
     {{-- MOBILE HEADER --}}
     <div class="container mobile-header-inner">
 
+        <a href="{{ route('home') }}" class="mobile-brand" aria-label="OrangBaik.id">
+            <img src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id">
+        </a>
+
         <form action="{{ url('donasi') }}" method="GET" class="mobile-search-form">
             <button type="submit" aria-label="Cari">
                 <i class="bi bi-search"></i>
             </button>
 
-            <input type="text" name="q" placeholder="Cari Program Unggulan Lainnya">
+            <input type="text" name="q" placeholder="Cari Program Donasi">
         </form>
 
         @guest
@@ -91,8 +121,10 @@
 
         @auth
             <a href="{{ route('profile.user') }}" class="mobile-profile-button" aria-label="Profil">
-                @if (!empty(auth()->user()->foto_profile))
-                    <img src="{{ asset('storage/' . auth()->user()->foto_profile) }}" alt="{{ auth()->user()->name }}">
+                @if(!empty(auth()->user()->foto_profil))
+                    <img
+                        src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
+                        alt="{{ auth()->user()->name }}">
                 @else
                     <i class="bi bi-person-fill"></i>
                 @endif
@@ -104,7 +136,7 @@
 
 {{-- MOBILE BOTTOM NAV --}}
 <nav class="mobile-bottom-nav">
-    <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">
+    <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}">
         <i class="bi bi-house-door-fill"></i>
         <span>Beranda</span>
     </a>

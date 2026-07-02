@@ -11,6 +11,8 @@
 </head>
 <body>
 
+@include('components.header')
+
 @php
     $terms = [
         [
@@ -93,87 +95,121 @@
     ];
 
     $faqs = [
-        'Apakah orangbaik.id memiliki izin legalitas dan diawasi oleh Pemerintah?',
-        'Bagaimana orangbaik.id memastikan keaslian galang dana?',
-        'Apakah ada potongan untuk biaya operasional orangbaik.id?',
-        'Bagaimana cara mendapatkan laporan perkembangan program yang saya dukung?',
-        'Bagaimana Cara Mendaftar menjadi Penggalang Dana?',
-        'Apakah orangbaik.id memiliki izin legalitas dan diawasi oleh Pemerintah?',
-        'Bagaimana orangbaik.id memastikan keaslian galang dana?',
+        [
+            'question' => 'Apakah OrangBaik.id memiliki izin legalitas?',
+            'answer' => 'OrangBaik.id dikelola oleh lembaga yang bertanggung jawab dan berkomitmen menjaga keamanan serta transparansi layanan.',
+        ],
+        [
+            'question' => 'Bagaimana OrangBaik.id memastikan keaslian galang dana?',
+            'answer' => 'Campaign dapat melalui proses peninjauan, verifikasi data, serta pemantauan informasi agar tetap sesuai dengan ketentuan platform.',
+        ],
+        [
+            'question' => 'Apakah ada biaya operasional?',
+            'answer' => 'Biaya operasional dapat diterapkan sesuai kebijakan platform dan akan diinformasikan pada halaman terkait apabila berlaku.',
+        ],
+        [
+            'question' => 'Bagaimana cara mendapatkan laporan perkembangan program?',
+            'answer' => 'Donatur dapat melihat update campaign atau informasi perkembangan yang dibagikan oleh penggalang dana melalui platform.',
+        ],
+        [
+            'question' => 'Bagaimana cara mendaftar menjadi penggalang dana?',
+            'answer' => 'Pengguna dapat mendaftar sebagai penggalang dana melalui fitur pendaftaran yang tersedia, kemudian mengikuti proses verifikasi.',
+        ],
     ];
 @endphp
 
 <main class="terms-page">
 
-    <div class="terms-container">
-        <button class="terms-back" type="button" onclick="history.back()">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M15 18L9 12L15 6" />
-            </svg>
-            <span>Kembali</span>
-        </button>
-    </div>
-
     {{-- HERO --}}
     <section class="terms-hero">
-        <div class="terms-container hero-inner">
-            <div class="hero-text">
-                <h1>Pahami Syarat dan Ketentuan Kami</h1>
-                <p>
-                    Pelajari ketentuan layanan yang berlaku agar Anda dapat menggunakan
-                    platform dengan aman, nyaman, dan sesuai aturan.
-                </p>
+        <div class="container">
+
+            <div class="terms-hero-card">
+                <div class="terms-hero-content">
+                    <span class="terms-eyebrow">
+                        Syarat & Ketentuan
+                    </span>
+
+                    <h1>
+                        Pahami Syarat dan Ketentuan Kami
+                    </h1>
+
+                    <p>
+                        Pelajari ketentuan layanan yang berlaku agar Anda dapat menggunakan
+                        platform OrangBaik.id dengan aman, nyaman, dan sesuai aturan.
+                    </p>
+                </div>
             </div>
 
-            <div class="hero-image">
-                <img src="{{ asset('assets/terms-hero.png') }}" alt="Syarat dan Ketentuan">
-            </div>
         </div>
     </section>
 
     {{-- CONTENT --}}
-    <section class="terms-content">
-        <div class="terms-container">
+    <section class="terms-content-section">
+        <div class="container terms-layout">
 
-            @foreach ($terms as $term)
-                <article class="terms-block">
-                    <h2>{{ $term['title'] }}</h2>
+            <aside class="terms-sidebar">
+                <h3>Daftar Isi</h3>
 
-                    @foreach ($term['body'] as $paragraph)
-                        <p>{{ $paragraph }}</p>
+                <nav>
+                    @foreach ($terms as $index => $term)
+                        <a href="#term-{{ $index + 1 }}">
+                            {{ $term['title'] }}
+                        </a>
                     @endforeach
-                </article>
-            @endforeach
+                </nav>
+            </aside>
+
+            <article class="terms-document">
+                @foreach ($terms as $index => $term)
+                    <section class="terms-block" id="term-{{ $index + 1 }}">
+                        <h2>{{ $term['title'] }}</h2>
+
+                        @foreach ($term['body'] as $paragraph)
+                            <p>{{ $paragraph }}</p>
+                        @endforeach
+                    </section>
+                @endforeach
+            </article>
 
         </div>
     </section>
 
     {{-- FAQ --}}
     <section class="terms-faq">
-        <div class="terms-container">
-            <h2>Pertanyaan Yang Sering Diajukan Tentang Kitabisa</h2>
+        <div class="container">
+
+            <div class="terms-faq-header">
+                <h2>Pertanyaan yang Sering Diajukan</h2>
+
+                <p>
+                    Beberapa informasi umum terkait penggunaan layanan OrangBaik.id.
+                </p>
+            </div>
 
             <div class="faq-list">
                 @foreach ($faqs as $faq)
                     <details class="faq-item">
                         <summary>
-                            <span>{{ $faq }}</span>
-                            <b>+</b>
+                            <span>{{ $faq['question'] }}</span>
+                            <i class="bi bi-plus-lg"></i>
                         </summary>
 
                         <p>
-                            OrangBaik.id menjaga transparansi, keamanan, serta kepercayaan pengguna
-                            melalui proses verifikasi dan pengawasan campaign.
+                            {{ $faq['answer'] }}
                         </p>
                     </details>
                 @endforeach
             </div>
+
         </div>
     </section>
 
 </main>
 
 @include('components.footer')
+
+<script src="{{ asset('js/header.js') }}"></script>
 
 </body>
 </html>

@@ -4,7 +4,8 @@
 
 @section('content')
 
-    <div class="welcome-banner">
+    {{-- Welcome Banner --}}
+    <section class="welcome-banner">
         <div>
             <h2>
                 Selamat datang, {{ auth()->user()->name }}
@@ -17,18 +18,19 @@
             @csrf
             <button type="submit" class="btn-logout">
                 <i class="bi bi-box-arrow-right"></i>
-                Logout
+                <span>Logout</span>
             </button>
         </form>
-    </div>
+    </section>
 
-    <!-- Statistik -->
-    <div class="stats-grid">
+    {{-- Statistik --}}
+    <section class="stats-grid">
 
         <div class="stat-card">
             <div class="stat-icon icon-purple text-purple">
                 <i class="bi bi-person"></i>
             </div>
+
             <div>
                 <p class="stat-label">Total User</p>
                 <h3 class="stat-value text-purple">{{ $totalUser }}</h3>
@@ -39,6 +41,7 @@
             <div class="stat-icon icon-red text-red">
                 <i class="bi bi-shield-check"></i>
             </div>
+
             <div>
                 <p class="stat-label">Total Admin</p>
                 <h3 class="stat-value text-red">{{ $totalAdmin }}</h3>
@@ -49,6 +52,7 @@
             <div class="stat-icon icon-green text-green">
                 <i class="bi bi-people"></i>
             </div>
+
             <div>
                 <p class="stat-label">Total Penggalang Dana</p>
                 <h3 class="stat-value text-green">{{ $totalPenggalangDana }}</h3>
@@ -59,6 +63,7 @@
             <div class="stat-icon icon-blue text-blue">
                 <i class="bi bi-megaphone"></i>
             </div>
+
             <div>
                 <p class="stat-label">Total Campaign</p>
                 <h3 class="stat-value text-blue">{{ $totalCampaign }}</h3>
@@ -69,21 +74,22 @@
             <div class="stat-icon icon-orange text-orange">
                 <i class="bi bi-newspaper"></i>
             </div>
+
             <div>
                 <p class="stat-label">Total Berita</p>
                 <h3 class="stat-value text-orange">{{ $totalBerita }}</h3>
             </div>
         </div>
 
-    </div>
+    </section>
 
-    <!-- Menu Manajemen -->
-    <div class="card">
+    {{-- Menu Manajemen --}}
+    <section class="ob-card ob-card-lg">
 
         <div class="card-topbar">
             <div>
                 <h2>Manajemen Data</h2>
-                <span class="card-subtitle">Akses cepat ke modul admin</span>
+                <p class="card-subtitle">Akses cepat ke modul admin.</p>
             </div>
         </div>
 
@@ -126,6 +132,6 @@
 
         </div>
 
-    </div>
+    </section>
 
 @endsection

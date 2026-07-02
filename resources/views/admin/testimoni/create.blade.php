@@ -1,105 +1,125 @@
 @extends('layouts.admin')
 
+@section('page-title', 'Tambah Testimoni')
+
 @section('content')
 
-<div class="card">
+    <section class="ob-card ob-card-lg">
 
-    <div class="card-header">
-        <div>
-            <h2>Tambah Testimoni</h2>
-            <span class="card-subtitle">
-                Tambahkan testimoni baru yang akan ditampilkan pada website.
-            </span>
+        <div class="card-topbar">
+            <div>
+                <h2>Tambah Testimoni</h2>
+                <p class="card-subtitle">
+                    Tambahkan testimoni baru yang akan ditampilkan pada website OrangBaik.id.
+                </p>
+            </div>
+
+            <a href="{{ route('admin.testimoni.index') }}" class="btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                <span>Kembali</span>
+            </a>
         </div>
 
-        <a href="{{ route('admin.testimoni.index') }}"
-            class="btn-secondary">
-            Kembali
-        </a>
-    </div>
+        <form
+            action="{{ route('admin.testimoni.store') }}"
+            method="POST"
+            enctype="multipart/form-data">
 
-    <form action="{{ route('admin.testimoni.store') }}"
-        method="POST"
-        enctype="multipart/form-data">
+            @csrf
 
-        @csrf
+            <div class="form-wrapper">
 
-        <div class="form-wrapper">
+                <div class="form-group">
+                    <label for="foto_profil">Foto Profil</label>
 
-            <div class="form-group">
-                <label>Foto Profil</label>
+                    <input
+                        type="file"
+                        id="foto_profil"
+                        name="foto_profil"
+                        accept="image/*"
+                        class="form-control"
+                        required>
 
-                <input type="file"
-                    name="foto_profil"
-                    accept="image/*"
-                    required>
+                    @error('foto_profil')
+                        <small class="text-danger">
+                            {{ $message }}
+                        </small>
+                    @enderror
+                </div>
 
-                @error('foto_profil')
-                    <small class="text-danger">
-                        {{ $message }}
-                    </small>
-                @enderror
+                <div class="form-group">
+                    <label for="nama">Nama</label>
+
+                    <input
+                        type="text"
+                        id="nama"
+                        name="nama"
+                        value="{{ old('nama') }}"
+                        placeholder="Masukkan nama"
+                        class="form-control"
+                        required>
+
+                    @error('nama')
+                        <small class="text-danger">
+                            {{ $message }}
+                        </small>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="jabatan">Jabatan</label>
+
+                    <input
+                        type="text"
+                        id="jabatan"
+                        name="jabatan"
+                        value="{{ old('jabatan') }}"
+                        placeholder="Contoh: Donatur Tetap"
+                        class="form-control"
+                        required>
+
+                    @error('jabatan')
+                        <small class="text-danger">
+                            {{ $message }}
+                        </small>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="isi_testimoni">Isi Testimoni</label>
+
+                    <textarea
+                        id="isi_testimoni"
+                        name="isi_testimoni"
+                        rows="5"
+                        placeholder="Masukkan isi testimoni"
+                        class="form-control"
+                        required>{{ old('isi_testimoni') }}</textarea>
+
+                    @error('isi_testimoni')
+                        <small class="text-danger">
+                            {{ $message }}
+                        </small>
+                    @enderror
+                </div>
+
             </div>
 
-            <div class="form-group">
-                <label>Nama</label>
+            <div class="form-footer">
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="bi bi-save"></i>
+                        <span>Simpan Testimoni</span>
+                    </button>
 
-                <input type="text"
-                    name="nama"
-                    value="{{ old('nama') }}"
-                    placeholder="Masukkan nama"
-                    required>
-
-                @error('nama')
-                    <small class="text-danger">
-                        {{ $message }}
-                    </small>
-                @enderror
+                    <a href="{{ route('admin.testimoni.index') }}" class="btn-secondary">
+                        Batal
+                    </a>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Jabatan</label>
+        </form>
 
-                <input type="text"
-                    name="jabatan"
-                    value="{{ old('jabatan') }}"
-                    placeholder="Contoh: Donatur Tetap"
-                    required>
-
-                @error('jabatan')
-                    <small class="text-danger">
-                        {{ $message }}
-                    </small>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label>Isi Testimoni</label>
-
-                <textarea
-                    name="isi_testimoni"
-                    rows="5"
-                    placeholder="Masukkan isi testimoni"
-                    required>{{ old('isi_testimoni') }}</textarea>
-
-                @error('isi_testimoni')
-                    <small class="text-danger">
-                        {{ $message }}
-                    </small>
-                @enderror
-            </div>
-
-        </div>
-
-        <div class="form-footer">
-            <button type="submit"
-                class="btn-primary">
-                Simpan Testimoni
-            </button>
-        </div>
-
-    </form>
-
-</div>
+    </section>
 
 @endsection

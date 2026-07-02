@@ -1,15 +1,24 @@
 @extends('layouts.admin')
 
+@section('page-title', 'Edit Berita')
+
 @section('content')
 
-    <div class="page-header">
-        <div>
-            <h2>Edit Berita</h2>
-            <p>Perbarui artikel "{{ $berita->judul }}"</p>
-        </div>
-    </div>
+    <section class="ob-card ob-card-lg form-card">
 
-    <div class="card form-card">
+        <div class="card-topbar">
+            <div>
+                <h2>Edit Berita</h2>
+                <p class="card-subtitle">
+                    Perbarui artikel "{{ $berita->judul }}" yang ditampilkan pada website.
+                </p>
+            </div>
+
+            <a href="{{ route('admin.berita.index') }}" class="btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                <span>Kembali</span>
+            </a>
+        </div>
 
         @if ($errors->any())
             <div class="alert alert-error">
@@ -21,153 +30,204 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.berita.update', $berita) }}" method="POST" enctype="multipart/form-data">
+        <form
+            action="{{ route('admin.berita.update', $berita) }}"
+            method="POST"
+            enctype="multipart/form-data">
+
             @csrf
             @method('PUT')
 
-            <div class="form-group">
-                <label for="judul">Judul</label>
+            <div class="form-wrapper">
 
-                <input type="text" id="judul" name="judul" value="{{ old('judul', $berita->judul) }}" class="form-control">
-            </div>
+                <div class="form-group">
+                    <label for="judul">Judul</label>
 
-            <div class="form-group">
+                    <input
+                        type="text"
+                        id="judul"
+                        name="judul"
+                        value="{{ old('judul', $berita->judul) }}"
+                        placeholder="Masukkan judul berita"
+                        class="form-control"
+                        required>
+                </div>
 
-                <label>Thumbnail Saat Ini</label>
+                <div class="form-group">
+                    <label>Thumbnail Saat Ini</label>
 
-                <img src="{{ asset('storage/' . $berita->thumbnail) }}" alt="{{ $berita->judul }}"
-                    class="current-thumbnail">
-            </div>
+                    @if($berita->thumbnail)
+                        <img
+                            src="{{ asset('storage/' . $berita->thumbnail) }}"
+                            alt="{{ $berita->judul }}"
+                            class="current-thumbnail">
+                    @else
+                        <p class="text-muted">
+                            Belum ada thumbnail.
+                        </p>
+                    @endif
+                </div>
 
-            <div class="form-group">
-                <label for="thumbnail">
-                    Ganti Thumbnail (Opsional)
-                </label>
+                <div class="form-group">
+                    <label for="thumbnail">Ganti Thumbnail</label>
 
-                <input type="file" id="thumbnail" name="thumbnail" class="form-control" accept="image/*">
-            </div>
+                    <input
+                        type="file"
+                        id="thumbnail"
+                        name="thumbnail"
+                        class="form-control"
+                        accept="image/*">
 
-            <div class="form-group">
+                    <small class="text-muted">
+                        Kosongkan jika tidak ingin mengganti thumbnail.
+                    </small>
+                </div>
 
-                <label>
-                    Galeri Saat Ini
-                </label>
+                <div class="form-group">
+                    <label>Galeri Saat Ini</label>
 
-                <p class="text-muted">
-                    {{ $berita->gambar->count() }}/3 gambar digunakan
-                </p>
+                    <p class="text-muted">
+                        {{ $berita->gambar->count() }}/3 gambar digunakan.
+                    </p>
 
-                <div class="gallery-grid">
+                    @if($berita->gambar->count() > 0)
 
-                    @foreach($berita->gambar as $gambar)
+                        <div class="gallery-grid">
 
-                        <div class="gallery-item">
+                            @foreach($berita->gambar as $gambar)
 
-                            <img src="{{ asset('storage/' . $gambar->gambar) }}" alt="Galeri">
+                                <div class="gallery-item">
 
-                            <button type="button" class="delete-image-btn" onclick="hapusGambar({{ $gambar->id }})">
-                                ×
-                            </button>
+                                    <img
+                                        src="{{ asset('storage/' . $gambar->gambar) }}"
+                                        alt="Galeri {{ $loop->iteration }}">
+
+                                    <button
+                                        type="button"
+                                        class="delete-image-btn"
+                                        onclick="hapusGambar({{ $gambar->id }})">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+
+                                </div>
+
+                            @endforeach
 
                         </div>
 
-                    @endforeach
+                    @else
 
+                        <p class="text-muted">
+                            Belum ada gambar galeri.
+                        </p>
+
+                    @endif
+                </div>
+
+                <div class="form-group">
+                    <label for="gambar">Tambah Gambar Galeri</label>
+
+                    <input
+                        type="file"
+                        id="gambar"
+                        name="gambar[]"
+                        class="form-control"
+                        multiple
+                        accept="image/*"
+                        data-current-count="{{ $berita->gambar->count() }}">
+
+                    <small class="text-muted">
+                        Maksimal total 3 gambar. Ukuran tiap gambar maksimal 2 MB.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="isi">Isi Berita</label>
+
+                    <textarea
+                        id="isi"
+                        name="isi"
+                        rows="8"
+                        placeholder="Masukkan isi berita"
+                        class="form-control"
+                        required>{{ old('isi', $berita->isi) }}</textarea>
                 </div>
 
             </div>
 
-            <div class="form-group">
+            <div class="form-footer">
+                <div class="form-actions">
 
-                <label for="gambar">
-                    Tambah Gambar Galeri
-                </label>
+                    <button type="submit" class="btn-primary">
+                        <i class="bi bi-save"></i>
+                        <span>Simpan Perubahan</span>
+                    </button>
 
-                <input type="file" id="gambar" name="gambar[]" class="form-control" multiple accept="image/*">
+                    <a href="{{ route('admin.berita.show', $berita) }}" class="btn-secondary">
+                        <i class="bi bi-eye"></i>
+                        <span>Detail</span>
+                    </a>
 
-                <small>
-                    Maksimal 3 gambar dan ukuran tiap gambar maksimal 2 MB.
-                </small>
+                    <a href="{{ route('admin.berita.index') }}" class="btn-secondary">
+                        Batal
+                    </a>
 
-            </div>
-
-            <div class="form-group">
-                <label for="isi">
-                    Isi Berita
-                </label>
-
-                <textarea id="isi" name="isi" rows="8" class="form-control">{{ old('isi', $berita->isi) }}</textarea>
-            </div>
-
-            <div class="form-actions">
-
-                <button type="submit" class="btn-primary">
-                    Simpan Perubahan
-                </button>
-
-                <a href="{{ route('admin.berita.show', $berita) }}" class="btn-secondary">
-                    Detail
-                </a>
-
-                <a href="{{ route('admin.berita.index') }}" class="btn-secondary">
-                    Kembali
-                </a>
-
+                </div>
             </div>
 
         </form>
 
         @foreach($berita->gambar as $gambar)
 
-            <form id="delete-image-{{ $gambar->id }}" action="{{ route('admin.berita-gambar.destroy', $gambar) }}" method="POST"
-                style="display:none;">
+            <form
+                id="delete-image-{{ $gambar->id }}"
+                action="{{ route('admin.berita-gambar.destroy', $gambar) }}"
+                method="POST"
+                style="display: none;">
+
                 @csrf
                 @method('DELETE')
+
             </form>
 
         @endforeach
 
-        <script>
-            function hapusGambar(id) {
-                if (confirm('Hapus gambar ini?')) {
-                    document
-                        .getElementById('delete-image-' + id)
-                        .submit();
-                }
+    </section>
+
+    <script>
+        function hapusGambar(id) {
+            if (confirm('Yakin ingin menghapus gambar ini?')) {
+                document
+                    .getElementById('delete-image-' + id)
+                    .submit();
             }
-        </script>
+        }
 
-        <script>
-            document.getElementById('gambar')
-                .addEventListener('change', function () {
+        const inputGambar = document.getElementById('gambar');
 
-                    const files = this.files;
+        if (inputGambar) {
+            inputGambar.addEventListener('change', function () {
+                const files = this.files;
+                const currentCount = Number(this.dataset.currentCount || 0);
+                const maxTotal = 3;
+                const maxFileSize = 2 * 1024 * 1024;
+                const remainingSlot = maxTotal - currentCount;
 
-                    if (files.length > 3) {
+                if (files.length > remainingSlot) {
+                    alert('Sisa slot galeri hanya ' + remainingSlot + ' gambar.');
+                    this.value = '';
+                    return;
+                }
 
-                        alert(
-                            'Maksimal hanya boleh upload 3 gambar.'
-                        );
-
+                for (let i = 0; i < files.length; i++) {
+                    if (files[i].size > maxFileSize) {
+                        alert('Ukuran tiap gambar maksimal 2 MB.');
                         this.value = '';
-
                         return;
                     }
-
-                    for (let i = 0; i < files.length; i++) {
-
-                        if (files[i].size > 2 * 1024 * 1024) {
-
-                            alert(
-                                'Ukuran gambar maksimal 2 MB.'
-                            );
-
-                            this.value = '';
-
-                            return;
-                        }
-                    }
-                });
-        </script>
+                }
+            });
+        }
+    </script>
 
 @endsection

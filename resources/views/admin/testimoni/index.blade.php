@@ -1,19 +1,22 @@
 @extends('layouts.admin')
 
+@section('page-title', 'Testimoni')
+
 @section('content')
 
-    <div class="card">
+    <section class="ob-card ob-card-lg">
 
-        <div class="card-header">
+        <div class="card-topbar">
             <div>
                 <h2>Data Testimoni</h2>
-                <span class="card-subtitle">
-                    Kelola testimoni yang ditampilkan pada website.
-                </span>
+                <p class="card-subtitle">
+                    Kelola testimoni yang ditampilkan pada website OrangBaik.id.
+                </p>
             </div>
 
             <a href="{{ route('admin.testimoni.create') }}" class="btn-primary">
-                + Tambah Testimoni
+                <i class="bi bi-plus-lg"></i>
+                <span>Tambah Testimoni</span>
             </a>
         </div>
 
@@ -36,17 +39,23 @@
                     @forelse($testimoni as $item)
 
                         <tr>
-
                             <td>
-                                <img src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama }}" width="60"
-                                    height="60" style="
-                                                border-radius:50%;
-                                                object-fit:cover;
-                                            ">
+                                @if($item->foto_profil)
+                                    <img
+                                        src="{{ asset('storage/' . $item->foto_profil) }}"
+                                        alt="{{ $item->nama }}"
+                                        class="table-avatar">
+                                @else
+                                    <div class="table-avatar table-avatar-placeholder">
+                                        {{ strtoupper(substr($item->nama, 0, 1)) }}
+                                    </div>
+                                @endif
                             </td>
 
                             <td>
-                                {{ $item->nama }}
+                                <p class="cell-title">
+                                    {{ $item->nama }}
+                                </p>
                             </td>
 
                             <td>
@@ -55,32 +64,44 @@
 
                             <td>
                                 <span class="badge badge-blue">
-                                    {{ $item->user->name }}
+                                    {{ $item->user->name ?? 'User tidak ditemukan' }}
                                 </span>
                             </td>
 
                             <td>
-                                {{ Str::limit($item->isi_testimoni, 50) }}
+                                <p class="cell-excerpt">
+                                    {{ \Illuminate\Support\Str::limit($item->isi_testimoni, 60) }}
+                                </p>
                             </td>
 
                             <td class="text-center">
-                                <div class="action-group">
+                                <div class="action-group action-group-center">
 
-                                    <a href="{{ route('admin.testimoni.show', $item) }}" class="action-link link-blue">
+                                    <a
+                                        href="{{ route('admin.testimoni.show', $item) }}"
+                                        class="action-link link-blue">
+                                        <i class="bi bi-eye"></i>
                                         Detail
                                     </a>
 
-                                    <a href="{{ route('admin.testimoni.edit', $item) }}" class="action-link link-yellow">
+                                    <a
+                                        href="{{ route('admin.testimoni.edit', $item) }}"
+                                        class="action-link link-yellow">
+                                        <i class="bi bi-pencil-square"></i>
                                         Edit
                                     </a>
 
-                                    <form action="{{ route('admin.testimoni.destroy', $item) }}" method="POST"
-                                        class="inline-form" onsubmit="return confirm('Yakin hapus testimoni ini?')">
+                                    <form
+                                        action="{{ route('admin.testimoni.destroy', $item) }}"
+                                        method="POST"
+                                        class="inline-form"
+                                        onsubmit="return confirm('Yakin ingin menghapus testimoni ini?')">
 
                                         @csrf
                                         @method('DELETE')
 
                                         <button type="submit" class="action-link link-red">
+                                            <i class="bi bi-trash"></i>
                                             Hapus
                                         </button>
 
@@ -88,13 +109,12 @@
 
                                 </div>
                             </td>
-
                         </tr>
 
                     @empty
 
                         <tr>
-                            <td colspan="5" class="empty-state">
+                            <td colspan="6" class="empty-state">
                                 Belum ada data testimoni.
                             </td>
                         </tr>
@@ -110,6 +130,6 @@
             {{ $testimoni->links() }}
         </div>
 
-    </div>
+    </section>
 
 @endsection
