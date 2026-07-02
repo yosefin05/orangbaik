@@ -291,17 +291,7 @@
                         Kirim Verifikasi
                     </button>
                 </div>
-            </div>
-            @if ($errors->any())
-                <div style="background:#fee2e2;color:#991b1b;padding:16px;margin-bottom:20px;border-radius:8px;">
-                    <strong>Terdapat kesalahan:</strong>
-                    <ul style="margin-top:10px;">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            </div>z
         </form>
     </main>
     @include('components.footer')
