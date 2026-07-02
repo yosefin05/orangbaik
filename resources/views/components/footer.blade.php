@@ -39,7 +39,7 @@
         </div>
 
         <div class="footer-col">
-            <h4>Jejaring Layanan</h4>
+            <h4>Jaringan Kami</h4>
             <a href="#">Dompet Al-Qur'an Indonesia</a>
             <a href="#">Wakaf Quran</a>
             <a href="#">Waqaf.id</a>
