@@ -77,15 +77,15 @@ Route::get('/riwayat-donasi', function () {
     return view('pages.riwayat-donasi');
 })->middleware('auth')->name('riwayat.donasi');
 
- Route::get(
-        '/profil-penggalang',
-        [PenggalangDanaController::class,'profile']
-    )->name('profil.penggalang');
+Route::get(
+    '/profil-penggalang',
+    [PenggalangDanaController::class, 'profile']
+)->name('profil.penggalang');
 
 // penggalang dana 
 Route::middleware('auth')->group(function () {
 
-   
+
 
 
     Route::get(
@@ -101,6 +101,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/verifikasi-penggalang', function () {
         return view('pages.penggalang_dana.create_individu');
     })->name('verifikasi.penggalang');
+
+    Route::post('/verifikasi-penggalang', [PenggalangDanaController::class, 'storeIndividu'])
+        ->name('penggalang_dana.individu.store');
 
     // profil
     Route::get(

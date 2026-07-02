@@ -151,19 +151,111 @@ class PenggalangDanaController extends Controller
         }
 
     }
-    public function profile()
-    {
-        $penggalang = auth()->user()
-            ->penggalangDana()
-            ->with([
-                'campaign',
-                'penggalangDanaDokumen'
-            ])
-            ->firstOrFail();
 
-        return view(
-            'pages.profil-penggalang',
-            compact('penggalang')
-        );
+    public function storeIndividu(Request $request)
+    {
+        $request->validate([
+
+            'foto_profil' => 'required|image|max:2048',
+
+            'nama_penggalang' => 'required|max:255',
+            'alamat' => 'required',
+            'deskripsi' => 'required',
+
+            'email' => 'required|email',
+            'no_telepon' => 'required',
+
+            'instagram' => 'nullable',
+            'facebook' => 'nullable',
+            'youtube' => 'nullable',
+            'tiktok' => 'nullable',
+
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            $fotoProfil = $request
+                ->file('foto_profil')
+                ->store(
+                    'penggalang_dana/profil',
+                    'public'
+                );
+
+            Penggalang_Dana::create([
+
+                'user_id' => auth()->id(),
+
+                'jenis_penggalang' => 'individu',
+
+                // Individu tidak punya banner
+                'thumbnail' => null,
+
+                'foto_profil' => $fotoProfil,
+
+                'nama_penggalang' => $request->nama_penggalang,
+
+                // Individu tidak punya tahun berdiri
+                'tahun_berdiri' => null,
+
+                'alamat' => $request->alamat,
+
+                'deskripsi' => $request->deskripsi,
+
+                // Visi & misi opsional
+                'visi' => $request->visi,
+                'misi' => $request->misi,
+
+                'email' => $request->email,
+
+                'no_telepon' => $request->no_telepon,
+
+                'instagram' => $request->instagram,
+
+                'facebook' => $request->facebook,
+
+                'youtube' => $request->youtube,
+
+                'tiktok' => $request->tiktok,
+
+                'status' => 'pending',
+
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('profile.user')
+                ->with(
+                    'success',
+                    'Pengajuan penggalang dana berhasil dikirim dan sedang menunggu verifikasi.'
+                );
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' => $e->getMessage()
+                ]);
+        }
     }
+    public function profile()
+{
+    $penggalang = auth()->user()
+        ->penggalangDana()
+        ->with([
+            'penggalangDanaDokumen',
+            'campaign'
+        ])
+        ->firstOrFail();
+
+    return view(
+        'pages.profil-penggalang',
+        compact('penggalang')
+    );
+}
 }

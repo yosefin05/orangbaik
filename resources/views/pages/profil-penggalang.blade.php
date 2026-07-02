@@ -14,6 +14,7 @@
 <body>
     <main class="fundraiser-profile-page">
 
+        {{-- HERO --}}
         <section class="fundraiser-hero">
             <div class="fundraiser-container">
 
@@ -24,9 +25,13 @@
                     <span>Kembali</span>
                 </button>
 
-                <img src="{{ $penggalang->thumbnail
-    ? asset('storage/' . $penggalang->thumbnail)
-    : asset('assets/profile-banner.png') }}" alt="{{ $penggalang->nama_penggalang }}" class="penggalang-banner">
+                <img
+                    src="{{ $penggalang->thumbnail
+                        ? asset('storage/' . $penggalang->thumbnail)
+                        : asset('assets/profile-banner.png') }}"
+                    alt="{{ $penggalang->nama_penggalang }}"
+                    class="penggalang-banner">
+
             </div>
         </section>
 
@@ -38,9 +43,12 @@
 
                     <div class="penggalang-info">
 
-                        <img src="{{ $penggalang->foto_profil
-    ? asset('storage/' . $penggalang->foto_profil)
-    : asset('assets/logo-icon.png') }}" alt="{{ $penggalang->nama_penggalang }}" class="penggalang-logo">
+                        <img
+                            src="{{ $penggalang->foto_profil
+                                ? asset('storage/' . $penggalang->foto_profil)
+                                : asset('assets/logo-icon.png') }}"
+                            alt="{{ $penggalang->nama_penggalang }}"
+                            class="penggalang-logo">
 
                         <div>
 
@@ -49,37 +57,17 @@
                             <div class="verified-row">
 
                                 @if($penggalang->jenis_penggalang == 'organisasi')
-
-                                    <span class="org-badge">
-                                        ✓ Organisasi
-                                    </span>
-
+                                    <span class="org-badge">✓ Organisasi</span>
                                 @else
-
-                                    <span class="org-badge">
-                                        ✓ Individu
-                                    </span>
-
+                                    <span class="org-badge">✓ Individu</span>
                                 @endif
 
                                 @if($penggalang->status == 'approved')
-
-                                    <span class="verified-text">
-                                        Verified
-                                    </span>
-
+                                    <span class="verified-text">Verified</span>
                                 @elseif($penggalang->status == 'pending')
-
-                                    <span class="pending-text">
-                                        Menunggu Verifikasi
-                                    </span>
-
+                                    <span class="pending-text">Menunggu Verifikasi</span>
                                 @else
-
-                                    <span class="rejected-text">
-                                        Pengajuan Ditolak
-                                    </span>
-
+                                    <span class="rejected-text">Pengajuan Ditolak</span>
                                 @endif
 
                             </div>
@@ -89,15 +77,8 @@
                     </div>
 
                     <div class="penggalang-actions">
-
-                        <a href="#" class="dashboard-link">
-                            Dashboard
-                        </a>
-
-                        <a href="#" class="edit-button">
-                            Edit Profil
-                        </a>
-
+                        <a href="#" class="dashboard-link">Dashboard</a>
+                        <a href="#" class="edit-button">Edit Profil</a>
                     </div>
 
                 </div>
@@ -107,31 +88,34 @@
 
                     <details class="info-card" open>
                         <summary>
-                            <span>Informasi Organisasi</span>
+                            <span>Informasi Penggalang</span>
                             <b>⌄</b>
                         </summary>
 
                         <div class="info-table">
+
                             <div>
-                                <strong>• Nama Organisasi</strong>
-                                <p>Dompet Al-Qur'an Indonesia</p>
+                                <strong>• Nama Penggalang</strong>
+                                <p>{{ $penggalang->nama_penggalang }}</p>
                             </div>
 
                             <div>
-                                <strong>• Bentuk Organisasi</strong>
-                                <p>Yayasan</p>
+                                <strong>• Jenis</strong>
+                                <p>{{ ucfirst($penggalang->jenis_penggalang) }}</p>
                             </div>
 
+                            @if($penggalang->tahun_berdiri)
                             <div>
                                 <strong>• Tahun Berdiri</strong>
-                                <p>Tahun 2011</p>
+                                <p>{{ $penggalang->tahun_berdiri }}</p>
                             </div>
+                            @endif
 
                             <div>
                                 <strong>• Lokasi</strong>
-                                <p>Ruko Citra City Blok R No. 28, Sarirogo, Sidoarjo, Jawa Timur, 61234 - Sidoarjo, Kab.
-                                    Sidoarjo, Jawa Timur</p>
+                                <p>{{ $penggalang->alamat }}</p>
                             </div>
+
                         </div>
                     </details>
 
@@ -142,21 +126,7 @@
                         </summary>
 
                         <div class="paragraph-content">
-                            <p>
-                                Dompet Al-Qur’an Indonesia (DQ) adalah Lembaga Amil Zakat dan Nazhir Wakaf resmi yang
-                                berada
-                                di bawah naungan Kementerian Agama RI dan Badan Wakaf Indonesia (BWI). DQ telah teraudit
-                                dengan predikat Wajar Tanpa Pengecualian (WTP) sebagai bentuk komitmen terhadap
-                                transparansi
-                                dan akuntabilitas.
-                            </p>
-
-                            <p>
-                                DQ mengelola dana Zakat, Infaq, Sedekah, dan Wakaf untuk disalurkan melalui berbagai
-                                program,
-                                seperti: Pendidikan, Ekonomi, Dakwah, dan Kemanusiaan, demi mewujudkan kesejahteraan
-                                masyarakat secara berkelanjutan.
-                            </p>
+                            {!! nl2br(e($penggalang->deskripsi)) !!}
                         </div>
                     </details>
 
@@ -167,18 +137,13 @@
                         </summary>
 
                         <div class="paragraph-content">
+
                             <h3>Visi</h3>
-                            <p>
-                                Menjadi Lembaga Profesional dalam Pemberdayaan dan Pelayanan serta membangun masyarakat
-                                yang akrab dengan Al-Qur'an.
-                            </p>
+                            <p>{{ $penggalang->visi }}</p>
 
                             <h3>Misi</h3>
-                            <ul>
-                                <li>Aktif dalam membangun jaringan filantropi yang profesional</li>
-                                <li>Meningkatkan kemandirian dan mengakrabkan masyarakat Indonesia dengan Al-Qur'an</li>
-                                <li>Meningkatkan sumber daya melalui keunggulan lembaga</li>
-                            </ul>
+                            <p>{!! nl2br(e($penggalang->misi)) !!}</p>
+
                         </div>
                     </details>
 
@@ -189,25 +154,22 @@
                         </summary>
 
                         <div class="info-table">
-                            <div>
-                                <strong>• Badan Wakaf Indonesia</strong>
-                                <p>Dompet Al-Qur'an Indonesia</p>
-                            </div>
 
-                            <div>
-                                <strong>• Dewan Pimpinan MUI</strong>
-                                <p>No. Rek-1954/DP-MUI/VI/2025</p>
-                            </div>
+                            @forelse($penggalang->penggalangDanaDokumen as $dokumen)
 
-                            <div>
-                                <strong>• No SK Kemenkumham</strong>
-                                <p>AHU-00003862.AH.01.12</p>
-                            </div>
+                                <div>
+                                    <strong>• {{ $dokumen->nama_dokumen }}</strong>
+                                    <p>
+                                        <a href="{{ $dokumen->file_dokumen }}" target="_blank">
+                                            Lihat Dokumen
+                                        </a>
+                                    </p>
+                                </div>
 
-                            <div>
-                                <strong>• SK LAZ</strong>
-                                <p>SK LAZ Kemenag RI No. 78 Tahun 2021.</p>
-                            </div>
+                            @empty
+                                <p>Belum ada dokumen legalitas.</p>
+                            @endforelse
+
                         </div>
                     </details>
 
@@ -218,25 +180,45 @@
                         </summary>
 
                         <div class="info-table">
+
                             <div>
                                 <strong>• Email</strong>
-                                <p>info@dompetalquran.or.id</p>
+                                <p>{{ $penggalang->email }}</p>
                             </div>
 
                             <div>
                                 <strong>• Hotline</strong>
-                                <p>+62 813-8500-2300</p>
+                                <p>{{ $penggalang->no_telepon }}</p>
                             </div>
 
+                            @if($penggalang->instagram)
                             <div>
-                                <strong>• Sosial Media</strong>
-                                <p>
-                                    • Instagram &nbsp;&nbsp; @dompetalquran <br>
-                                    • Facebook &nbsp;&nbsp;&nbsp; @dompetalquran <br>
-                                    • Youtube &nbsp;&nbsp;&nbsp;&nbsp; @dompetalquran <br>
-                                    • Tiktok &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @dompetalquran.id
-                                </p>
+                                <strong>• Instagram</strong>
+                                <p>{{ '@'.$penggalang->instagram }}</p>
                             </div>
+                            @endif
+
+                            @if($penggalang->facebook)
+                            <div>
+                                <strong>• Facebook</strong>
+                                <p>{{ $penggalang->facebook }}</p>
+                            </div>
+                            @endif
+
+                            @if($penggalang->youtube)
+                            <div>
+                                <strong>• Youtube</strong>
+                                <p>{{ $penggalang->youtube }}</p>
+                            </div>
+                            @endif
+
+                            @if($penggalang->tiktok)
+                            <div>
+                                <strong>• TikTok</strong>
+                                <p>{{ '@'.$penggalang->tiktok }}</p>
+                            </div>
+                            @endif
+
                         </div>
                     </details>
 
@@ -244,25 +226,36 @@
 
                 {{-- CAMPAIGN LIST --}}
                 <section class="fundraiser-campaign-section">
+
                     <h2>Penggalangan Dana</h2>
 
                     <div class="campaign-list">
-                        @foreach ($campaigns as $campaign)
+
+                        @forelse($penggalang->campaign as $campaign)
+
                             <article class="campaign-row">
-                                <img src="{{ asset($campaign['image']) }}" alt="{{ $campaign['title'] }}"
+
+                                <img
+                                    src="{{ $campaign->thumbnail
+                                        ? asset('storage/' . $campaign->thumbnail)
+                                        : asset('assets/slide1.png') }}"
+                                    alt="{{ $campaign->judul }}"
                                     class="campaign-row-image">
 
                                 <div class="campaign-row-body">
-                                    <h3>{{ $campaign['title'] }}</h3>
+
+                                    <h3>{{ $campaign->judul }}</h3>
 
                                     <p>
-                                        {{ $campaign['organizer'] }}
+                                        {{ $penggalang->nama_penggalang }}
                                         <span>●</span>
                                     </p>
 
                                     <div class="campaign-row-amount">
-                                        <strong>{{ $campaign['amount'] }}</strong>
-                                        <span>Terkumpul</span>
+                                        <strong>
+                                            Rp{{ number_format($campaign->target_donasi,0,',','.') }}
+                                        </strong>
+                                        <span>Target</span>
                                     </div>
 
                                     <div class="campaign-progress">
@@ -270,13 +263,27 @@
                                     </div>
 
                                     <div class="campaign-meta">
-                                        <span>👤 100rb ± donatur</span>
-                                        <span>∞</span>
+                                        <span>Status: {{ $campaign->status }}</span>
+
+                                        @if($campaign->tanggal_berakhir)
+                                            <span>
+                                                {{ \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') }}
+                                            </span>
+                                        @endif
                                     </div>
+
                                 </div>
+
                             </article>
-                        @endforeach
+
+                        @empty
+
+                            <p>Belum ada campaign.</p>
+
+                        @endforelse
+
                     </div>
+
                 </section>
 
             </div>

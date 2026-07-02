@@ -17,7 +17,11 @@ class Penggalang_Dana extends Model
 
     public function campaign()
     {
-        return $this->hasMany(Campaign::class);
+        return $this->hasMany(
+            Campaign::class,
+            'penggalang_dana_id', // FK di tabel campaign
+            'id'
+        );
     }
 
     public function user()
