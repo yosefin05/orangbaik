@@ -1,265 +1,233 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Akun Penggalang Dana Individu - OrangBaik.id</title>
+    <title>Verifikasi Penggalang Dana - OrangBaik.id</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/verifikasi-penggalang.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/penggalang-individu.css') }}">
 </head>
+
 <body>
 
+@include('components.header')
+
 @php
-    $userName = auth()->check() ? auth()->user()->name : 'Yosefin Kurniawati Tanto';
+    $user = auth()->user();
 @endphp
 
 <main class="verify-page">
-    <div class="verify-container">
 
-        <button class="verify-back" type="button" onclick="history.back()">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M15 18L9 12L15 6" />
-            </svg>
-            <span>Kembali</span>
-        </button>
+    <section class="verify-hero">
+        <div class="container verify-hero-inner">
 
-        <section class="verify-heading">
-            <h1>Verifikasi Akun Penggalang Dana</h1>
-            <p>
-                Lengkapi informasi untuk proses pendaftaran penggalang dana. Data yang diberikan akan
-                digunakan untuk verifikasi akun dan pengelolaan campaign di orangbaik.id
-            </p>
-        </section>
+            <a href="{{ route('profile.user') }}" class="verify-back">
+                <i class="bi bi-arrow-left"></i>
+                <span>Kembali ke Profil</span>
+            </a>
 
-        <form action="#" method="POST" enctype="multipart/form-data" class="verify-form">
-            @csrf
+            <div class="verify-heading">
+                <span class="verify-eyebrow">Verifikasi Akun</span>
 
-            {{-- PROFIL --}}
-            <section class="form-section">
-                <h2>Profil Penggalang Dana</h2>
+                <h1>Verifikasi Akun Penggalang Dana</h1>
 
-                <div class="profile-form-grid">
-                    <div class="avatar-upload">
-                        <div class="avatar-preview">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M12 12C14.76 12 17 9.76 17 7C17 4.24 14.76 2 12 2C9.24 2 7 4.24 7 7C7 9.76 9.24 12 12 12Z"/>
-                                <path d="M4 22C4.7 17.9 7.8 15.5 12 15.5C16.2 15.5 19.3 17.9 20 22H4Z"/>
-                            </svg>
+                <p>
+                    Lengkapi informasi berikut untuk proses pendaftaran penggalang dana.
+                    Data yang diberikan akan digunakan untuk verifikasi akun dan pengelolaan campaign.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="verify-section">
+        <div class="container">
+
+            <form action="#" method="POST" enctype="multipart/form-data" class="verify-form">
+                @csrf
+
+                {{-- PROFIL --}}
+                <section class="verify-card">
+                    <div class="verify-card-header">
+                        <h2>Profil Penggalang Dana</h2>
+                        <p>Masukkan data dasar penggalang dana yang akan ditampilkan pada profil.</p>
+                    </div>
+
+                    <div class="verify-profile-grid">
+
+                        <div class="verify-avatar-upload">
+                            <div class="verify-avatar-preview" id="avatarPreview">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+
+                            <label class="verify-upload-button">
+                                <input type="file" name="foto_profil" id="fotoProfilInput" accept="image/*">
+                                <i class="bi bi-camera-fill"></i>
+                                <span>Upload Foto</span>
+                            </label>
                         </div>
 
-                        <label class="camera-button">
-                            <input type="file" name="foto_profil" accept="image/*">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M4 8H8L10 5H14L16 8H20V19H4V8Z"/>
-                                <path d="M12 17C14.2 17 16 15.2 16 13C16 10.8 14.2 9 12 9C9.8 9 8 10.8 8 13C8 15.2 9.8 17 12 17Z"/>
-                            </svg>
+                        <div class="verify-fields">
+                            <label class="verify-field">
+                                <span>Jenis Penggalang Dana</span>
+
+                                <select name="jenis_penggalang">
+                                    <option value="individu" selected>Individu</option>
+                                    <option value="organisasi">Organisasi</option>
+                                </select>
+                            </label>
+
+                            <label class="verify-field">
+                                <span>Nama Lengkap</span>
+
+                                <input
+                                    type="text"
+                                    name="nama_penggalang"
+                                    value="{{ old('nama_penggalang', $user->name ?? '') }}"
+                                    placeholder="Masukkan nama lengkap">
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <label class="verify-field">
+                        <span>Alamat Domisili</span>
+
+                        <textarea
+                            name="alamat"
+                            rows="3"
+                            placeholder="Masukkan alamat domisili lengkap">{{ old('alamat') }}</textarea>
+                    </label>
+                </section>
+
+                {{-- INFORMASI --}}
+                <section class="verify-card">
+                    <div class="verify-card-header">
+                        <h2>Informasi Penggalang Dana</h2>
+                        <p>Ceritakan profil singkat dan alasan kamu menjadi penggalang dana.</p>
+                    </div>
+
+                    <label class="verify-field">
+                        <span>Cerita / Profil Singkat Penggalang Dana</span>
+
+                        <textarea
+                            name="deskripsi"
+                            rows="6"
+                            placeholder="Ceritakan siapa kamu, alasan menjadi penggalang dana, dan bentuk tanggung jawab kamu terhadap campaign yang akan dibuat.">{{ old('deskripsi') }}</textarea>
+                    </label>
+                </section>
+
+                {{-- LEGALITAS --}}
+                <section class="verify-card">
+                    <div class="verify-card-header">
+                        <h2>Dokumen Legalitas</h2>
+                        <p>Unggah atau lampirkan dokumen identitas untuk memperkuat kredibilitas akun.</p>
+                    </div>
+
+                    <div class="verify-grid-2">
+                        <label class="verify-field">
+                            <span>Nama Dokumen <b>*</b></span>
+
+                            <input
+                                type="text"
+                                name="nama_legalitas"
+                                value="{{ old('nama_legalitas') }}"
+                                placeholder="Contoh: KTP">
+                        </label>
+
+                        <label class="verify-field">
+                            <span>Link Dokumen <b>*</b></span>
+
+                            <input
+                                type="url"
+                                name="link_legalitas"
+                                value="{{ old('link_legalitas') }}"
+                                placeholder="Masukkan link Drive dokumen">
+                        </label>
+                    </div>
+                </section>
+
+                {{-- KONTAK --}}
+                <section class="verify-card">
+                    <div class="verify-card-header">
+                        <h2>Kontak & Sosial Media</h2>
+                        <p>Informasi kontak membantu membangun transparansi dan kepercayaan donatur.</p>
+                    </div>
+
+                    <div class="verify-grid-2">
+                        <label class="verify-field">
+                            <span>Email <b>*</b></span>
+
+                            <input
+                                type="email"
+                                name="email"
+                                value="{{ old('email', $user->email ?? '') }}"
+                                placeholder="Masukkan email">
+                        </label>
+
+                        <label class="verify-field">
+                            <span>Nomor Telepon <b>*</b></span>
+
+                            <input
+                                type="text"
+                                name="no_telepon"
+                                value="{{ old('no_telepon') }}"
+                                placeholder="Masukkan nomor telepon">
                         </label>
                     </div>
 
-                    <div class="profile-fields">
-                        <label class="input-card select-card">
-                            <span>Jenis Penggalang Dana</span>
+                    <div class="verify-subtitle">
+                        <h3>Sosial Media</h3>
+                        <span>Opsional</span>
+                    </div>
 
-                            <select name="jenis_penggalang">
-                                <option value="individu" selected>Individu</option>
-                                <option value="organisasi">Organisasi</option>
-                            </select>
-
-                            <i>
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M6 9L12 15L18 9"/>
-                                </svg>
-                            </i>
+                    <div class="verify-grid-2">
+                        <label class="verify-field">
+                            <span>Instagram</span>
+                            <input type="text" name="instagram" value="{{ old('instagram') }}" placeholder="Username Instagram">
                         </label>
 
-                        <label class="input-card">
-                            <span>Nama Lengkap</span>
+                        <label class="verify-field">
+                            <span>Facebook</span>
+                            <input type="text" name="facebook" value="{{ old('facebook') }}" placeholder="Username Facebook">
+                        </label>
 
-                            <input 
-                                type="text" 
-                                name="nama_penggalang"
-                                value="{{ $userName }}"
-                                placeholder="Masukkan Nama Lengkap"
-                            >
+                        <label class="verify-field">
+                            <span>Youtube</span>
+                            <input type="text" name="youtube" value="{{ old('youtube') }}" placeholder="Username Youtube">
+                        </label>
 
-                            <i>
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/>
-                                    <path d="M13.5 6.5L17.5 10.5"/>
-                                </svg>
-                            </i>
+                        <label class="verify-field">
+                            <span>Tiktok</span>
+                            <input type="text" name="tiktok" value="{{ old('tiktok') }}" placeholder="Username Tiktok">
                         </label>
                     </div>
+                </section>
+
+                <div class="verify-actions">
+                    <a href="{{ route('profile.user') }}" class="verify-cancel-button">
+                        Batal
+                    </a>
+
+                    <button type="submit" class="verify-submit-button">
+                        Kirim Verifikasi
+                    </button>
                 </div>
 
-                <label class="input-card full">
-                    <span>Alamat Domisili</span>
+            </form>
 
-                    <textarea name="alamat" rows="2" placeholder="Masukkan alamat domisili lengkap"></textarea>
+        </div>
+    </section>
 
-                    <i>
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 21C12 21 19 15.5 19 9C19 5.1 15.9 2 12 2C8.1 2 5 5.1 5 9C5 15.5 12 21 12 21Z"/>
-                            <path d="M12 12C13.7 12 15 10.7 15 9C15 7.3 13.7 6 12 6C10.3 6 9 7.3 9 9C9 10.7 10.3 12 12 12Z"/>
-                        </svg>
-                    </i>
-                </label>
-            </section>
-
-            {{-- INFORMASI --}}
-            <section class="form-section">
-                <h2>Informasi Penggalang Dana</h2>
-
-                <label class="input-card full textarea-card">
-                    <span>Cerita / Profil Singkat Penggalang Dana</span>
-
-                    <textarea 
-                        name="deskripsi" 
-                        rows="5" 
-                        placeholder="Ceritakan siapa kamu, alasan menjadi penggalang dana, dan bentuk tanggung jawab kamu terhadap campaign yang akan dibuat."
-                    ></textarea>
-
-                    <i>
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/>
-                            <path d="M13.5 6.5L17.5 10.5"/>
-                        </svg>
-                    </i>
-                </label>
-            </section>
-
-            {{-- LEGALITAS --}}
-            <section class="form-section">
-                <h2>Lengkapi Dokumen Legalitas</h2>
-
-                <p class="section-desc">
-                    Unggah dokumen identitas untuk memperkuat kredibilitas akun penggalang dana Anda
-                    serta meningkatkan kepercayaan donatur terhadap campaign yang Anda jalankan.
-                </p>
-
-                <h3>Dokumen Identitas <span>*</span></h3>
-
-                <div class="two-column">
-                    <label class="input-card">
-                        <span>Nama Dokumen</span>
-
-                        <input 
-                            type="text" 
-                            name="nama_legalitas"
-                            placeholder="Masukkan Nama Dokumen (cth: KTP)"
-                        >
-
-                        <i>
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/>
-                                <path d="M13.5 6.5L17.5 10.5"/>
-                            </svg>
-                        </i>
-                    </label>
-
-                    <label class="input-card">
-                        <span>Link Dokumen</span>
-
-                        <input 
-                            type="url" 
-                            name="link_legalitas"
-                            placeholder="Masukkan Link Dokumen (cth: Link Drive)"
-                        >
-
-                        <i>
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/>
-                                <path d="M13.5 6.5L17.5 10.5"/>
-                            </svg>
-                        </i>
-                    </label>
-                </div>
-            </section>
-
-            {{-- KONTAK --}}
-            <section class="form-section">
-                <h2>Kontak & Sosial Media</h2>
-
-                <p class="section-desc">
-                    Informasi kontak dan media sosial yang lengkap membantu membangun transparansi
-                    serta meningkatkan kredibilitas penggalangan dana Anda.
-                </p>
-
-                <h3>Kontak<span>*</span></h3>
-
-                <div class="stack-fields">
-                    <label class="input-card full">
-                        <span>Masukkan Email</span>
-
-                        <input 
-                            type="email" 
-                            name="email"
-                            placeholder="Masukkan Email Anda"
-                        >
-
-                        <i>
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/>
-                                <path d="M13.5 6.5L17.5 10.5"/>
-                            </svg>
-                        </i>
-                    </label>
-
-                    <label class="input-card full">
-                        <span>Masukkan Nomor Telepon</span>
-
-                        <input 
-                            type="text" 
-                            name="no_telepon"
-                            placeholder="Masukkan Nomor Telepon Anda"
-                        >
-
-                        <i>
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/>
-                                <path d="M13.5 6.5L17.5 10.5"/>
-                            </svg>
-                        </i>
-                    </label>
-                </div>
-
-                <h3>Sosial Media <small>(Opsional)</small></h3>
-
-                <div class="stack-fields">
-                    <label class="input-card full">
-                        <span>Masukkan Username Instagram</span>
-                        <input type="text" name="instagram" placeholder="Masukkan Username Instagram Anda">
-                        <i><svg viewBox="0 0 24 24"><path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/><path d="M13.5 6.5L17.5 10.5"/></svg></i>
-                    </label>
-
-                    <label class="input-card full">
-                        <span>Masukkan Username Facebook</span>
-                        <input type="text" name="facebook" placeholder="Masukkan Username Facebook Anda">
-                        <i><svg viewBox="0 0 24 24"><path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/><path d="M13.5 6.5L17.5 10.5"/></svg></i>
-                    </label>
-
-                    <label class="input-card full">
-                        <span>Masukkan Username Youtube</span>
-                        <input type="text" name="youtube" placeholder="Masukkan Username Youtube Anda">
-                        <i><svg viewBox="0 0 24 24"><path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/><path d="M13.5 6.5L17.5 10.5"/></svg></i>
-                    </label>
-
-                    <label class="input-card full">
-                        <span>Masukkan Username Tiktok</span>
-                        <input type="text" name="tiktok" placeholder="Masukkan Username Tiktok Anda">
-                        <i><svg viewBox="0 0 24 24"><path d="M4 20H8L18.5 9.5L14.5 5.5L4 16V20Z"/><path d="M13.5 6.5L17.5 10.5"/></svg></i>
-                    </label>
-                </div>
-            </section>
-
-        </form>
-
-    </div>
 </main>
 
 @include('components.footer')
+
+<script src="{{ asset('js/header.js') }}"></script>
+<script src="{{ asset('js/penggalang-individu.js') }}"></script>
 
 </body>
 </html>

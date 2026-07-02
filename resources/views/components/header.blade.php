@@ -1,4 +1,5 @@
 <header class="site-header" id="siteHeader">
+    {{-- DESKTOP HEADER --}}
     <div class="container header-inner desktop-header">
 
         <a href="{{ route('home') }}" class="brand" aria-label="OrangBaik.id">
@@ -101,10 +102,6 @@
     {{-- MOBILE HEADER --}}
     <div class="container mobile-header-inner">
 
-        <a href="{{ route('home') }}" class="mobile-brand" aria-label="OrangBaik.id">
-            <img src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id">
-        </a>
-
         <form action="{{ url('donasi') }}" method="GET" class="mobile-search-form">
             <button type="submit" aria-label="Cari">
                 <i class="bi bi-search"></i>
@@ -114,19 +111,21 @@
         </form>
 
         @guest
-            <a href="{{ route('login') }}" class="mobile-profile-button" aria-label="Login">
-                <i class="bi bi-person-fill"></i>
+            <a href="{{ route('login') }}" class="mobile-login-button">
+                Masuk
             </a>
         @endguest
 
         @auth
-            <a href="{{ route('profile.user') }}" class="mobile-profile-button" aria-label="Profil">
+            <a href="{{ route('profile.user') }}" class="mobile-profile-button" aria-label="Profil Saya">
                 @if(!empty(auth()->user()->foto_profil))
                     <img
                         src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                         alt="{{ auth()->user()->name }}">
                 @else
-                    <i class="bi bi-person-fill"></i>
+                    <span>
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </span>
                 @endif
             </a>
         @endauth
@@ -156,5 +155,3 @@
         <span>Berita</span>
     </a>
 </nav>
-
-<script src="{{ asset('js/header.js') }}"></script>
