@@ -84,10 +84,6 @@ Route::get(
 
 // penggalang dana 
 Route::middleware('auth')->group(function () {
-
-
-
-
     Route::get(
         '/penggalang_dana_organisasi',
         [PenggalangDanaController::class, 'createOrganisasi']
@@ -104,6 +100,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/verifikasi-penggalang', [PenggalangDanaController::class, 'storeIndividu'])
         ->name('penggalang_dana.individu.store');
+
+    Route::get('/penggalang-dana/{id}/edit', [PenggalangDanaController::class, 'edit'])
+        ->name('penggalang_dana.edit');
+
+    Route::patch('/penggalang-dana/{id}', [PenggalangDanaController::class, 'update'])
+        ->name('penggalang_dana.update');
 
     // profil
     Route::get(

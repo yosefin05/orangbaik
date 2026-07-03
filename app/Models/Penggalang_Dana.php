@@ -56,6 +56,7 @@ class Penggalang_Dana extends Model
         'youtube',
         'tiktok',
         'status',
+        'verified',
         'user_id',
         'verified_by',
         'verified_at'
@@ -63,5 +64,6 @@ class Penggalang_Dana extends Model
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'verified' => 'boolean',
     ];
 }

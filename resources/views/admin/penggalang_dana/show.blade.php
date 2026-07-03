@@ -8,9 +8,7 @@
     <section class="ob-card ob-card-lg profile-card">
 
         @if($penggalangDana->foto_profil)
-            <img
-                src="{{ asset('storage/' . $penggalangDana->foto_profil) }}"
-                alt="{{ $penggalangDana->nama_penggalang }}"
+            <img src="{{ asset('storage/' . $penggalangDana->foto_profil) }}" alt="{{ $penggalangDana->nama_penggalang }}"
                 class="profile-photo">
         @else
             <div class="profile-photo table-avatar-placeholder">
@@ -31,6 +29,10 @@
                 <span class="badge badge-green">Approved</span>
             @else
                 <span class="badge badge-red">Rejected</span>
+            @endif
+
+            @if($penggalangDana->jenis_penggalang == 'organisasi' && $penggalangDana->verified)
+                <span>Verified Organization</span>
             @endif
         </div>
 
@@ -208,10 +210,8 @@
                                 </p>
                             </td>
 
-                            <td class="text-center">
-                                <a
-                                    href="{{ asset('storage/' . $dokumen->file_dokumen) }}"
-                                    target="_blank"
+                            <td>
+                                <a href="{{ $dokumen->file_dokumen }}" target="_blank"
                                     class="action-link link-blue">
                                     <i class="bi bi-file-earmark-text"></i>
                                     <span>Lihat Dokumen</span>
@@ -268,46 +268,148 @@
 
     @endif
 
-    {{-- Aksi Verifikasi --}}
-    <section class="ob-card ob-card-lg">
+    {{-- STATUS + VERIFIKASI --}}
+    <div class="info-grid">
 
-        <div class="card-topbar">
-            <div>
-                <h2>Aksi Verifikasi</h2>
-                <p class="card-subtitle">
-                    Setujui atau tolak pengajuan penggalang dana.
-                </p>
+        {{-- STATUS PENGAJUAN --}}
+        <section class="ob-card ob-card-lg">
+
+            <div class="card-topbar">
+                <div>
+                    <h2>Status Pengajuan</h2>
+                    <p class="card-subtitle">
+                        Status persetujuan penggalang dana.
+                    </p>
+                </div>
             </div>
-        </div>
 
-        <div class="form-actions">
+            <div class="status-box">
 
-            @if($penggalangDana->status !== 'approved')
-                <form action="{{ route('admin.penggalang_dana.approve', $penggalangDana) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
+                <div class="status-row">
+                    <span class="status-label">Status</span>
 
-                    <button type="submit" class="btn-primary">
-                        <i class="bi bi-check-circle"></i>
-                        <span>Approve</span>
-                    </button>
-                </form>
-            @endif
+                    @if($penggalangDana->status === 'approved')
+                        <span class="badge badge-green">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Approved
+                        </span>
 
-            @if($penggalangDana->status !== 'rejected')
-                <form action="{{ route('admin.penggalang_dana.reject', $penggalangDana) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
+                    @elseif($penggalangDana->status === 'pending')
+                        <span class="badge badge-yellow">
+                            <i class="bi bi-clock-fill"></i>
+                            Pending
+                        </span>
 
-                    <button type="submit" class="btn-danger">
-                        <i class="bi bi-x-circle"></i>
-                        <span>Reject</span>
-                    </button>
-                </form>
-            @endif
+                    @else
+                        <span class="badge badge-red">
+                            <i class="bi bi-x-circle-fill"></i>
+                            Rejected
+                        </span>
+                    @endif
+                </div>
 
-        </div>
+            </div>
 
-    </section>
+            {{-- ACTION BUTTONS --}}
+            <div class="form-actions">
 
+                @if($penggalangDana->status !== 'approved')
+                    <form action="{{ route('admin.penggalang_dana.approve', $penggalangDana) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+
+                        <button type="submit" class="btn-primary w-100">
+                            <i class="bi bi-check-circle"></i>
+                            Approve
+                        </button>
+                    </form>
+                @endif
+
+                @if($penggalangDana->status !== 'rejected')
+                    <form action="{{ route('admin.penggalang_dana.reject', $penggalangDana) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+
+                        <button type="submit" class="btn-danger w-100">
+                            <i class="bi bi-x-circle"></i>
+                            Reject
+                        </button>
+                    </form>
+                @endif
+
+            </div>
+
+        </section>
+
+
+        {{-- VERIFIKASI ORGANISASI (HANYA ORGANISASI) --}}
+        @if($penggalangDana->jenis_penggalang === 'organisasi')
+
+            <section class="ob-card ob-card-lg">
+
+                <div class="card-topbar">
+                    <div>
+                        <h2>Verifikasi Organisasi</h2>
+                        <p class="card-subtitle">
+                            Status verifikasi organisasi.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="status-box">
+
+                    <div class="status-row">
+                        <span class="status-label">Verifikasi</span>
+                        @if($penggalangDana->verified)
+                            <span class="badge badge-green">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Terverifikasi
+                            </span>
+                        @else
+                            <span class="badge badge-red">
+                                <i class="bi bi-x-circle-fill"></i>
+                                Belum Diverifikasi
+                            </span>
+                        @endif
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+
+                    {{-- JIKA BELUM VERIFIED --}}
+                    @if(!$penggalangDana->verified)
+
+                        <form action="{{ route('admin.penggalang_dana.verify', $penggalangDana) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+
+                            <button type="submit" class="btn-primary">
+                                <i class="bi bi-shield-check"></i>
+                                Verifikasi Organisasi
+                            </button>
+                        </form>
+
+                        {{-- JIKA SUDAH VERIFIED (CABUT VERIFIKASI) --}}
+                    @else
+
+                        <form action="{{ route('admin.penggalang_dana.unverify', $penggalangDana) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+
+                            <button type="submit" class="btn-danger">
+                                <i class="bi bi-shield-x"></i>
+                                Cabut Verifikasi
+                            </button>
+                        </form>
+
+                    @endif
+
+                </div>
+
+            </section>
+
+        @endif
+
+    </div>
 @endsection

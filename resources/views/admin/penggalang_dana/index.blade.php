@@ -26,6 +26,7 @@
                         <th>User</th>
                         <th>Jenis</th>
                         <th>Status</th>
+                        <th>Verified</th>
                         <th>Tanggal Daftar</th>
                         <th class="text-center">Aksi</th>
                     </tr>
@@ -38,9 +39,7 @@
                         <tr>
                             <td>
                                 @if($item->foto_profil)
-                                    <img
-                                        src="{{ asset('storage/' . $item->foto_profil) }}"
-                                        alt="{{ $item->nama_penggalang }}"
+                                    <img src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama_penggalang }}"
                                         class="table-avatar">
                                 @else
                                     <div class="table-avatar table-avatar-placeholder">
@@ -78,24 +77,30 @@
                                     </span>
                                 @endif
                             </td>
-
+                            <td>@if($item->verified)
+                                <span class="badge badge-green">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Terverifikasi
+                                </span>
+                            @else
+                                    <span class="badge badge-red">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                        Belum Diverifikasi
+                                    </span>
+                                @endif
+                            </td>
                             <td class="text-muted-strong">
                                 {{ $item->created_at->format('d M Y') }}
                             </td>
 
                             <td class="text-center">
                                 <div class="action-group action-group-center">
-
-                                    <a
-                                        href="{{ route('admin.penggalang_dana.show', $item) }}"
-                                        class="action-link link-blue">
+                                    <a href="{{ route('admin.penggalang_dana.show', $item) }}" class="action-link link-blue">
                                         <i class="bi bi-eye"></i>
                                         Detail
                                     </a>
 
-                                    <form
-                                        action="{{ route('admin.penggalang_dana.destroy', $item) }}"
-                                        method="POST"
+                                    <form action="{{ route('admin.penggalang_dana.destroy', $item) }}" method="POST"
                                         class="inline-form"
                                         onsubmit="return confirm('Yakin ingin menghapus penggalang dana ini?')">
 

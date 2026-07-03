@@ -33,6 +33,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Script untuk menghapus thumbnail
+        document.getElementById('removeThumbnail')?.addEventListener('click', function() {
+            if (confirm('Apakah Anda yakin ingin menghapus banner ini?')) {
+                // Tampilkan placeholder
+                document.getElementById('thumbnailPlaceholder').style.display = 'block';
+                document.getElementById('thumbnailPreview').style.display = 'none';
+                this.closest('.verify-cover-info').style.display = 'none';
+                
+                // Tambahkan input hidden untuk menandai penghapusan
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'remove_thumbnail';
+                hiddenInput.value = '1';
+                this.closest('.verify-cover-upload').appendChild(hiddenInput);
+            }
+        });
+
     if (fotoProfilInput && fotoProfilPreview) {
         fotoProfilInput.addEventListener('change', function () {
             previewImage(fotoProfilInput, function (imageUrl) {

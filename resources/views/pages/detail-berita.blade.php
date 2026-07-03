@@ -38,6 +38,33 @@
                         {!! nl2br(e($berita->isi)) !!}
                     </div>
 
+                    <div class="news-content">
+                        {!! nl2br(e($berita->isi)) !!}
+                    </div>
+
+                    @if($berita->gambar->count())
+                        <section class="news-gallery">
+
+                            <h3>Galeri Dokumentasi</h3>
+
+                            <div class="news-gallery-grid">
+
+                                @foreach($berita->gambar as $gambar)
+
+                                    <a href="{{ asset('storage/' . $gambar->gambar) }}" target="_blank"
+                                        class="news-gallery-item">
+
+                                        <img src="{{ asset('storage/' . $gambar->gambar) }}" alt="{{ $berita->judul }}">
+
+                                    </a>
+
+                                @endforeach
+
+                            </div>
+
+                        </section>
+                    @endif
+
                     {{-- COMMENT --}}
                     <section class="comment-section">
 

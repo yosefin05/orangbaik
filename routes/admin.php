@@ -61,6 +61,12 @@ Route::middleware(['auth', 'admin'])
             [PenggalangDanaController::class, 'reject']
         )->name('penggalang_dana.reject');
 
+        Route::patch('/penggalang_dana/{penggalangDana}/verify', [PenggalangDanaController::class, 'verify'])
+            ->name('penggalang_dana.verify');
+
+        Route::patch('/penggalang_dana/{penggalangDana}/unverify', [PenggalangDanaController::class, 'unverify'])
+            ->name('penggalang_dana.unverify');
+
         Route::get(
             '/campaign',
             [CampaignController::class, 'index']

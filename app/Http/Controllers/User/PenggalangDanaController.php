@@ -7,6 +7,8 @@ use App\Models\Penggalang_Dana;
 use App\Models\Penggalang_Dana_Dokumen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PenggalangDanaController extends Controller
 {
@@ -183,7 +185,7 @@ class PenggalangDanaController extends Controller
                     'public'
                 );
 
-            Penggalang_Dana::create([
+            $penggalangDana = Penggalang_Dana::create([
 
                 'user_id' => auth()->id(),
 
@@ -221,8 +223,28 @@ class PenggalangDanaController extends Controller
 
                 'status' => 'pending',
 
-            ]);
+                'nama_dokumen' => 'required|array',
+                'nama_dokumen.*' => 'required|string',
 
+                'file_dokumen' => 'required|array',
+                'file_dokumen.*' => 'required|url',
+
+            ]);
+            if ($request->nama_dokumen && $request->file_dokumen) {
+
+                foreach ($request->nama_dokumen as $i => $nama) {
+
+                    if (empty($nama) || empty($request->file_dokumen[$i])) {
+                        continue;
+                    }
+
+                    Penggalang_Dana_Dokumen::create([
+                        'penggalang_dana_id' => $penggalangDana->id,
+                        'nama_dokumen' => $nama,
+                        'file_dokumen' => $request->file_dokumen[$i],
+                    ]);
+                }
+            }
             DB::commit();
 
             return redirect()
@@ -244,18 +266,119 @@ class PenggalangDanaController extends Controller
         }
     }
     public function profile()
-{
-    $penggalang = auth()->user()
-        ->penggalangDana()
-        ->with([
-            'penggalangDanaDokumen',
-            'campaign'
-        ])
-        ->firstOrFail();
+    {
+        $penggalang = auth()->user()
+            ->penggalangDana()
+            ->with([
+                'penggalangDanaDokumen',
+                'campaign'
+            ])
+            ->firstOrFail();
 
-    return view(
-        'pages.profil-penggalang',
-        compact('penggalang')
-    );
-}
+        return view(
+            'pages.profil-penggalang',
+            compact('penggalang')
+        );
+    }
+    public function edit($id)
+    {
+        $penggalang = Auth::user()
+            ->penggalangDana()
+            ->with('penggalangDanaDokumen')
+            ->first();
+
+        if ($penggalang->jenis_penggalang == 'organisasi') {
+            return view('pages.penggalang_dana.edit_organisasi', compact('penggalang'));
+        }
+
+        return view('pages.penggalang_dana.edit_individu', compact('penggalang'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $penggalang = Penggalang_Dana::findOrFail($id);
+
+        $validated = $request->validate([
+            'nama_penggalang' => 'required|string',
+            'email' => 'required|email',
+            'no_telepon' => 'required',
+            'alamat' => 'required',
+            'deskripsi' => 'required',
+            'visi' => 'required',
+            'misi' => 'required',
+            'instagram' => 'nullable',
+            'facebook' => 'nullable',
+            'youtube' => 'nullable',
+            'tiktok' => 'nullable',
+            'foto_profil' => 'nullable|image',
+            'thumbnail' => 'nullable|image',
+            'tahun_berdiri' => 'nullable',
+            'nama_dokumen' => 'nullable|array',
+            'file_dokumen' => 'nullable|array',
+        ]);
+
+        // upload foto profil
+        if ($request->hasFile('foto_profil')) {
+
+            if (
+                $penggalang->foto_profil &&
+                Storage::disk('public')->exists($penggalang->foto_profil)
+            ) {
+                Storage::disk('public')->delete(
+                    $penggalang->foto_profil
+                );
+            }
+
+            $validated['foto_profil'] =
+                $request->file('foto_profil')
+                    ->store(
+                        'penggalang_dana/profil',
+                        'public'
+                    );
+        }
+
+        // upload thumbnail organisasi
+        if ($request->hasFile('thumbnail')) {
+
+            // hapus thumbnail lama
+            if ($penggalang->thumbnail && Storage::disk('public')->exists($penggalang->thumbnail)) {
+                Storage::disk('public')->delete($penggalang->thumbnail);
+            }
+
+            $validated['thumbnail'] = $request->file('thumbnail')->store(
+                'penggalang_dana/thumbnail',
+                'public'
+            );
+        }
+
+        // update data utama
+        $penggalang->update($validated);
+
+        return redirect()
+            ->route('profil.penggalang', $penggalang->id)
+            ->with('success', 'Data berhasil diperbarui');
+        $penggalang->penggalangDanaDokumen()->delete();
+
+        foreach ($request->nama_dokumen as $i => $nama) {
+
+            if (
+                empty($nama) ||
+                empty($request->file_dokumen[$i])
+            ) {
+                continue;
+            }
+
+            Penggalang_Dana_Dokumen::create([
+
+                'penggalang_dana_id' => $penggalang->id,
+
+                'nama_dokumen' => $nama,
+
+                'file_dokumen' => $request->file_dokumen[$i],
+
+            ]);
+        }
+    }
+
+
 }

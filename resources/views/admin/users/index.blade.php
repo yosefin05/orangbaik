@@ -80,14 +80,6 @@
 
                             <td class="text-center">
                                 <div class="action-group action-group-center">
-
-                                    <a
-                                        href="{{ route('admin.users.edit', $user) }}"
-                                        class="action-link link-yellow">
-                                        <i class="bi bi-pencil-square"></i>
-                                        Edit
-                                    </a>
-
                                     <form
                                         action="{{ route('admin.users.destroy', $user) }}"
                                         method="POST"

@@ -19,18 +19,17 @@
             <div class="fundraiser-container">
 
                 <button class="fundraiser-back" type="button" onclick="history.back()">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
                         <path d="M15 18L9 12L15 6" />
                     </svg>
                     <span>Kembali</span>
                 </button>
 
-                <img
-                    src="{{ $penggalang->thumbnail
-                        ? asset('storage/' . $penggalang->thumbnail)
-                        : asset('assets/profile-banner.png') }}"
-                    alt="{{ $penggalang->nama_penggalang }}"
-                    class="penggalang-banner">
+                <div class="banner-wrapper">
+                    <img src="{{ $penggalang->thumbnail
+    ? asset('storage/' . $penggalang->thumbnail)
+    : asset('assets/profile-banner.png') }}" alt="{{ $penggalang->nama_penggalang }}" class="penggalang-banner">
+                </div>
 
             </div>
         </section>
@@ -41,35 +40,31 @@
                 {{-- PROFILE SUMMARY --}}
                 <div class="penggalang-summary">
 
-                    <div class="penggalang-info">
+                    <div class="penggalang-left">
 
-                        <img
-                            src="{{ $penggalang->foto_profil
-                                ? asset('storage/' . $penggalang->foto_profil)
-                                : asset('assets/logo-icon.png') }}"
-                            alt="{{ $penggalang->nama_penggalang }}"
-                            class="penggalang-logo">
+                        <div class="logo-wrapper">
 
-                        <div>
+                            <img src="{{ $penggalang->foto_profil
+    ? asset('storage/' . $penggalang->foto_profil)
+    : asset('assets/logo-icon.png') }}" alt="{{ $penggalang->nama_penggalang }}" class="penggalang-logo">
+
+                        </div>
+
+                        <div class="penggalang-title">
 
                             <h1>{{ $penggalang->nama_penggalang }}</h1>
 
                             <div class="verified-row">
 
-                                @if($penggalang->jenis_penggalang == 'organisasi')
-                                    <span class="org-badge">✓ Organisasi</span>
-                                @else
-                                    <span class="org-badge">✓ Individu</span>
-                                @endif
+                                {{-- Badge kecil --}}
+                                @if($penggalang->jenis_penggalang == 'organisasi' && $penggalang->verified)
 
-                                @if($penggalang->status == 'approved')
-                                    <span class="verified-text">Verified</span>
-                                @elseif($penggalang->status == 'pending')
-                                    <span class="pending-text">Menunggu Verifikasi</span>
-                                @else
-                                    <span class="rejected-text">Pengajuan Ditolak</span>
-                                @endif
+                                    <span class="jenis-badge">
+                                        ✓ .org
+                                    </span>
+                                    <span>Verified Organization</span>
 
+                                @endif
                             </div>
 
                         </div>
@@ -77,12 +72,18 @@
                     </div>
 
                     <div class="penggalang-actions">
-                        <a href="#" class="dashboard-link">Dashboard</a>
-                        <a href="#" class="edit-button">Edit Profil</a>
+
+                        <a href="#" class="dashboard-link">
+                            Dashboard
+                        </a>
+
+                        <a href="{{ route('penggalang_dana.edit', $penggalang->id) }}" class="edit-button">
+                            Edit
+                        </a>
+
                     </div>
 
                 </div>
-
                 {{-- DETAIL INFO --}}
                 <section class="accordion-list">
 
@@ -105,10 +106,10 @@
                             </div>
 
                             @if($penggalang->tahun_berdiri)
-                            <div>
-                                <strong>• Tahun Berdiri</strong>
-                                <p>{{ $penggalang->tahun_berdiri }}</p>
-                            </div>
+                                <div>
+                                    <strong>• Tahun Berdiri</strong>
+                                    <p>{{ $penggalang->tahun_berdiri }}</p>
+                                </div>
                             @endif
 
                             <div>
@@ -192,31 +193,31 @@
                             </div>
 
                             @if($penggalang->instagram)
-                            <div>
-                                <strong>• Instagram</strong>
-                                <p>{{ '@'.$penggalang->instagram }}</p>
-                            </div>
+                                <div>
+                                    <strong>• Instagram</strong>
+                                    <p>{{ '@' . $penggalang->instagram }}</p>
+                                </div>
                             @endif
 
                             @if($penggalang->facebook)
-                            <div>
-                                <strong>• Facebook</strong>
-                                <p>{{ $penggalang->facebook }}</p>
-                            </div>
+                                <div>
+                                    <strong>• Facebook</strong>
+                                    <p>{{ $penggalang->facebook }}</p>
+                                </div>
                             @endif
 
                             @if($penggalang->youtube)
-                            <div>
-                                <strong>• Youtube</strong>
-                                <p>{{ $penggalang->youtube }}</p>
-                            </div>
+                                <div>
+                                    <strong>• Youtube</strong>
+                                    <p>{{ $penggalang->youtube }}</p>
+                                </div>
                             @endif
 
                             @if($penggalang->tiktok)
-                            <div>
-                                <strong>• TikTok</strong>
-                                <p>{{ '@'.$penggalang->tiktok }}</p>
-                            </div>
+                                <div>
+                                    <strong>• TikTok</strong>
+                                    <p>{{ '@' . $penggalang->tiktok }}</p>
+                                </div>
                             @endif
 
                         </div>
@@ -233,48 +234,45 @@
 
                         @forelse($penggalang->campaign as $campaign)
 
-                            <article class="campaign-row">
+                                            <article class="campaign-row">
 
-                                <img
-                                    src="{{ $campaign->thumbnail
-                                        ? asset('storage/' . $campaign->thumbnail)
-                                        : asset('assets/slide1.png') }}"
-                                    alt="{{ $campaign->judul }}"
-                                    class="campaign-row-image">
+                                                <img src="{{ $campaign->thumbnail
+                            ? asset('storage/' . $campaign->thumbnail)
+                            : asset('assets/slide1.png') }}" alt="{{ $campaign->judul }}" class="campaign-row-image">
 
-                                <div class="campaign-row-body">
+                                                <div class="campaign-row-body">
 
-                                    <h3>{{ $campaign->judul }}</h3>
+                                                    <h3>{{ $campaign->judul }}</h3>
 
-                                    <p>
-                                        {{ $penggalang->nama_penggalang }}
-                                        <span>●</span>
-                                    </p>
+                                                    <p>
+                                                        {{ $penggalang->nama_penggalang }}
+                                                        <span>●</span>
+                                                    </p>
 
-                                    <div class="campaign-row-amount">
-                                        <strong>
-                                            Rp{{ number_format($campaign->target_donasi,0,',','.') }}
-                                        </strong>
-                                        <span>Target</span>
-                                    </div>
+                                                    <div class="campaign-row-amount">
+                                                        <strong>
+                                                            Rp{{ number_format($campaign->target_donasi, 0, ',', '.') }}
+                                                        </strong>
+                                                        <span>Target</span>
+                                                    </div>
 
-                                    <div class="campaign-progress">
-                                        <div></div>
-                                    </div>
+                                                    <div class="campaign-progress">
+                                                        <div></div>
+                                                    </div>
 
-                                    <div class="campaign-meta">
-                                        <span>Status: {{ $campaign->status }}</span>
+                                                    <div class="campaign-meta">
+                                                        <span>Status: {{ $campaign->status }}</span>
 
-                                        @if($campaign->tanggal_berakhir)
-                                            <span>
-                                                {{ \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') }}
-                                            </span>
-                                        @endif
-                                    </div>
+                                                        @if($campaign->tanggal_berakhir)
+                                                            <span>
+                                                                {{ \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
 
-                                </div>
+                                                </div>
 
-                            </article>
+                                            </article>
 
                         @empty
 

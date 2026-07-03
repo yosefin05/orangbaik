@@ -57,6 +57,7 @@ class PenggalangDanaController extends Controller
     ) {
         $penggalangDana->update([
             'status' => 'rejected',
+            'verified' => false,
             'verified_by' => auth()->id(),
             'verified_at' => now(),
         ]);
@@ -81,5 +82,27 @@ class PenggalangDanaController extends Controller
             'success',
             'Penggalang dana berhasil dihapus.'
         );
+    }
+
+    public function verify(Penggalang_Dana $penggalangDana)
+    {
+        $penggalangDana->update([
+            'verified' => true,
+            'verified_by' => auth()->id(),
+            'verified_at' => now(),
+        ]);
+
+        return back()->with('success', 'Organisasi berhasil diverifikasi.');
+    }
+
+    public function unverify(Penggalang_Dana $penggalangDana)
+    {
+        $penggalangDana->update([
+            'verified' => false,
+            'verified_by' => null,
+            'verified_at' => null,
+        ]);
+
+        return back()->with('success', 'Verifikasi dicabut.');
     }
 }
