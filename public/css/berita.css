@@ -1,96 +1,190 @@
 .berita-page {
     min-height: 100vh;
+    overflow-x: hidden;
     background: var(--bg-soft);
 }
 
+/* SECTION */
 .berita-section {
-    padding: 58px 0 72px;
+    padding: var(--section-space-sm, 58px) 0 var(--section-space, 72px);
 }
 
+/* GRID */
 .berita-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 26px 48px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 26px 28px;
 }
 
+/* CARD */
 .berita-card {
+    overflow: hidden;
+
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    overflow: hidden;
     box-shadow: var(--shadow-card);
-    transition: .2s ease;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
 }
 
 .berita-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow);
     border-color: rgba(51, 101, 175, .25);
+    box-shadow: var(--shadow);
+}
+
+.berita-card a {
+    display: block;
+
+    height: 100%;
+
+    color: inherit;
+    text-decoration: none;
 }
 
 .berita-image {
     width: 100%;
     aspect-ratio: 16 / 9;
+
     display: block;
+
     object-fit: cover;
     object-position: center;
 }
 
 .berita-body {
-    padding: 14px 16px 12px;
+    padding: var(--space-4, 14px) var(--space-4, 16px) var(--space-3, 12px);
 }
 
 .berita-body h2 {
-    color: var(--text-dark);
+    margin-bottom: var(--space-2, 8px);
+
+    color: var(--text-dark, var(--text));
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    line-height: 1.25;
-    margin-bottom: 8px;
+    line-height: 1.3;
 
     display: -webkit-box;
+    overflow: hidden;
+
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     line-clamp: 3;
-    overflow: hidden;
 }
 
 .berita-body p {
-    color: #9ca3af;
-    font-size: var(--fs-xs);
+    margin: 0;
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
     font-weight: var(--fw-medium);
-    line-height: 1;
+    line-height: 1.4;
+}
+
+/* EMPTY */
+.berita-empty {
+    grid-column: 1 / -1;
+
+    padding: var(--space-8, 32px);
+
+    text-align: center;
+
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+}
+
+.berita-empty p {
+    margin: 0;
+
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+}
+
+/* PAGINATION */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+
+    margin-top: var(--space-8, 32px);
+}
+
+.pagination-wrapper nav {
+    width: 100%;
+}
+
+.pagination-wrapper p,
+.pagination-wrapper span,
+.pagination-wrapper a {
+    font-size: var(--fs-xs);
+}
+
+.pagination-wrapper a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.pagination-wrapper svg {
+    width: 18px;
+    height: 18px;
 }
 
 /* TABLET */
 @media (max-width: 1000px) {
+    .berita-section {
+        padding: var(--section-space-sm, 52px) 0;
+    }
+
     .berita-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-5, 20px);
     }
 }
 
 /* MOBILE */
 @media (max-width: 640px) {
     .berita-section {
-        padding: 32px 0 48px;
+        padding: var(--space-7, 28px) 0 var(--space-8, 34px);
     }
 
     .berita-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-3, 12px);
+    }
+
+    .berita-card {
+        border-radius: var(--radius-sm);
+    }
+
+    .berita-card:hover {
+        transform: none;
     }
 
     .berita-body {
-        padding: 10px 11px;
+        padding: var(--space-2, 10px);
     }
 
     .berita-body h2 {
+        margin-bottom: var(--space-1, 6px);
+
         font-size: 10px;
-        line-height: 1.3;
-        margin-bottom: 7px;
+        line-height: 1.35;
+
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
     }
 
     .berita-body p {
-        font-size: 10px;
+        font-size: 9px;
+    }
+
+    .pagination-wrapper {
+        margin-top: var(--space-6, 24px);
     }
 }

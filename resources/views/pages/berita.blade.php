@@ -13,57 +13,56 @@
 
 @include('components.header')
 
-<main class="berita-page">
-    <section class="container berita-section">
+<main class="berita-page page-wrapper">
+    <section class="berita-section">
+        <div class="container">
 
-        <div class="berita-grid">
+            <div class="berita-grid">
 
-            @forelse ($beritas as $berita)
+                @forelse ($beritas as $berita)
+                    <article class="berita-card">
+                        <a href="{{ route('berita.show', $berita->slug) }}">
 
-                <article class="berita-card">
+                            <img
+                                src="{{ asset('storage/' . $berita->thumbnail) }}"
+                                alt="{{ $berita->judul }}"
+                                class="berita-image"
+                                loading="lazy"
+                            >
 
-                    <a href="{{ route('berita.show', $berita->slug) }}">
+                            <div class="berita-body">
+                                <h2>
+                                    {{ $berita->judul }}
+                                </h2>
 
-                        <img
-                            src="{{ asset('storage/' . $berita->thumbnail) }}"
-                            alt="{{ $berita->judul }}"
-                            class="berita-image"
-                            loading="lazy">
+                                <p>
+                                    {{ $berita->created_at->translatedFormat('d F Y') }}
+                                </p>
+                            </div>
 
-                        <div class="berita-body">
+                        </a>
+                    </article>
+                @empty
+                    <div class="berita-empty">
+                        <p>Belum ada berita.</p>
+                    </div>
+                @endforelse
 
-                            <h2>
-                                {{ $berita->judul }}
-                            </h2>
+            </div>
 
-                            <p>
-                                {{ $berita->created_at->translatedFormat('d F Y') }}
-                            </p>
-
-                        </div>
-
-                    </a>
-
-                </article>
-
-            @empty
-
-                <p>Belum ada berita.</p>
-
-            @endforelse
+            <div class="pagination-wrapper">
+                @if (is_object($beritas) && method_exists($beritas, 'links'))
+                    {{ $beritas->links() }}
+                @endif
+            </div>
 
         </div>
-
-        <div class="pagination-wrapper">
-            @if (is_object($beritas) && method_exists($beritas, 'links'))
-                {{ $beritas->links() }}
-            @endif
-        </div>
-
     </section>
 </main>
 
 @include('components.footer')
+
+<script src="{{ asset('js/header.js') }}"></script>
 
 </body>
 </html>

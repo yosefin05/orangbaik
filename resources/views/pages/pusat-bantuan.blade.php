@@ -11,118 +11,183 @@
 </head>
 <body>
 
+@include('components.header')
+
 @php
+    $contacts = [
+        [
+            'title' => 'Hubungi Hotline OrangBaik.id',
+            'desc' => 'Hubungi Hotline OrangBaik.id untuk menjawab pertanyaan, saran, atau kendalamu.',
+            'url' => '#',
+            'icon' => 'bi bi-telephone-fill',
+        ],
+        [
+            'title' => 'Hubungi kami via email',
+            'desc' => 'Hubungi untuk menjawab pertanyaan, saran, atau kendalamu via email kami.',
+            'url' => 'mailto:info@dompetalquran.or.id',
+            'icon' => 'bi bi-envelope-fill',
+        ],
+    ];
+
     $faqs = [
-        'Apakah orangbaik.id memiliki izin legalitas dan diawasi oleh Pemerintah?',
-        'Bagaimana orangbaik.id memastikan keaslian galang dana?',
-        'Apakah ada potongan untuk biaya operasional orangbaik.id?',
-        'Bagaimana cara mendapatkan laporan perkembangan program yang saya dukung?',
-        'Bagaimana Cara Mendaftar menjadi Penggalang Dana?',
-        'Apakah orangbaik.id memiliki izin legalitas dan diawasi oleh Pemerintah?',
-        'Bagaimana orangbaik.id memastikan keaslian galang dana?',
+        [
+            'question' => 'Apakah OrangBaik.id memiliki izin legalitas dan diawasi oleh Pemerintah?',
+            'answer' => 'OrangBaik.id berkomitmen menjaga transparansi, legalitas, serta pengelolaan dana yang amanah dalam setiap program yang ditampilkan.',
+        ],
+        [
+            'question' => 'Bagaimana OrangBaik.id memastikan keaslian galang dana?',
+            'answer' => 'Setiap penggalang dana perlu melalui proses verifikasi data dan pemeriksaan informasi sebelum campaign ditampilkan kepada publik.',
+        ],
+        [
+            'question' => 'Apakah ada potongan untuk biaya operasional OrangBaik.id?',
+            'answer' => 'Biaya operasional digunakan untuk mendukung layanan platform, verifikasi, sistem pembayaran, dan pelaporan program.',
+        ],
+        [
+            'question' => 'Bagaimana cara mendapatkan laporan perkembangan program yang saya dukung?',
+            'answer' => 'Laporan perkembangan program dapat dilihat melalui update campaign atau informasi yang dibagikan oleh penggalang dana.',
+        ],
+        [
+            'question' => 'Bagaimana Cara Mendaftar menjadi Penggalang Dana?',
+            'answer' => 'Kamu dapat mendaftar melalui menu penggalang dana, lalu melengkapi data dan dokumen verifikasi yang dibutuhkan.',
+        ],
+        [
+            'question' => 'Apakah donasi saya aman?',
+            'answer' => 'Donasi diproses melalui sistem yang dirancang untuk menjaga keamanan transaksi dan transparansi penyaluran bantuan.',
+        ],
+        [
+            'question' => 'Apakah saya bisa mendapatkan e-kwitansi?',
+            'answer' => 'Ya, e-kwitansi dapat diakses melalui halaman riwayat donasi setelah transaksi berhasil diproses.',
+        ],
     ];
 @endphp
 
 <main class="help-page">
 
-    <section class="help-top">
-        <div class="help-container">
+    <section class="help-hero">
+        <div class="container">
 
-            <button class="help-back" type="button" onclick="history.back()">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M15 18L9 12L15 6" />
-                </svg>
-                <span>Kembali</span>
-            </button>
-
-            <div class="chatbot-hero">
-                <div class="chatbot-pill">
-                    <span>✦</span>
-                    orangbaik.id Official Chatbot
+            <div class="help-hero-content">
+                <div class="help-pill">
+                    <i class="bi bi-stars" aria-hidden="true"></i>
+                    <span>OrangBaik.id Official Chatbot</span>
                 </div>
 
                 <h1>
-                    <span class="bot-icon">🤖</span>
-                    Chatbot Cerdas untuk <br>
-                    Pertanyaan Seputar <strong>orangbaik.id</strong>
+                    <span class="help-bot-icon" aria-hidden="true">
+                        <i class="bi bi-robot"></i>
+                    </span>
+
+                    Chatbot Cerdas untuk
+                    <br>
+
+                    Pertanyaan Seputar <strong>OrangBaik.id</strong>
                 </h1>
 
                 <p>
-                    Chatbot interaktif yang siap membantu menjawab pertanyaan seputar orangbaik.id
-                    dengan cepat, mudah, dan akurat kapan saja Anda membutuhkannya.
+                    Chatbot interaktif yang siap membantu menjawab pertanyaan seputar OrangBaik.id
+                    dengan cepat, mudah, dan akurat kapan saja kamu membutuhkannya.
                 </p>
 
-                <form class="chatbox" action="#" method="POST">
+                <form class="chatbox" id="help-ai-form" action="#" method="POST">
                     @csrf
 
-                    <textarea name="message" placeholder="What would you like to know?"></textarea>
+                    <textarea
+                        name="message"
+                        class="chatbox-input"
+                        placeholder="What would you like to know?"
+                        aria-label="Tulis pertanyaan"
+                        required
+                    ></textarea>
 
                     <div class="chatbox-bottom">
-                        <div class="chatbox-actions">
-                            <button type="button" aria-label="Upload gambar">▧</button>
-                            <button type="button" aria-label="Kode">‹›</button>
-                            <button type="button" aria-label="Voice">♟</button>
+                        <div class="chatbox-tools">
+                            <button type="button" aria-label="Upload gambar">
+                                <i class="bi bi-image"></i>
+                            </button>
+
+                            <button type="button" aria-label="Kode">
+                                <i class="bi bi-code-slash"></i>
+                            </button>
+
+                            <button type="button" aria-label="Voice">
+                                <i class="bi bi-mic-fill"></i>
+                            </button>
                         </div>
 
-                        <button class="send-button" type="submit" aria-label="Kirim">
-                            ↑
+                        <button class="chatbox-send" type="submit" aria-label="Kirim pertanyaan">
+                            <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </form>
-            </div>
 
-            <div class="help-contact-wrap">
-                <div class="help-contact-list">
-
-                    <a href="#" class="contact-card">
-                        <span class="contact-icon">☎</span>
-
-                        <span class="contact-text">
-                            <strong>Hubungi Hotline orangbaik.id</strong>
-                            <small>Hubungi Hotline orangbaik.id untuk menjawab pertanyaan, saran, atau kendalamu.</small>
-                        </span>
-
-                        <span class="contact-arrow">›</span>
-                    </a>
-
-                    <a href="mailto:info@dompetalquran.or.id" class="contact-card">
-                        <span class="contact-icon">✉</span>
-
-                        <span class="contact-text">
-                            <strong>Hubungi kami via email</strong>
-                            <small>Hubungi untuk menjawab pertanyaan, saran, atau kendalamu via email kami.</small>
-                        </span>
-
-                        <span class="contact-arrow">›</span>
-                    </a>
-
-                </div>
-
-                <div class="map-card">
-                    MAPS
+                <div class="chat-preview" id="help-ai-chat">
+                    <div class="chat-message bot">
+                        <strong>OrangBaik.id Assistant</strong>
+                        <p>
+                            Halo, saya siap membantu menjawab pertanyaan seputar donasi,
+                            penggalang dana, transaksi, e-kwitansi, dan layanan OrangBaik.id.
+                        </p>
+                    </div>
                 </div>
             </div>
 
         </div>
     </section>
 
-    <section class="help-faq">
-        <div class="help-container">
+    <section class="help-contact-section">
+        <div class="container">
 
-            <h2>Pertanyaan Yang Sering Diajukan Tentang Kitabisa</h2>
+            <div class="help-contact-layout">
+                <div class="help-contact-list">
+                    @foreach ($contacts as $contact)
+                        <a href="{{ $contact['url'] }}" class="contact-card">
+                            <span class="contact-icon" aria-hidden="true">
+                                <i class="{{ $contact['icon'] }}"></i>
+                            </span>
 
-            <div class="faq-list">
+                            <span class="contact-text">
+                                <strong>{{ $contact['title'] }}</strong>
+                                <small>{{ $contact['desc'] }}</small>
+                            </span>
+
+                            <span class="contact-arrow" aria-hidden="true">
+                                <i class="bi bi-chevron-right"></i>
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="map-card">
+                    <span>MAPS</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="about-section about-faq-section">
+        <div class="container">
+
+            <div class="about-section-heading">
+                <span class="about-section-label">FAQ</span>
+
+                <h2>Pertanyaan yang Sering Diajukan Tentang OrangBaik.id</h2>
+
+                <p>
+                    Beberapa pertanyaan umum seputar OrangBaik.id, donasi,
+                    penggalang dana, transaksi, dan laporan program.
+                </p>
+            </div>
+
+            <div class="about-faq-list">
                 @foreach ($faqs as $faq)
-                    <details class="faq-item">
+                    <details class="about-faq-item">
                         <summary>
-                            <span>{{ $faq }}</span>
-                            <b>+</b>
+                            <span>{{ $faq['question'] }}</span>
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
                         </summary>
 
-                        <p>
-                            OrangBaik.id menjaga transparansi, keamanan, serta kepercayaan pengguna
-                            melalui proses verifikasi dan pengawasan campaign.
-                        </p>
+                        <p>{{ $faq['answer'] }}</p>
                     </details>
                 @endforeach
             </div>
@@ -133,6 +198,9 @@
 </main>
 
 @include('components.footer')
+
+<script src="{{ asset('js/header.js') }}"></script>
+<script src="{{ asset('js/pusat-bantuan.js') }}"></script>
 
 </body>
 </html>

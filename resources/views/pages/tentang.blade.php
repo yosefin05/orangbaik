@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,10 @@
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/tentang.css') }}">
 </head>
+
 <body>
+
+@include('components.header')
 
 @php
     $legalities = [
@@ -23,71 +27,101 @@
     $years = ['2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016'];
 
     $faqs = [
-        'Apakah orangbaik.id memiliki izin legalitas dan diawasi oleh Pemerintah?',
-        'Bagaimana orangbaik.id memastikan keaslian galang dana?',
-        'Apakah ada potongan untuk biaya operasional orangbaik.id?',
-        'Bagaimana cara mendapatkan laporan perkembangan program yang saya dukung?',
-        'Bagaimana Cara Mendaftar menjadi Penggalang Dana?',
-        'Apakah orangbaik.id memiliki izin legalitas dan diawasi oleh Pemerintah?',
-        'Bagaimana orangbaik.id memastikan keaslian galang dana?',
+        [
+            'question' => 'Apakah OrangBaik.id memiliki izin legalitas dan diawasi oleh pemerintah?',
+            'answer' => 'OrangBaik.id dikelola secara profesional dengan komitmen terhadap transparansi, legalitas, dan pengelolaan dana yang amanah.',
+        ],
+        [
+            'question' => 'Bagaimana OrangBaik.id memastikan keaslian galang dana?',
+            'answer' => 'Setiap penggalang dana perlu melalui proses verifikasi dan pemeriksaan data sebelum campaign ditampilkan kepada publik.',
+        ],
+        [
+            'question' => 'Apakah ada potongan untuk biaya operasional OrangBaik.id?',
+            'answer' => 'Biaya operasional digunakan untuk mendukung layanan platform, pengembangan sistem, verifikasi, serta proses pelaporan program.',
+        ],
+        [
+            'question' => 'Bagaimana cara mendapatkan laporan perkembangan program yang saya dukung?',
+            'answer' => 'Laporan perkembangan program dapat dilihat melalui update campaign atau informasi yang disediakan oleh penggalang dana.',
+        ],
+        [
+            'question' => 'Bagaimana cara mendaftar menjadi penggalang dana?',
+            'answer' => 'Kamu dapat mendaftar melalui halaman profil, lalu memilih menu daftar sebagai penggalang dana dan melengkapi data verifikasi.',
+        ],
     ];
 @endphp
 
 <main class="about-page">
 
-    <div class="about-container">
+    {{-- HERO --}}
+    <section class="about-hero">
+        <div class="container about-hero-inner">
 
-        {{-- BACK --}}
-        <button class="about-back" type="button" onclick="history.back()">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M15 18L9 12L15 6" />
-            </svg>
-            <span>Kembali</span>
-        </button>
+            <div class="about-hero-content">
+                <span class="about-eyebrow">Tentang Kami</span>
 
-        {{-- INTRO --}}
-        <section class="about-intro">
-            <h1>Siapa <span>orangbaik.id?</span></h1>
+                <h1>
+                    Siapa <span>OrangBaik.id?</span>
+                </h1>
 
-            <p>
-                Situs orangbaik.id merupakan platform donasi dan galang dana secara online
-                yang dikelola oleh Yayasan Dompet Al-Qur'an Indonesia.
-            </p>
+                <p>
+                    OrangBaik.id merupakan platform donasi dan galang dana online
+                    yang dikelola untuk membantu masyarakat berbagi kebaikan secara
+                    mudah, aman, dan transparan.
+                </p>
 
-            <p>
-                Dompet Al-Qur'an Indonesia adalah Lembaga Amil Zakat yang mengelola dana
-                Zakat, Infaq, Sedekah, dan Wakaf (ZISWAF) untuk kesejahteraan masyarakat
-                dengan program-program pendidikan, perekonomian, dakwah, dan kemanusiaan.
-            </p>
-        </section>
+                <p>
+                    Platform ini hadir untuk mendukung pengelolaan dana zakat, infak,
+                    sedekah, wakaf, serta program sosial, pendidikan, dakwah, ekonomi,
+                    dan kemanusiaan.
+                </p>
+            </div>
 
-    </div>
+            <div class="about-hero-image">
+                <img
+                    src="{{ asset('assets/about-person.png') }}"
+                    alt="Relawan OrangBaik.id">
+            </div>
+
+        </div>
+    </section>
 
     {{-- VISI MISI --}}
-    <section class="vision-section">
-        <div class="about-container vision-wrapper">
+    <section class="about-section about-vision-section">
+        <div class="container about-vision-layout">
 
-            <div class="vision-content">
+            <div class="about-section-heading">
+                <span class="about-section-label">Visi & Misi</span>
+                <h2>Visi dan Misi Lembaga</h2>
+                <p>
+                    Menjadi landasan dalam membangun layanan kebaikan yang profesional,
+                    amanah, dan berdampak bagi masyarakat.
+                </p>
+            </div>
 
-                <span class="section-pill">Visi & Misi Lembaga</span>
+            <div class="about-vision-grid">
 
-                <div class="vision-item">
-                    <div class="vision-icon">☼</div>
+                <article class="about-vision-card">
+                    <div class="about-card-icon">
+                        <i class="bi bi-brightness-high-fill"></i>
+                    </div>
 
                     <div>
-                        <h2>Visi Lembaga</h2>
+                        <h3>Visi Lembaga</h3>
+
                         <p>
-                            Menjadi Lembaga Profesional dalam Pemberdayaan dan Pelayanan
+                            Menjadi lembaga profesional dalam pemberdayaan dan pelayanan,
                             serta membangun masyarakat yang akrab dengan Al-Qur'an.
                         </p>
                     </div>
-                </div>
+                </article>
 
-                <div class="vision-item">
-                    <div class="vision-icon">▣</div>
+                <article class="about-vision-card">
+                    <div class="about-card-icon">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                    </div>
 
                     <div>
-                        <h2>Misi Lembaga</h2>
+                        <h3>Misi Lembaga</h3>
 
                         <ol>
                             <li>Aktif dalam membangun jaringan filantropi yang profesional.</li>
@@ -95,42 +129,37 @@
                             <li>Meningkatkan sumber daya melalui keunggulan lembaga.</li>
                         </ol>
                     </div>
-                </div>
+                </article>
 
-                <p class="vision-note">
-                    Menjadi landasan dalam menciptakan masa depan yang lebih baik melalui
-                    inovasi, integritas, dan pelayanan.
-                </p>
-
-            </div>
-
-            <div class="vision-image-wrap">
-                <img src="{{ asset('assets/about-person.png') }}" alt="Relawan OrangBaik.id">
             </div>
 
         </div>
     </section>
 
     {{-- LEGALITAS --}}
-    <section class="legal-section">
-        <div class="about-container">
+    <section class="about-section about-legal-section">
+        <div class="container">
 
-            <span class="section-pill">Legalitas</span>
+            <div class="about-section-heading">
+                <span class="about-section-label">Legalitas</span>
+                <h2>Legalitas Lembaga</h2>
+                <p>
+                    Lembaga kami beroperasi secara resmi dan profesional dengan legalitas
+                    yang sah sebagai bentuk komitmen dalam membangun kepercayaan,
+                    transparansi, dan pelayanan yang bertanggung jawab.
+                </p>
+            </div>
 
-            <p class="legal-desc">
-                Lembaga kami beroperasi secara resmi dan profesional dengan legalitas yang sah
-                sesuai peraturan yang berlaku, sebagai bentuk komitmen dalam membangun
-                kepercayaan, transparansi, dan pelayanan yang bertanggung jawab.
-            </p>
-
-            <div class="legal-grid">
+            <div class="about-legal-grid">
                 @foreach ($legalities as $legal)
-                    <article class="legal-card">
-                        <img src="{{ asset($legal['image']) }}" alt="{{ $legal['name'] }}">
+                    <article class="about-legal-card">
+                        <img
+                            src="{{ asset($legal['image']) }}"
+                            alt="{{ $legal['name'] }}">
 
                         <a href="#">
-                            Lihat Izin
-                            <span>↗</span>
+                            <span>Lihat Izin</span>
+                            <i class="bi bi-arrow-up-right"></i>
                         </a>
                     </article>
                 @endforeach
@@ -140,52 +169,63 @@
     </section>
 
     {{-- LAPORAN KEUANGAN --}}
-    <section class="report-section">
-        <div class="about-container">
+    <section class="about-section about-report-section">
+        <div class="container">
 
-            <span class="section-pill">Laporan Keuangan</span>
+            <div class="about-section-heading">
+                <span class="about-section-label">Laporan Keuangan</span>
+                <h2>Transparansi Laporan Keuangan</h2>
+                <p>
+                    Lihat laporan keuangan OrangBaik.id sebagai wujud komitmen terhadap
+                    transparansi dan pengelolaan dana yang amanah.
+                </p>
+            </div>
 
-            <p class="report-desc">
-                Lihat laporan keuangan orangbaik.id yang telah diaudit secara independen
-                setiap tahun sebagai wujud komitmen kami terhadap transparansi dan
-                pengelolaan dana yang amanah.
-            </p>
-
-            <div class="year-tabs">
+            <div class="about-year-tabs">
                 @foreach ($years as $index => $year)
-                    <button class="{{ $index === 0 ? 'active' : '' }}" type="button">
+                    <button
+                        class="{{ $index === 0 ? 'active' : '' }}"
+                        type="button">
                         {{ $year }}
                     </button>
                 @endforeach
             </div>
 
-            <a href="#" class="report-link">
-                <span>▣</span>
+            <a href="#" class="about-report-link">
+                <span class="about-report-icon">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                </span>
+
                 <strong>Laporan Keuangan 2025</strong>
-                <i>›</i>
+
+                <i class="bi bi-chevron-right"></i>
             </a>
 
         </div>
     </section>
 
     {{-- FAQ --}}
-    <section class="faq-section">
-        <div class="about-container">
+    <section class="about-section about-faq-section">
+        <div class="container">
 
-            <h2>Pertanyaan Yang Sering Diajukan Tentang Kitabisa</h2>
+            <div class="about-section-heading">
+                <span class="about-section-label">FAQ</span>
+                <h2>Pertanyaan yang Sering Diajukan</h2>
+                <p>
+                    Beberapa pertanyaan umum seputar OrangBaik.id, legalitas,
+                    penggalang dana, dan laporan program.
+                </p>
+            </div>
 
-            <div class="faq-list">
+            <div class="about-faq-list">
                 @foreach ($faqs as $faq)
-                    <details class="faq-item">
+                    <details class="about-faq-item">
                         <summary>
-                            <span>{{ $faq }}</span>
-                            <b>+</b>
+                            <span>{{ $faq['question'] }}</span>
+                            <i class="bi bi-plus-lg"></i>
                         </summary>
 
-                        <p>
-                            OrangBaik.id berkomitmen menjaga transparansi, keamanan, dan
-                            kepercayaan dalam setiap proses donasi maupun galang dana.
-                        </p>
+                        <p>{{ $faq['answer'] }}</p>
                     </details>
                 @endforeach
             </div>
@@ -196,6 +236,9 @@
 </main>
 
 @include('components.footer')
+
+<script src="{{ asset('js/header.js') }}"></script>
+<script src="{{ asset('js/tentang.js') }}"></script>
 
 </body>
 </html>

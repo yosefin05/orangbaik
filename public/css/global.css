@@ -2,7 +2,7 @@
    GLOBAL CSS - ORANGBAIK.ID
    Pondasi utama: warna, font, spacing, container, card, button
    ============================ */
-
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root {
@@ -36,7 +36,7 @@
     --muted-light: #a3a3a3;
 
     --bg: #ffffff;
-    --bg-soft: #f3f7fc;
+    --bg-soft: #f7faff;
     --bg-blue-soft: #f5f9ff;
 
     --border: #dbe3ef;
