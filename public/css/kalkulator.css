@@ -49,12 +49,45 @@
 /* === Zakat Form Section - restyle only === */
 
 .zakat-form-header {
+    margin-top: 20px;
     margin-bottom: 20px;
 }
 
 #form-fields {
     display: flex;
     flex-direction: column;
+}
+
+/* Judul section */
+#form-fields .form-section h4{
+    font-size: var(--fs-sm);
+}
+
+#form-fields .form-section p{
+    font-size: var(--fs-xs);
+    color: var(--muted);
+}
+
+/* Label input */
+#form-fields .zakat-form-group label{
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+}
+
+/* Input */
+#form-fields .zakat-form-group input{
+    font-size: var(--fs-sm);
+}
+
+/* Rp */
+#form-fields .rupiah-label{
+    font-size: var(--fs-sm);
+}
+
+/* Keterangan kecil */
+#form-fields .zakat-form-group small{
+    font-size: var(--fs-xxs);
+    color: var(--muted);
 }
 
 .zakat-field-group {
@@ -68,7 +101,7 @@
 }
 
 .zakat-field-title {
-    font-size: var(--font-size-lg);
+    font-size: var(--fs-lg);
     font-weight: 700;
     color: var(--color-text);
     margin: 0 0 4px 0;
@@ -157,6 +190,28 @@
     flex-shrink: 0;
 }
 
+.form-section{
+    margin:28px 0 18px;
+}
+
+.form-section:first-child{
+    margin-top:10px;
+}
+
+.form-section h4{
+    margin:0 0 6px;
+    font-size:22px;
+    font-weight:700;
+    color:#2E2E2E;
+}
+
+.form-section p{
+    margin:0;
+    color:#6B6B6B;
+    font-size:14px;
+    line-height:1.6;
+}
+
 /* INFO BANNER */
 .zakat-info-banner {
     max-width: var(--container);
@@ -238,7 +293,7 @@
     padding: 12px 14px;
 
     background: #fffdf5;
-    border: 1px solid #eee8d8;
+    border: 1px solid var(--primary);
     border-radius: 8px;
 
     color: #333;
@@ -260,16 +315,16 @@
 
 /* Hover */
 .zakat-tab:hover {
-    border-color: #2e7d32;
-    background: #f7fff7;
+    border-color: var(--primary);
+    background: var(--primary-light);
 }
 
 
 /* Saat aktif */
 .zakat-tab.active {
-    background: #f1fff1;
-    border: 1.5px solid #3a8f45;
-    color: #24752c;
+    background: var(--primary-light);
+    border: 1.5px solid var(--primary);
+    color: var(--primary-hover);
 }
 
 

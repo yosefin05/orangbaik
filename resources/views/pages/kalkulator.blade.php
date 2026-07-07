@@ -55,7 +55,7 @@
             <!-- 1. PILIH JENIS ZAKAT -->
             <div class="zakat-card">
                 <div class="zakat-card-header">
-                    <h2>Kalkulator Zakat</h2>
+                    <h3>1. Pilih jenis zakat</h3>
                     <p>Pilih jenis zakat, kemudian isi data sesuai kondisi Anda.</p>
                 </div>
 
@@ -101,139 +101,129 @@
 
                 <form action="{{ url('/kalkulator/hitung') }}" method="POST" id="zakatForm">
                     @csrf
-                    <input type="hidden" name="jenis" id="jenis" value="penghasilan">
-
+                    <input type="hidden" id="jenis" name="jenis" value="penghasilan">
                     <div class="zakat-form-header">
-                        <h3 id="form-title">
-                            Zakat Penghasilan
-                        </h3>
-                        <p id="form-subtitle">
-                            Masukkan penghasilan bulanan Anda.
-                        </p>
+                        <h3 id="form-title"></h3>
+                        <div class="zakat-info-box">
+                            <strong>Nisab</strong>
+                            <span id="nishab-info"></span>
+                        </div>
                     </div>
 
-                    <div class="zakat-info-box">
-                        <strong>Nishab</strong>
-                        <span id="nishab-info">
-                            85 gram emas per tahun
-                        </span>
-                    </div>
-
-                    <div id="form-fields">
-                    </div>
+                    <div id="form-fields"></div>
 
                     <button type="submit" class="zakat-submit-btn">
-                        <svg class="zakat-submit-icon" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="2" />
-                            <line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="2" />
-                            <circle cx="8" cy="11" r="1" fill="currentColor" />
-                            <circle cx="12" cy="11" r="1" fill="currentColor" />
-                            <circle cx="16" cy="11" r="1" fill="currentColor" />
-                            <circle cx="8" cy="15" r="1" fill="currentColor" />
-                            <circle cx="12" cy="15" r="1" fill="currentColor" />
-                            <circle cx="16" cy="15" r="1" fill="currentColor" />
-                        </svg>
+                        <i class="fa-solid fa-calculator"></i>
                         Hitung Zakat
                     </button>
+
                 </form>
-
-                <form action="{{ url('/kalkulator/hitung') }}" method="POST" id="zakatForm">
-
-
             </div>
         </div>
 
-        <!-- KOLOM KANAN -->
+        <!-- ================= HASIL PERHITUNGAN ================= -->
         <div class="zakat-right">
 
             @if(session('hasil'))
 
-                <!-- HASIL PERHITUNGAN -->
-                <div class="zakat-result-card">
+                        <div class="zakat-result-card">
 
-                    <div class="zakat-result-header">
-                        <h3>Hasil Perhitungan</h3>
-                        <span class="zakat-result-badge">{{ ucfirst(session('jenis', 'Zakat')) }}</span>
-                    </div>
+                            <div class="zakat-result-header">
+                                <h3>Hasil Perhitungan</h3>
 
-                    <div class="zakat-result-label">Total Zakat yang Harus Dibayarkan</div>
+                                <span class="zakat-result-badge">
+                                    {{ ucfirst(session('jenis', 'Zakat')) }}
+                                </span>
+                            </div>
 
-                    <div class="zakat-result-amount">
-                        Rp{{ number_format(session('hasil'), 0, ',', '.') }}
-                    </div>
+                            <p class="zakat-result-title">
+                                Total Zakat yang Harus Dibayarkan
+                            </p>
 
-                    @if(session('persentase'))
-                        <div class="zakat-result-note">({{ session('persentase') }}% dari
-                            {{ session('dasar') ? 'Rp' . number_format(session('dasar'), 0, ',', '.') : '-' }})
+                            <h1 class="zakat-result-amount">
+                                Rp{{ number_format(session('hasil'), 0, ',', '.') }}
+                            </h1>
+
+                            <p class="zakat-result-subtitle">
+                                ({{ session('persentase', 2.5) }}% dari
+                                Rp{{ number_format(session('dasar', 0), 0, ',', '.') }})
+                            </p>
+
+                            <div class="zakat-result-detail">
+
+                                <div class="zakat-result-row">
+                                    <span>Total Harta</span>
+                                    <strong>
+                                        Rp{{ number_format(session('harta', 0), 0, ',', '.') }}
+                                    </strong>
+                                </div>
+
+                                <div class="zakat-result-row">
+                                    <span>Total Hutang</span>
+                                    <strong class="text-danger">
+                                        -Rp{{ number_format(session('hutang', 0), 0, ',', '.') }}
+                                    </strong>
+                                </div>
+
+                                <div class="zakat-result-row">
+                                    <span>Harta Bersih (Nisab)</span>
+                                    <strong>
+                                        Rp{{ number_format(session('nishab', 0), 0, ',', '.') }}
+                                    </strong>
+                                </div>
+
+                                <div class="zakat-result-row">
+                                    <span>Persentase Zakat</span>
+                                    <strong>
+                                        {{ session('persentase', 2.5) }}%
+                                    </strong>
+                                </div>
+
+                                <div class="zakat-result-row total">
+                                    <span>Zakat yang Dikeluarkan</span>
+                                    <strong class="text-success">
+                                        Rp{{ number_format(session('hasil'), 0, ',', '.') }}
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                            <div class="zakat-info-card">
+
+                                <div class="info-icon">
+                                    <i class="fa-regular fa-bookmark"></i>
+                                </div>
+
+                                <div>
+
+                                    <h4>Dasar Perhitungan</h4>
+
+                                    <p>
+                                        {{ session(
+                    'dasar_hukum',
+                    'Zakat dihitung sebesar 2,5% dari harta bersih (setelah dikurangi hutang) yang telah mencapai nisab dan dimiliki selama 1 tahun (haul).'
+                ) }}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
                         </div>
-                    @endif
+                        <!-- REKOMENDASI -->
+                        <div class="zakat-rekomendasi-card">
+                            <h3>Rekomendasi Selanjutnya</h3>
+                            <p>Salurkan zakat Anda untuk membantu mereka yang membutuhkan</p>
 
-                    <div class="zakat-result-table">
+                            <a href="/donasi/zakat" class="btn-pay-primary">
+                                🤝 Salurkan Zakat Sekarang
+                            </a>
 
-                        @if(session('harta'))
-                            <div class="zakat-result-row">
-                                <span>Total Harta</span>
-                                <strong>Rp{{ number_format(session('harta'), 0, ',', '.') }}</strong>
-                            </div>
-                        @endif
-
-                        @if(session('utang'))
-                            <div class="zakat-result-row">
-                                <span>Total Hutang</span>
-                                <strong class="red">- Rp{{ number_format(session('utang'), 0, ',', '.') }}</strong>
-                            </div>
-                        @endif
-
-                        @if(session('nishab'))
-                            <div class="zakat-result-row">
-                                <span>Harta Bersih (Nishab)</span>
-                                <strong>Rp{{ number_format(session('nishab'), 0, ',', '.') }}</strong>
-                            </div>
-                        @endif
-
-                        @if(session('persentase'))
-                            <div class="zakat-result-row">
-                                <span>Persentase Zakat</span>
-                                <strong>{{ session('persentase') }}%</strong>
-                            </div>
-                        @endif
-
-                        <div class="zakat-result-row">
-                            <span>Zakat yang Dikeluarkan</span>
-                            <strong class="green">Rp{{ number_format(session('hasil'), 0, ',', '.') }}</strong>
+                            <button type="button" class="btn-pay-outline" onclick="window.print()">
+                                🔖 Simpan Perhitungan
+                            </button>
                         </div>
-
-                    </div>
-
-                    @if(session('dasar_hukum'))
-                        <div class="zakat-basis-box">
-                            <div class="zakat-basis-icon">📖</div>
-                            <div>
-                                <h4>Dasar Perhitungan</h4>
-                                <p>{{ session('dasar_hukum') }}</p>
-                            </div>
-                        </div>
-                    @endif
-
-                </div>
-
-                <!-- REKOMENDASI -->
-                <div class="zakat-rekomendasi-card">
-                    <h3>Rekomendasi Selanjutnya</h3>
-                    <p>Salurkan zakat Anda untuk membantu mereka yang membutuhkan</p>
-
-                    <a href="/donasi/zakat" class="btn-pay-primary">
-                        🤝 Salurkan Zakat Sekarang
-                    </a>
-
-                    <button type="button" class="btn-pay-outline" onclick="window.print()">
-                        🔖 Simpan Perhitungan
-                    </button>
-                </div>
-
             @else
-
                 <!-- EMPTY STATE -->
                 <div class="zakat-result-card">
                     <div class="zakat-result-header">
@@ -246,9 +236,7 @@
                         </p>
                     </div>
                 </div>
-
             @endif
-
         </div>
 
     </div>
@@ -290,6 +278,9 @@
 
     @include('components.footer')
     <script src="{{ asset('js/kalkulator.js') }}"></script>
+    <script>
+        window.selectedZakat = "{{ session('selected_zakat', 'penghasilan') }}";
+    </script>
 </body>
 
 </html>

@@ -37,211 +37,134 @@ class KalkulatorController extends Controller
     // penghasilan
     private function penghasilan($request)
     {
+        $gaji = (int) str_replace('.', '', $request->gaji ?? 0);
+        $bonus = (int) str_replace('.', '', $request->bonus ?? 0);
 
-        $gaji = $request->gaji ?? 0;
-        $bonus = $request->bonus ?? 0;
+        $totalHarta = $gaji + $bonus;
+        $hutang = 0;
+        $hartaBersih = $totalHarta - $hutang;
 
+        $nishab = (self::NISHAB_GRAM * self::HARGA_EMAS) / 12;
 
-        $bruto = $gaji + $bonus;
+        $wajib = $hartaBersih >= $nishab;
 
-
-        $nishabBulanan =
-            (self::NISHAB_GRAM * self::HARGA_EMAS) / 12;
-
-
-        $wajib = $bruto >= $nishabBulanan;
-
-
-        $zakat = $wajib
-            ? $bruto * self::TARIF
-            : 0;
-
+        $zakat = $wajib ? $hartaBersih * self::TARIF : 0;
 
         return back()->with([
-
-            'hasil' => $zakat,
-
+            'selected_zakat' => $request->jenis,
             'jenis' => 'Zakat Penghasilan',
-
-            'wajib' => $wajib,
-
-            'dasar' => $bruto,
-
+            'hasil' => $zakat,
             'persentase' => 2.5,
-
-
-            'detail' => [
-                'Pendapatan Pokok' => $gaji,
-                'Pendapatan Lain' => $bonus,
-                'Total Bruto' => $bruto,
-                'Nishab' => $nishabBulanan
-            ],
-
-
-            'dasar_hukum' =>
-                'SK BAZNAS RI No. 01 Tahun 2024'
-
+            'dasar' => $hartaBersih,
+            'harta' => $totalHarta,
+            'hutang' => $hutang,
+            'nishab' => $nishab,
+            'harga_emas' => self::HARGA_EMAS,
+            'dasar_hukum' => 'Zakat penghasilan sebesar 2,5% apabila penghasilan bulanan telah mencapai nisab BAZNAS RI Tahun 2024.',
+            'wajib' => $wajib,
         ]);
-
     }
 
     // emas
     private function emas($request)
     {
+        $gram = (float) $request->gram;
 
-        $gram = $request->gram;
+        $totalHarta = $gram * self::HARGA_EMAS;
 
-        $harga =
-            $request->harga_emas
-            ?? self::HARGA_EMAS;
+        $hutang = (int) str_replace('.', '', $request->pengurang ?? 0);
 
+        $hartaBersih = max(0, $totalHarta - $hutang);
 
-        $nilai =
-            $gram * $harga;
+        $nishab = self::NISHAB_GRAM * self::HARGA_EMAS;
 
+        $wajib = $hartaBersih >= $nishab;
 
-        $wajib =
-            $gram >= 85;
-
-
-        $zakat =
-            $wajib
-            ? $nilai * self::TARIF
-            : 0;
-
+        $zakat = $wajib ? $hartaBersih * self::TARIF : 0;
 
         return back()->with([
-
-            'hasil' => $zakat,
-
+            'selected_zakat' => $request->jenis,
             'jenis' => 'Zakat Emas',
-
+            'hasil' => $zakat,
+            'persentase' => 2.5,
+            'dasar' => $hartaBersih,
+            'harta' => $totalHarta,
+            'hutang' => $hutang,
+            'nishab' => $nishab,
+            'harga_emas' => self::HARGA_EMAS,
+            'dasar_hukum' => 'Zakat emas wajib apabila kepemilikan mencapai nisab 85 gram emas.',
             'wajib' => $wajib,
-
-
-            'detail' => [
-
-                'Jumlah emas' => $gram . ' gram',
-
-                'Harga emas' => $harga,
-
-                'Nilai emas' => $nilai,
-
-                'Nishab' => '85 gram'
-
-            ]
-
         ]);
-
     }
 
     // tabungan
     private function tabungan($request)
     {
+        $saldo = (int) str_replace('.', '', $request->saldo);
 
-        $saldo = $request->saldo;
+        $bunga = (int) str_replace('.', '', $request->bunga ?? 0);
 
-        $bunga = $request->bunga ?? 0;
+        $totalHarta = $saldo;
 
+        $hutang = $bunga;
 
-        $bersih =
-            max(0, $saldo - $bunga);
+        $hartaBersih = max(0, $saldo - $bunga);
 
+        $nishab = self::NISHAB_GRAM * self::HARGA_EMAS;
 
-        $nishab =
-            self::NISHAB_GRAM *
-            self::HARGA_EMAS;
+        $wajib = $hartaBersih >= $nishab;
 
-
-        $wajib =
-            $bersih >= $nishab;
-
-
-        $zakat =
-            $wajib
-            ? $bersih * self::TARIF
-            : 0;
-
+        $zakat = $wajib ? $hartaBersih * self::TARIF : 0;
 
         return back()->with([
-
-            'hasil' => $zakat,
-
+            'selected_zakat' => $request->jenis,
             'jenis' => 'Zakat Tabungan',
-
+            'hasil' => $zakat,
+            'persentase' => 2.5,
+            'dasar' => $hartaBersih,
+            'harta' => $totalHarta,
+            'hutang' => $hutang,
+            'nishab' => $nishab,
+            'harga_emas' => self::HARGA_EMAS,
+            'dasar_hukum' => 'Zakat tabungan dihitung dari saldo bersih yang telah mencapai nisab.',
             'wajib' => $wajib,
-
-
-            'detail' => [
-
-                'Saldo' => $saldo,
-
-                'Bunga' => $bunga,
-
-                'Saldo Bersih' => $bersih,
-
-                'Nishab' => $nishab
-
-            ]
-
         ]);
-
     }
 
     // perdagangan
     private function perdagangan($request)
     {
+        $modal = (int) str_replace('.', '', $request->modal);
+        $untung = (int) str_replace('.', '', $request->untung);
+        $piutang = (int) str_replace('.', '', $request->piutang ?? 0);
 
-        $dasar =
-            (
-                $request->modal +
-                $request->untung +
-                $request->piutang
-            )
-            -
-            (
-                $request->rugi +
-                $request->hutang
-            );
+        $rugi = (int) str_replace('.', '', $request->rugi ?? 0);
+        $hutang = (int) str_replace('.', '', $request->hutang ?? 0);
 
+        $totalHarta = $modal + $untung + $piutang;
 
-        $dasar = max(0, $dasar);
+        $totalHutang = $rugi + $hutang;
 
+        $hartaBersih = max(0, $totalHarta - $totalHutang);
 
-        $nishab =
-            self::NISHAB_GRAM *
-            self::HARGA_EMAS;
+        $nishab = self::NISHAB_GRAM * self::HARGA_EMAS;
 
+        $wajib = $hartaBersih >= $nishab;
 
-        $wajib =
-            $dasar >= $nishab;
-
-
-        $zakat =
-            $wajib
-            ?
-            $dasar * self::TARIF
-            :
-            0;
-
+        $zakat = $wajib ? $hartaBersih * self::TARIF : 0;
 
         return back()->with([
-
+            'selected_zakat' => $request->jenis,
+            'jenis' => 'Zakat Perniagaan',
             'hasil' => $zakat,
-
-            'jenis' => 'Zakat Perdagangan',
-
+            'persentase' => 2.5,
+            'dasar' => $hartaBersih,
+            'harta' => $totalHarta,
+            'hutang' => $totalHutang,
+            'nishab' => $nishab,
+            'harga_emas' => self::HARGA_EMAS,
+            'dasar_hukum' => 'Zakat perniagaan dihitung dari harta bersih usaha yang telah mencapai nisab.',
             'wajib' => $wajib,
-
-            'detail' => [
-
-                'Dasar Zakat' => $dasar,
-
-                'Nishab' => $nishab
-
-            ]
-
         ]);
-
     }
 }
