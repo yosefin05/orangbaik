@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\PenggalangDanaController;
 use App\Http\Controllers\User\BeritaController;
 use App\Http\Controllers\User\KomentarController;
+use App\Http\Controllers\User\KalkulatorController;
 use Illuminate\Support\Facades\Route;
 
 // login register
@@ -36,6 +37,10 @@ Route::get('/home', function () {
             'auth',
             'verified'
         ])->name('home');
+
+// kalkulator zakat
+Route::get('/kalkulator', [KalkulatorController::class, 'index']);
+Route::post('/kalkulator/hitung', [KalkulatorController::class, 'calculate'])->name('kalkulator.hitung');
 
 // donasi dan campaign
 Route::get('/donasi', function () {
