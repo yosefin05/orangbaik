@@ -1,320 +1,457 @@
-const NISAB_PENDAPATAN_BULANAN = 6859394;
-const NISAB_PENDAPATAN_TAHUNAN = 82312725;
-const KADAR_ZAKAT = 0.025;
-const HARGA_EMAS_PER_GRAM = 82312725 / 85;
-const formConfigs = {
-    penghasilan: {
-        title: "Zakat Penghasilan",
-        nishab: "Rp6.859.394/bulan (setara 85 gram emas per tahun).",
-        sections: [
-            {
-                title: "2. Masukkan Penghasilan",
-                subtitle:
-                    "Masukkan total penghasilan bulanan yang Anda terima (dalam Rupiah).",
+document.addEventListener('DOMContentLoaded', function () {
+    const zakatData = {
+        penghasilan: {
+            title: 'Zakat Penghasilan',
+            percent: 2.5,
+            nisab: 'Setara 85 gram emas per tahun',
+            note: 'Zakat penghasilan dihitung dari pendapatan bersih.',
+            law: 'Zakat penghasilan umumnya dihitung sebesar 2,5% dari pendapatan bersih yang telah mencapai nisab.',
+            fields: [
+                {
+                    label: 'Pendapatan Bulanan',
+                    name: 'penghasilan',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'asset',
+                    help: 'Contoh: 5.000.000',
+                },
+                {
+                    label: 'Pendapatan Lain',
+                    name: 'pendapatan_lain',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'asset',
+                    help: 'Bonus, komisi, atau penghasilan tambahan.',
+                },
+                {
+                    label: 'Kebutuhan / Hutang Jatuh Tempo',
+                    name: 'hutang',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'debt',
+                    help: 'Isi 0 jika tidak ada.',
+                    full: true,
+                },
+            ],
+        },
 
-                fields: [
-                    {
-                        label: "Penghasilan Pokok (Rp)",
-                        name: "gaji",
-                        placeholder: "Contoh: 7000000",
-                        rupiah: true,
-                        required: true,
-                    },
-                ],
-            },
+        emas: {
+            title: 'Zakat Emas',
+            percent: 2.5,
+            nisab: '85 gram emas',
+            note: 'Zakat emas dihitung dari total nilai emas yang dimiliki.',
+            law: 'Zakat emas dikenakan apabila emas yang dimiliki telah mencapai nisab dan memenuhi ketentuan haul.',
+            fields: [
+                {
+                    label: 'Berat Emas',
+                    name: 'berat_emas',
+                    placeholder: '0',
+                    type: 'number',
+                    role: 'gold_weight',
+                    help: 'Masukkan berat emas dalam gram.',
+                },
+                {
+                    label: 'Harga Emas per Gram',
+                    name: 'harga_emas',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'gold_price',
+                    help: 'Contoh: 1.200.000',
+                },
+                {
+                    label: 'Hutang Terkait Harta',
+                    name: 'hutang',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'debt',
+                    help: 'Isi 0 jika tidak ada.',
+                    full: true,
+                },
+            ],
+        },
 
-            {
-                title: "3. Informasi Tambahan (Opsional)",
-                subtitle: "Masukkan penghasilan tambahan apabila ada.",
+        tabungan: {
+            title: 'Zakat Tabungan',
+            percent: 2.5,
+            nisab: 'Setara 85 gram emas',
+            note: 'Zakat tabungan dihitung dari total simpanan bersih.',
+            law: 'Zakat tabungan dikenakan apabila simpanan telah mencapai nisab dan memenuhi ketentuan haul.',
+            fields: [
+                {
+                    label: 'Saldo Tabungan',
+                    name: 'tabungan',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'asset',
+                    help: 'Total tabungan yang dimiliki.',
+                },
+                {
+                    label: 'Deposito / Investasi',
+                    name: 'deposito',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'asset',
+                    help: 'Isi 0 jika tidak ada.',
+                },
+                {
+                    label: 'Hutang Jatuh Tempo',
+                    name: 'hutang',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'debt',
+                    help: 'Isi 0 jika tidak ada.',
+                    full: true,
+                },
+            ],
+        },
 
-                fields: [
-                    {
-                        label: "Penghasilan Tambahan (Rp)",
-                        name: "bonus",
-                        placeholder: "Contoh: 1000000",
-                        rupiah: true,
-                        required: false,
-                    },
-                ],
-            },
-        ],
-    },
+        perdagangan: {
+            title: 'Zakat Perniagaan',
+            percent: 2.5,
+            nisab: 'Setara 85 gram emas',
+            note: 'Zakat perniagaan dihitung dari aset usaha bersih.',
+            law: 'Zakat perniagaan dihitung dari harta usaha bersih seperti kas, stok barang, dan piutang lancar setelah dikurangi hutang.',
+            fields: [
+                {
+                    label: 'Kas / Saldo Usaha',
+                    name: 'kas_usaha',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'asset',
+                    help: 'Uang kas atau saldo usaha.',
+                },
+                {
+                    label: 'Nilai Stok Barang',
+                    name: 'stok_barang',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'asset',
+                    help: 'Nilai barang dagangan.',
+                },
+                {
+                    label: 'Piutang Lancar',
+                    name: 'piutang',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'asset',
+                    help: 'Piutang yang masih mungkin ditagih.',
+                },
+                {
+                    label: 'Hutang Usaha',
+                    name: 'hutang',
+                    placeholder: '0',
+                    type: 'money',
+                    role: 'debt',
+                    help: 'Hutang usaha jatuh tempo.',
+                },
+            ],
+        },
+    };
 
-    emas: {
-        title: "Zakat Emas",
-        nishab: "85 gram emas (BAZNAS RI 2024).",
-        sections: [
-            {
-                title: "2. Masukkan Data Emas",
-                subtitle: "Masukkan jumlah emas yang dimiliki.",
+    const form = document.getElementById('zakatForm');
+    const tabs = document.querySelectorAll('.zakat-tab');
+    const jenisInput = document.getElementById('jenis');
+    const formTitle = document.getElementById('formTitle');
+    const nisabInfo = document.getElementById('nisabInfo');
+    const formFields = document.getElementById('formFields');
 
-                fields: [
-                    {
-                        label: "Jumlah Emas (gram)",
-                        name: "gram",
-                        placeholder: "Contoh: 100",
-                        rupiah: false,
-                        required: true,
-                    },
+    const liveZakatAmount = document.getElementById('liveZakatAmount');
+    const liveZakatNote = document.getElementById('liveZakatNote');
 
-                    {
-                        label: "Nilai Emas (Rp)",
-                        name: "harga_emas",
-                        placeholder: "Otomatis dihitung",
-                        rupiah: true,
-                        required: true,
-                        readonly: true,
-                    },
-                ],
-            },
+    const resultCard = document.getElementById('zakatResultCard');
+    const resultEmpty = document.getElementById('zakatResultEmpty');
+    const resultContent = document.getElementById('zakatResultContent');
+    const recommendationCard = document.getElementById('zakatRecommendationCard');
 
-            {
-                title: "3. Informasi Tambahan (Opsional)",
-                subtitle:
-                    "Masukkan emas yang masih menjadi tanggungan atau belum dimiliki sepenuhnya apabila ada.",
+    const resultType = document.getElementById('resultType');
+    const resultPercent = document.getElementById('resultPercent');
+    const resultAmount = document.getElementById('resultAmount');
+    const resultBase = document.getElementById('resultBase');
+    const resultHarta = document.getElementById('resultHarta');
+    const resultHutang = document.getElementById('resultHutang');
+    const resultBersih = document.getElementById('resultBersih');
+    const resultFinal = document.getElementById('resultFinal');
+    const resultLaw = document.getElementById('resultLaw');
 
-                fields: [
-                    {
-                        label: "Pengurang (Rp)",
-                        name: "pengurang",
-                        placeholder: "Contoh: 0",
-                        rupiah: true,
-                        required: false,
-                    },
-                ],
-            },
-        ],
-    },
+    let currentType = window.selectedZakat || 'penghasilan';
 
-    tabungan: {
-        title: "Zakat Tabungan",
-        nishab: "Minimal senilai 85 gram emas.",
-        sections: [
-            {
-                title: "2. Masukkan Data Tabungan",
-                subtitle: "Masukkan jumlah tabungan yang dimiliki saat ini.",
+    function onlyNumber(value) {
+        return String(value || '').replace(/[^\d]/g, '');
+    }
 
-                fields: [
-                    {
-                        label: "Saldo Tabungan (Rp)",
-                        name: "saldo",
-                        placeholder: "Contoh: 100000000",
-                        rupiah: true,
-                        required: true,
-                    },
-                ],
-            },
+    function toNumber(value) {
+        const clean = onlyNumber(value);
 
-            {
-                title: "3. Informasi Tambahan (Opsional)",
-                subtitle:
-                    "Masukkan bunga bank atau pengurang lainnya apabila ada.",
+        return clean ? Number(clean) : 0;
+    }
 
-                fields: [
-                    {
-                        label: "Bunga Bank (Rp)",
-                        name: "bunga",
-                        placeholder: "0",
-                        rupiah: true,
-                        required: false,
-                    },
-                ],
-            },
-        ],
-    },
-    perdagangan: {
-        title: "Zakat Perniagaan",
-        nishab: "Minimal senilai 85 gram emas.",
+    function formatNumber(value) {
+        return new Intl.NumberFormat('id-ID').format(value || 0);
+    }
 
-        sections: [
-            {
-                title: "2. Masukkan Nilai Usaha",
-                subtitle: "Masukkan nilai aset usaha yang dimiliki.",
+    function formatRupiah(value) {
+        return 'Rp' + formatNumber(Math.round(value || 0));
+    }
 
-                fields: [
-                    {
-                        label: "Modal (Rp)",
-                        name: "modal",
-                        placeholder: "50000000",
-                        rupiah: true,
-                        required: true,
-                    },
+    function formatMoneyInput(input) {
+        const clean = onlyNumber(input.value);
 
-                    {
-                        label: "Keuntungan (Rp)",
-                        name: "untung",
-                        placeholder: "10000000",
-                        rupiah: true,
-                        required: true,
-                    },
+        input.value = clean ? formatNumber(Number(clean)) : '';
+    }
 
-                    {
-                        label: "Piutang (Rp)",
-                        name: "piutang",
-                        placeholder: "0",
-                        rupiah: true,
-                        required: false,
-                    },
-                ],
-            },
+    function createField(field) {
+        const wrapper = document.createElement('div');
 
-            {
-                title: "3. Informasi Tambahan (Opsional)",
-                subtitle:
-                    "Masukkan kewajiban usaha yang dapat mengurangi harta.",
+        wrapper.className = field.full
+            ? 'zakat-field zakat-field-full'
+            : 'zakat-field';
 
-                fields: [
-                    {
-                        label: "Kerugian (Rp)",
-                        name: "rugi",
-                        placeholder: "0",
-                        rupiah: true,
-                        required: false,
-                    },
+        const label = document.createElement('label');
 
-                    {
-                        label: "Hutang (Rp)",
-                        name: "hutang",
-                        placeholder: "0",
-                        rupiah: true,
-                        required: false,
-                    },
-                ],
-            },
-        ],
-    },
-};
+        label.setAttribute('for', field.name);
+        label.textContent = field.label;
 
-function formatInputRupiah() {
-    document.querySelectorAll(".format-rupiah").forEach((input) => {
-        input.oninput = function () {
-            let angka = this.value.replace(/\D/g, "");
+        const inputWrap = document.createElement('div');
 
-            if (!angka) {
-                this.value = "";
-                return;
+        inputWrap.className = field.type === 'money'
+            ? 'zakat-input-wrap has-prefix'
+            : 'zakat-input-wrap';
+
+        if (field.type === 'money') {
+            const prefix = document.createElement('span');
+
+            prefix.className = 'zakat-input-prefix';
+            prefix.textContent = 'Rp';
+
+            inputWrap.appendChild(prefix);
+        }
+
+        const input = document.createElement('input');
+
+        input.id = field.name;
+        input.name = field.name;
+
+        /*
+            Jangan pakai type="number".
+            Kalau type number, browser tidak bisa menampilkan titik ribuan.
+        */
+        input.type = 'text';
+        input.inputMode = 'numeric';
+        input.autocomplete = 'off';
+
+        input.placeholder = field.placeholder || '0';
+        input.dataset.role = field.role || 'asset';
+        input.dataset.type = field.type || 'money';
+
+        input.addEventListener('input', function () {
+            if (field.type === 'money') {
+                formatMoneyInput(input);
+            } else {
+                input.value = onlyNumber(input.value);
             }
 
-            this.value = new Intl.NumberFormat("id-ID").format(angka);
-        };
-    });
-}
-
-function hitungHargaEmas() {
-    const gram = document.querySelector('input[name="gram"]');
-    const harga = document.querySelector('input[name="harga_emas"]');
-
-    if (!gram || !harga) return;
-
-    gram.addEventListener("input", function () {
-        const jumlahGram = parseFloat(this.value.replace(",", ".")) || 0;
-
-        const total = jumlahGram * HARGA_EMAS_PER_GRAM;
-
-        harga.value = new Intl.NumberFormat("id-ID").format(Math.round(total));
-    });
-}
-
-function renderFields(type) {
-    const config = formConfigs[type];
-
-    // Header
-    document.getElementById("form-title").textContent = config.title;
-    document.getElementById("nishab-info").textContent = config.nishab;
-
-    const container = document.getElementById("form-fields");
-    container.innerHTML = "";
-
-    config.sections.forEach((section) => {
-        // Judul Section
-        container.innerHTML += `
-            <div class="form-section">
-                <h4>${section.title}</h4>
-                <p>${section.subtitle}</p>
-            </div>
-        `;
-
-        // Semua field pada section
-        section.fields.forEach((field) => {
-            container.innerHTML += `
-                <div class="zakat-form-group">
-
-                    <label>
-                        ${field.label}
-                        ${field.required ? '<span class="required">*</span>' : ""}
-                    </label>
-
-                    <div class="rupiah-input">
-
-                        ${
-                            field.rupiah
-                                ? '<span class="rupiah-label">Rp</span>'
-                                : ""
-                        }
-
-                        <input
-                            type="text"
-                            name="${field.name}"
-                            class="${field.rupiah ? "format-rupiah" : ""}"
-                            placeholder="${field.placeholder}"
-                            autocomplete="off"
-                            ${field.required ? "required" : ""}
-                            ${field.readonly ? "readonly" : ""}
-                        >
-
-                    </div>
-
-                    <small>
-                        ${
-                            field.rupiah
-                                ? "Masukkan nominal tanpa titik atau koma."
-                                : "Masukkan sesuai satuan yang diminta."
-                        }
-                    </small>
-
-                </div>
-            `;
-        });
-    });
-
-    formatInputRupiah();
-    hitungHargaEmas();
-}
-
-function selectZakat(type, button) {
-    document.getElementById("jenis").value = type;
-
-    document.querySelectorAll(".zakat-tab").forEach((tab) => {
-        tab.classList.remove("active");
-    });
-
-    button.classList.add("active");
-
-    renderFields(type);
-
-    // reset hasil lama kalau ada
-    document.querySelectorAll(".format-rupiah").forEach((input) => {
-        input.value = "";
-    });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const jenis = window.selectedZakat || "penghasilan";
-
-    renderFields(jenis);
-
-    const activeTab = document.querySelector(`.zakat-tab[onclick*="${jenis}"]`);
-
-    if (activeTab) {
-        document.querySelectorAll(".zakat-tab").forEach((tab) => {
-            tab.classList.remove("active");
+            updateLivePreview();
         });
 
-        activeTab.classList.add("active");
+        inputWrap.appendChild(input);
+
+        const help = document.createElement('small');
+
+        help.textContent = field.help || '';
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(inputWrap);
+        wrapper.appendChild(help);
+
+        return wrapper;
     }
-});
-document.getElementById("zakatForm").addEventListener("submit", function () {
-    document.querySelectorAll(".format-rupiah").forEach((input) => {
-        input.value = input.value.replace(/\./g, "");
+
+    function getCalculation() {
+        const config = zakatData[currentType];
+
+        let totalHarta = 0;
+        let totalHutang = 0;
+
+        if (currentType === 'emas') {
+            const beratEmas = toNumber(
+                formFields.querySelector('[data-role="gold_weight"]')?.value
+            );
+
+            const hargaEmas = toNumber(
+                formFields.querySelector('[data-role="gold_price"]')?.value
+            );
+
+            const hutang = toNumber(
+                formFields.querySelector('[data-role="debt"]')?.value
+            );
+
+            totalHarta = beratEmas * hargaEmas;
+            totalHutang = hutang;
+        } else {
+            const inputs = formFields.querySelectorAll('input');
+
+            inputs.forEach(function (input) {
+                const value = toNumber(input.value);
+
+                if (input.dataset.role === 'debt') {
+                    totalHutang += value;
+                } else {
+                    totalHarta += value;
+                }
+            });
+        }
+
+        const hartaBersih = Math.max(totalHarta - totalHutang, 0);
+        const zakat = hartaBersih * (config.percent / 100);
+
+        return {
+            totalHarta,
+            totalHutang,
+            hartaBersih,
+            zakat,
+            percent: config.percent,
+        };
+    }
+
+    function updateLivePreview() {
+        const config = zakatData[currentType];
+        const result = getCalculation();
+
+        if (liveZakatAmount) {
+            liveZakatAmount.textContent = formatRupiah(result.zakat);
+        }
+
+        if (!liveZakatNote) return;
+
+        if (result.hartaBersih <= 0) {
+            liveZakatNote.textContent = 'Masukkan nominal harta untuk melihat estimasi zakat.';
+            return;
+        }
+
+        liveZakatNote.textContent =
+            config.note + ' Dasar hitung sementara: ' + formatRupiah(result.hartaBersih) + '.';
+    }
+
+    function showResult() {
+        const config = zakatData[currentType];
+        const result = getCalculation();
+
+        if (!resultCard || !resultEmpty || !resultContent) return;
+
+        resultCard.classList.remove('is-empty');
+        resultEmpty.hidden = true;
+        resultContent.hidden = false;
+
+        if (recommendationCard) {
+            recommendationCard.hidden = false;
+        }
+
+        if (resultType) {
+            resultType.textContent = config.title;
+        }
+
+        if (resultPercent) {
+            resultPercent.textContent = config.percent + '%';
+        }
+
+        if (resultAmount) {
+            resultAmount.textContent = formatRupiah(result.zakat);
+        }
+
+        if (resultBase) {
+            resultBase.textContent = 'Dari dasar perhitungan ' + formatRupiah(result.hartaBersih);
+        }
+
+        if (resultHarta) {
+            resultHarta.textContent = formatRupiah(result.totalHarta);
+        }
+
+        if (resultHutang) {
+            resultHutang.textContent = '-' + formatRupiah(result.totalHutang);
+        }
+
+        if (resultBersih) {
+            resultBersih.textContent = formatRupiah(result.hartaBersih);
+        }
+
+        if (resultFinal) {
+            resultFinal.textContent = formatRupiah(result.zakat);
+        }
+
+        if (resultLaw) {
+            resultLaw.textContent = config.law;
+        }
+
+        resultCard.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+        });
+    }
+
+    function setActiveType(type) {
+        currentType = zakatData[type] ? type : 'penghasilan';
+
+        if (jenisInput) {
+            jenisInput.value = currentType;
+        }
+
+        if (formTitle) {
+            formTitle.textContent = zakatData[currentType].title;
+        }
+
+        if (nisabInfo) {
+            nisabInfo.textContent = zakatData[currentType].nisab;
+        }
+
+        tabs.forEach(function (tab) {
+            tab.classList.toggle('active', tab.dataset.zakat === currentType);
+        });
+
+        if (formFields) {
+            formFields.innerHTML = '';
+
+            zakatData[currentType].fields.forEach(function (field) {
+                formFields.appendChild(createField(field));
+            });
+        }
+
+        if (resultCard && resultEmpty && resultContent) {
+            resultCard.classList.add('is-empty');
+            resultEmpty.hidden = false;
+            resultContent.hidden = true;
+        }
+
+        if (recommendationCard) {
+            recommendationCard.hidden = true;
+        }
+
+        updateLivePreview();
+    }
+
+    tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            setActiveType(tab.dataset.zakat);
+        });
     });
+
+    if (form) {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            showResult();
+        });
+    }
+
+    const printButton = document.querySelector('[data-print-zakat]');
+
+    if (printButton) {
+        printButton.addEventListener('click', function () {
+            window.print();
+        });
+    }
+
+    window.selectZakat = function (type) {
+        setActiveType(type);
+    };
+
+    setActiveType(currentType);
 });
