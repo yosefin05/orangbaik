@@ -39,34 +39,29 @@
 
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value="{{ old('email') }}"
-                            placeholder="nama@example.com"
-                            required
-                            autofocus
-                        >
+                        <input type="email" id="email" name="email" value="{{ old('email') }}"
+                            placeholder="nama@example.com" required autofocus>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
                         <div class="password-box">
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                placeholder="Masukkan Password"
-                                required
-                            >
-                            <button type="button" class="eye-button" onclick="togglePassword('password', 'eyeOpen1', 'eyeClosed1')" aria-label="Tampilkan password">
-                                <svg id="eyeOpen1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <input type="password" id="password" name="password" placeholder="Masukkan Password"
+                                required>
+                            <button type="button" class="eye-button"
+                                onclick="togglePassword('password', 'eyeOpen1', 'eyeClosed1')"
+                                aria-label="Tampilkan password">
+                                <svg id="eyeOpen1" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                     <circle cx="12" cy="12" r="3" />
                                 </svg>
-                                <svg id="eyeClosed1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-                                    <path d="M17.94 17.94A10.94 10.94 0 0112 20c-7 0-11-8-11-8a18.7 18.7 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24" />
+                                <svg id="eyeClosed1" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round" style="display:none;">
+                                    <path
+                                        d="M17.94 17.94A10.94 10.94 0 0112 20c-7 0-11-8-11-8a18.7 18.7 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24" />
                                     <line x1="1" y1="1" x2="23" y2="23" />
                                 </svg>
                             </button>
@@ -94,33 +89,35 @@
                     Platform donasi yang transparan, aman, dan berdampak nyata bagi masyarakat Indonesia.
                 </p>
 
-                <div class="testimonial">
+                @php
+                    $quotes = [
+                        [
+                            'quote' => 'Kita mencari nafkah dengan apa yang kita dapatkan, tetapi kita membuat kehidupan dengan apa yang kita berikan.',
+                            'author' => 'Winston Churchill'
+                        ],
+                        [
+                            'quote' => 'Service to others is the rent you pay for your room here on Earth.',
+                            'author' => 'Muhammad Ali'
+                        ],
+                        [
+                            'quote' => 'Sedekahmu tidak akan diterima sampai engkau percaya bahwa: "Aku lebih membutuhkan pahala sedekah ini daripada si miskin membutuhkan uang tersebut."',
+                            'author' => 'Khalifah Utsman bin Affan'
+                        ]
+                    ];
 
-                    @if($testimoni)
+                    $randomQuote = $quotes[array_rand($quotes)];
+                @endphp
 
-                        <p>
-                            "{{ $testimoni->isi_testimoni }}"
-                        </p>
+                <div class="quote-box">
+                    <div class="quote-icon">❝</div>
 
-                        <div class="testimonial-user">
-                            <img
-                                src="{{ $testimoni->foto_profil ? asset('storage/' . $testimoni->foto_profil) : asset('images/default-avatar.png') }}"
-                                alt="{{ $testimoni->nama }}"
-                            >
-                            <div>
-                                <h4>{{ $testimoni->nama }}</h4>
-                                <span>{{ $testimoni->jabatan }}</span>
-                            </div>
-                        </div>
+                    <p class="quote-text">
+                        "{{ $randomQuote['quote'] }}"
+                    </p>
 
-                    @else
-
-                        <p>
-                            "Platform donasi yang transparan, aman, dan terpercaya untuk membantu sesama."
-                        </p>
-
-                    @endif
-
+                    <span class="quote-author">
+                        — {{ $randomQuote['author'] }}
+                    </span>
                 </div>
 
             </div>

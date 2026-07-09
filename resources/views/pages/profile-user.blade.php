@@ -16,9 +16,9 @@
     @include('components.header')
 
     @php
-        $user = auth()->user();
-        $penggalang = $user->penggalangDana ?? null;
-        $penggalangStatus = $penggalang->status ?? null;
+        $user = auth()->user()->load('penggalangDana');
+        $penggalang = $user->penggalangDana;
+        $penggalangStatus = $penggalang?->status;
         $avatarInitial = strtoupper(substr($user->name ?? 'U', 0, 1));
     @endphp
 
@@ -128,8 +128,14 @@
                             <span class="menu-arrow">›</span>
                         </a>
 
+                        @php
+                            $penggalangStatus = $penggalang?->status;
+                        @endphp
+
                         @if(!$penggalang)
+
                             <a href="#" class="profile-menu-item" id="openPenggalangModal">
+
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'handshake'])
                                 </span>
@@ -140,116 +146,102 @@
                                 </span>
 
                                 <span class="menu-arrow">›</span>
+
                             </a>
+
                         @elseif($penggalangStatus === 'pending')
                             <a href="{{ route('profil.penggalang') }}" class="profile-menu-item">
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'handshake'])
                                 </span>
-
                                 <span class="menu-text">
                                     <strong>Status Pengajuan</strong>
                                     <small>Pengajuan sedang diverifikasi admin</small>
                                 </span>
-
                                 <span class="menu-arrow">›</span>
                             </a>
                         @elseif($penggalangStatus === 'rejected')
-                            <a href="{{ route('profil.penggalang') }}" class="profile-menu-item">
+                            <a href="{{ route('penggalang_dana.rejected') }}" class="profile-menu-item">
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'handshake'])
+                                    @if(!$penggalang->status_read)
+                                        <span class="notif-dot"></span>
+                                    @endif
                                 </span>
 
                                 <span class="menu-text">
                                     <strong>Pengajuan Ditolak</strong>
-                                    <small>Lihat alasan dan ajukan kembali</small>
+                                    <small>Lihat alasan penolakan</small>
                                 </span>
-
                                 <span class="menu-arrow">›</span>
                             </a>
                         @elseif($penggalangStatus === 'approved')
                             <a href="{{ route('profil.penggalang') }}" class="profile-menu-item">
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'handshake'])
+                                    @if(!$penggalang->status_read)
+                                        <span class="notif-dot"></span>
+                                    @endif
                                 </span>
-
                                 <span class="menu-text">
                                     <strong>Profil Penggalang Dana</strong>
                                     <small>Kelola akun penggalang dana kamu</small>
                                 </span>
-
                                 <span class="menu-arrow">›</span>
                             </a>
                         @endif
-
                     </div>
                 </section>
 
                 {{-- LAINNYA --}}
                 <section class="profile-card">
                     <h2>Lainnya</h2>
-
                     <div class="profile-menu-list">
-
                         <a href="{{ route('tentang') }}" class="profile-menu-item">
                             <span class="menu-icon">
                                 @include('components.profile-icon', ['type' => 'info'])
                             </span>
-
                             <span class="menu-text">
                                 <strong>Tentang Kami</strong>
                                 <small>Informasi umum tentang OrangBaik.id</small>
                             </span>
-
                             <span class="menu-arrow">›</span>
                         </a>
-
                         <a href="{{ route('syarat.ketentuan') }}" class="profile-menu-item">
                             <span class="menu-icon">
                                 @include('components.profile-icon', ['type' => 'terms'])
                             </span>
-
                             <span class="menu-text">
                                 <strong>Syarat & Ketentuan</strong>
                                 <small>Aturan penggunaan OrangBaik.id</small>
                             </span>
-
                             <span class="menu-arrow">›</span>
                         </a>
-
                         <a href="{{ route('pusat.bantuan') }}" class="profile-menu-item">
                             <span class="menu-icon">
                                 @include('components.profile-icon', ['type' => 'help'])
                             </span>
-
                             <span class="menu-text">
                                 <strong>Pusat Bantuan</strong>
                                 <small>Tempat mendapatkan panduan dan bantuan</small>
                             </span>
-
                             <span class="menu-arrow">›</span>
                         </a>
-
                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                             @csrf
-
                             <button type="submit" class="profile-menu-item logout-button">
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'logout'])
                                 </span>
-
                                 <span class="menu-text">
                                     <strong>Logout</strong>
                                     <small>Keluar dari akun kamu</small>
                                 </span>
-
                                 <span class="menu-arrow">›</span>
                             </button>
                         </form>
-
                     </div>
                 </section>
-
             </div>
         </section>
 

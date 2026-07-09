@@ -37,4 +37,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.style.overflow = "";
         }
     });
+
+    window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
 });

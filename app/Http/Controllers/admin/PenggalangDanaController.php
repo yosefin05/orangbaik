@@ -37,13 +37,17 @@ class PenggalangDanaController extends Controller
         );
     }
 
-    public function approve(
-        Penggalang_Dana $penggalangDana
-    ) {
+    public function approve(Penggalang_Dana $penggalangDana)
+    {
         $penggalangDana->update([
+
             'status' => 'approved',
+            'verified' => true,
             'verified_by' => auth()->id(),
             'verified_at' => now(),
+            'catatan_verifikasi' => 'Selamat! Pengajuan Anda telah disetujui. Sekarang Anda dapat mulai membuat campaign penggalangan dana.',
+            'status_read' => false,
+
         ]);
 
         return back()->with(
@@ -53,13 +57,17 @@ class PenggalangDanaController extends Controller
     }
 
     public function reject(
-        Penggalang_Dana $penggalangDana
+        Penggalang_Dana $penggalangDana,
+        Request $request
     ) {
         $penggalangDana->update([
             'status' => 'rejected',
             'verified' => false,
             'verified_by' => auth()->id(),
             'verified_at' => now(),
+            'catatan_verifikasi' => $request->catatan_verifikasi,
+            'status_read' => false
+
         ]);
 
         return back()->with(

@@ -18,11 +18,13 @@
         <section class="fundraiser-hero">
             <div class="fundraiser-container">
 
-                <button class="fundraiser-back" type="button" onclick="history.back()">
-                    <svg viewBox="0 0 24 24">
+                <button class="fundraiser-back" type="button">
+                    <a href="{{ route('profile.user') }}">
+                    </a><svg viewBox="0 0 24 24">
                         <path d="M15 18L9 12L15 6" />
                     </svg>
                     <span>Kembali</span>
+                    </a>
                 </button>
 
                 <div class="banner-wrapper">

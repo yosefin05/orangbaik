@@ -73,10 +73,21 @@ Route::get('/pusat-bantuan', function () {
 })->name('pusat.bantuan');
 
 // profile pengguna
-
 Route::get('/profile-user', function () {
-    return view('pages.profile-user');
+
+    $penggalang = auth()->user()
+        ->penggalangDana()
+        ->first();
+
+    return view('pages.profile-user', compact('penggalang'));
+
 })->middleware('auth')->name('profile.user');
+
+// Halaman Pengajuan Ditolak
+Route::get(
+    '/penggalang/rejected',
+    [PenggalangDanaController::class, 'rejected']
+)->middleware('auth')->name('penggalang_dana.rejected');
 
 Route::get('/riwayat-donasi', function () {
     return view('pages.riwayat-donasi');

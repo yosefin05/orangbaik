@@ -24,23 +24,28 @@
             </p>
 
             @if($penggalangDana->status === 'pending')
-                <span class="badge badge-yellow">Pending</span>
+                <span class="badge badge-yellow">
+                    Pending
+                </span>
+                @if($penggalangDana->revision_count > 0)
+                    <span class="badge badge-info ms-2">
+                        🔄 Revisi ke-{{ $penggalangDana->revision_count }}
+                    </span>
+                @endif
             @elseif($penggalangDana->status === 'approved')
-                <span class="badge badge-green">Approved</span>
+                <span class="badge badge-green">
+                    Approved
+                </span>
             @else
-                <span class="badge badge-red">Rejected</span>
-            @endif
-
-            @if($penggalangDana->jenis_penggalang == 'organisasi' && $penggalangDana->verified)
-                <span>Verified Organization</span>
+                <span class="badge badge-red">
+                    Rejected
+                </span>
             @endif
         </div>
-
     </section>
 
     {{-- Informasi Utama --}}
     <section class="ob-card ob-card-lg">
-
         <div class="card-topbar">
             <div>
                 <h2>Informasi Penggalang Dana</h2>
@@ -211,8 +216,7 @@
                             </td>
 
                             <td>
-                                <a href="{{ $dokumen->file_dokumen }}" target="_blank"
-                                    class="action-link link-blue">
+                                <a href="{{ $dokumen->file_dokumen }}" target="_blank" class="action-link link-blue">
                                     <i class="bi bi-file-earmark-text"></i>
                                     <span>Lihat Dokumen</span>
                                 </a>
@@ -268,148 +272,136 @@
 
     @endif
 
-    {{-- STATUS + VERIFIKASI --}}
-    <div class="info-grid">
+    {{-- ACTION ADMIN --}}
+    {{-- ACTION BUTTONS --}}
+    <div class="form-actions">
 
-        {{-- STATUS PENGAJUAN --}}
-        <section class="ob-card ob-card-lg">
+        @if($penggalangDana->status !== 'approved')
+            <form action="{{ route('admin.penggalang_dana.approve', $penggalangDana) }}" method="POST">
+                @csrf
+                @method('PATCH')
 
-            <div class="card-topbar">
-                <div>
-                    <h2>Status Pengajuan</h2>
-                    <p class="card-subtitle">
-                        Status persetujuan penggalang dana.
-                    </p>
-                </div>
-            </div>
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-check-circle"></i>
+                    Setujui
+                </button>
+            </form>
+        @endif
 
-            <div class="status-box">
+        @if($penggalangDana->status !== 'rejected')
+            <button type="button" class="btn-danger" onclick="openRejectModal()">
 
-                <div class="status-row">
-                    <span class="status-label">Status</span>
+                <i class="bi bi-x-circle"></i>
+                Tolak
 
-                    @if($penggalangDana->status === 'approved')
-                        <span class="badge badge-green">
-                            <i class="bi bi-check-circle-fill"></i>
-                            Approved
-                        </span>
-
-                    @elseif($penggalangDana->status === 'pending')
-                        <span class="badge badge-yellow">
-                            <i class="bi bi-clock-fill"></i>
-                            Pending
-                        </span>
-
-                    @else
-                        <span class="badge badge-red">
-                            <i class="bi bi-x-circle-fill"></i>
-                            Rejected
-                        </span>
-                    @endif
-                </div>
-
-            </div>
-
-            {{-- ACTION BUTTONS --}}
-            <div class="form-actions">
-
-                @if($penggalangDana->status !== 'approved')
-                    <form action="{{ route('admin.penggalang_dana.approve', $penggalangDana) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-
-                        <button type="submit" class="btn-primary w-100">
-                            <i class="bi bi-check-circle"></i>
-                            Approve
-                        </button>
-                    </form>
-                @endif
-
-                @if($penggalangDana->status !== 'rejected')
-                    <form action="{{ route('admin.penggalang_dana.reject', $penggalangDana) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-
-                        <button type="submit" class="btn-danger w-100">
-                            <i class="bi bi-x-circle"></i>
-                            Reject
-                        </button>
-                    </form>
-                @endif
-
-            </div>
-
-        </section>
-
-
-        {{-- VERIFIKASI ORGANISASI (HANYA ORGANISASI) --}}
-        @if($penggalangDana->jenis_penggalang === 'organisasi')
-
-            <section class="ob-card ob-card-lg">
-
-                <div class="card-topbar">
-                    <div>
-                        <h2>Verifikasi Organisasi</h2>
-                        <p class="card-subtitle">
-                            Status verifikasi organisasi.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="status-box">
-
-                    <div class="status-row">
-                        <span class="status-label">Verifikasi</span>
-                        @if($penggalangDana->verified)
-                            <span class="badge badge-green">
-                                <i class="bi bi-check-circle-fill"></i>
-                                Terverifikasi
-                            </span>
-                        @else
-                            <span class="badge badge-red">
-                                <i class="bi bi-x-circle-fill"></i>
-                                Belum Diverifikasi
-                            </span>
-                        @endif
-                    </div>
-
-                </div>
-
-                <div class="form-actions">
-
-                    {{-- JIKA BELUM VERIFIED --}}
-                    @if(!$penggalangDana->verified)
-
-                        <form action="{{ route('admin.penggalang_dana.verify', $penggalangDana) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-
-                            <button type="submit" class="btn-primary">
-                                <i class="bi bi-shield-check"></i>
-                                Verifikasi Organisasi
-                            </button>
-                        </form>
-
-                        {{-- JIKA SUDAH VERIFIED (CABUT VERIFIKASI) --}}
-                    @else
-
-                        <form action="{{ route('admin.penggalang_dana.unverify', $penggalangDana) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-
-                            <button type="submit" class="btn-danger">
-                                <i class="bi bi-shield-x"></i>
-                                Cabut Verifikasi
-                            </button>
-                        </form>
-
-                    @endif
-
-                </div>
-
-            </section>
-
+            </button>
         @endif
 
     </div>
+
+    <div id="rejectModal" class="reject-modal">
+        <div class="reject-modal-content">
+            <form action="{{ route('admin.penggalang_dana.reject', $penggalangDana) }}" method="POST"
+                onsubmit="return gabungkanAlasan(event)">
+                @csrf
+                @method('PATCH')
+                <div class="modal-header">
+                    <h3>Konfirmasi Penolakan</h3>
+                    <button type="button" class="close-btn" onclick="closeRejectModal()">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">
+                        Pilih alasan penolakan pengajuan.
+                    </p>
+                    <label class="checkbox-item">
+                        <input class="alasan-check" type="checkbox"
+                            value="Dokumen legalitas belum lengkap atau kurang jelas.">
+                        <span>Dokumen legalitas belum lengkap / kurang jelas</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input class="alasan-check" type="checkbox" value="Link atau URL dokumen tidak dapat dibuka.">
+                        <span>Link / URL dokumen tidak dapat dibuka</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input class="alasan-check" type="checkbox" value="Data penggalang dana tidak sesuai.">
+                        <span>Data penggalang dana tidak sesuai</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input class="alasan-check" type="checkbox" value="Informasi profil belum lengkap.">
+                        <span>Informasi profil belum lengkap</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input class="alasan-check" type="checkbox" value="Foto profil atau thumbnail tidak sesuai.">
+                        <span>Foto profil / thumbnail tidak sesuai</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input class="alasan-check" type="checkbox" value="Konten melanggar syarat dan ketentuan platform.">
+                        <span>Melanggar syarat dan ketentuan platform</span>
+                    </label>
+                    <hr>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="lainnya">
+                        <span>Lainnya</span>
+                    </label>
+
+                    <textarea id="lainnyaText" class="form-control" rows="4" placeholder="Tuliskan alasan lainnya..."
+                        style="display:none;margin-top:12px;"></textarea>
+                    <input type="hidden" name="catatan_verifikasi" id="catatan_verifikasi">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeRejectModal()">
+                        Batal
+                    </button>
+                    <button type="submit" class="btn-danger">
+                        Tolak Pengajuan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const modal = document.getElementById("rejectModal");
+        const lainnya = document.getElementById("lainnya");
+        const lainnyaText = document.getElementById("lainnyaText");
+
+        function openRejectModal() {
+            modal.classList.add("show");
+        }
+
+        function closeRejectModal() {
+            modal.classList.remove("show");
+        }
+
+        window.onclick = function (e) {
+            if (e.target == modal) {
+                closeRejectModal();
+            }
+        }
+        lainnya.addEventListener("change", function () {
+            lainnyaText.style.display = this.checked ? "block" : "none";
+            if (!this.checked) {
+                lainnyaText.value = "";
+            }
+        });
+
+        function gabungkanAlasan(e) {
+            let hasil = [];
+            document.querySelectorAll(".alasan-check:checked").forEach(function (item) {
+                hasil.push("• " + item.value);
+            });
+            if (lainnya.checked && lainnyaText.value.trim() !== "") {
+                hasil.push("• " + lainnyaText.value.trim());
+            }
+            if (hasil.length == 0) {
+                alert("Pilih minimal satu alasan.");
+                e.preventDefault();
+                return false;
+            }
+            document.getElementById("catatan_verifikasi").value = hasil.join("\n");
+            return true;
+        }
+    </script>
 @endsection

@@ -275,11 +275,38 @@ class PenggalangDanaController extends Controller
             ])
             ->firstOrFail();
 
+        if (!$penggalang->status_read) {
+            $penggalang->update([
+                'status_read' => true
+            ]);
+        }
+
         return view(
             'pages.profil-penggalang',
             compact('penggalang')
         );
     }
+
+    public function rejected()
+    {
+        $penggalang = auth()->user()
+            ->penggalangDana()
+            ->with('penggalangDanaDokumen')
+            ->firstOrFail();
+
+        // tandai notifikasi sudah dibaca
+        if (!$penggalang->status_read) {
+            $penggalang->update([
+                'status_read' => true
+            ]);
+        }
+
+        return view(
+            'pages.penggalang_dana.rejected',
+            compact('penggalang')
+        );
+    }
+
     public function edit($id)
     {
         $penggalang = Auth::user()
@@ -317,67 +344,74 @@ class PenggalangDanaController extends Controller
             'file_dokumen' => 'nullable|array',
         ]);
 
-        // upload foto profil
+        // Upload foto profil
         if ($request->hasFile('foto_profil')) {
 
             if (
                 $penggalang->foto_profil &&
                 Storage::disk('public')->exists($penggalang->foto_profil)
             ) {
-                Storage::disk('public')->delete(
-                    $penggalang->foto_profil
-                );
+                Storage::disk('public')->delete($penggalang->foto_profil);
             }
 
-            $validated['foto_profil'] =
-                $request->file('foto_profil')
-                    ->store(
-                        'penggalang_dana/profil',
-                        'public'
-                    );
+            $validated['foto_profil'] = $request->file('foto_profil')
+                ->store('penggalang_dana/profil', 'public');
         }
 
-        // upload thumbnail organisasi
+        // Upload thumbnail
         if ($request->hasFile('thumbnail')) {
 
-            // hapus thumbnail lama
-            if ($penggalang->thumbnail && Storage::disk('public')->exists($penggalang->thumbnail)) {
+            if (
+                $penggalang->thumbnail &&
+                Storage::disk('public')->exists($penggalang->thumbnail)
+            ) {
                 Storage::disk('public')->delete($penggalang->thumbnail);
             }
 
-            $validated['thumbnail'] = $request->file('thumbnail')->store(
-                'penggalang_dana/thumbnail',
-                'public'
-            );
+            $validated['thumbnail'] = $request->file('thumbnail')
+                ->store('penggalang_dana/thumbnail', 'public');
         }
 
-        // update data utama
+        // Jika sebelumnya ditolak, berarti ini revisi
+        if ($penggalang->status === 'rejected') {
+
+            $validated['status'] = 'pending';
+            $validated['status_read'] = false;
+            $validated['catatan_verifikasi'] = null;
+            $validated['verified_by'] = null;
+            $validated['verified_at'] = null;
+            $validated['revision_count'] = $penggalang->revision_count + 1;
+
+        }
+
+        // Update data utama
         $penggalang->update($validated);
 
-        return redirect()
-            ->route('profil.penggalang', $penggalang->id)
-            ->with('success', 'Data berhasil diperbarui');
-        $penggalang->penggalangDanaDokumen()->delete();
+        // Update dokumen
+        if ($request->filled('nama_dokumen')) {
 
-        foreach ($request->nama_dokumen as $i => $nama) {
+            $penggalang->penggalangDanaDokumen()->delete();
 
-            if (
-                empty($nama) ||
-                empty($request->file_dokumen[$i])
-            ) {
-                continue;
+            foreach ($request->nama_dokumen as $i => $nama) {
+
+                if (
+                    empty($nama) ||
+                    empty($request->file_dokumen[$i])
+                ) {
+                    continue;
+                }
+
+                Penggalang_Dana_Dokumen::create([
+                    'penggalang_dana_id' => $penggalang->id,
+                    'nama_dokumen' => $nama,
+                    'file_dokumen' => $request->file_dokumen[$i],
+                ]);
             }
-
-            Penggalang_Dana_Dokumen::create([
-
-                'penggalang_dana_id' => $penggalang->id,
-
-                'nama_dokumen' => $nama,
-
-                'file_dokumen' => $request->file_dokumen[$i],
-
-            ]);
         }
+
+        return redirect()
+            ->route('profil.penggalang')
+            ->with('success', 'Data berhasil diperbarui.');
     }
 
 

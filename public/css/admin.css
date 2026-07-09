@@ -1214,6 +1214,78 @@ small.text-muted,
     color: var(--bg);
 }
 
+.reject-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.reject-modal.show{
+    display:flex;
+}
+
+.reject-modal-content{
+    width:100%;
+    max-width:600px;
+    background:#fff;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,.2);
+}
+
+.modal-header{
+    padding:20px 24px;
+    border-bottom:1px solid #eee;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.modal-body{
+    padding:24px;
+}
+
+.modal-desc{
+    margin-bottom:20px;
+    color:#666;
+}
+
+.checkbox-item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    margin-bottom:14px;
+    cursor:pointer;
+}
+
+.checkbox-item input{
+    margin-top:3px;
+}
+
+.modal-footer{
+    padding:20px 24px;
+    border-top:1px solid #eee;
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+}
+
+.close-btn{
+    border:none;
+    background:none;
+    font-size:24px;
+    cursor:pointer;
+}
+
+.badge-info{
+    background:#e0f2fe;
+    color:#0369a1;
+    border:1px solid #7dd3fc;
+}
 /* ============================
    ALERT
    ============================ */

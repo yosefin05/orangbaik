@@ -182,13 +182,13 @@
 
                         <div class="verify-document-list">
 
-                            @for($i = 1; $i <= 4; $i++)
+                            @for($i = 1; $i <= 3; $i++)
                                 <div class="verify-document-item">
                                     <div class="verify-document-title">
                                         <h3>
                                             Dokumen Legalitas {{ $i }}
 
-                                            @if($i <= 2)
+                                            @if($i <= 1)
                                                 <b>*</b>
                                             @else
                                                 <em>Opsional</em>
@@ -198,7 +198,7 @@
 
                                     <div class="verify-grid-2">
                                         <label class="verify-field">
-                                            <span>Nama Legalitas {{ $i <= 2 ? '*' : '' }}</span>
+                                            <span>Nama Legalitas {{ $i <= 1 ? '*' : '' }}</span>
 
                                             <input type="text" name="nama_dokumen[]"
                                                 value="{{ old('nama_dokumen.' . ($i - 1)) }}"
@@ -206,7 +206,7 @@
                                         </label>
 
                                         <label class="verify-field">
-                                            <span>Link Legalitas {{ $i <= 2 ? '*' : '' }}</span>
+                                            <span>Link Legalitas {{ $i <= 1 ? '*' : '' }}</span>
 
                                             <input type="url" name="file_dokumen[]"
                                                 value="{{ old('file_dokumen.' . ($i - 1)) }}"

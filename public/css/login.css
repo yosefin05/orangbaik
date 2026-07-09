@@ -212,44 +212,34 @@ body {
     margin-bottom: 24px;
 }
 
-/* TESTIMONIAL */
-.testimonial {
-    background: rgba(255, 255, 255, 0.16);
-    border-radius: 14px;
-    padding: 18px;
-    backdrop-filter: blur(12px);
+/* quote */
+.quote-box {
+    margin-top: 10px;
+    padding: 25px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
 }
 
-.testimonial p {
-    font-size: 12px;
-    line-height: 1.7;
-    text-align: center;
+.quote-icon {
+    font-size: 48px;
+    color: rgba(255,255,255,.4);
+    line-height: 1;
+}
+
+.quote-text {
+    margin: 15px 0 20px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #fff;
     font-style: italic;
-    color: #f0f4ff;
 }
 
-.testimonial-user {
-    margin-top: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.testimonial-user img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.testimonial-user h4 {
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 2px;
-}
-
-.testimonial-user span {
-    font-size: 11px;
-    color: #d5e0f7;
+.quote-author {
+    display: block;
+    text-align: right;
+    color: rgba(255,255,255,.85);
+    font-weight: 600;
+    font-size: 15px;
 }

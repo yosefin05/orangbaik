@@ -247,6 +247,21 @@
     line-height: 1;
 }
 
+.menu-icon{
+    position:relative;
+}
+
+.notif-dot{
+    position:absolute;
+    top:-2px;
+    right:-10px;
+    width:15px;
+    height:15px;
+    border-radius:70%;
+    background:#ef4444;
+    border:2px solid #fff;
+}
+
 .profile-menu-item:hover .menu-text strong {
     color: var(--primary);
 }

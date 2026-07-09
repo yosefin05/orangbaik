@@ -59,11 +59,15 @@ class Penggalang_Dana extends Model
         'verified',
         'user_id',
         'verified_by',
-        'verified_at'
+        'verified_at',
+        'catatan_verifikasi',
+        'status_read',
+        'revision_count',
     ];
 
     protected $casts = [
         'verified_at' => 'datetime',
         'verified' => 'boolean',
+        'status_read' => 'boolean'
     ];
 }
