@@ -596,36 +596,28 @@
         width: 20px;
     }
 
+    /* CATEGORY MOBILE: 4 ATAS, 2/4 BAWAH */
     .category-grid {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: var(--space-5, 20px);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-5, 20px) var(--space-3, 12px);
 
-        overflow-x: auto;
-        overflow-y: hidden;
-
-        padding-bottom: var(--space-3, 12px);
-
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
+        overflow: visible;
+        padding-bottom: 0;
     }
 
-    .category-grid::-webkit-scrollbar {
-        display: none;
-    }
-
-    .category-grid-small {
-        margin-bottom: var(--space-9, 36px);
+    .category-grid-small,
+    .category-grid.small {
+        margin-bottom: var(--space-8, 32px);
     }
 
     .category-item {
-        flex: 0 0 88px;
-        min-width: 88px;
+        min-width: 0;
 
+        display: flex;
+        align-items: center;
+        flex-direction: column;
         gap: var(--space-2, 8px);
-
-        scroll-snap-align: start;
     }
 
     .category-icon {
@@ -640,13 +632,15 @@
 
     .category-item p {
         font-size: var(--fs-xxs);
+        line-height: 1.25;
     }
 
+    /* CAMPAIGN MOBILE: 2 CARD TERLIHAT */
     .campaign-grid {
         display: flex;
         grid-template-columns: unset;
         flex-wrap: nowrap;
-        gap: var(--space-4, 16px);
+        gap: var(--space-3, 12px);
 
         overflow-x: auto;
         overflow-y: hidden;
@@ -664,8 +658,10 @@
     }
 
     .campaign-card {
-        flex: 0 0 278px;
-        max-width: 278px;
+        flex: 0 0 calc((100% - var(--space-3, 12px)) / 2);
+        max-width: calc((100% - var(--space-3, 12px)) / 2);
+
+        border-radius: var(--radius-md);
 
         scroll-snap-align: start;
     }
@@ -674,10 +670,70 @@
         transform: none;
     }
 
-    .campaign-body {
-        padding: var(--space-4, 16px);
+    .campaign-image {
+        aspect-ratio: 16 / 10;
     }
 
+    .campaign-body {
+        padding: var(--space-3, 12px);
+    }
+
+    .campaign-body h3 {
+        margin-bottom: var(--space-2, 8px);
+
+        font-size: var(--fs-xxs);
+        line-height: 1.4;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .campaign-body p {
+        font-size: var(--fs-xxs);
+
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .campaign-price {
+        gap: var(--space-2, 8px);
+        margin-top: var(--space-2, 8px);
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .campaign-price strong {
+        font-size: var(--fs-xxs);
+    }
+
+    .campaign-price span {
+        font-size: var(--fs-xxs);
+    }
+
+    .progress {
+        height: 6px;
+    }
+
+    .campaign-meta {
+        gap: var(--space-2, 8px);
+        font-size: var(--fs-xxs);
+    }
+
+    .campaign-meta span:first-child {
+        max-width: 90px;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* NEW SECTION */
     .new-grid {
         display: flex;
         grid-template-columns: unset;
@@ -706,6 +762,7 @@
         scroll-snap-align: start;
     }
 
+    /* TESTIMONIAL */
     .testimonial-wrapper {
         min-height: 300px;
     }
@@ -719,11 +776,12 @@
         height: 76px;
     }
 
+    /* LIST CAMPAIGN: 2 CARD TERLIHAT JUGA */
     .list-campaign {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        gap: var(--space-4, 16px);
+        gap: var(--space-3, 12px);
 
         overflow-x: auto;
         overflow-y: hidden;
@@ -741,31 +799,48 @@
     }
 
     .list-card {
-        flex: 0 0 278px;
-        max-width: 278px;
+        flex: 0 0 calc((100% - var(--space-3, 12px)) / 2);
+        max-width: calc((100% - var(--space-3, 12px)) / 2);
 
         display: block;
         padding: var(--space-3, 12px);
+
+        border-radius: var(--radius-md);
 
         scroll-snap-align: start;
     }
 
     .list-card img {
         width: 100%;
-        aspect-ratio: 16 / 9;
+        aspect-ratio: 16 / 10;
         border-radius: var(--radius-md);
     }
 
     .list-body {
-        padding: var(--space-3, 12px) var(--space-1, 4px) 0;
+        padding: var(--space-3, 12px) 0 0;
     }
 
     .list-body h3 {
-        font-size: var(--fs-xs);
+        font-size: var(--fs-xxs);
+        line-height: 1.4;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
-    .campaign-price strong,
+    .list-body p {
+        font-size: var(--fs-xxs);
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .list-body strong {
-        font-size: var(--fs-xs);
+        margin-top: var(--space-2, 8px);
+        font-size: var(--fs-xxs);
     }
 }
