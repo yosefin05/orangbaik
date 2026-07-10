@@ -7,6 +7,7 @@ use App\Http\Controllers\User\BeritaController;
 use App\Http\Controllers\User\KomentarController;
 use App\Http\Controllers\User\KalkulatorController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // login register
 Route::get('/', function () {
@@ -19,6 +20,14 @@ Route::get('/', function () {
 
 })->name('home');
 
+Route::post('/set-intended-url', function (Request $request) {
+    session(['url.intended' => $request->url]);
+
+    return response()->json([
+        'success' => true
+    ]);
+})->name('set.intended.url');
+
 // berita
 Route::get('/berita', [BeritaController::class, 'index'])
     ->name('berita.index');
@@ -26,7 +35,7 @@ Route::get('/berita', [BeritaController::class, 'index'])
 Route::get('/berita/{slug}', [BeritaController::class, 'show'])
     ->name('berita.show');
 
-Route::post(
+Route::middleware('auth')->post(
     '/berita/{berita}/komentar',
     [KomentarController::class, 'store']
 )->name('berita.komentar.store');

@@ -72,7 +72,15 @@
                             <strong>Komentar</strong>
                             <span>{{ $berita->komentar->count() }}</span>
                         </div>
-
+                        @guest
+                            <div class="comment-login-box">
+                                <p>
+                                    Anda harus <a href="{{ route('login', ['redirect' => url()->full()]) }}">login</a>
+                                    terlebih dahulu untuk memberikan komentar.
+                                </p>
+                            </div>
+                        @endguest
+                        @auth
                         <form action="{{ route('berita.komentar.store', $berita) }}" method="POST" class="comment-form"
                             id="commentForm" data-logged-in="{{ auth()->check() ? '1' : '0' }}"
                             data-login-url="{{ route('login') }}">
@@ -90,6 +98,7 @@
                                 </button>
                             </div>
                         </form>
+                        @endauth
 
                         @forelse($berita->komentar()->latest()->get() as $komentar)
 
@@ -156,54 +165,58 @@
         </div>
     </main>
 
-    {{-- MODAL KONFIRMASI LOGIN --}}
-    <div class="login-modal-overlay" id="loginModalOverlay">
-        <div class="login-modal">
-
-            <div class="login-modal-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" />
-                    <path d="M7 11V7a5 5 0 0110 0v4" />
-                </svg>
-            </div>
-
-            <h3>Masuk Diperlukan</h3>
-            <p>Silakan login terlebih dahulu untuk memberikan komentar pada berita ini.</p>
-
-            <div class="login-modal-actions">
-                <a href="{{ route('login') }}" class="modal-btn modal-btn-confirm">
-                    Login Sekarang
-                </a>
-                <button type="button" class="modal-btn modal-btn-cancel" id="modalCancelBtn">
-                    Batal
-                </button>
-            </div>
-
-        </div>
-    </div>
-
     @include('components.footer')
     <script>
-        const commentForm = document.getElementById('commentForm');
-        const loginModalOverlay = document.getElementById('loginModalOverlay');
-        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        document.addEventListener('DOMContentLoaded', function () {
 
-        commentForm.addEventListener('submit', function (e) {
-            if (this.dataset.loggedIn !== '1') {
-                e.preventDefault();
-                loginModalOverlay.classList.add('active');
+            const commentForm = document.getElementById('commentForm');
+            const loginModalOverlay = document.getElementById('loginModalOverlay');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+            const modalLoginBtn = document.getElementById('modalLoginBtn');
+
+            if (commentForm) {
+                commentForm.addEventListener('submit', function (e) {
+
+                    if (this.dataset.loggedIn !== '1') {
+                        e.preventDefault();
+                        loginModalOverlay.classList.add('active');
+                    }
+
+                });
             }
-        });
 
-        modalCancelBtn.addEventListener('click', function () {
-            loginModalOverlay.classList.remove('active');
-        });
-
-        loginModalOverlay.addEventListener('click', function (e) {
-            if (e.target === loginModalOverlay) {
-                loginModalOverlay.classList.remove('active');
+            if (modalCancelBtn) {
+                modalCancelBtn.addEventListener('click', function () {
+                    loginModalOverlay.classList.remove('active');
+                });
             }
+
+            if (loginModalOverlay) {
+                loginModalOverlay.addEventListener('click', function (e) {
+                    if (e.target === loginModalOverlay) {
+                        loginModalOverlay.classList.remove('active');
+                    }
+                });
+            }
+
+            if (modalLoginBtn) {
+                modalLoginBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    fetch("{{ route('set.intended.url') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            url: window.location.href
+                        })
+                    }).then(() => {
+                        window.location.href = commentForm.dataset.loginUrl;
+                    });
+                }
+
         });
     </script>
 </body>

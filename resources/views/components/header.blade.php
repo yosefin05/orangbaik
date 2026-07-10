@@ -1,3 +1,4 @@
+<x-logout-modal />
 <header class="site-header" id="siteHeader">
     {{-- DESKTOP HEADER --}}
     <div class="container header-inner desktop-header">
@@ -54,8 +55,7 @@
 
                         <span class="header-user-avatar">
                             @if(!empty(auth()->user()->foto_profil))
-                                <img
-                                    src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
+                                <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                                     alt="{{ auth()->user()->name }}">
                             @else
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -82,13 +82,12 @@
                                 <span>Dashboard Admin</span>
                             </a>
                         @endif
-
-                        <form action="{{ route('logout') }}" method="POST">
+                        <form id="logoutForm" action="{{ route('logout') }}" method="POST">
                             @csrf
 
-                            <button type="submit">
+                            <button type="button" id="logoutButton" class="logout-trigger">
                                 <i class="bi bi-box-arrow-right"></i>
-                                <span>Keluar</span>
+                                Logout
                             </button>
                         </form>
                     </div>
@@ -119,9 +118,7 @@
         @auth
             <a href="{{ route('profile.user') }}" class="mobile-profile-button" aria-label="Profil Saya">
                 @if(!empty(auth()->user()->foto_profil))
-                    <img
-                        src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
-                        alt="{{ auth()->user()->name }}">
+                    <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="{{ auth()->user()->name }}">
                 @else
                     <span>
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}

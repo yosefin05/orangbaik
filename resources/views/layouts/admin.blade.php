@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
+<x-logout-modal/>
+
 <body>
 
     <div class="admin-wrapper">
@@ -120,7 +122,7 @@
 
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit">
+                            <button type="submit" class="logout-trigger">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Keluar</span>
                             </button>

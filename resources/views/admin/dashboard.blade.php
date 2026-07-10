@@ -3,7 +3,7 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
-
+<x-logout-modal/>
     {{-- Welcome Banner --}}
     <section class="welcome-banner">
         <div>
@@ -16,7 +16,7 @@
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="btn-logout">
+            <button type="submit" class="btn-logout logout-trigger">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Logout</span>
             </button>

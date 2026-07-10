@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/profile-user.css') }}">
 </head>
+<x-logout-modal/>
 
 <body>
 
@@ -229,7 +230,7 @@
                         </a>
                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                             @csrf
-                            <button type="submit" class="profile-menu-item logout-button">
+                            <button type="submit" class="profile-menu-item logout-button logout-trigger" >
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'logout'])
                                 </span>
