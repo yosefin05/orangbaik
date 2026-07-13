@@ -81,6 +81,10 @@ Route::get('/pusat-bantuan', function () {
     return view('pages.pusat-bantuan');
 })->name('pusat.bantuan');
 
+Route::get('/campaign/create', function () {
+    return view('pages.create');
+});
+
 // profile pengguna
 Route::get('/profile-user', function () {
 
