@@ -30,6 +30,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(Penggalang_Dana::class);
     }
+    public function donasi()
+    {
+        return $this->hasMany(Donasi::class);
+    }
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 

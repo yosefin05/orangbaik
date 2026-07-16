@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,390 +10,381 @@
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 </head>
+
 <body>
 
-@include('components.header')
+    @include('components.header')
 
-@php
-    $heroSlides = [
-        [
-            'image' => 'assets/slide1.png',
-            'title' => 'Peduli Banjir Sumatera',
-        ],
-        [
-            'image' => 'assets/sedekah.png',
-            'title' => 'Sedekah Tidak Mengurangi Harta',
-        ],
-        [
-            'image' => 'assets/slide1.png',
-            'title' => 'Bantu Pendidikan Anak Yatim',
-        ],
-    ];
+    @php
+        $heroSlides = [
+            [
+                'image' => 'assets/slide1.png',
+                'title' => 'Peduli Banjir Sumatera',
+            ],
+            [
+                'image' => 'assets/sedekah.png',
+                'title' => 'Sedekah Tidak Mengurangi Harta',
+            ],
+            [
+                'image' => 'assets/slide1.png',
+                'title' => 'Bantu Pendidikan Anak Yatim',
+            ],
+        ];
 
-    $sideNews = [
-        [
-            'image' => 'assets/gngerti.jpg',
-            'label' => 'Berita',
-            'title' => 'Update terbaru program kebaikan OrangBaik.id',
-            'url' => '#',
-        ],
-        [
-            'image' => 'assets/sedekah.png',
-            'label' => 'Artikel',
-            'title' => 'Keutamaan sedekah dan manfaatnya untuk sesama',
-            'url' => '#',
-        ],
-        [
-            'image' => 'assets/slide1.png',
-            'label' => 'Kabar Baik',
-            'title' => 'Campaign pendidikan mulai menjangkau penerima manfaat',
-            'url' => '#',
-        ],
-    ];
+        $sideNews = [
+            [
+                'image' => 'assets/gngerti.jpg',
+                'label' => 'Berita',
+                'title' => 'Update terbaru program kebaikan OrangBaik.id',
+                'url' => '#',
+            ],
+            [
+                'image' => 'assets/sedekah.png',
+                'label' => 'Artikel',
+                'title' => 'Keutamaan sedekah dan manfaatnya untuk sesama',
+                'url' => '#',
+            ],
+            [
+                'image' => 'assets/slide1.png',
+                'label' => 'Kabar Baik',
+                'title' => 'Campaign pendidikan mulai menjangkau penerima manfaat',
+                'url' => '#',
+            ],
+        ];
 
-    $categories = [
-        ['name' => 'Zakat', 'icon' => 'assets/zakat.svg'],
-        ['name' => 'Wakaf', 'icon' => 'assets/wakaf.svg'],
-        ['name' => 'Infaq', 'icon' => 'assets/infaq.svg'],
-        ['name' => 'Kemanusiaan', 'icon' => 'assets/kemanusiaan.svg'],
-        ['name' => 'Sedekah Rutin', 'icon' => 'assets/sedekah-rutin.svg'],
-        ['name' => 'Lainnya', 'icon' => 'assets/lainnya.svg'],
-    ];
+    @endphp
 
-    $campaigns = [
-        [
-            'title' => 'Sedekah Makan untuk Yatim dan Dhuafa',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 200.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '55%',
-        ],
-        [
-            'title' => 'Bantu Korban Bencana Banjir Sumatera',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 85.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '40%',
-        ],
-        [
-            'title' => 'Wakaf Pendidikan untuk Santri Penghafal Qur’an',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 125.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '62%',
-        ],
-        [
-            'title' => 'Sedekah Pangan untuk Keluarga Dhuafa',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 75.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '35%',
-        ],
-    ];
+    <main class="main">
 
-    $listCampaigns = [
-        [
-            'title' => 'Gotong Royong Infaq Jariyah Hadirkan Layanan Ambulans Gratis',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 200.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '55%',
-        ],
-        [
-            'title' => 'Bantu Pendidikan Anak Yatim dan Dhuafa',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 150.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '48%',
-        ],
-        [
-            'title' => 'Wakaf Al-Qur’an untuk Santri Pelosok Negeri',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 90.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '38%',
-        ],
-        [
-            'title' => 'Sedekah Pangan untuk Keluarga Dhuafa',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 75.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '34%',
-        ],
-        [
-            'title' => 'Bantu Renovasi Rumah Ibadah dan Pesantren',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp 110.000.000',
-            'image' => 'assets/slide1.png',
-            'progress' => '46%',
-        ],
-    ];
-@endphp
+        {{-- HERO --}}
+        <section class="hero-section">
+            <div class="container hero-layout">
 
-<main class="main">
-
-    {{-- HERO --}}
-    <section class="hero-section">
-        <div class="container hero-layout">
-
-            <div class="hero-card hero-main-slider">
-                @foreach ($heroSlides as $index => $slide)
-                    <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
-                        <img src="{{ asset($slide['image']) }}" alt="{{ $slide['title'] }}">
-                    </div>
-                @endforeach
-
-                <div class="hero-dots"></div>
-            </div>
-
-            <div class="hero-side-slider">
-                @foreach ($sideNews as $index => $news)
-                    <a href="{{ $news['url'] }}" class="hero-side-card {{ $index === 0 ? 'active' : '' }}">
-                        <img src="{{ asset($news['image']) }}" alt="{{ $news['title'] }}">
-
-                        <div class="hero-side-body">
-                            <span>{{ $news['label'] }}</span>
-                            <h3>{{ $news['title'] }}</h3>
+                <div class="hero-card hero-main-slider">
+                    @foreach ($heroSlides as $index => $slide)
+                        <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
+                            <img src="{{ asset($slide['image']) }}" alt="{{ $slide['title'] }}">
                         </div>
-                    </a>
-                @endforeach
+                    @endforeach
 
-                <div class="hero-side-dots"></div>
+                    <div class="hero-dots"></div>
+                </div>
+
+                <div class="hero-side-slider">
+                    @foreach ($sideNews as $index => $news)
+                        <a href="{{ $news['url'] }}" class="hero-side-card {{ $index === 0 ? 'active' : '' }}">
+                            <img src="{{ asset($news['image']) }}" alt="{{ $news['title'] }}">
+
+                            <div class="hero-side-body">
+                                <span>{{ $news['label'] }}</span>
+                                <h3>{{ $news['title'] }}</h3>
+                            </div>
+                        </a>
+                    @endforeach
+
+                    <div class="hero-side-dots"></div>
+                </div>
+
             </div>
+        </section>
 
-        </div>
-    </section>
+        {{-- CATEGORY ATAS --}}
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Yuk, Berbuat Baik Hari Ini!</h2>
 
-    {{-- CATEGORY ATAS --}}
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Yuk, Berbuat Baik Hari Ini!</h2>
+                <div class="category-grid">
+                    @foreach($kategori as $item)
+                        @php
+                            $icon = match (strtolower($item->nama_kategori)) {
+                                'zakat' => 'assets/zakat.svg',
+                                'wakaf' => 'assets/wakaf.svg',
+                                'infaq' => 'assets/infaq.svg',
+                                'kemanusiaan' => 'assets/kemanusiaan.svg',
+                                'sedekah rutin' => 'assets/sedekah-rutin.svg',
+                                default => 'assets/lainnya.svg',
+                            };
+                        @endphp
 
-            <div class="category-grid">
-                @foreach ($categories as $category)
-                    <a href="{{ url('donasi') }}" class="category-item">
+                        <a href="{{ route('donasi', ['kategori' => $item->id]) }}"
+                            class="category-item {{ request('kategori') == $item->id ? 'active' : '' }}">
+
+                            <div class="category-icon">
+                                <img src="{{ asset($icon) }}" alt="{{ $item->nama_kategori }}">
+                            </div>
+
+                            <p>{{ $item->nama_kategori }}</p>
+                        </a>
+                    @endforeach
+
+                    {{-- Lainnya / Semua Campaign --}}
+                    <a href="{{ route('donasi') }}"
+                        class="category-item {{ request()->filled('kategori') ? '' : 'active' }}">
+
                         <div class="category-icon">
-                            <img src="{{ asset($category['icon']) }}" alt="{{ $category['name'] }}">
+                            <img src="{{ asset('assets/lainnya.svg') }}" alt="Semua Campaign">
                         </div>
 
-                        <p>{{ $category['name'] }}</p>
+                        <p>Lainnya</p>
                     </a>
-                @endforeach
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    {{-- DARURAT --}}
-    <section class="section section-border">
-        <div class="container">
-            <h2 class="section-title">Darurat! Bantu Sekarang</h2>
+        {{-- DARURAT --}}
+        <section class="section section-border">
+            <div class="container">
 
-            <div class="campaign-grid">
-                @foreach ($campaigns as $campaign)
-                    <article class="campaign-card">
-                        <a href="{{ url('donasi') }}">
-                            <img
-                                class="campaign-image"
-                                src="{{ asset($campaign['image']) }}"
-                                alt="{{ $campaign['title'] }}"
+                <h2 class="section-title">
+                    Darurat! Bantu Sekarang
+                </h2>
+
+                <div class="campaign-grid">
+                    @forelse ($campaigns as $campaign)
+                        @php
+                            $terkumpul = $campaign->donasi->sum('nominal');
+                            $persen = $campaign->target_donasi
+                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                : 0;
+
+                            $hari = max(
+                                0,
+                                (int) now()->diffInDays($campaign->tanggal_berakhir, false)
+                            );
+                        @endphp
+                        <article class="campaign-card">
+                            <a href="{{ route('campaign.show', $campaign->slug) }}">
+                                <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                    alt="{{ $campaign->judul }}" loading="lazy">
+                            </a>
+                            <div class="campaign-body">
+                                <h3>{{ $campaign->judul }}</h3>
+                                <p>
+                                    {{ $campaign->penggalangDana->nama_penggalang }}
+                                    <span>●</span>
+                                </p>
+                                <div class="campaign-price">
+                                    <strong>
+                                        Rp {{ number_format($terkumpul, 0, ',', '.') }}
+                                    </strong>
+                                    <span>Terkumpul</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
+                                </div>
+                                <div class="campaign-meta">
+                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ $hari }} Hari</span>
+                                </div>
+                            </div>
+                        </article>
+                    @empty
+                        <p>Belum ada campaign.</p>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+
+        {{-- YANG BARU --}}
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Yuk, Lihat yang Baru!</h2>
+                <div class="donasi-new-grid">
+                    @forelse ($campaignTerbaru as $campaign)
+                        <a href="{{ route('campaign.show', ['slug' => $campaign->slug]) }}" class="donasi-new-item">
+                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
                                 loading="lazy">
                         </a>
+                    @empty
+                        <p>Belum ada campaign terbaru.</p>
+                    @endforelse
+                </div>
+            </div>
+        </section>
 
-                        <div class="campaign-body">
-                            <h3>{{ $campaign['title'] }}</h3>
+        {{-- PEMBERDAYAAN --}}
+        <section class="section section-border">
+            <div class="container">
+                <h2 class="section-title">Pemberdayaan Berkelanjutan</h2>
 
-                            <p>
-                                {{ $campaign['organizer'] }}
-                                <span>●</span>
+                <div class="campaign-grid">
+                    @foreach ($campaigns as $campaign)
+                        <article class="campaign-card">
+                            <a href="{{ url('donasi') }}">
+                                <img class="campaign-image" src="{{ asset($campaign['image']) }}"
+                                    alt="{{ $campaign['title'] }}" loading="lazy">
+                            </a>
+
+                            <div class="campaign-body">
+                                <h3>{{ $campaign['title'] }}</h3>
+
+                                <p>
+                                    {{ $campaign['organizer'] }}
+                                    <span>●</span>
+                                </p>
+
+                                <div class="campaign-price">
+                                    <strong>{{ $campaign['amount'] }}</strong>
+                                    <span>Terkumpul</span>
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: {{ $campaign['progress'] }}"></div>
+                                </div>
+
+                                <div class="campaign-meta">
+                                    <span>100rb+ donatur</span>
+                                    <span>∞</span>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        {{-- TESTIMONIAL --}}
+        <section class="section testimonial">
+            <div class="container">
+                <h2 class="section-title">Apa Kata Mereka?</h2>
+
+                <div class="testimonial-wrapper">
+                    @forelse(($testimoni ?? []) as $item)
+                        <div class="testimonial-item {{ $loop->first ? 'active' : '' }}">
+                            <p class="testimonial-description">
+                                "{{ $item->isi_testimoni }}"
                             </p>
 
-                            <div class="campaign-price">
-                                <strong>{{ $campaign['amount'] }}</strong>
-                                <span>Terkumpul</span>
-                            </div>
+                            @if($item->foto_profil)
+                                <img src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama }}" loading="lazy">
+                            @else
+                                <img src="{{ asset('assets/logo.png') }}" alt="{{ $item->nama }}" loading="lazy">
+                            @endif
 
-                            <div class="progress">
-                                <div class="progress-fill" style="width: {{ $campaign['progress'] }}"></div>
-                            </div>
-
-                            <div class="campaign-meta">
-                                <span>100rb+ donatur</span>
-                                <span>∞</span>
-                            </div>
+                            <h3>{{ $item->nama }}</h3>
+                            <span>{{ $item->jabatan }}</span>
                         </div>
-                    </article>
-                @endforeach
+                    @empty
+                        <div class="testimonial-item active">
+                            <p class="testimonial-description">
+                                "OrangBaik.id memudahkan kami untuk ikut berbagi dan mendukung program kebaikan."
+                            </p>
+
+                            <img src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id" loading="lazy">
+
+                            <h3>OrangBaik.id</h3>
+                            <span>Platform Donasi</span>
+                        </div>
+                    @endforelse
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    {{-- YANG BARU --}}
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Yuk, Lihat yang Baru!</h2>
+        {{-- KATEGORI FAVORIT --}}
+        <section class="section" id="kategori-favorit">
+            <div class="container">
+                <h2 class="section-title">Pilih Kategori Favoritmu</h2>
 
-            <div class="new-grid">
-                <img
-                    src="{{ asset('assets/sedekah.png') }}"
-                    alt="Sedekah Tidaklah Mengurangi Harta"
-                    loading="lazy">
+                <div class="category-grid category-grid-small">
+                    @foreach($kategori as $item)
+                        @php
+                            $icon = match (strtolower($item->nama_kategori)) {
+                                'zakat' => 'assets/zakat.svg',
+                                'wakaf' => 'assets/wakaf.svg',
+                                'infaq' => 'assets/infaq.svg',
+                                'kemanusiaan' => 'assets/kemanusiaan.svg',
+                                'sedekah rutin' => 'assets/sedekah-rutin.svg',
+                                default => 'assets/lainnya.svg',
+                            };
+                        @endphp
 
-                <img
-                    src="{{ asset('assets/sedekah.png') }}"
-                    alt="Sedekah Tidaklah Mengurangi Harta"
-                    loading="lazy">
-            </div>
-        </div>
-    </section>
+                        <a href="{{ route('home', ['kategori' => $item->id]) }}#kategori-favorit"
+                            class="category-item {{ request('kategori') == $item->id ? 'active' : '' }}">
 
-    {{-- PEMBERDAYAAN --}}
-    <section class="section section-border">
-        <div class="container">
-            <h2 class="section-title">Pemberdayaan Berkelanjutan</h2>
+                            <div class="category-icon">
+                                <img src="{{ asset($icon) }}" alt="{{ $item->nama_kategori }}">
+                            </div>
 
-            <div class="campaign-grid">
-                @foreach ($campaigns as $campaign)
-                    <article class="campaign-card">
-                        <a href="{{ url('donasi') }}">
-                            <img
-                                class="campaign-image"
-                                src="{{ asset($campaign['image']) }}"
-                                alt="{{ $campaign['title'] }}"
-                                loading="lazy">
+                            <p>{{ $item->nama_kategori }}</p>
                         </a>
+                    @endforeach
 
-                        <div class="campaign-body">
-                            <h3>{{ $campaign['title'] }}</h3>
+                    {{-- Lainnya / Semua Campaign --}}
+                    <a href="{{ route('home') }}#kategori-favorit"
+                        class="category-item {{ request()->filled('kategori') ? '' : 'active' }}">
 
-                            <p>
-                                {{ $campaign['organizer'] }}
-                                <span>●</span>
-                            </p>
-
-                            <div class="campaign-price">
-                                <strong>{{ $campaign['amount'] }}</strong>
-                                <span>Terkumpul</span>
-                            </div>
-
-                            <div class="progress">
-                                <div class="progress-fill" style="width: {{ $campaign['progress'] }}"></div>
-                            </div>
-
-                            <div class="campaign-meta">
-                                <span>100rb+ donatur</span>
-                                <span>∞</span>
-                            </div>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    {{-- TESTIMONIAL --}}
-    <section class="section testimonial">
-        <div class="container">
-            <h2 class="section-title">Apa Kata Mereka?</h2>
-
-            <div class="testimonial-wrapper">
-                @forelse(($testimoni ?? []) as $item)
-                    <div class="testimonial-item {{ $loop->first ? 'active' : '' }}">
-                        <p class="testimonial-description">
-                            "{{ $item->isi_testimoni }}"
-                        </p>
-
-                        @if($item->foto_profil)
-                            <img
-                                src="{{ asset('storage/' . $item->foto_profil) }}"
-                                alt="{{ $item->nama }}"
-                                loading="lazy">
-                        @else
-                            <img
-                                src="{{ asset('assets/logo.png') }}"
-                                alt="{{ $item->nama }}"
-                                loading="lazy">
-                        @endif
-
-                        <h3>{{ $item->nama }}</h3>
-                        <span>{{ $item->jabatan }}</span>
-                    </div>
-                @empty
-                    <div class="testimonial-item active">
-                        <p class="testimonial-description">
-                            "OrangBaik.id memudahkan kami untuk ikut berbagi dan mendukung program kebaikan."
-                        </p>
-
-                        <img
-                            src="{{ asset('assets/logo.png') }}"
-                            alt="OrangBaik.id"
-                            loading="lazy">
-
-                        <h3>OrangBaik.id</h3>
-                        <span>Platform Donasi</span>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-    </section>
-
-    {{-- KATEGORI FAVORIT --}}
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Pilih Kategori Favoritmu</h2>
-
-            <div class="category-grid category-grid-small">
-                @foreach ($categories as $category)
-                    <a href="{{ url('donasi') }}" class="category-item">
                         <div class="category-icon">
-                            <img src="{{ asset($category['icon']) }}" alt="{{ $category['name'] }}">
+                            <img src="{{ asset('assets/lainnya.svg') }}" alt="Semua Campaign">
                         </div>
 
-                        <p>{{ $category['name'] }}</p>
+                        <p>Lainnya</p>
                     </a>
-                @endforeach
-            </div>
+                </div>
 
-            <div class="list-campaign">
-                @foreach ($listCampaigns as $campaign)
-                    <article class="list-card">
-                        <a href="{{ url('donasi') }}">
-                            <img
-                                src="{{ asset($campaign['image']) }}"
-                                alt="{{ $campaign['title'] }}"
-                                loading="lazy">
-                        </a>
+                <div class="list-campaign">
+                    @forelse ($campaigns as $campaign)
+                        @php
+                            $terkumpul = $campaign->donasi->sum('nominal');
 
-                        <div class="list-body">
-                            <h3>{{ $campaign['title'] }}</h3>
+                            $persen = $campaign->target_donasi
+                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                : 0;
 
-                            <p>
-                                {{ $campaign['organizer'] }}
-                                <span>●</span>
-                            </p>
+                            $hari = max(
+                                0,
+                                (int) now()->diffInDays($campaign->tanggal_berakhir, false)
+                            );
+                        @endphp
 
-                            <strong>{{ $campaign['amount'] }}</strong>
+                        <article class="list-card">
 
-                            <div class="progress">
-                                <div class="progress-fill" style="width: {{ $campaign['progress'] }}"></div>
+                            <a href="{{ route('campaign.show', $campaign->slug) }}">
+                                <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
+                                    loading="lazy">
+                            </a>
+
+                            <div class="list-body">
+
+                                <h3>{{ $campaign->judul }}</h3>
+
+                                <p>
+                                    {{ $campaign->penggalangDana->nama_penggalang }}
+                                    <span>●</span>
+                                </p>
+
+                                <strong>
+                                    Rp {{ number_format($terkumpul, 0, ',', '.') }}
+                                </strong>
+
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: {{ $persen }}%;">
+                                    </div>
+                                </div>
+
+                                <div class="campaign-meta">
+                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ $hari }} Hari</span>
+                                </div>
+
                             </div>
 
-                            <div class="campaign-meta">
-                                <span>100rb+ donatur</span>
-                                <span>∞</span>
-                            </div>
-                        </div>
-                    </article>
-                @endforeach
+                        </article>
+                    @empty
+
+                        <p>Belum ada campaign.</p>
+
+                    @endforelse
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-</main>
+    </main>
 
-@include('components.footer')
+    @include('components.footer')
 
-<script src="{{ asset('js/header.js') }}"></script>
-<script src="{{ asset('js/home.js') }}"></script>
+    <script src="{{ asset('js/header.js') }}"></script>
+    <script src="{{ asset('js/home.js') }}"></script>
 
 </body>
+
 </html>

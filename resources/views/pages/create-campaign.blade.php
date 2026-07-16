@@ -25,12 +25,27 @@
                 <span>Kembali</span>
             </a>
 
+            @if ($errors->any())
+<div style="background:red;color:white;padding:10px">
+
+    <ul>
+
+        @foreach($errors->all() as $error)
+
+            <li>{{ $error }}</li>
+
+        @endforeach
+
+    </ul>
+
+</div>
+@endif
             <form
-                action="{{ url('/campaign/store') }}"
+                action="{{ route('campaign.store') }}"
                 method="POST"
                 enctype="multipart/form-data"
                 class="campaign-create-layout"
-                id="campaignCreateForm">
+                id="campaignCreateForm" novalidate>
                 @csrf
 
                 {{-- LEFT FORM --}}
@@ -168,60 +183,75 @@
                     </section>
 
                     {{-- CATEGORY --}}
-                    <section class="campaign-create-card">
-                        <div class="campaign-create-card-head">
-                            <h2>Pilih Kategori untuk Campaign Anda</h2>
-                            <p>Pilih kategori sesuai kebutuhan campaign agar informasi tersampaikan dengan lebih jelas kepada donatur.</p>
-                        </div>
+<section class="campaign-create-card">
+    <div class="campaign-create-card-head">
+        <h2>Pilih Kategori untuk Campaign Anda</h2>
+        <p>
+            Pilih kategori sesuai kebutuhan campaign agar informasi
+            tersampaikan dengan lebih jelas kepada donatur.
+        </p>
+    </div>
 
-                        <div class="campaign-field">
-                            <label for="kategori_campaign">Kategori Campaign <span>*</span></label>
-                            <div class="campaign-select-wrap">
-                                <select id="kategori_campaign" name="kategori_campaign" required>
-                                    <option value="">Pilih kategori campaign Anda</option>
-                                    <option value="pendidikan">Bantuan Pendidikan</option>
-                                    <option value="bencana">Bencana Alam</option>
-                                    <option value="difabel">Difabel</option>
-                                    <option value="panti">Panti Asuhan</option>
-                                    <option value="umkm">Pemberdayaan UMKM</option>
-                                    <option value="lingkungan">Lingkungan</option>
-                                    <option value="masjid">Masjid Berdaya</option>
-                                    <option value="mualaf">Mualaf</option>
-                                    <option value="kesehatan">Bantuan Kesehatan</option>
-                                    <option value="negara">Negara Terdampak</option>
-                                </select>
-                                <i class="bi bi-chevron-down"></i>
-                            </div>
-                        </div>
+    {{-- Kategori --}}
+    <div class="campaign-field">
+        <label for="kategori_id">
+            Kategori Campaign <span>*</span>
+        </label>
+        <div class="campaign-select-wrap">
+            <select
+                id="kategori_id"
+                name="kategori_id"
+                required>
+                <option value="">
+                    Pilih kategori campaign Anda
+                </option>
+                @foreach($kategori as $item)
+                    <option
+                        value="{{ $item->id }}"
+                        {{ old('kategori_id') == $item->id ? 'selected' : '' }}>
+                        {{ $item->nama_kategori }}
+                    </option>
+                @endforeach
+            </select>
+            <i class="bi bi-chevron-down"></i>
+        </div>
+        @error('kategori_id')
+            <small class="text-danger">
+                {{ $message }}
+            </small>
+        @enderror
+    </div>
 
-                        <div class="campaign-field">
-                            <label>Filter Campaign <span>*</span></label>
-
-                            <div class="campaign-filter-grid">
-                                @foreach([
-                                    'Bantuan Pendidikan',
-                                    'Bencana Alam',
-                                    'Difabel',
-                                    'Panti Asuhan',
-                                    'Pemberdayaan UMKM',
-                                    'Lingkungan',
-                                    'Masjid Berdaya',
-                                    'Mualaf',
-                                    'Bantuan Kesehatan',
-                                    'Negara Terdampak'
-                                ] as $filter)
-                                    <label class="campaign-filter-item">
-                                        <input type="checkbox" name="filter_campaign[]" value="{{ $filter }}">
-                                        <span>{{ $filter }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-
-                            <small class="campaign-note" id="filterNote">Catatan: maksimal 4 filter.</small>
-                        </div>
-                    </section>
-
-                </div>
+    {{-- Filter --}}
+    <div class="campaign-field">
+        <label>
+            Filter Campaign <span>*</span>
+        </label>
+        <div class="campaign-filter-grid">
+            @foreach($filter as $item)
+                <label class="campaign-filter-item">
+                    <input
+                        type="checkbox"
+                        name="filter[]"
+                        value="{{ $item->id }}"
+                        {{ in_array($item->id, old('filter', [])) ? 'checked' : '' }}>
+                    <span>
+                        {{ $item->nama_filter }}
+                    </span>
+                </label>
+            @endforeach
+        </div>
+        <small class="campaign-note">
+            Catatan: maksimal 4 filter.
+        </small>
+        @error('filter')
+            <small class="text-danger">
+                {{ $message }}
+            </small>
+        @enderror
+    </div>
+</section>
+</div>
 
                 {{-- RIGHT SIDEBAR --}}
                 <aside class="campaign-create-sidebar">
@@ -272,6 +302,7 @@
                                         <span>Rp</span>
                                         <input type="text" name="packages[0][nominal]" placeholder="0" inputmode="numeric" data-money required>
                                     </div>
+                                    <div class="package-extra-feature"></div>
                                 </div>
                             </div>
 
@@ -284,56 +315,119 @@
                     </section>
 
                     <section class="campaign-side-card">
-                        <div class="campaign-side-head">
-                            <h2>Fitur Tambahan</h2>
-                            <p>Aktifkan informasi tambahan yang ingin ditampilkan.</p>
+
+                    <div class="campaign-side-head">
+                        <h2>Tambahkan Fitur Lainnya <span>(Opsional)</span></h2>
+                    </div>
+
+                    <!-- Jumlah Package -->
+                    <div class="feature-row">
+
+                        <label class="feature-check">
+                            <input type="checkbox"
+                                id="toggleQuantity"
+                                name="enable_quantity"
+                                >
+
+                            <span></span>
+                        </label>
+
+                        <div class="feature-counter">
+
+                            <button type="button" class="minus">
+                                <i class="bi bi-dash"></i>
+                            </button>
+
+                            <span class="qty">1</span>
+
+                            <button type="button" class="plus">
+                                <i class="bi bi-plus"></i>
+                            </button>
+
                         </div>
 
-                        <div class="campaign-extra-list">
-                            <label>
-                                <input type="checkbox" name="fitur[]" value="jumlah_paket" checked>
-                                <span>Jumlah package</span>
-                            </label>
+                    </div>
 
-                            <label>
-                                <input type="checkbox" name="fitur[]" value="nama_pekurban" checked>
-                                <span>Nama pekurban / donatur</span>
-                            </label>
+                    <!-- Nama Pekurban -->
 
-                            <label>
-                                <input type="checkbox" name="fitur[]" value="nominal_lainnya">
-                                <span>Nominal lainnya</span>
-                            </label>
+                    <div class="feature-input-card">
+
+                        <label class="feature-check">
+
+                            <input type="checkbox"
+                                id="toggleDonatur"
+                                name="enable_donatur_name"
+                                >
+
+                            <span></span>
+
+                        </label>
+
+                        <div class="feature-input">
+
+                            <input
+                                type="text"
+                                placeholder="Nama Pekurban">
+
+                            <small>Masukkan Atas Nama Pekurban</small>
+
+                            <i class="bi bi-pencil-fill"></i>
+
                         </div>
-                    </section>
 
+                    </div>
+
+                    <!-- Nominal -->
+
+                    <div class="feature-input-card">
+
+                        <label class="feature-check">
+
+                            <input type="checkbox"
+                                id="toggleNominal"
+                                name="enable_custom_nominal">
+
+                            <span></span>
+
+                        </label>
+
+                        <div class="feature-money">
+
+                            <label>Nominal Lainnya</label>
+
+                            <div class="money-box">
+
+                                <span>Rp</span>
+                                <input type="text" placeholder="0" inputmode="numeric" data-money>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
                     <section class="campaign-side-card">
                         <div class="campaign-side-head">
                             <h2>Contoh Layout</h2>
                             <p>Preview sederhana tampilan pilihan donasi.</p>
                         </div>
-
                         <div class="campaign-layout-preview">
                             <div class="preview-package">
                                 <span class="preview-image">
                                     <i class="bi bi-image"></i>
                                 </span>
-
                                 <div>
                                     <span></span>
                                     <span></span>
                                 </div>
-
                                 <strong>-</strong>
                                 <b>1</b>
                                 <strong>+</strong>
                             </div>
-
                             <div class="preview-list">
                                 <span>Rp10.000</span>
                                 <span>Rp50.000</span>
                                 <span>Rp100.000</span>
-
                                 <div class="preview-custom">
                                     <small>Masukkan donasi lainnya</small>
                                     <p>Rp 0</p>
@@ -341,16 +435,12 @@
                             </div>
                         </div>
                     </section>
-
                     <button type="submit" class="campaign-submit-button">
                         <i class="bi bi-send-fill"></i>
                         <span>Publikasikan Campaign</span>
                     </button>
-
                 </aside>
-
             </form>
-
         </div>
     </section>
 

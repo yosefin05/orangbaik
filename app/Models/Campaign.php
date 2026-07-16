@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Campaign extends Model
 {
+    public function filter()
+    {
+        return $this->belongsToMany(
+            Filter::class,
+            'campaign_filter',
+            'campaign_id',
+            'filter_id'
+        );
+    }
+
     public function kategori()
     {
         return $this->belongsTo(
@@ -13,6 +23,7 @@ class Campaign extends Model
             'kategori_id'
         );
     }
+
     public function penggalangDana()
     {
         return $this->belongsTo(Penggalang_Dana::class, 'penggalang_dana_id');
@@ -34,6 +45,11 @@ class Campaign extends Model
         return $this->hasMany(Campaign_Fundraiser::class);
     }
 
+    public function donasi()
+    {
+        return $this->hasMany(Donasi::class);
+    }
+
     public function verifier()
     {
         return $this->belongsTo(
@@ -41,20 +57,30 @@ class Campaign extends Model
             'verified_by'
         );
     }
+
+    public function packages()
+    {
+        return $this->hasMany(Campaign_Package::class);
+    }
+
     protected $table = 'campaign';
     protected $fillable = [
         'thumbnail',
         'judul',
         'slug',
         'deskripsi',
+        'is_active',
         'tanggal_mulai',
         'tanggal_berakhir',
         'target_donasi',
+        'minimal_donasi',
         'kategori_id',
         'penggalang_dana_id',
-        'status',
         'verified_by',
-        'verified_at'
+        'verified_at',
+        'enable_quantity',
+        'enable_nama_donatur',
+        'enable_custom_nominal'
     ];
 
     protected $casts = [

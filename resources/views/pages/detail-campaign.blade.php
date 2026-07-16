@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,215 +10,217 @@
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/detail-campaign.css') }}">
 </head>
+
 <body>
 
-@include('components.header')
+    @include('components.header')
 
-@php
-    $donations = [
-        ['name' => 'Orang Baik', 'amount' => 'Rp10.000', 'time' => '1 Jam lalu'],
-        ['name' => 'yayayay', 'amount' => 'Rp100.000', 'time' => '1 Jam lalu'],
-        ['name' => 'Josie Raditya', 'amount' => 'Rp1.000.000', 'time' => '1 Jam lalu'],
-    ];
+    @php
+        $donations = [
+            ['name' => 'Orang Baik', 'amount' => 'Rp10.000', 'time' => '1 Jam lalu'],
+            ['name' => 'yayayay', 'amount' => 'Rp100.000', 'time' => '1 Jam lalu'],
+            ['name' => 'Josie Raditya', 'amount' => 'Rp1.000.000', 'time' => '1 Jam lalu'],
+        ];
 
-    $fundraisers = [
-        ['name' => 'Orang Baik', 'desc' => 'Berhasil mengajak 1 orang untuk berdonasi', 'amount' => 'Rp100.000'],
-        ['name' => 'Fundraiser Baik', 'desc' => 'Berhasil mengajak 10 orang untuk berdonasi', 'amount' => 'Rp1.000.000'],
-        ['name' => 'Rinto Aji', 'desc' => 'Berhasil mengajak 100 orang untuk berdonasi', 'amount' => 'Rp10.000.000'],
-    ];
+        $fundraisers = [
+            ['name' => 'Orang Baik', 'desc' => 'Berhasil mengajak 1 orang untuk berdonasi', 'amount' => 'Rp100.000'],
+            ['name' => 'Fundraiser Baik', 'desc' => 'Berhasil mengajak 10 orang untuk berdonasi', 'amount' => 'Rp1.000.000'],
+            ['name' => 'Rinto Aji', 'desc' => 'Berhasil mengajak 100 orang untuk berdonasi', 'amount' => 'Rp10.000.000'],
+        ];
 
-    $news = [
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
-            'date' => '12 Desember 2024',
-            'image' => 'assets/slide1.png',
-        ],
-    ];
-@endphp
+        $news = [
+            [
+                'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
+                'date' => '12 Desember 2024',
+                'image' => 'assets/slide1.png',
+            ],
+            [
+                'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
+                'date' => '12 Desember 2024',
+                'image' => 'assets/slide1.png',
+            ],
+        ];
+    @endphp
 
-<main class="campaign-detail-page">
-    <div class="container detail-container">
+    <main class="campaign-detail-page">
+        <div class="container detail-container">
 
-        <div class="detail-layout">
+            <div class="detail-layout">
 
-            {{-- LEFT CONTENT --}}
-            <div class="detail-main">
+                {{-- LEFT CONTENT --}}
+                <div class="detail-main">
+                    <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
+                        class="campaign-hero-image">
 
-                <img 
-                    src="{{ asset('assets/slide1.png') }}" 
-                    alt="Beasiswa Yatim Dhuafa"
-                    class="campaign-hero-image"
-                >
+                    <section class="description-section">
+                        <h1>{{ $campaign->judul }}</h1>
 
-                <section class="description-section">
-                    <h1>Deskripsi</h1>
+                        <p>
+                            {{ $campaign->deskripsi }}
 
-                    <p>
-                        Pendidikan merupakan fondasi utama untuk kemajuan suatu bangsa, membuka jalan menuju kehidupan
-                        yang sejahtera dan berdaya saing. Namun, tidak semua anak memiliki keberuntungan yang sama.
-                        Banyak anak-anak di Indonesia yang berasal dari keluarga kurang mampu atau dhuafa menghadapi
-                        risiko putus sekolah, menghalangi mereka untuk mendapatkan pendidikan yang layak dan menggapai
-                        cita-cita mereka.
-                    </p>
+                        </p>
+                    </section>
 
-                    <p>
-                        Menurut laporan Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi (Kemendikbud Ristek),
-                        saat ini ada 76.834 anak yang putus sekolah pada tahun 2023.
-                    </p>
+                    {{-- NEWS --}}
+                    <section class="latest-news-section">
+                        <h2>Kabar Terbaru</h2>
 
-                    <p>
-                        Melalui Program Beasiswa Yatim Dhuafa, Dompet Al-Qur’an Indonesia berkomitmen untuk membantu
-                        Anak-anak Yatim Dhuafa Penghafal Al-Qur’an dalam mewujudkan impian mereka mendapatkan pendidikan
-                        yang layak. Program ini dirancang untuk memberikan dukungan finansial dan moral, memastikan
-                        anak-anak ini memiliki kesempatan untuk melanjutkan pendidikan mereka tanpa terkendala oleh
-                        kondisi ekonomi.
-                    </p>
+                        <div class="news-grid">
+                            @foreach ($news as $item)
+                                <article class="news-card">
+                                    <img src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}">
 
-                    <p>
-                        Insya Allah dengan kita mengambil langkah nyata mendukung pendidikan Anak-anak Yatim Dhuafa
-                        Penghafal Al-Qur’an untuk bisa sekolah kelak kita di surga akan berada di dekat Nabi Muhammad SAW.
-                    </p>
+                                    <div class="news-body">
+                                        <h3>{{ $campaign->judul }} </h3>
+                                        <p>{{ $item['date'] }}</p>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    </section>
 
-                    <p>
-                        Rasulullah shallallahu ‘alaihi wa sallam bersabda: “Aku dan orang yang menanggung anak yatim
-                        kedudukannya di surga seperti ini”, kemudian beliau shallallahu ‘alaihi wa sallam mengisyaratkan
-                        jari telunjuk dan jari tengah beliau shallallahu ‘alaihi wa sallam, serta agak merenggangkan
-                        keduanya” (HR Bukhari).
-                    </p>
+                    {{-- PRAYER --}}
+                    <section class="prayer-section">
+                        <h2>Doa #OrangBaik</h2>
 
-                    <p>
-                        Oleh karena itu, kami mengajak Sahabat DQ dalam memberikan kontribusi bersama dalam membantu
-                        biaya beasiswa pendidikan Anak-anak Yatim dan Dhuafa Penghafal Al-Qur’an yang membutuhkan.
-                    </p>
-                </section>
+                        <div class="prayer-card">
+                            <div class="prayer-user">
+                                <div class="avatar-circle">👤</div>
 
-                {{-- NEWS --}}
-                <section class="latest-news-section">
-                    <h2>Kabar Terbaru</h2>
-
-                    <div class="news-grid">
-                        @foreach ($news as $item)
-                            <article class="news-card">
-                                <img src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}">
-
-                                <div class="news-body">
-                                    <h3>{{ $item['title'] }}</h3>
-                                    <p>{{ $item['date'] }}</p>
+                                <div>
+                                    <h3>Rinto Aji Pambudi</h3>
+                                    <p>1 Jam yang lalu</p>
                                 </div>
-                            </article>
-                        @endforeach
-                    </div>
-                </section>
+                            </div>
 
-                {{-- PRAYER --}}
-                <section class="prayer-section">
-                    <h2>Doa #OrangBaik</h2>
+                            <p class="prayer-text">
+                                Mudahkanlah setiap langkah kami, kuatkan hati kami dalam menghadapi setiap tantangan,
+                                dan berikan hasil terbaik dari setiap usaha yang kami lakukan.
+                            </p>
 
-                    <div class="prayer-card">
-                        <div class="prayer-user">
-                            <div class="avatar-circle">👤</div>
-
-                            <div>
-                                <h3>Rinto Aji Pambudi</h3>
-                                <p>1 Jam yang lalu</p>
+                            <div class="prayer-footer">
+                                <span>5 orang lainnya telah mengaminkan doa ini</span>
+                                <button type="button">🤍 Aamiin kan doa ini</button>
                             </div>
                         </div>
+                    </section>
 
-                        <p class="prayer-text">
-                            Mudahkanlah setiap langkah kami, kuatkan hati kami dalam menghadapi setiap tantangan,
-                            dan berikan hasil terbaik dari setiap usaha yang kami lakukan.
-                        </p>
+                </div>
 
-                        <div class="prayer-footer">
-                            <span>5 orang lainnya telah mengaminkan doa ini</span>
-                            <button type="button">🤍 Aamiin kan doa ini</button>
+                {{-- RIGHT SIDEBAR --}}
+                <aside class="detail-sidebar">
+
+                    <div class="donation-summary-card">
+                        <h2>{{ $campaign->judul }}</h2>
+
+                        <div class="summary-amount">
+                            <strong>Rp {{ number_format($campaign->terkumpul ?? 0, 0, ',', '.') }}
+                            </strong>
+                            <span>
+                                Terkumpul dari
+                                <b>
+                                    Rp {{ number_format($campaign->target_donasi, 0, ',', '.') }}
+                                </b>
+                            </span>
+                        </div>
+
+                        @php
+                            $persen = $campaign->target_donasi > 0
+                                ? (($campaign->terkumpul ?? 0) / $campaign->target_donasi) * 100
+                                : 0;
+
+                            $persen = min($persen, 100);
+                        @endphp
+
+
+                        <div class="summary-progress">
+                            <div style="width: {{ $persen }}%"></div>
+                        </div>
+
+                        <div class="summary-meta">
+                            <span>
+                                👤 {{ $campaign->donasi_count ?? 0 }} donatur
+                            </span>
+
+                            <span>
+                                @php
+                                    use Carbon\Carbon;
+
+                                    $hariIni = Carbon::today();
+                                    $mulai = Carbon::parse($campaign->tanggal_mulai)->startOfDay();
+                                    $akhir = Carbon::parse($campaign->tanggal_berakhir)->endOfDay();
+
+                                    if ($hariIni->lt($mulai)) {
+                                        $statusHari = 'Mulai dalam ' . $hariIni->diffInDays($mulai) . ' hari';
+                                    } elseif ($hariIni->gt($akhir)) {
+                                        $statusHari = 'Campaign berakhir';
+                                    } else {
+                                        $sisaHari = (int) $hariIni->diffInDays($akhir);
+
+                                        $statusHari = $sisaHari == 0
+                                            ? 'Hari terakhir'
+                                            : $sisaHari . ' Hari lagi';
+                                    }
+                                @endphp
+                                {{ $statusHari }}
+                            </span>
+                        </div>
+                        <a href="#" class="donate-button">Donasi Sekarang</a>
+                    </div>
+
+                    <div class="fundraiser-info-card">
+                        <h3>Informasi Penggalang Dana</h3>
+
+                        <div class="fundraiser-profile">
+                            <img src="{{ asset('storage/' . $campaign->penggalangDana->foto_profil) }}">
+                            <div>
+                                <h4>{{ $campaign->penggalangDana->nama_penggalang ?? 'Orang Baik' }}
+                                </h4>
+                            </div>
                         </div>
                     </div>
-                </section>
+
+                    <div class="side-list-card">
+                        <h3>Donasi</h3>
+
+                        @foreach ($donations as $donation)
+                            <div class="side-list-item">
+                                <div class="avatar-circle">👤</div>
+
+                                <div>
+                                    <h4>{{ $donation['name'] }}</h4>
+                                    <p>Berdonasi sebesar <b>{{ $donation['amount'] }}</b></p>
+                                    <span>{{ $donation['time'] }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="side-list-card">
+                        <h3>Fundraiser</h3>
+
+                        @foreach ($fundraisers as $fundraiser)
+                            <div class="side-list-item">
+                                <div class="avatar-circle">👤</div>
+
+                                <div>
+                                    <h4>{{ $fundraiser['name'] }}</h4>
+                                    <p>{{ $fundraiser['desc'] }}</p>
+                                    <b>{{ $fundraiser['amount'] }}</b>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                </aside>
 
             </div>
 
-            {{-- RIGHT SIDEBAR --}}
-            <aside class="detail-sidebar">
-
-                <div class="donation-summary-card">
-                    <h2>Gotong Royong Infaq Jariyah Hadirkan Layanan Ambulan Gratis</h2>
-
-                    <div class="summary-amount">
-                        <strong>Rp 200.000.000</strong>
-                        <span>Terkumpul dari <b>Rp 500.000.000</b></span>
-                    </div>
-
-                    <div class="summary-progress">
-                        <div></div>
-                    </div>
-
-                    <div class="summary-meta">
-                        <span>👤 1rb ± donatur</span>
-                        <span>∞ Hari lagi</span>
-                    </div>
-
-                    <a href="#" class="donate-button">Donasi Sekarang</a>
-                </div>
-
-                <div class="fundraiser-info-card">
-                    <h3>Informasi Penggalang Dana</h3>
-
-                    <div class="fundraiser-profile">
-                        <img src="{{ asset('assets/logo-icon.png') }}" alt="Dompet Al-Quran Indonesia">
-
-                        <div>
-                            <h4>Dompet Al-Quran Indonesia</h4>
-                            <span>✓ .org</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="side-list-card">
-                    <h3>Donasi</h3>
-
-                    @foreach ($donations as $donation)
-                        <div class="side-list-item">
-                            <div class="avatar-circle">👤</div>
-
-                            <div>
-                                <h4>{{ $donation['name'] }}</h4>
-                                <p>Berdonasi sebesar <b>{{ $donation['amount'] }}</b></p>
-                                <span>{{ $donation['time'] }}</span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <div class="side-list-card">
-                    <h3>Fundraiser</h3>
-
-                    @foreach ($fundraisers as $fundraiser)
-                        <div class="side-list-item">
-                            <div class="avatar-circle">👤</div>
-
-                            <div>
-                                <h4>{{ $fundraiser['name'] }}</h4>
-                                <p>{{ $fundraiser['desc'] }}</p>
-                                <b>{{ $fundraiser['amount'] }}</b>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-            </aside>
-
         </div>
+    </main>
 
-    </div>
-</main>
-
-@include('components.footer')
+    @include('components.footer')
 
 </body>
+
 </html>

@@ -40,9 +40,7 @@
                         <tr>
                             <td>
                                 @if($item->thumbnail)
-                                    <img
-                                        src="{{ asset('storage/' . $item->thumbnail) }}"
-                                        alt="{{ $item->judul }}"
+                                    <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->judul }}"
                                         class="table-thumbnail">
                                 @else
                                     <span class="text-muted">Tidak ada</span>
@@ -70,17 +68,21 @@
                             </td>
 
                             <td>
-                                @if($item->status === 'pending')
-                                    <span class="badge badge-yellow">
-                                        Pending
-                                    </span>
-                                @elseif($item->status === 'approved')
+                                {{--
+                                PHP
+                                --}}
+                                @php
+                                    $hariIni = now();
+                                    $tanggalBerakhir = \Carbon\Carbon::parse($item->tanggal_berakhir);
+                                @endphp
+
+                                @if($hariIni->lte($tanggalBerakhir))
                                     <span class="badge badge-green">
-                                        Approved
+                                        Aktif
                                     </span>
                                 @else
                                     <span class="badge badge-red">
-                                        Rejected
+                                        Berakhir
                                     </span>
                                 @endif
                             </td>
@@ -100,12 +102,21 @@
                             <td class="text-center">
                                 <div class="action-group action-group-center">
 
-                                    <a
-                                        href="{{ route('admin.campaign.show', $item) }}"
-                                        class="action-link link-blue">
+                                    <a href="{{ route('admin.campaign.show', $item) }}" class="action-link link-blue">
                                         <i class="bi bi-eye"></i>
                                         Detail
                                     </a>
+                                    <form action="{{ route('admin.berita.destroy', $item) }}" method="POST" class="inline-form"
+                                        onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
+
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit" class="action-link link-red">
+                                            <i class="bi bi-trash"></i>
+                                            <span>Hapus</span>
+                                        </button>
+                                    </form>
 
                                 </div>
                             </td>

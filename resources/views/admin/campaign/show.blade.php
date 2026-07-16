@@ -8,10 +8,7 @@
     <section class="ob-card ob-card-lg profile-card">
 
         @if($campaign->thumbnail)
-            <img
-                src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                alt="{{ $campaign->judul }}"
-                class="current-thumbnail">
+            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}" class="current-thumbnail">
         @else
             <div class="current-thumbnail table-avatar-placeholder">
                 <i class="bi bi-image"></i>
@@ -24,13 +21,19 @@
             <p class="profile-type">
                 {{ $campaign->kategori->nama_kategori ?? 'Kategori tidak ditemukan' }}
             </p>
+            @php
+                $hariIni = now();
+                $tanggalBerakhir = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
+            @endphp
 
-            @if($campaign->status === 'pending')
-                <span class="badge badge-yellow">Pending</span>
-            @elseif($campaign->status === 'approved')
-                <span class="badge badge-green">Approved</span>
+            @if($hariIni->lte($tanggalBerakhir))
+                <span class="badge badge-green">
+                    Aktif
+                </span>
             @else
-                <span class="badge badge-red">Rejected</span>
+                <span class="badge badge-red">
+                    Berakhir
+                </span>
             @endif
         </div>
 
@@ -74,6 +77,15 @@
                     <td>
                         <span class="text-muted-strong">
                             Rp {{ number_format($campaign->target_donasi, 0, ',', '.') }}
+                        </span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Minimal Donasi</th>
+                    <td>
+                        <span class="text-muted-strong">
+                            Rp {{ number_format($campaign->minimal_donasi, 0, ',', '.') }}
                         </span>
                     </td>
                 </tr>
@@ -130,9 +142,7 @@
             <div class="gallery-grid">
                 @foreach($campaign->campaignGambar as $gambar)
                     <div class="gallery-item">
-                        <img
-                            src="{{ asset('storage/' . $gambar->foto) }}"
-                            alt="{{ $campaign->judul }}">
+                        <img src="{{ asset('storage/' . $gambar->foto) }}" alt="{{ $campaign->judul }}">
                     </div>
                 @endforeach
             </div>
@@ -169,6 +179,57 @@
                 Tidak ada filter.
             </p>
         @endif
+
+    </section>
+
+    {{-- Fitur Tambahan --}}
+    <section class="ob-card ob-card-lg">
+
+        <div class="card-topbar">
+            <div>
+                <h2>Fitur Tambahan</h2>
+                <p class="card-subtitle">
+                    Fitur opsional yang diaktifkan untuk campaign ini.
+                </p>
+            </div>
+        </div>
+
+        <table class="data-table data-table-kv">
+            <tbody>
+                <tr>
+                    <th>Jumlah Package</th>
+                    <td>
+                        @if($campaign->enable_quantity)
+                            <span class="badge badge-green">Aktif</span>
+                        @else
+                            <span class="badge badge-red">Nonaktif</span>
+                        @endif
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Nama Pekurban</th>
+                    <td>
+                        @if($campaign->enable_donatur_name)
+                            <span class="badge badge-green">Aktif</span>
+                        @else
+                            <span class="badge badge-red">Nonaktif</span>
+                        @endif
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Nominal Lainnya</th>
+                    <td>
+                        @if($campaign->enable_custom_nominal)
+                            <span class="badge badge-green">Aktif</span>
+                        @else
+                            <span class="badge badge-red">Nonaktif</span>
+                        @endif
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
     </section>
 
@@ -269,79 +330,4 @@
         </div>
 
     </section>
-
-    {{-- Riwayat Verifikasi --}}
-    @if($campaign->verified_by || $campaign->verified_at)
-
-        <section class="ob-card ob-card-lg">
-
-            <div class="card-topbar">
-                <div>
-                    <h2>Riwayat Verifikasi</h2>
-                    <p class="card-subtitle">
-                        Informasi admin yang melakukan verifikasi campaign.
-                    </p>
-                </div>
-            </div>
-
-            <table class="data-table data-table-kv">
-                <tbody>
-                    <tr>
-                        <th>Diverifikasi Oleh</th>
-                        <td>{{ optional($campaign->verifier)->name ?? '-' }}</td>
-                    </tr>
-
-                    <tr>
-                        <th>Tanggal Verifikasi</th>
-                        <td>{{ optional($campaign->verified_at)->format('d M Y H:i') ?? '-' }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-        </section>
-
-    @endif
-
-    {{-- Aksi Verifikasi --}}
-    <section class="ob-card ob-card-lg">
-
-        <div class="card-topbar">
-            <div>
-                <h2>Aksi Verifikasi</h2>
-                <p class="card-subtitle">
-                    Setujui atau tolak campaign ini.
-                </p>
-            </div>
-        </div>
-
-        <div class="form-actions">
-
-            @if($campaign->status !== 'approved')
-                <form action="{{ route('admin.campaign.approve', $campaign) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-
-                    <button type="submit" class="btn-primary">
-                        <i class="bi bi-check-circle"></i>
-                        <span>Approve</span>
-                    </button>
-                </form>
-            @endif
-
-            @if($campaign->status !== 'rejected')
-                <form action="{{ route('admin.campaign.reject', $campaign) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-
-                    <button type="submit" class="btn-danger">
-                        <i class="bi bi-x-circle"></i>
-                        <span>Reject</span>
-                    </button>
-                </form>
-            @endif
-
-        </div>
-
-    </section>
-
 @endsection

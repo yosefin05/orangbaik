@@ -1,40 +1,207 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const moneyInputs = document.querySelectorAll('[data-money]');
+document.addEventListener("DOMContentLoaded", function () {
+    const moneyInputs = document.querySelectorAll("[data-money]");
     const fileInputs = document.querySelectorAll('input[type="file"]');
-    const filterInputs = document.querySelectorAll('input[name="filter_campaign[]"]');
-    const filterNote = document.getElementById('filterNote');
-    const packageList = document.getElementById('packageList');
-    const addPackageButton = document.getElementById('addPackageButton');
+    const filterInputs = document.querySelectorAll(
+        'input[name="filter_campaign[]"]',
+    );
+    const filterNote = document.getElementById("filterNote");
+    const packageList = document.getElementById("packageList");
+    const addPackageButton = document.getElementById("addPackageButton");
+    const quantityHTML = `
+<div class="package-feature quantity-feature">
+
+    <label>Jumlah Package</label>
+
+    <div class="feature-counter">
+
+        <button type="button" class="minus">−</button>
+
+        <span>1</span>
+
+        <button type="button" class="plus">+</button>
+
+    </div>
+
+</div>
+`;
+
+    const donaturHTML = `
+<div class="package-feature donatur-feature">
+
+    <label>Nama Pekurban</label>
+
+    <div class="campaign-input-wrap">
+
+        <input
+            type="text"
+            placeholder="Masukkan Nama Pekurban">
+
+        <i class="bi bi-pencil-fill"></i>
+
+    </div>
+
+</div>
+`;
+
+    const nominalHTML = `
+<div class="package-feature custom-feature">
+
+    <label>Nominal Lainnya</label>
+
+    <div class="campaign-money-wrap">
+
+        <span>Rp</span>
+
+        <input
+            type="text"
+            placeholder="0">
+
+    </div>
+
+</div>
+`;
+
+    function renderPackageFeature() {
+        const quantityChecked =
+            document.getElementById("toggleQuantity")?.checked;
+        const donaturChecked =
+            document.getElementById("toggleDonatur")?.checked;
+        const nominalChecked =
+            document.getElementById("toggleNominal")?.checked;
+
+        document
+            .querySelectorAll(".package-extra-feature")
+            .forEach(function (feature) {
+                feature.innerHTML = "";
+
+                // Nama Pekurban
+                if (donaturChecked) {
+                    feature.insertAdjacentHTML(
+                        "beforeend",
+                        `
+                <div class="campaign-field compact">
+                    <label>Nama Pekurban</label>
+
+                    <div class="campaign-input-wrap">
+                        <input
+                            type="text"
+                            placeholder="Masukkan Nama Pekurban">
+
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+                </div>
+            `,
+                    );
+                }
+
+                // Nominal + Jumlah
+                feature.insertAdjacentHTML(
+                    "beforeend",
+                    `
+            <div class="package-price-row">
+
+                ${
+                    nominalChecked
+                        ? `
+                <div class="campaign-field compact custom-nominal">
+                    <label>Nominal Lainnya</label>
+
+                    <div class="campaign-money-wrap">
+                        <span>Rp</span>
+
+                        <input
+                            type="text"
+                            placeholder="0"
+                            inputmode="numeric"
+                            data-money>
+                    </div>
+                </div>
+                `
+                        : ""
+                }
+
+                ${
+                    quantityChecked
+                        ? `
+                <div class="package-quantity">
+
+                    <label>Jumlah</label>
+
+                    <div class="feature-counter">
+
+                        <button type="button" class="minus">
+                            <i class="bi bi-dash"></i>
+                        </button>
+
+                        <span>1</span>
+
+                        <button type="button" class="plus">
+                            <i class="bi bi-plus"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+                `
+                        : ""
+                }
+
+            </div>
+        `,
+                );
+            });
+
+        document.querySelectorAll("[data-money]").forEach(function (input) {
+            input.addEventListener("input", function () {
+                formatMoneyInput(input);
+            });
+        });
+    }
+    document
+        .getElementById("toggleQuantity")
+        .addEventListener("change", renderPackageFeature);
+
+    document
+        .getElementById("toggleDonatur")
+        .addEventListener("change", renderPackageFeature);
+
+    document
+        .getElementById("toggleNominal")
+        .addEventListener("change", renderPackageFeature);
+
+    renderPackageFeature();
 
     let packageIndex = 1;
 
     function onlyNumber(value) {
-        return String(value || '').replace(/[^\d]/g, '');
+        return String(value || "").replace(/[^\d]/g, "");
     }
 
     function formatNumber(value) {
-        return new Intl.NumberFormat('id-ID').format(value || 0);
+        return new Intl.NumberFormat("id-ID").format(value || 0);
     }
 
     function formatMoneyInput(input) {
         const clean = onlyNumber(input.value);
 
-        input.value = clean ? formatNumber(Number(clean)) : '';
+        input.value = clean ? formatNumber(Number(clean)) : "";
     }
 
     moneyInputs.forEach(function (input) {
-        input.addEventListener('input', function () {
+        input.addEventListener("input", function () {
             formatMoneyInput(input);
         });
     });
 
     fileInputs.forEach(function (input) {
-        input.addEventListener('change', function () {
+        input.addEventListener("change", function () {
             const file = input.files[0];
 
             if (!file) return;
 
-            const preview = document.querySelector('[data-preview="' + input.id + '"]');
+            const preview = document.querySelector(
+                '[data-preview="' + input.id + '"]',
+            );
 
             if (!preview) return;
 
@@ -44,36 +211,38 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     filterInputs.forEach(function (input) {
-        input.addEventListener('change', function () {
-            const checked = document.querySelectorAll('input[name="filter_campaign[]"]:checked');
+        input.addEventListener("change", function () {
+            const checked = document.querySelectorAll(
+                'input[name="filter[]"]:checked',
+            );
 
             if (checked.length > 4) {
                 input.checked = false;
 
                 if (filterNote) {
-                    filterNote.textContent = 'Maksimal hanya 4 filter.';
-                    filterNote.style.color = 'var(--danger)';
+                    filterNote.textContent = "Maksimal hanya 4 filter.";
+                    filterNote.style.color = "var(--danger)";
                 }
 
                 return;
             }
 
             if (filterNote) {
-                filterNote.textContent = 'Catatan: maksimal 4 filter.';
-                filterNote.style.color = '';
+                filterNote.textContent = "Catatan: maksimal 4 filter.";
+                filterNote.style.color = "";
             }
         });
     });
 
     function refreshPackageTitle() {
-        const items = packageList.querySelectorAll('[data-package-item]');
+        const items = packageList.querySelectorAll("[data-package-item]");
 
         items.forEach(function (item, index) {
-            const title = item.querySelector('.campaign-package-title strong');
-            const removeButton = item.querySelector('[data-remove-package]');
+            const title = item.querySelector(".campaign-package-title strong");
+            const removeButton = item.querySelector("[data-remove-package]");
 
             if (title) {
-                title.textContent = 'Package ' + (index + 1);
+                title.textContent = "Package " + (index + 1);
             }
 
             if (removeButton) {
@@ -83,31 +252,31 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function bindPackageMoneyInput(item) {
-        const input = item.querySelector('[data-money]');
+        const input = item.querySelector("[data-money]");
 
         if (!input) return;
 
-        input.addEventListener('input', function () {
+        input.addEventListener("input", function () {
             formatMoneyInput(input);
         });
     }
 
     function bindRemovePackage(item) {
-        const removeButton = item.querySelector('[data-remove-package]');
+        const removeButton = item.querySelector("[data-remove-package]");
 
         if (!removeButton) return;
 
-        removeButton.addEventListener('click', function () {
+        removeButton.addEventListener("click", function () {
             item.remove();
             refreshPackageTitle();
         });
     }
 
     function createPackageItem() {
-        const item = document.createElement('div');
+        const item = document.createElement("div");
 
-        item.className = 'campaign-package-item';
-        item.setAttribute('data-package-item', '');
+        item.className = "campaign-package-item";
+        item.setAttribute("data-package-item", "");
 
         item.innerHTML = `
             <div class="campaign-package-title">
@@ -143,10 +312,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <div class="campaign-field compact">
                 <label>Nominal Package <span>*</span></label>
+
                 <div class="campaign-money-wrap">
                     <span>Rp</span>
-                    <input type="text" name="packages[${packageIndex}][nominal]" placeholder="0" inputmode="numeric" data-money required>
+
+                    <input
+                        type="text"
+                        name="packages[${packageIndex}][nominal]"
+                        placeholder="0"
+                        inputmode="numeric"
+                        data-money
+                        required>
                 </div>
+                <div class="package-extra-feature"></div>
             </div>
         `;
 
@@ -159,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (addPackageButton && packageList) {
-        const firstItem = packageList.querySelector('[data-package-item]');
+        const firstItem = packageList.querySelector("[data-package-item]");
 
         if (firstItem) {
             bindPackageMoneyInput(firstItem);
@@ -168,11 +346,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         refreshPackageTitle();
 
-        addPackageButton.addEventListener('click', function () {
+        addPackageButton.addEventListener("click", function () {
             const item = createPackageItem();
 
             packageList.appendChild(item);
+
+            bindPackageMoneyInput(item);
+
+            bindRemovePackage(item);
+
             refreshPackageTitle();
+
+            renderPackageFeature();
         });
     }
 });

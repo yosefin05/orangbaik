@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('deskripsi');
             $table->date('tanggal_mulai');
             $table->date('tanggal_berakhir');
-            $table->string('target_donasi');
+            $table->unsignedBigInteger('target_donasi');
             $table->foreignId('kategori_id')->constrained('kategori')->onDelete('cascade');
             $table->foreignId('penggalang_dana_id')->constrained('penggalang_dana')->onDelete('cascade');
             $table->timestamps();

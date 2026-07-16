@@ -6,19 +6,14 @@ use App\Http\Controllers\User\PenggalangDanaController;
 use App\Http\Controllers\User\BeritaController;
 use App\Http\Controllers\User\KomentarController;
 use App\Http\Controllers\User\KalkulatorController;
+use App\Http\Controllers\User\CampaignController;
+use App\Http\Controllers\User\HomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 // login register
-Route::get('/', function () {
-
-    $testimoni = Testimoni::inRandomOrder()
-        ->take(5)
-        ->get();
-
-    return view('pages.home', compact('testimoni'));
-
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
 
 Route::post('/set-intended-url', function (Request $request) {
     session(['url.intended' => $request->url]);
@@ -52,13 +47,11 @@ Route::get('/kalkulator', [KalkulatorController::class, 'index']);
 Route::post('/kalkulator/hitung', [KalkulatorController::class, 'calculate'])->name('kalkulator.hitung');
 
 // donasi dan campaign
-Route::get('/donasi', function () {
-    return view('pages.donasi');
-})->name('donasi');
+Route::get('/donasi', [CampaignController::class, 'index'])
+    ->name('donasi');
 
-Route::get('/campaign/detail', function () {
-    return view('pages.detail-campaign');
-})->name('campaign.detail');
+Route::get('/campaign/{slug}', [CampaignController::class, 'show'])
+    ->name('campaign.show');
 
 Route::get('/donasi/bayar', function () {
     return view('pages.donasi-bayar');
@@ -80,10 +73,6 @@ Route::get('/syarat-ketentuan', function () {
 Route::get('/pusat-bantuan', function () {
     return view('pages.pusat-bantuan');
 })->name('pusat.bantuan');
-
-Route::get('/campaign/create', function () {
-    return view('pages.create');
-});
 
 // profile pengguna
 Route::get('/profile-user', function () {
@@ -151,6 +140,13 @@ Route::middleware('auth')->group(function () {
         '/profile',
         [ProfileController::class, 'destroy']
     )->name('profile.destroy');
+
+    // campaign
+    Route::get('/campaign/create', [CampaignController::class, 'create'])
+        ->name('campaign.create');
+
+    Route::post('/campaign', [CampaignController::class, 'store'], )
+        ->name('campaign.store');
 });
 
 require __DIR__ . '/auth.php';
