@@ -1,9 +1,6 @@
 @extends('layouts.admin')
-
 @section('page-title', 'Tambah Berita')
-
 @section('content')
-
     <section class="ob-card ob-card-lg form-card">
 
         <div class="card-topbar">
@@ -19,17 +16,7 @@
                 <span>Kembali</span>
             </a>
         </div>
-
-        @if ($errors->any())
-            <div class="alert alert-error">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
+        <x-alert-error />
         <form
             action="{{ route('admin.berita.store') }}"
             method="POST"

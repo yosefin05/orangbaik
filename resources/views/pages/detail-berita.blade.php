@@ -11,63 +11,42 @@
 </head>
 
 <body>
-
     @include('components.header')
-
     <main class="detail-news-page">
         <div class="container detail-news-container">
-
             <div class="detail-news-layout">
-
                 {{-- MAIN CONTENT --}}
                 <article class="news-detail-main">
-
                     @if ($berita->thumbnail)
                         <img src="{{ asset('storage/' . $berita->thumbnail) }}" alt="{{ $berita->judul }}"
                             class="news-hero-image">
                     @endif
-
                     <h1>{{ $berita->judul }}</h1>
-
                     <div class="news-meta-row">
                         <span>{{ $berita->user->nama ?? 'Admin' }}</span>
                         <span>{{ $berita->created_at->translatedFormat('d F Y') }}</span>
                     </div>
-
                     <div class="news-content">
                         {!! nl2br(e($berita->isi)) !!}
                     </div>
-
                     <div class="news-content">
                         {!! nl2br(e($berita->isi)) !!}
                     </div>
-
                     @if($berita->gambar->count())
                         <section class="news-gallery">
-
                             <h3>Galeri Dokumentasi</h3>
-
                             <div class="news-gallery-grid">
-
                                 @foreach($berita->gambar as $gambar)
-
-                                    <a href="{{ asset('storage/' . $gambar->gambar) }}" target="_blank"
-                                        class="news-gallery-item">
-
+                                    <div class="news-gallery-item" data-image="{{ asset('storage/' . $gambar->gambar) }}">
                                         <img src="{{ asset('storage/' . $gambar->gambar) }}" alt="{{ $berita->judul }}">
-
-                                    </a>
-
+                                    </div>
                                 @endforeach
-
                             </div>
-
                         </section>
                     @endif
 
                     {{-- COMMENT --}}
                     <section class="comment-section">
-
                         <div class="comment-header">
                             <strong>Komentar</strong>
                             <span>{{ $berita->komentar->count() }}</span>
@@ -81,31 +60,27 @@
                             </div>
                         @endguest
                         @auth
-                        <form action="{{ route('berita.komentar.store', $berita) }}" method="POST" class="comment-form"
-                            id="commentForm" data-logged-in="{{ auth()->check() ? '1' : '0' }}"
-                            data-login-url="{{ route('login') }}">
-                            @csrf
-                            <div class="comment-title">
-                                Tulis Komentar
-                            </div>
-                            <div class="comment-body">
-                                <textarea name="komentar" placeholder="Tulis komentar Anda di sini..."
-                                    required></textarea>
-                                <button type="submit" class="comment-send" aria-label="Kirim komentar">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M3 20L22 12L3 4V10L16 12L3 14V20Z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </form>
+                            <form action="{{ route('berita.komentar.store', $berita) }}" method="POST" class="comment-form"
+                                id="commentForm" data-logged-in="{{ auth()->check() ? '1' : '0' }}"
+                                data-login-url="{{ route('login') }}">
+                                @csrf
+                                <div class="comment-title">
+                                    Tulis Komentar
+                                </div>
+                                <div class="comment-body">
+                                    <textarea name="komentar" placeholder="Tulis komentar Anda di sini..."
+                                        required></textarea>
+                                    <button type="submit" class="comment-send" aria-label="Kirim komentar">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M3 20L22 12L3 4V10L16 12L3 14V20Z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
                         @endauth
-
                         @forelse($berita->komentar()->latest()->get() as $komentar)
-
                             <div class="comment-card" id="komentar-{{ $komentar->id }}">
-
                                 <div class="comment-info">
-
                                     <strong>
                                         @if($komentar->user)
                                             {{ $komentar->user->name }}
@@ -116,19 +91,13 @@
                                     <span>
                                         {{ $komentar->created_at->format('d M Y • H:i') }}
                                     </span>
-
                                 </div>
-
                                 <div class="comment-text">
                                     {{ $komentar->komentar }}
                                 </div>
-
                             </div>
-
                         @empty
-
                             <div class="empty-comment">
-
                                 <div class="empty-icon">
                                     <svg viewBox="0 0 24 24">
                                         <path
@@ -138,87 +107,43 @@
                                         <path d="M16 10H16.01" />
                                     </svg>
                                 </div>
-
                                 <p>Tidak Ada Komentar</p>
-
                             </div>
-
                         @endforelse
-
                     </section>
-
                 </article>
 
                 {{-- SIDEBAR --}}
                 <aside class="news-sidebar">
-
                     <h3>Berita Lainnya</h3>
 
-                    <p style="color:#888; margin-top:10px;">
-                        Belum ada berita terkait.
-                    </p>
-
+                    @forelse($relatedNews as $news)
+                        <a href="{{ route('berita.show', $news->slug) }}" class="sidebar-news-card">
+                            <img src="{{ asset('storage/' . $news->thumbnail) }}" alt="{{ $news->judul }}">
+                            <div class="sidebar-news-content">
+                                <h4>{{ Str::limit($news->judul, 55) }}</h4>
+                                <span>
+                                    {{ $news->created_at->translatedFormat('d F Y') }}
+                                </span>
+                            </div>
+                        </a>
+                    @empty
+                        <p class="empty-news">
+                            Belum ada berita terkait.
+                        </p>
+                    @endforelse
                 </aside>
-
             </div>
-
+        </div>
+        <div class="gallery-modal" id="galleryModal">
+            <span class="gallery-close">&times;</span>
+            <button class="gallery-prev">&#10094;</button>
+            <img id="galleryImage">
+            <button class="gallery-next">&#10095;</button>
         </div>
     </main>
-
     @include('components.footer')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const commentForm = document.getElementById('commentForm');
-            const loginModalOverlay = document.getElementById('loginModalOverlay');
-            const modalCancelBtn = document.getElementById('modalCancelBtn');
-            const modalLoginBtn = document.getElementById('modalLoginBtn');
-
-            if (commentForm) {
-                commentForm.addEventListener('submit', function (e) {
-
-                    if (this.dataset.loggedIn !== '1') {
-                        e.preventDefault();
-                        loginModalOverlay.classList.add('active');
-                    }
-
-                });
-            }
-
-            if (modalCancelBtn) {
-                modalCancelBtn.addEventListener('click', function () {
-                    loginModalOverlay.classList.remove('active');
-                });
-            }
-
-            if (loginModalOverlay) {
-                loginModalOverlay.addEventListener('click', function (e) {
-                    if (e.target === loginModalOverlay) {
-                        loginModalOverlay.classList.remove('active');
-                    }
-                });
-            }
-
-            if (modalLoginBtn) {
-                modalLoginBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-
-                    fetch("{{ route('set.intended.url') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            url: window.location.href
-                        })
-                    }).then(() => {
-                        window.location.href = commentForm.dataset.loginUrl;
-                    });
-                }
-
-        });
-    </script>
+    <script src="{{ asset('js/detail-berita.js') }}"></script>
 </body>
 
 </html>

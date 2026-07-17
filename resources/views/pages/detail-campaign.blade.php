@@ -43,6 +43,11 @@
     @endphp
 
     <main class="campaign-detail-page">
+        @if (session('success'))
+            <div class="alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
         <div class="container detail-container">
 
             <div class="detail-layout">
@@ -54,7 +59,6 @@
 
                     <section class="description-section">
                         <h1>{{ $campaign->judul }}</h1>
-
                         <p>
                             {{ $campaign->deskripsi }}
 
@@ -82,22 +86,18 @@
                     {{-- PRAYER --}}
                     <section class="prayer-section">
                         <h2>Doa #OrangBaik</h2>
-
                         <div class="prayer-card">
                             <div class="prayer-user">
                                 <div class="avatar-circle">👤</div>
-
                                 <div>
                                     <h3>Rinto Aji Pambudi</h3>
                                     <p>1 Jam yang lalu</p>
                                 </div>
                             </div>
-
                             <p class="prayer-text">
                                 Mudahkanlah setiap langkah kami, kuatkan hati kami dalam menghadapi setiap tantangan,
                                 dan berikan hasil terbaik dari setiap usaha yang kami lakukan.
                             </p>
-
                             <div class="prayer-footer">
                                 <span>5 orang lainnya telah mengaminkan doa ini</span>
                                 <button type="button">🤍 Aamiin kan doa ini</button>

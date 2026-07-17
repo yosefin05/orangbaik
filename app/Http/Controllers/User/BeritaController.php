@@ -8,9 +8,6 @@ use App\Models\Berita;
 
 class BeritaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $beritas = Berita::with(['user', 'gambar'])

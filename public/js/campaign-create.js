@@ -269,6 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
         removeButton.addEventListener("click", function () {
             item.remove();
             refreshPackageTitle();
+            renderPreview();
         });
     }
 
@@ -348,16 +349,127 @@ document.addEventListener("DOMContentLoaded", function () {
 
         addPackageButton.addEventListener("click", function () {
             const item = createPackageItem();
-
             packageList.appendChild(item);
-
             bindPackageMoneyInput(item);
-
             bindRemovePackage(item);
-
             refreshPackageTitle();
-
             renderPackageFeature();
+            renderPreview();
         });
     }
+
+    const previewContainer = document.getElementById("previewPackageList");
+
+    function formatRupiahPreview(value) {
+        value = value.replace(/\D/g, "");
+
+        if (!value) return "Rp0";
+
+        return "Rp" + Number(value).toLocaleString("id-ID");
+    }
+
+    function renderPreview() {
+        console.log("render preview jalan");
+
+        if (!previewContainer) return;
+        previewContainer.innerHTML = "";
+        const quantityChecked =
+            document.getElementById("toggleQuantity")?.checked;
+        const donaturChecked =
+            document.getElementById("toggleDonatur")?.checked;
+        const nominalChecked =
+            document.getElementById("toggleNominal")?.checked;
+        const packages = document.querySelectorAll("[data-package-item]");
+        packages.forEach((item) => {
+            const title =
+                item.querySelector('input[name*="[title]"]')?.value.trim() ||
+                "";
+            const description =
+                item
+                    .querySelector('textarea[name*="[description]"]')
+                    ?.value.trim() || "";
+            const nominal =
+                item.querySelector('input[name*="[nominal]"]')?.value || "";
+            const imageInput = item.querySelector(
+                'input[type="file"][name*="[image]"]',
+            );
+
+            let imageHTML = `
+            <div class="preview-package-placeholder">
+                <i class="bi bi-image"></i>
+            </div>
+        `;
+
+            if (imageInput.files.length > 0) {
+                imageHTML = `
+                <img src="${URL.createObjectURL(imageInput.files[0])}">
+            `;
+            }
+            const isCard =
+                title !== "" ||
+                description !== "" ||
+                imageInput.files.length > 0;
+                
+            const donaturHTML = donaturChecked
+                ? `
+                <div class="preview-donatur">
+                    <small>Nama Pekurban</small>
+                    <input
+                        type="text"
+                        placeholder="Masukkan Nama Pekurban"
+                        disabled>
+                </div>
+            `
+                : "";
+            const counterHTML = quantityChecked
+                ? `
+                <div class="preview-counter">
+                    <button>-</button>
+                    <strong>1</strong>
+                    <button>+</button>
+                </div>
+            `
+                : "";
+            previewContainer.insertAdjacentHTML(
+                "beforeend",
+                `
+            <div class="preview-package">
+                ${imageHTML}
+                <div class="preview-package-body">
+                    <h5>${title}</h5>
+                    <p>${description}</p>
+                    <span>${formatRupiahPreview(nominal)}</span>
+                    ${donaturHTML}
+                </div>
+                ${counterHTML}
+            </div>
+        `,
+            );
+        });
+
+        if (nominalChecked) {
+            previewContainer.insertAdjacentHTML(
+                "beforeend",
+                `
+            <div class="preview-list">
+                <div class="preview-custom">
+                    <small>Masukkan Donasi Lainnya</small>
+                    <div class="money-box">
+                        <span>Rp</span>
+                        <input
+                            type="text"
+                            value="0"
+                            disabled>
+                    </div>
+                </div>
+            </div>
+        `,
+            );
+        }
+    }
+    document.addEventListener("input", renderPreview);
+
+    document.addEventListener("change", renderPreview);
+
+    renderPreview();
 });

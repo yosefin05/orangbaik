@@ -16,30 +16,24 @@
 <main class="berita-page page-wrapper">
     <section class="berita-section">
         <div class="container">
-
             <div class="berita-grid">
-
                 @forelse ($beritas as $berita)
                     <article class="berita-card">
                         <a href="{{ route('berita.show', $berita->slug) }}">
-
                             <img
                                 src="{{ asset('storage/' . $berita->thumbnail) }}"
                                 alt="{{ $berita->judul }}"
                                 class="berita-image"
                                 loading="lazy"
                             >
-
                             <div class="berita-body">
                                 <h2>
-                                    {{ $berita->judul }}
+                                    {{ Str::limit($berita->judul, 55) }}
                                 </h2>
-
                                 <p>
                                     {{ $berita->created_at->translatedFormat('d F Y') }}
                                 </p>
                             </div>
-
                         </a>
                     </article>
                 @empty
@@ -47,22 +41,16 @@
                         <p>Belum ada berita.</p>
                     </div>
                 @endforelse
-
             </div>
-
             <div class="pagination-wrapper">
                 @if (is_object($beritas) && method_exists($beritas, 'links'))
                     {{ $beritas->links() }}
                 @endif
             </div>
-
         </div>
     </section>
 </main>
-
 @include('components.footer')
-
 <script src="{{ asset('js/header.js') }}"></script>
-
 </body>
 </html>

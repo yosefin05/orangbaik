@@ -3,7 +3,7 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
-<x-logout-modal/>
+    <x-logout-modal />
     {{-- Welcome Banner --}}
     <section class="welcome-banner">
         <div>

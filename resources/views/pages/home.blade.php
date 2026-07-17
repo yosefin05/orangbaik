@@ -14,46 +14,6 @@
 <body>
 
     @include('components.header')
-
-    @php
-        $heroSlides = [
-            [
-                'image' => 'assets/slide1.png',
-                'title' => 'Peduli Banjir Sumatera',
-            ],
-            [
-                'image' => 'assets/sedekah.png',
-                'title' => 'Sedekah Tidak Mengurangi Harta',
-            ],
-            [
-                'image' => 'assets/slide1.png',
-                'title' => 'Bantu Pendidikan Anak Yatim',
-            ],
-        ];
-
-        $sideNews = [
-            [
-                'image' => 'assets/gngerti.jpg',
-                'label' => 'Berita',
-                'title' => 'Update terbaru program kebaikan OrangBaik.id',
-                'url' => '#',
-            ],
-            [
-                'image' => 'assets/sedekah.png',
-                'label' => 'Artikel',
-                'title' => 'Keutamaan sedekah dan manfaatnya untuk sesama',
-                'url' => '#',
-            ],
-            [
-                'image' => 'assets/slide1.png',
-                'label' => 'Kabar Baik',
-                'title' => 'Campaign pendidikan mulai menjangkau penerima manfaat',
-                'url' => '#',
-            ],
-        ];
-
-    @endphp
-
     <main class="main">
 
         {{-- HERO --}}
@@ -61,9 +21,11 @@
             <div class="container hero-layout">
 
                 <div class="hero-card hero-main-slider">
-                    @foreach ($heroSlides as $index => $slide)
+                    @foreach ($campaigns as $index => $campaign)
                         <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
-                            <img src="{{ asset($slide['image']) }}" alt="{{ $slide['title'] }}">
+                            <a href="{{ route('campaign.show', $campaign->slug) }}">
+                                <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}">
+                            </a>
                         </div>
                     @endforeach
 
@@ -71,13 +33,14 @@
                 </div>
 
                 <div class="hero-side-slider">
-                    @foreach ($sideNews as $index => $news)
-                        <a href="{{ $news['url'] }}" class="hero-side-card {{ $index === 0 ? 'active' : '' }}">
-                            <img src="{{ asset($news['image']) }}" alt="{{ $news['title'] }}">
+                    @foreach ($berita as $index => $news)
+                        <a href="{{ route('berita.show', $news->slug) }}"
+                            class="hero-side-card {{ $index === 0 ? 'active' : '' }}">
+                            <img src="{{ asset('storage/' . $news->thumbnail) }}" alt="{{ $news->judul }}">
 
                             <div class="hero-side-body">
-                                <span>{{ $news['label'] }}</span>
-                                <h3>{{ $news['title'] }}</h3>
+                                <span>Berita</span>
+                                <h3>{{ $news->judul }}</h3>
                             </div>
                         </a>
                     @endforeach
@@ -189,7 +152,7 @@
         <section class="section">
             <div class="container">
                 <h2 class="section-title">Yuk, Lihat yang Baru!</h2>
-                <div class="donasi-new-grid">
+                <div class="new-grid">
                     @forelse ($campaignTerbaru as $campaign)
                         <a href="{{ route('campaign.show', ['slug' => $campaign->slug]) }}" class="donasi-new-item">
                             <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
@@ -298,7 +261,7 @@
                             };
                         @endphp
 
-                        <a href="{{ route('home', ['kategori' => $item->id]) }}#kategori-favorit"
+                        <a href="{{ route('home', ['kategori' => $item->id]) }} #kategori-favorit"
                             class="category-item {{ request('kategori') == $item->id ? 'active' : '' }}">
 
                             <div class="category-icon">
@@ -325,11 +288,9 @@
                     @forelse ($campaigns as $campaign)
                         @php
                             $terkumpul = $campaign->donasi->sum('nominal');
-
                             $persen = $campaign->target_donasi
                                 ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                 : 0;
-
                             $hari = max(
                                 0,
                                 (int) now()->diffInDays($campaign->tanggal_berakhir, false)

@@ -39,7 +39,7 @@
 
         <section class="verify-section">
             <div class="container">
-
+                <x-alert-error />
                 <form class="verify-form" action="{{ route('penggalang_dana.organisasi.store') }}" method="POST"
                     enctype="multipart/form-data" novalidate>
                     @csrf
@@ -325,15 +325,6 @@
 
                     </div>
             </div>
-            @if ($errors->any())
-                <div style="background:#fee2e2;padding:15px;color:red;">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
             </form>
     </main>
     @include('components.footer')

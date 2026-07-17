@@ -83,8 +83,9 @@ class CampaignController extends Controller
     {
         $kategori = Kategori::all();
         $filter = Filter::all();
+        $today = date('Y-m-d');
 
-        return view('pages.create-campaign', compact('kategori', 'filter'));
+        return view('pages.create-campaign', compact('kategori', 'filter', 'today'));
     }
 
     /**
@@ -105,7 +106,7 @@ class CampaignController extends Controller
             'filter.*' => 'exists:filter,id',
             'gambar_pendukung.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'packages' => 'required|array|min:1',
-            'packages.*.title' => 'required|string|max:255',
+            'packages.*.title' => 'nullable|string|max:255',
             'packages.*.description' => 'nullable|string',
             'packages.*.nominal' => 'required',
             'packages.*.image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -209,7 +210,7 @@ class CampaignController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('campaign.create')
+                ->route('campaign.show', $campaign->slug)
                 ->with('success', 'Campaign berhasil dibuat.');
 
         } catch (\Exception $e) {

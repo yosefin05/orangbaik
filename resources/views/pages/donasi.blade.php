@@ -70,117 +70,113 @@
                 <div class="campaign-carousel">
                     <div class="donasi-card-grid">
                         @foreach ($campaigns as $campaign)
-                                            @php
-                                                $terkumpul = $campaign->donasi->sum('nominal');
-                                                $persen = $campaign->target_donasi
-                                                    ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                                    : 0;
-                                                $hari =
-                                                    max(
-                                                        0,
-                                                        (int) now()->diffInDays($campaign->tanggal_berakhir, false)
-                                                    );
-                                            @endphp
-                                            <article class="donasi-card">
-                                                <a href=" {{ route('campaign.show', $campaign->slug) }}">
-                                                    <img class="donasi-card-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                                                        alt="{{ $campaign->judul }}">
-                                                    <div class="donasi-card-body">
-                                                        <h3>{{ $campaign->judul }}</h3>
-                                                        <p class="donasi-organizer">
-                                                            {{ $campaign->penggalangDana->nama_penggalang }}
-                                                            <span>●</span>
-                                                        </p>
-                                                        <div class="donasi-amount">
-                                                            <strong>
-                                                                Rp {{ number_format($terkumpul, 0, ',', '.') }}
-                                                            </strong>
-                                                            <span>Terkumpul</span>
-                                                        </div>
-                                                        <div class="donasi-progress">
-                                                            <div class="donasi-progress-fill" style="width:{{ $persen }}%"></div>
-                                                        </div>
-                                                        <div class="donasi-meta">
-                                                            <span>
-                                                                {{ $campaign->donasi->count() }} Donatur
-                                                            </span>
-                                                            <span>
-                                                                {{ $hari }} Hari
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </article>
+                            @php
+                                $terkumpul = $campaign->donasi->sum('nominal');
+                                $persen = $campaign->target_donasi
+                                    ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                    : 0;
+                                $hari =
+                                    max(
+                                        0,
+                                        (int) now()->diffInDays($campaign->tanggal_berakhir, false)
+                                    );
+                            @endphp
+                            <article class="donasi-card">
+                                <a href=" {{ route('campaign.show', $campaign->slug) }}">
+                                    <img class="donasi-card-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                        alt="{{ $campaign->judul }}">
+                                    <div class="donasi-card-body">
+                                        <h3>{{ $campaign->judul }}</h3>
+                                        <p class="donasi-organizer">
+                                            {{ $campaign->penggalangDana->nama_penggalang }}
+                                            <span>●</span>
+                                        </p>
+                                        <div class="donasi-amount">
+                                            <strong>
+                                                Rp {{ number_format($terkumpul, 0, ',', '.') }}
+                                            </strong>
+                                            <span>Terkumpul</span>
+                                        </div>
+                                        <div class="donasi-progress">
+                                            <div class="donasi-progress-fill" style="width:{{ $persen }}%"></div>
+                                        </div>
+                                        <div class="donasi-meta">
+                                            <span>
+                                                {{ $campaign->donasi->count() }} Donatur
+                                            </span>
+                                            <span>
+                                                {{ $hari }} Hari
+                                            </span>
                                         </div>
                                     </div>
-                                </div>
-                            </section>
-
-                            <section class="donasi-border donasi-section">
-                                <div class="container">
-
-                                    <h2 class="donasi-section-title">
-                                        Yuk, Lihat yang Baru!
-                                    </h2>
-
-                                    <div class="donasi-new-grid">
-                                        @forelse ($campaignTerbaru as $campaign)
-                                            <a href="{{ route('campaign.show', ['slug' => $campaign->slug]) }}" class="donasi-new-item">
-                                                <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
-                                                    loading="lazy">
-                                            </a>
-                                        @empty
-                                            <p>Belum ada campaign terbaru.</p>
-                                        @endforelse
-                                    </div>
-                                </div>
-                                </div>
-                            </section>
-
-                            <section class="donasi-border donasi-section">
-                                <div class="container">
-
-                                    <h2 class="donasi-section-title">
-                                        Pemberdayaan Berkelanjutan
-                                    </h2>
-                                    <div class="campaign-carousel">
-                                        <div class="donasi-card-grid">
-                                            <a href="{{ route('campaign.show', $campaign->slug) }}" class="donasi-card"> <img
-                                                    class="donasi-card-image" src="{{ asset($campaign['image']) }}"
-                                                    alt="{{ $campaign['title'] }}" loading="lazy">
-
-                                                <div class="donasi-card-body">
-                                                    <h3>{{ $campaign['title'] }}</h3>
-
-                                                    <p class="donasi-organizer">
-                                                        {{ $campaign['organizer'] }}
-                                                        <span aria-hidden="true">●</span>
-                                                    </p>
-
-                                                    <div class="donasi-amount">
-                                                        <strong>{{ $campaign['amount'] }}</strong>
-                                                        <span>Terkumpul</span>
-                                                    </div>
-
-                                                    <div class="donasi-progress">
-                                                        <div class="donasi-progress-fill"></div>
-                                                    </div>
-
-                                                    <div class="donasi-meta">
-                                                        <span>{{ $campaign['donatur'] }}</span>
-                                                        <span>∞</span>
-                                                    </div>
-                                                </div>
-                                            </a>
+                                </a>
+                            </article>
                         @endforeach
                     </div>
                 </div>
-
             </div>
         </section>
 
+        <section class="donasi-border donasi-section">
+            <div class="container">
 
+                <h2 class="donasi-section-title">
+                    Yuk, Lihat yang Baru!
+                </h2>
 
+                <div class="donasi-new-grid">
+                    @forelse ($campaignTerbaru as $campaign)
+                        <a href="{{ route('campaign.show', ['slug' => $campaign->slug]) }}" class="donasi-new-item">
+                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
+                                loading="lazy">
+                        </a>
+                    @empty
+                        <p>Belum ada campaign terbaru.</p>
+                    @endforelse
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <section class="donasi-border donasi-section">
+            <div class="container">
+
+                <h2 class="donasi-section-title">
+                    Pemberdayaan Berkelanjutan
+                </h2>
+                <div class="campaign-carousel">
+                    <div class="donasi-card-grid">
+                        <a href="{{ route('campaign.show', $campaign->slug) }}" class="donasi-card"> <img
+                                class="donasi-card-image" src="{{ asset($campaign['image']) }}"
+                                alt="{{ $campaign['title'] }}" loading="lazy">
+
+                            <div class="donasi-card-body">
+                                <h3>{{ $campaign['title'] }}</h3>
+
+                                <p class="donasi-organizer">
+                                    {{ $campaign['organizer'] }}
+                                    <span aria-hidden="true">●</span>
+                                </p>
+
+                                <div class="donasi-amount">
+                                    <strong>{{ $campaign['amount'] }}</strong>
+                                    <span>Terkumpul</span>
+                                </div>
+
+                                <div class="donasi-progress">
+                                    <div class="donasi-progress-fill"></div>
+                                </div>
+
+                                <div class="donasi-meta">
+                                    <span>{{ $campaign['donatur'] }}</span>
+                                    <span>∞</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     @include('components.footer')

@@ -12,15 +12,11 @@
 </head>
 
 <body>
-
     @include('components.header')
-
     @php
         $user = auth()->user();
     @endphp
-
     <main class="verify-page">
-
         <section class="verify-hero">
             <div class="container verify-hero-inner">
                 <div class="verify-heading">
@@ -39,15 +35,12 @@
 
         <section class="verify-section">
             <div class="container">
-
+                <x-alert-error />
                 <form action="{{ route('penggalang_dana.individu.store') }}" method="POST" enctype="multipart/form-data"
                     class="verify-form">
-
                     @csrf
-
                     {{-- PROFIL --}}
                     <section class="verify-card">
-
                         <div class="verify-card-header">
                             <h2>Profil Penggalang Dana</h2>
                             <p>

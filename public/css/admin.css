@@ -837,16 +837,13 @@ button {
 .table-thumbnail {
     width: 86px;
     aspect-ratio: 16 / 10;
-
     object-fit: cover;
-
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
 }
 
 .cell-title {
     margin: 0;
-
     color: var(--text-dark);
     font-weight: var(--fw-bold);
     line-height: 1.5;
@@ -854,9 +851,7 @@ button {
 
 .cell-excerpt {
     margin: 0;
-
     max-width: 260px;
-
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.6;
@@ -871,10 +866,6 @@ button {
     color: var(--muted);
     font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
-}
-
-.text-center {
-    text-align: center;
 }
 
 .empty-state {
@@ -941,10 +932,6 @@ button {
     align-items: center;
     gap: 14px;
     flex-wrap: wrap;
-}
-
-.action-group-center {
-    justify-content: center;
 }
 
 .inline-form {

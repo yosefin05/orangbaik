@@ -47,6 +47,15 @@ Route::get('/kalkulator', [KalkulatorController::class, 'index']);
 Route::post('/kalkulator/hitung', [KalkulatorController::class, 'calculate'])->name('kalkulator.hitung');
 
 // donasi dan campaign
+// campaign
+Route::middleware('auth')->group(function () {
+    Route::get('/campaign/create', [CampaignController::class, 'create'])
+        ->name('campaign.create');
+
+    Route::post('/campaign', [CampaignController::class, 'store'])
+        ->name('campaign.store');
+});
+
 Route::get('/donasi', [CampaignController::class, 'index'])
     ->name('donasi');
 
@@ -140,13 +149,6 @@ Route::middleware('auth')->group(function () {
         '/profile',
         [ProfileController::class, 'destroy']
     )->name('profile.destroy');
-
-    // campaign
-    Route::get('/campaign/create', [CampaignController::class, 'create'])
-        ->name('campaign.create');
-
-    Route::post('/campaign', [CampaignController::class, 'store'], )
-        ->name('campaign.store');
 });
 
 require __DIR__ . '/auth.php';

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\Kategori;
 use App\Models\Testimoni;
+use App\Models\Berita;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -15,6 +16,8 @@ class HomeController extends Controller
         $testimoni = Testimoni::inRandomOrder()->take(5)->get();
 
         $kategori = Kategori::all();
+
+        $berita = Berita::all();
 
         $campaigns = Campaign::with([
             'penggalangDana',
@@ -40,6 +43,7 @@ class HomeController extends Controller
         return view('pages.home', compact(
             'testimoni',
             'kategori',
+            'berita',
             'campaigns',
             'campaignTerbaru'
         ));
