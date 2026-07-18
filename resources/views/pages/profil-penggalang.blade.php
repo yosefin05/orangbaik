@@ -182,49 +182,94 @@
                 <section class="fundraiser-campaign-section">
                     <h2>Penggalangan Dana</h2>
                     <div class="campaign-list">
-                        @forelse($penggalang->campaign as $campaign)
+                        @forelse ($penggalang->campaign as $campaign)
+
                                             @php
                                                 $terkumpul = $campaign->donasi->sum('nominal');
+
                                                 $persen = $campaign->target_donasi
                                                     ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                                     : 0;
-
-                                                $hari = max(
-                                                    0,
-                                                    (int) now()->diffInDays($campaign->tanggal_berakhir, false)
-                                                );
                                             @endphp
-                                            <a href="{{ route('campaign.show', $campaign->slug) }}" class="campaign-row">
-                                                <img src="{{ $campaign->thumbnail
+
+                                            <div class="campaign-row">
+
+                                                <a href="{{ route('campaign.show', $campaign->slug) }}" class="campaign-row-image-link">
+                                                    <img src="{{ $campaign->thumbnail
                             ? asset('storage/' . $campaign->thumbnail)
                             : asset('assets/slide1.png') }}" alt="{{ $campaign->judul }}" class="campaign-row-image">
+                                                </a>
+
                                                 <div class="campaign-row-body">
-                                                    <h3>{{ $campaign->judul }}</h3>
+
+                                                    <div class="campaign-row-header">
+
+                                                        <h3>{{ $campaign->judul }}</h3>
+
+                                                        @if ($isOwner)
+                                                            <div class="campaign-actions">
+
+                                                                <a href="{{ route('campaign.edit', $campaign->id) }}"
+                                                                    class="campaign-action edit" title="Edit Campaign">
+                                                                    <i class="bi bi-pencil-fill"></i>
+                                                                </a>
+
+                                                                <form action="{{ route('campaign.destroy', $campaign->id) }}" method="POST"
+                                                                    onsubmit="return confirm('Yakin ingin menghapus campaign ini?')">
+                                                                    @csrf
+                                                                    @method('DELETE')
+
+                                                                    <button type="submit" class="campaign-action delete" title="Hapus Campaign">
+                                                                        <i class="bi bi-trash-fill"></i>
+                                                                    </button>
+
+                                                                </form>
+
+                                                            </div>
+                                                        @endif
+
+                                                    </div>
+
                                                     <p>
                                                         {{ $penggalang->nama_penggalang }}
                                                         <span>●</span>
                                                     </p>
+
                                                     <div class="campaign-row-amount">
                                                         <strong>
                                                             Rp{{ number_format($campaign->target_donasi, 0, ',', '.') }}
                                                         </strong>
+
                                                         <span>Target</span>
                                                     </div>
+
                                                     <div class="campaign-progress">
                                                         <div class="progress-fill" style="width: {{ $persen }}%;"></div>
                                                     </div>
+
                                                     <div class="campaign-meta">
-                                                        <span>Status: {{ $campaign->status }}</span>
-                                                        @if($campaign->tanggal_berakhir)
+
+                                                        <span>
+                                                            Status:
+                                                            {{ ucfirst($campaign->status) }}
+                                                        </span>
+
+                                                        @if ($campaign->tanggal_berakhir)
                                                             <span>
                                                                 {{ \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') }}
                                                             </span>
                                                         @endif
+
                                                     </div>
+
                                                 </div>
-                                            </a>
+
+                                            </div>
+
                         @empty
+
                             <p>Belum ada campaign.</p>
+
                         @endforelse
                     </div>
                 </section>

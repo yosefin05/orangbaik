@@ -85,7 +85,7 @@ class CampaignController extends Controller
         $filter = Filter::all();
         $today = date('Y-m-d');
 
-        return view('pages.create-campaign', compact('kategori', 'filter', 'today'));
+        return view('pages.campaign.create', compact('kategori', 'filter', 'today'));
     }
 
     /**
@@ -236,6 +236,77 @@ class CampaignController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
-        return view('pages.detail-campaign', compact('campaign'));
+        return view('pages.campaign.show', compact('campaign'));
+    }
+
+    public function edit(Campaign $campaign)
+    {
+        if ($campaign->penggalang_dana_id !== auth()->user()->penggalangDana->id) {
+            abort(403);
+        }
+
+        $kategori = Kategori::all();
+        $filter = Filter::all();
+
+        $campaign->load([
+            'campaignGambar',
+            'packages',
+            'filter',
+            'kategori'
+        ]);
+
+
+        return view(
+            'pages.campaign.edit',
+            compact(
+                'campaign',
+                'kategori',
+                'filter'
+            )
+        );
+    }
+    public function update(Request $request, Campaign $campaign)
+    {
+        // Validasi
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
+            'target_donasi' => 'required|min:0',
+            'minimal_donasi' => 'required|min:0',
+            'kategori_id' => 'required|exists:kategori,id',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // ... validasi lainnya
+        ]);
+
+        // Update data
+        $campaign->update([
+            'judul' => $validated['judul'],
+            'deskripsi' => $validated['deskripsi'],
+            'tanggal_mulai' => $validated['tanggal_mulai'],
+            'tanggal_berakhir' => $validated['tanggal_berakhir'],
+            'target_donasi' => str_replace(['.', ','], '', $validated['target_donasi']),
+            'minimal_donasi' => str_replace(['.', ','], '', $validated['minimal_donasi']),
+            'kategori_id' => $validated['kategori_id'],
+            // ... field lainnya
+        ]);
+
+        return redirect()->route('campaign.show', $campaign->slug)
+            ->with('success', 'Campaign berhasil diupdate');
+    }
+
+    public function destroy(Campaign $campaign)
+    {
+        if ($campaign->penggalang_dana_id !== auth()->user()->penggalangDana->id) {
+            abort(403);
+        }
+
+        $campaign->delete();
+
+        return back()->with(
+            'success',
+            'Campaign berhasil dihapus.'
+        );
     }
 }

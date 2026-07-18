@@ -1,217 +1,229 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sedekah Pendidikan Anak - OrangBaik.id</title>
+    <title>Detail Campaign - OrangBaik.id</title>
 
-    <link rel="stylesheet" href="{{ asset('css/campaign.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/detail-campaign.css') }}">
 </head>
+
 <body>
 
-<header class="site-header">
-    <div class="container header-inner">
-        <a href="{{ url('/') }}" class="brand">
-            <div class="brand-logo">
-                <img src="{{ asset('assets/logo-icon.png') }}" alt="OrangBaik.id">
+    @include('components.header')
+
+    @php
+        $donations = [
+            ['name' => 'Orang Baik', 'amount' => 'Rp10.000', 'time' => '1 Jam lalu'],
+            ['name' => 'yayayay', 'amount' => 'Rp100.000', 'time' => '1 Jam lalu'],
+            ['name' => 'Josie Raditya', 'amount' => 'Rp1.000.000', 'time' => '1 Jam lalu'],
+        ];
+
+        $fundraisers = [
+            ['name' => 'Orang Baik', 'desc' => 'Berhasil mengajak 1 orang untuk berdonasi', 'amount' => 'Rp100.000'],
+            ['name' => 'Fundraiser Baik', 'desc' => 'Berhasil mengajak 10 orang untuk berdonasi', 'amount' => 'Rp1.000.000'],
+            ['name' => 'Rinto Aji', 'desc' => 'Berhasil mengajak 100 orang untuk berdonasi', 'amount' => 'Rp10.000.000'],
+        ];
+
+        $news = [
+            [
+                'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
+                'date' => '12 Desember 2024',
+                'image' => 'assets/slide1.png',
+            ],
+            [
+                'title' => 'Bangkitkan Semangat Belajar, LAZ DQ Dirikan Sekolah Darurat untuk Anak Gaza',
+                'date' => '12 Desember 2024',
+                'image' => 'assets/slide1.png',
+            ],
+        ];
+    @endphp
+
+    <main class="campaign-detail-page">
+        @if (session('success'))
+            <div class="alert-success">
+                {{ session('success') }}
             </div>
-        </a>
+        @endif
+        <div class="container detail-container">
 
-        <nav class="nav-menu">
-            <a href="{{ url('/') }}">Beranda</a>
-            <a href="#" class="active">Donasi</a>
-            <a href="#">Kalkulator</a>
-            <a href="#">Berita</a>
-        </nav>
+            <div class="detail-layout">
 
-        <div class="header-actions">
-            <a href="{{ route('login') }}" class="login-link">Masuk</a>
-            <a href="{{ route('register') }}" class="register-btn">Daftar</a>
-        </div>
-    </div>
-</header>
+                {{-- LEFT CONTENT --}}
+                <div class="detail-main">
+                    <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
+                        class="campaign-hero-image">
 
-<main class="campaign-page">
-    <section class="campaign-hero">
-        <div class="container campaign-grid">
+                    <section class="description-section">
+                        <h1>{{ $campaign->judul }}</h1>
+                        <p>
+                            {{ $campaign->deskripsi }}
 
-            <div class="campaign-content">
-                <div class="campaign-image">
-                    <img src="{{ asset('assets/campaign-cover.jpg') }}" alt="Campaign Donasi">
+                        </p>
+                    </section>
+
+                    {{-- NEWS --}}
+                    <section class="latest-news-section">
+                        <h2>Kabar Terbaru</h2>
+
+                        <div class="news-grid">
+                            @foreach ($news as $item)
+                                <article class="news-card">
+                                    <img src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}">
+
+                                    <div class="news-body">
+                                        <h3>{{ $campaign->judul }} </h3>
+                                        <p>{{ $item['date'] }}</p>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    </section>
+
+                    {{-- PRAYER --}}
+                    <section class="prayer-section">
+                        <h2>Doa #OrangBaik</h2>
+                        <div class="prayer-card">
+                            <div class="prayer-user">
+                                <div class="avatar-circle">👤</div>
+                                <div>
+                                    <h3>Rinto Aji Pambudi</h3>
+                                    <p>1 Jam yang lalu</p>
+                                </div>
+                            </div>
+                            <p class="prayer-text">
+                                Mudahkanlah setiap langkah kami, kuatkan hati kami dalam menghadapi setiap tantangan,
+                                dan berikan hasil terbaik dari setiap usaha yang kami lakukan.
+                            </p>
+                            <div class="prayer-footer">
+                                <span>5 orang lainnya telah mengaminkan doa ini</span>
+                                <button type="button">🤍 Aamiin kan doa ini</button>
+                            </div>
+                        </div>
+                    </section>
+
                 </div>
 
-                <div class="campaign-meta">
-                    <span class="badge">Pendidikan</span>
-                    <span>OrangBaik.id Foundation</span>
-                </div>
+                {{-- RIGHT SIDEBAR --}}
+                <aside class="detail-sidebar">
 
-                <h1>Bantu Pendidikan Anak Yatim dan Dhuafa</h1>
+                    <div class="donation-summary-card">
+                        <h2>{{ $campaign->judul }}</h2>
 
-                <p class="campaign-desc">
-                    Mari bantu anak-anak yatim dan dhuafa mendapatkan perlengkapan sekolah,
-                    biaya pendidikan, dan kebutuhan belajar agar mereka bisa terus mengejar cita-cita.
-                </p>
-
-                <div class="progress-box">
-                    <div class="progress-top">
-                        <div>
-                            <p>Terkumpul</p>
-                            <h3>Rp 42.500.000</h3>
-                        </div>
-                        <div class="target">
-                            <p>Target</p>
-                            <h3>Rp 100.000.000</h3>
-                        </div>
-                    </div>
-
-                    <div class="progress-bar">
-                        <span style="width: 42.5%"></span>
-                    </div>
-
-                    <div class="progress-info">
-                        <span>425 Donatur</span>
-                        <span>28 hari lagi</span>
-                    </div>
-                </div>
-
-                <section class="story-section">
-                    <h2>Cerita Campaign</h2>
-
-                    <p>
-                        Banyak anak-anak yang masih kesulitan mendapatkan akses pendidikan yang layak.
-                        Sebagian dari mereka harus berjuang dengan keterbatasan biaya, perlengkapan sekolah,
-                        dan kebutuhan belajar sehari-hari.
-                    </p>
-
-                    <p>
-                        Melalui campaign ini, donasi yang terkumpul akan digunakan untuk membantu biaya sekolah,
-                        buku, seragam, alat tulis, dan kebutuhan pendidikan lainnya.
-                    </p>
-
-                    <div class="info-cards">
-                        <div class="info-card">
-                            <h4>Tujuan Donasi</h4>
-                            <p>Biaya pendidikan, perlengkapan sekolah, dan kebutuhan belajar.</p>
+                        <div class="summary-amount">
+                            <strong>Rp {{ number_format($campaign->terkumpul ?? 0, 0, ',', '.') }}
+                            </strong>
+                            <span>
+                                Terkumpul dari
+                                <b>
+                                    Rp {{ number_format($campaign->target_donasi, 0, ',', '.') }}
+                                </b>
+                            </span>
                         </div>
 
-                        <div class="info-card">
-                            <h4>Penerima Manfaat</h4>
-                            <p>Anak yatim, dhuafa, dan pelajar dari keluarga kurang mampu.</p>
+                        @php
+                            $persen = $campaign->target_donasi > 0
+                                ? (($campaign->terkumpul ?? 0) / $campaign->target_donasi) * 100
+                                : 0;
+
+                            $persen = min($persen, 100);
+                        @endphp
+
+
+                        <div class="summary-progress">
+                            <div style="width: {{ $persen }}%"></div>
                         </div>
-                    </div>
-                </section>
-            </div>
 
-            <aside class="donation-card">
-                <h2>Mulai Donasi</h2>
-                <p class="donation-subtitle">
-                    Pilih cara donasi yang paling nyaman untuk kamu.
-                </p>
+                        <div class="summary-meta">
+                            <span>
+                                👤 {{ $campaign->donasi_count ?? 0 }} donatur
+                            </span>
 
-                <div class="donation-tabs">
-                    <button class="tab-btn active" data-tab="guest">Donasi Cepat</button>
-                    <button class="tab-btn" data-tab="account">Pakai Akun</button>
-                </div>
+                            <span>
+                                @php
+                                    use Carbon\Carbon;
 
-                <form id="guestForm" class="donation-form active-form" action="#" method="POST">
-                    @csrf
+                                    $hariIni = Carbon::today();
+                                    $mulai = Carbon::parse($campaign->tanggal_mulai)->startOfDay();
+                                    $akhir = Carbon::parse($campaign->tanggal_berakhir)->endOfDay();
 
-                    <label>Nama Donatur</label>
-                    <input type="text" name="name" placeholder="Contoh: Josie Karim">
+                                    if ($hariIni->lt($mulai)) {
+                                        $statusHari = 'Mulai dalam ' . $hariIni->diffInDays($mulai) . ' hari';
+                                    } elseif ($hariIni->gt($akhir)) {
+                                        $statusHari = 'Campaign berakhir';
+                                    } else {
+                                        $sisaHari = (int) $hariIni->diffInDays($akhir);
 
-                    <label>Email / No HP</label>
-                    <input type="text" name="contact" placeholder="Email atau nomor WhatsApp">
-
-                    <label>Nominal Donasi</label>
-                    <div class="amount-options">
-                        <button type="button" data-amount="10000">Rp10.000</button>
-                        <button type="button" data-amount="25000">Rp25.000</button>
-                        <button type="button" data-amount="50000">Rp50.000</button>
-                        <button type="button" data-amount="100000">Rp100.000</button>
-                    </div>
-
-                    <input type="number" id="amountInput" name="amount" placeholder="Nominal lainnya">
-
-                    <label>Metode Pembayaran</label>
-                    <div class="payment-options">
-                        <label>
-                            <input type="radio" name="payment" checked>
-                            <span>QRIS</span>
-                        </label>
-
-                        <label>
-                            <input type="radio" name="payment">
-                            <span>Transfer Bank</span>
-                        </label>
-
-                        <label>
-                            <input type="radio" name="payment">
-                            <span>E-Wallet</span>
-                        </label>
+                                        $statusHari = $sisaHari == 0
+                                            ? 'Hari terakhir'
+                                            : $sisaHari . ' Hari lagi';
+                                    }
+                                @endphp
+                                {{ $statusHari }}
+                            </span>
+                        </div>
+                        <a href="#" class="donate-button">Donasi Sekarang</a>
                     </div>
 
-                    <button type="submit" class="donate-btn">
-                        Donasi Sekarang
-                    </button>
+                    <div class="fundraiser-info-card">
+                        <h3>Informasi Penggalang Dana</h3>
 
-                    <p class="form-note">
-                        Dengan donasi cepat, kamu tidak perlu membuat password.
-                        Setelah donasi berhasil, kamu bisa melihat status donasi.
-                    </p>
-                </form>
+                        <a href="{{ route('profil.penggalang', $campaign->penggalangDana->id) }}"
+                            class="fundraiser-profile">
+                            <img src="{{ asset('storage/' . $campaign->penggalangDana->foto_profil) }}"
+                                alt="{{ $campaign->penggalangDana->nama_penggalang }}">
 
-                <div id="accountForm" class="donation-form account-box">
-                    <div class="account-option">
-                        <h3>Sudah punya akun?</h3>
-                        <p>Masuk untuk donasi dan menyimpan riwayat donasi kamu.</p>
-                        <a href="{{ route('login') }}" class="outline-btn">Masuk Akun</a>
-                    </div>
-
-                    <div class="account-option">
-                        <h3>Belum punya akun?</h3>
-                        <p>Daftar dengan password agar bisa login kapan saja.</p>
-                        <a href="{{ route('register') }}" class="donate-btn register-full">
-                            Daftar Akun Donatur
+                            <div>
+                                <h4>
+                                    {{ $campaign->penggalangDana->nama_penggalang ?? 'Orang Baik' }}
+                                </h4>
+                            </div>
                         </a>
                     </div>
-                </div>
-            </aside>
+
+                    <div class="side-list-card">
+                        <h3>Donasi</h3>
+
+                        @foreach ($donations as $donation)
+                            <div class="side-list-item">
+                                <div class="avatar-circle">👤</div>
+                                <div>
+                                    <h4>{{ $donation['name'] }}</h4>
+                                    <p>Berdonasi sebesar <b>{{ $donation['amount'] }}</b></p>
+                                    <span>{{ $donation['time'] }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="side-list-card">
+                        <h3>Fundraiser</h3>
+
+                        @foreach ($fundraisers as $fundraiser)
+                            <div class="side-list-item">
+                                <div class="avatar-circle">👤</div>
+
+                                <div>
+                                    <h4>{{ $fundraiser['name'] }}</h4>
+                                    <p>{{ $fundraiser['desc'] }}</p>
+                                    <b>{{ $fundraiser['amount'] }}</b>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                </aside>
+
+            </div>
 
         </div>
-    </section>
-</main>
+    </main>
 
-<script>
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const guestForm = document.getElementById('guestForm');
-    const accountForm = document.getElementById('accountForm');
-
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-
-            if (button.dataset.tab === 'guest') {
-                guestForm.classList.add('active-form');
-                accountForm.classList.remove('active-form');
-            } else {
-                accountForm.classList.add('active-form');
-                guestForm.classList.remove('active-form');
-            }
-        });
-    });
-
-    const amountButtons = document.querySelectorAll('.amount-options button');
-    const amountInput = document.getElementById('amountInput');
-
-    amountButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            amountButtons.forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
-            amountInput.value = button.dataset.amount;
-        });
-    });
-</script>
+    @include('components.footer')
 
 </body>
+
 </html>

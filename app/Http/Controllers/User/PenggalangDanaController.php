@@ -281,9 +281,12 @@ class PenggalangDanaController extends Controller
             ]);
         }
 
+        $isOwner = auth()->check() &&
+            optional(auth()->user()->penggalangDana)->id === $penggalang->id;
+
         return view(
             'pages.profil-penggalang',
-            compact('penggalang')
+            compact('penggalang', 'isOwner')
         );
     }
 

@@ -76,12 +76,23 @@
                             <span>Profil Saya</span>
                         </a>
 
+                        @php
+                            $penggalang = auth()->user()->penggalangDana;
+                        @endphp
+                        @if($penggalang && $penggalang->status === 'approved')
+                            <a href="{{ route('profile.user') }}">
+                                <i class="bi bi-megaphone-fill"></i>
+                                <span>Profil Penggalang</span>
+                            </a>
+                        @endif
+
                         @if(auth()->user()->role === 'admin')
                             <a href="{{ route('admin.dashboard') }}">
                                 <i class="bi bi-speedometer2"></i>
                                 <span>Dashboard Admin</span>
                             </a>
                         @endif
+                    
                         <form id="logoutForm" action="{{ route('logout') }}" method="POST">
                             @csrf
 

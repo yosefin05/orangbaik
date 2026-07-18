@@ -134,6 +134,27 @@ Route::middleware('auth')->group(function () {
     Route::patch('/penggalang-dana/{id}', [PenggalangDanaController::class, 'update'])
         ->name('penggalang_dana.update');
 
+    Route::get(
+        '/profil-penggalang/{id}',
+        [PenggalangDanaController::class, 'profile']
+    )->name('profil.penggalang');
+
+    //campaign
+    Route::get(
+        '/campaign/{campaign}/edit',
+        [CampaignController::class, 'edit']
+    )->name('campaign.edit');
+
+    Route::put(
+        '/campaign/{campaign}',
+        [CampaignController::class, 'update']
+    )->name('campaign.update');
+
+    Route::delete(
+        '/campaign/{campaign}',
+        [CampaignController::class, 'destroy']
+    )->name('campaign.destroy');
+
     // profil
     Route::get(
         '/profile',
