@@ -80,7 +80,7 @@
                             $penggalang = auth()->user()->penggalangDana;
                         @endphp
                         @if($penggalang && $penggalang->status === 'approved')
-                            <a href="{{ route('profile.user') }}">
+                            <a href="{{ route('profil.penggalang') }}">
                                 <i class="bi bi-megaphone-fill"></i>
                                 <span>Profil Penggalang</span>
                             </a>

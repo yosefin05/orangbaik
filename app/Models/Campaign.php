@@ -63,6 +63,51 @@ class Campaign extends Model
         return $this->hasMany(Campaign_Package::class);
     }
 
+    public function emergencyApprovedBy()
+    {
+        return $this->belongsTo(User::class, 'emergency_approved_by');
+    }
+
+    // Scopes untuk filter di landing page
+    public function scopeEmergency($query)
+    {
+        return $query->where('campaign_type', 'emergency')
+            ->where('emergency_approval', 'approved');
+    }
+
+    public function scopeSustainable($query)
+    {
+        return $query->where('campaign_type', 'sustainable')
+            ->where('emergency_approval', 'approved');
+    }
+
+    public function scopeRegular($query)
+    {
+        return $query->where('campaign_type', 'regular');
+    }
+
+    // Scope untuk admin approval
+    public function scopePendingEmergencyApproval($query)
+    {
+        return $query->whereIn('campaign_type', ['emergency', 'sustainable'])
+            ->where('emergency_approval', 'pending');
+    }
+
+    // Helper methods
+    public function needsEmergencyApproval()
+    {
+        return in_array($this->campaign_type, ['emergency', 'sustainable'])
+            && $this->emergency_approval === 'pending';
+    }
+
+    public function isEmergencyApproved()
+    {
+        if (in_array($this->campaign_type, ['emergency', 'sustainable'])) {
+            return $this->emergency_approval === 'approved';
+        }
+        return true; // Regular campaign selalu approved
+    }
+
     protected $table = 'campaign';
     protected $fillable = [
         'thumbnail',
@@ -80,10 +125,17 @@ class Campaign extends Model
         'verified_at',
         'enable_quantity',
         'enable_nama_donatur',
-        'enable_custom_nominal'
+        'enable_custom_nominal',
+        'campaign_type',
+        'emergency_approval',
+        'emergency_approved_at',
+        'emergency_approved_by',
+        'emergency_rejection_reason'
     ];
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'verified_at' => 'datetime',
+        'emergency_approved_at' => 'datetime',
     ];
 }

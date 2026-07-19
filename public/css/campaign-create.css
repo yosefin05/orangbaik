@@ -791,6 +791,24 @@
     transform: translateY(-2px);
 }
 
+/* Di campaign-create.css tambahkan */
+.btn-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.btn-loading span:after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
 /* RESPONSIVE */
 @media (max-width: 1100px) {
     .campaign-create-layout {

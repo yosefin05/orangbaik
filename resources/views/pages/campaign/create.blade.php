@@ -185,6 +185,38 @@
                                     </small>
                                 @enderror
                             </div>
+
+                            {{-- TIPE CAMPAIGN --}}
+                            <div class="campaign-field">
+                                <label for="campaign_type">
+                                    Tipe Campaign <span>*</span>
+                                </label>
+                                <div class="campaign-select-wrap">
+                                    <select id="campaign_type" name="campaign_type" required>
+                                        <option value="regular" {{ old('campaign_type') == 'regular' ? 'selected' : '' }}>
+                                            Campaign Reguler
+                                        </option>
+                                        <option value="emergency" {{ old('campaign_type') == 'emergency' ? 'selected' : '' }}>
+                                            🔥 Donasi Darurat (Perlu Persetujuan Admin)
+                                        </option>
+                                        <option value="sustainable" {{ old('campaign_type') == 'sustainable' ? 'selected' : '' }}>
+                                            ♻️ Donasi Berkelanjutan (Perlu Persetujuan Admin)
+                                        </option>
+                                    </select>
+                                    <i class="bi bi-chevron-down"></i>
+                                </div>
+                                @error ('campaign_type')
+                                    <small class="text-danger">
+                                        {{ $message }}
+                                    </small>
+                                @enderror
+                                <small class="campaign-note" id="campaignTypeNote">
+                                    <strong>Catatan:</strong> Campaign darurat dan berkelanjutan memerlukan
+                                    persetujuan admin sebelum ditampilkan di halaman utama.
+                                    Campaign reguler langsung tampil.
+                                </small>
+                            </div>
+
                             {{-- Filter --}}
                             <div class="campaign-field">
                                 <label>
@@ -201,7 +233,7 @@
                                         </label>
                                     @endforeach
                                 </div>
-                                <small class="campaign-note">
+                                <small class="campaign-note" id="filterNote">
                                     Catatan: maksimal 4 filter.
                                 </small>
                                 @error ('filter')
@@ -236,7 +268,7 @@
                                         <small>Tambahkan Gambar</small>
                                     </label>
                                     <div class="campaign-field compact">
-                                        <label>Judul Package <span>*</span></label>
+                                        <label>Judul Package</label>
                                         <div class="campaign-input-wrap">
                                             <input type="text" name="packages[0][title]"
                                                 placeholder="Masukkan judul package">
@@ -326,7 +358,7 @@
                                 <div id="previewPackageList"></div>
                             </div>
                         </section>
-                        <button type="submit" class="campaign-submit-button">
+                        <button type="button" class="campaign-submit-button" id="publishBtn">
                             <i class="bi bi-send-fill"></i>
                             <span>Publikasikan Campaign</span>
                         </button>
@@ -340,6 +372,7 @@
     @include('components.footer')
     <script src="{{ asset('js/header.js') }}"></script>
     <script src="{{ asset('js/campaign-create.js') }}"></script>
+    <script src="{{ asset('js/campaign-type.js') }}"></script>
 
 </body>
 

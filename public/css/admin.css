@@ -924,6 +924,158 @@ button {
 }
 
 /* ============================
+   EMERGENCY APPROVAL SPECIFIC
+   ============================ */
+
+/* Emergency Section Border */
+.emergency-section {
+    border-left: 4px solid var(--primary);
+    transition: all 0.3s ease;
+}
+
+.emergency-section.emergency {
+    border-left-color: var(--danger);
+}
+
+.emergency-section.sustainable {
+    border-left-color: var(--success);
+}
+
+/* Alert untuk alasan penolakan */
+.alert-danger {
+    background-color: var(--danger-light);
+    color: var(--danger);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--danger);
+}
+
+/* Modal Custom */
+.modal-content {
+    border-radius: var(--radius);
+    border: none;
+    box-shadow: var(--shadow-hover);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-4) var(--space-5);
+}
+
+.modal-header .modal-title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
+}
+
+.modal-body {
+    padding: var(--space-5);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border);
+    padding: var(--space-4) var(--space-5);
+}
+
+/* Form di Modal */
+.form-label {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    color: var(--text);
+    margin-bottom: var(--space-2);
+    display: block;
+}
+
+.form-label .text-danger {
+    color: var(--danger);
+}
+
+.form-control {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    color: var(--text);
+    background: var(--bg);
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.form-control::placeholder {
+    color: var(--muted-light);
+}
+
+.text-muted {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    margin-top: var(--space-1);
+    display: block;
+}
+
+/* Button Close Modal */
+.btn-close {
+    background: none;
+    border: none;
+    font-size: var(--fs-lg);
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+    color: var(--text);
+}
+
+/* Utility */
+.d-inline {
+    display: inline;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.gap-2 {
+    gap: var(--space-2);
+}
+
+.gap-3 {
+    gap: var(--space-3);
+}
+
+.mt-3 {
+    margin-top: var(--space-3);
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .emergency-section .d-flex.gap-2 {
+        flex-direction: column;
+    }
+    
+    .emergency-section .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .modal-dialog {
+        margin: var(--space-3);
+    }
+}
+
+/* ============================
    ACTION LINK
    ============================ */
 

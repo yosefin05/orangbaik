@@ -20,6 +20,7 @@ Route::middleware(['auth', 'admin'])
             '/dashboard',
             [DashboardController::class, 'index']
         )->name('dashboard');
+        
         Route::resource('filter', FilterController::class)
             ->except(['show']);
 
@@ -27,7 +28,6 @@ Route::middleware(['auth', 'admin'])
             ->except(['show']);
 
         Route::resource('berita', BeritaController::class);
-
         Route::delete(
             '/berita-gambar/{gambar}',
             [BeritaController::class, 'destroyImage']
@@ -40,30 +40,24 @@ Route::middleware(['auth', 'admin'])
             '/penggalang_dana',
             [PenggalangDanaController::class, 'index']
         )->name('penggalang_dana.index');
-
         Route::get(
             '/penggalang_dana/{penggalangDana}',
             [PenggalangDanaController::class, 'show']
         )->name('penggalang_dana.show');
-
         Route::delete(
             '/penggalang_dana/{penggalangDana}',
             [PenggalangDanaController::class, 'destroy']
         )->name('penggalang_dana.destroy');
-
         Route::patch(
             '/penggalang_dana/{penggalangDana}/approve',
             [PenggalangDanaController::class, 'approve']
         )->name('penggalang_dana.approve');
-
         Route::patch(
             '/penggalang_dana/{penggalangDana}/reject',
             [PenggalangDanaController::class, 'reject']
         )->name('penggalang_dana.reject');
-
         Route::patch('/penggalang_dana/{penggalangDana}/verify', [PenggalangDanaController::class, 'verify'])
             ->name('penggalang_dana.verify');
-
         Route::patch('/penggalang_dana/{penggalangDana}/unverify', [PenggalangDanaController::class, 'unverify'])
             ->name('penggalang_dana.unverify');
 
@@ -71,21 +65,26 @@ Route::middleware(['auth', 'admin'])
             '/campaign',
             [CampaignController::class, 'index']
         )->name('campaign.index');
-
         Route::get(
             '/campaign/{campaign}',
             [CampaignController::class, 'show']
         )->name('campaign.show');
-
         Route::patch(
             '/campaign/{campaign}/approve',
             [CampaignController::class, 'approve']
         )->name('campaign.approve');
-
         Route::patch(
             '/campaign/{campaign}/reject',
             [CampaignController::class, 'reject']
         )->name('campaign.reject');
+
+        Route::get('/campaigns/emergency-approvals', [CampaignController::class, 'emergencyApprovals'])
+            ->name('campaign.emergency.approvals');
+        Route::post('/campaigns/{campaign}/approve-emergency', [CampaignController::class, 'approveEmergency'])
+            ->name('campaign.emergency.approve');
+        Route::post('/campaigns/{campaign}/reject-emergency', [CampaignController::class, 'rejectEmergency'])
+            ->name('campaign.emergency.reject');
+
 
         Route::resource('testimoni', TestimoniController::class);
     });
