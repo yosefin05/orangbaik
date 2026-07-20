@@ -2,6 +2,10 @@
 
 @section('page-title', 'Detail Berita')
 
+@push('style')
+<link rel="stylesheet" href="{{ asset('css/admin/berita/show.css') }}">
+@endpush
+
 @section('content')
 
     <section class="ob-card ob-card-lg detail-card">

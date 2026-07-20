@@ -1,0 +1,355 @@
+/* ============================================================
+   TESTIMONI CREATE - ORANGBAIK.ID
+   ============================================================ */
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-group label {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.form-group label .text-danger {
+    color: var(--danger);
+    font-weight: var(--fw-bold);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+    transition: .2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg);
+    box-shadow: 0 0 0 4px rgba(51, 101, 175, .13);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.form-group .text-danger {
+    color: var(--danger);
+    font-size: var(--fs-xxs);
+    margin-top: var(--space-1);
+}
+
+/* ============================================================
+   UPLOAD DROPZONE
+   ============================================================ */
+
+.upload-dropzone {
+    position: relative;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-6);
+    background: var(--bg-soft);
+    transition: all 0.3s ease;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.upload-dropzone:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.upload-dropzone.dragover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: scale(1.01);
+}
+
+/* Saat ada preview, padding dikurangi dan background berubah */
+.upload-dropzone.has-preview {
+    padding: var(--space-3);
+    min-height: auto;
+    border-color: var(--success);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* ============================================================
+   UPLOAD PLACEHOLDER
+   ============================================================ */
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    text-align: center;
+    color: var(--muted);
+    z-index: 1;
+    pointer-events: none;
+    padding: var(--space-4);
+}
+
+.upload-placeholder i {
+    font-size: 56px;
+    color: var(--muted-light);
+    transition: all 0.3s ease;
+}
+
+.upload-dropzone:hover .upload-placeholder i {
+    color: var(--primary);
+    transform: translateY(-4px);
+}
+
+.upload-placeholder p {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--text-dark);
+}
+
+.upload-placeholder .text-muted {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+}
+
+/* ============================================================
+   AVATAR PREVIEW - LINGKARAN PENUH
+   ============================================================ */
+
+.upload-preview.avatar-preview {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    z-index: 1;
+    border: 4px solid var(--bg);
+    outline: 2px solid var(--border);
+    flex-shrink: 0;
+}
+
+.upload-preview.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.upload-preview.avatar-preview .btn-remove-image {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.upload-preview.avatar-preview .btn-remove-image:hover {
+    background: var(--danger);
+    transform: scale(1.1);
+}
+
+.upload-preview.avatar-preview .btn-remove-image i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* ============================================================
+   FORM ACTIONS
+   ============================================================ */
+
+.form-footer {
+    margin-top: var(--space-6);
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-soft);
+}
+
+.form-actions .btn-primary,
+.form-actions .btn-secondary {
+    min-height: 42px;
+    padding: 11px 24px;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: .2s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.form-actions .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    box-shadow: var(--shadow-soft);
+}
+
+.form-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.form-actions .btn-secondary {
+    background: #eef2f7;
+    color: var(--text);
+}
+
+.form-actions .btn-secondary:hover {
+    background: var(--border);
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .upload-dropzone {
+        min-height: 160px;
+        padding: var(--space-4);
+    }
+
+    .upload-placeholder i {
+        font-size: 40px;
+    }
+
+    .upload-placeholder p {
+        font-size: var(--fs-xs);
+    }
+
+    .upload-preview.avatar-preview {
+        width: 140px;
+        height: 140px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .upload-dropzone {
+        min-height: 130px;
+        padding: var(--space-3);
+    }
+
+    .upload-placeholder i {
+        font-size: 32px;
+    }
+
+    .upload-placeholder p {
+        font-size: var(--fs-xxs);
+    }
+
+    .upload-placeholder .text-muted {
+        font-size: 10px;
+    }
+
+    .upload-preview.avatar-preview {
+        width: 120px;
+        height: 120px;
+    }
+
+    .upload-preview.avatar-preview .btn-remove-image {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+        top: 4px;
+        right: 4px;
+    }
+
+    .upload-preview.avatar-preview .btn-remove-image i {
+        font-size: 12px;
+    }
+
+    .form-control {
+        font-size: var(--fs-xxs);
+        padding: 10px 12px;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+    }
+
+    .form-group label {
+        font-size: var(--fs-xxs);
+    }
+
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary {
+        min-height: 38px;
+        padding: 9px 18px;
+        font-size: var(--fs-xxs);
+    }
+
+    .form-actions .btn-primary i,
+    .form-actions .btn-secondary i {
+        font-size: 14px;
+    }
+}

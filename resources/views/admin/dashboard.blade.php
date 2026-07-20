@@ -2,9 +2,17 @@
 
 @section('page-title', 'Dashboard')
 
+{{-- ============================================================ --}}
+{{-- PAGE-SPECIFIC CSS                                             --}}
+{{-- ============================================================ --}}
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}">
+@endpush
+
 @section('content')
-    <x-logout-modal />
-    {{-- Welcome Banner --}}
+    {{-- ========================================================== --}}
+    {{-- WELCOME BANNER                                             --}}
+    {{-- ========================================================== --}}
     <section class="welcome-banner">
         <div>
             <h2>
@@ -23,11 +31,13 @@
         </form>
     </section>
 
-    {{-- Statistik --}}
+    {{-- ========================================================== --}}
+    {{-- STATISTIK                                                  --}}
+    {{-- ========================================================== --}}
     <section class="stats-grid">
 
         <div class="stat-card">
-            <div class="stat-icon icon-purple text-purple">
+            <div class="stat-icon icon-purple">
                 <i class="bi bi-person"></i>
             </div>
 
@@ -38,7 +48,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon icon-red text-red">
+            <div class="stat-icon icon-red">
                 <i class="bi bi-shield-check"></i>
             </div>
 
@@ -49,7 +59,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon icon-green text-green">
+            <div class="stat-icon icon-green">
                 <i class="bi bi-people"></i>
             </div>
 
@@ -60,7 +70,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon icon-blue text-blue">
+            <div class="stat-icon icon-blue">
                 <i class="bi bi-megaphone"></i>
             </div>
 
@@ -71,7 +81,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon icon-orange text-orange">
+            <div class="stat-icon icon-orange">
                 <i class="bi bi-newspaper"></i>
             </div>
 
@@ -83,7 +93,9 @@
 
     </section>
 
-    {{-- Menu Manajemen --}}
+    {{-- ========================================================== --}}
+    {{-- MENU MANAJEMEN                                             --}}
+    {{-- ========================================================== --}}
     <section class="ob-card ob-card-lg">
 
         <div class="card-topbar">

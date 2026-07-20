@@ -2,6 +2,10 @@
 
 @section('page-title', 'Penggalang Dana')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/penggalang_dana/index.css') }}">
+@endpush
+
 @section('content')
 
     <section class="ob-card ob-card-lg">

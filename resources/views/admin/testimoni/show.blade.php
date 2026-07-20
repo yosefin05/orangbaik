@@ -2,6 +2,10 @@
 
 @section('page-title', 'Detail Testimoni')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/testimoni/show.css') }}">
+@endpush
+
 @section('content')
 
     <section class="ob-card ob-card-lg detail-card">

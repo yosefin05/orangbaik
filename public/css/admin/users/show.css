@@ -1,0 +1,147 @@
+/* ============================================================
+   USERS SHOW - ORANGBAIK.ID
+   ============================================================ */
+
+/* ============================================================
+   PROFILE CARD
+   ============================================================ */
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-6);
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 3px solid var(--border);
+    box-shadow: var(--shadow-soft);
+}
+
+.profile-avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-extrabold);
+    border: 3px solid var(--border);
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info h2 {
+    margin: 0 0 var(--space-1);
+    color: var(--text-dark);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.25;
+}
+
+.profile-email {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    margin-bottom: var(--space-2);
+}
+
+.profile-role {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+}
+
+.profile-role.admin {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.profile-role.user {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+/* ============================================================
+   DETAIL INFO
+   ============================================================ */
+
+.detail-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.detail-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-soft);
+    border-radius: var(--radius-sm);
+}
+
+.detail-info-item .label {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-info-item .value {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .profile-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-info {
+        text-align: center;
+    }
+
+    .detail-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .profile-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        font-size: var(--fs-lg);
+    }
+
+    .profile-info h2 {
+        font-size: var(--fs-sm);
+    }
+}

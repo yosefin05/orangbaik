@@ -2,6 +2,10 @@
 
 @section('page-title', 'Detail Penggalang Dana')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/penggalang_dana/show.css') }}">
+@endpush
+
 @section('content')
 
     {{-- Profil Penggalang Dana --}}

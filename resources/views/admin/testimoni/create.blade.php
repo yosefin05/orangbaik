@@ -2,6 +2,10 @@
 
 @section('page-title', 'Tambah Testimoni')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/testimoni/create.css') }}">
+@endpush
+
 @section('content')
 
     <section class="ob-card ob-card-lg">
@@ -23,33 +27,57 @@
         <form
             action="{{ route('admin.testimoni.store') }}"
             method="POST"
-            enctype="multipart/form-data">
+            enctype="multipart/form-data"
+            id="testimoniForm"
+        >
 
             @csrf
 
             <div class="form-wrapper">
 
+                {{-- ====================================================== --}}
+                {{-- FOTO PROFIL - Dengan Preview Lingkaran                  --}}
+                {{-- ====================================================== --}}
                 <div class="form-group">
-                    <label for="foto_profil">Foto Profil</label>
+                    <label for="foto_profil">Foto Profil <span class="text-danger">*</span></label>
 
-                    <input
-                        type="file"
-                        id="foto_profil"
-                        name="foto_profil"
-                        accept="image/*"
-                        class="form-control"
-                        required>
+                    {{-- Dropzone Area --}}
+                    <div class="upload-dropzone" id="foto_profilDropzone">
+                        {{-- Placeholder --}}
+                        <div class="upload-placeholder" id="foto_profilPlaceholder">
+                            <i class="bi bi-person-circle"></i>
+                            <p>Klik atau seret foto profil</p>
+                            <span class="text-muted">Format: JPG, PNG, JPEG • Maks: 2MB</span>
+                        </div>
+
+                        {{-- Preview --}}
+                        <div class="upload-preview avatar-preview" id="foto_profilPreview" style="display: none;">
+                            <img id="foto_profilPreviewImg" src="#" alt="Foto Preview" />
+                            <button type="button" class="btn-remove-image" id="foto_profilRemoveBtn" title="Hapus foto">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                        <input
+                            type="file"
+                            id="foto_profil"
+                            name="foto_profil"
+                            class="upload-input"
+                            accept="image/*"
+                            required
+                        />
+                    </div>
 
                     @error('foto_profil')
-                        <small class="text-danger">
-                            {{ $message }}
-                        </small>
+                        <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
+                {{-- ====================================================== --}}
+                {{-- NAMA                                                    --}}
+                {{-- ====================================================== --}}
                 <div class="form-group">
-                    <label for="nama">Nama</label>
-
+                    <label for="nama">Nama <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         id="nama"
@@ -57,18 +85,18 @@
                         value="{{ old('nama') }}"
                         placeholder="Masukkan nama"
                         class="form-control"
-                        required>
-
+                        required
+                    />
                     @error('nama')
-                        <small class="text-danger">
-                            {{ $message }}
-                        </small>
+                        <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
+                {{-- ====================================================== --}}
+                {{-- JABATAN                                                 --}}
+                {{-- ====================================================== --}}
                 <div class="form-group">
-                    <label for="jabatan">Jabatan</label>
-
+                    <label for="jabatan">Jabatan <span class="text-danger">*</span></label>
                     <input
                         type="text"
                         id="jabatan"
@@ -76,35 +104,36 @@
                         value="{{ old('jabatan') }}"
                         placeholder="Contoh: Donatur Tetap"
                         class="form-control"
-                        required>
-
+                        required
+                    />
                     @error('jabatan')
-                        <small class="text-danger">
-                            {{ $message }}
-                        </small>
+                        <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
+                {{-- ====================================================== --}}
+                {{-- ISI TESTIMONI                                           --}}
+                {{-- ====================================================== --}}
                 <div class="form-group">
-                    <label for="isi_testimoni">Isi Testimoni</label>
-
+                    <label for="isi_testimoni">Isi Testimoni <span class="text-danger">*</span></label>
                     <textarea
                         id="isi_testimoni"
                         name="isi_testimoni"
                         rows="5"
                         placeholder="Masukkan isi testimoni"
                         class="form-control"
-                        required>{{ old('isi_testimoni') }}</textarea>
-
+                        required
+                    >{{ old('isi_testimoni') }}</textarea>
                     @error('isi_testimoni')
-                        <small class="text-danger">
-                            {{ $message }}
-                        </small>
+                        <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
             </div>
 
+            {{-- ========================================================== --}}
+            {{-- FORM ACTIONS                                               --}}
+            {{-- ========================================================== --}}
             <div class="form-footer">
                 <div class="form-actions">
                     <button type="submit" class="btn-primary">
@@ -113,6 +142,7 @@
                     </button>
 
                     <a href="{{ route('admin.testimoni.index') }}" class="btn-secondary">
+                        <i class="bi bi-x-circle"></i>
                         Batal
                     </a>
                 </div>

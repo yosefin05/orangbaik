@@ -1,0 +1,186 @@
+/* ============================================================
+   SIDEBAR - ORANGBAIK.ID
+   ============================================================ */
+
+.sidebar {
+    width: 280px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    color: var(--bg);
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, .22), transparent 34%),
+        linear-gradient(180deg, var(--primary), var(--primary-hover));
+    box-shadow: 12px 0 32px rgba(31, 41, 55, .12);
+}
+
+/* ============================================================
+   SIDEBAR BRAND
+   ============================================================ */
+
+.sidebar-brand {
+    display: block;
+    padding: 30px 22px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, .16);
+}
+
+.sidebar-brand h1 {
+    margin: 0;
+    color: var(--bg);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.2;
+    letter-spacing: -.03em;
+}
+
+.sidebar-brand h1 span {
+    color: var(--secondary-light);
+}
+
+.sidebar-brand p {
+    margin-top: var(--space-2);
+    color: rgba(255, 255, 255, .78);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+/* ============================================================
+   SIDEBAR NAVIGATION
+   ============================================================ */
+
+.sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: 18px 14px;
+}
+
+.sidebar-nav a {
+    position: relative;
+    width: 100%;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    border-radius: var(--radius-md);
+    color: rgba(255, 255, 255, .86);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.2;
+    transition: .2s ease;
+}
+
+.sidebar-nav a i {
+    width: 20px;
+    flex-shrink: 0;
+    font-size: 18px;
+    line-height: 1;
+    text-align: center;
+}
+
+.sidebar-nav a span {
+    flex: 1;
+}
+
+.sidebar-nav a::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 0;
+    border-radius: var(--radius-full);
+    background: var(--bg);
+    transition: .2s ease;
+}
+
+.sidebar-nav a:hover {
+    background: rgba(255, 255, 255, .12);
+    color: var(--bg);
+    transform: translateX(3px);
+}
+
+.sidebar-nav a.active {
+    background: rgba(255, 255, 255, .20);
+    color: var(--bg);
+    font-weight: var(--fw-bold);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+}
+
+.sidebar-nav a.active::before {
+    height: 24px;
+}
+
+/* ============================================================
+   SIDEBAR FOOTER
+   ============================================================ */
+
+.sidebar-footer {
+    padding: 18px 16px;
+    color: rgba(255, 255, 255, .72);
+    font-size: var(--fs-xxs);
+    line-height: 1.6;
+    border-top: 1px solid rgba(255, 255, 255, .16);
+}
+
+/* ============================================================
+   SIDEBAR RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1100px) {
+    .sidebar {
+        width: 240px;
+    }
+}
+
+@media (max-width: 860px) {
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        box-shadow: none;
+    }
+
+    .sidebar-brand {
+        padding: 18px 16px;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 12px 14px;
+        gap: var(--space-1);
+    }
+
+    .sidebar-nav a {
+        width: auto;
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 10px 14px;
+    }
+
+    .sidebar-nav a::before {
+        display: none;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar-nav a {
+        font-size: var(--fs-xxs);
+        padding: 8px 12px;
+    }
+
+    .sidebar-nav a i {
+        font-size: 15px;
+        width: 16px;
+    }
+}

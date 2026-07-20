@@ -2,6 +2,10 @@
 
 @section('page-title', 'Campaign')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/campaign/index.css') }}">
+@endpush
+
 @section('content')
 
     <section class="ob-card ob-card-lg">

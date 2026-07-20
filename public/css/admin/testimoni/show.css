@@ -1,0 +1,199 @@
+/* ============================================================
+   TESTIMONI SHOW - ORANGBAIK.ID
+   ============================================================ */
+
+/* ============================================================
+   DETAIL PROFILE PREVIEW
+   ============================================================ */
+
+.detail-profile-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+}
+
+.detail-avatar {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 3px solid var(--bg);
+    box-shadow: var(--shadow-soft);
+}
+
+.detail-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-extrabold);
+    border: 3px solid var(--bg);
+}
+
+.detail-profile-preview h3 {
+    margin: 0 0 var(--space-1);
+    color: var(--text-dark);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.25;
+}
+
+.detail-profile-preview p {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+}
+
+/* ============================================================
+   FORM WRAPPER
+   ============================================================ */
+
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* ============================================================
+   FORM GROUP
+   ============================================================ */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-group label {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.form-group .form-control {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+    transition: .2s ease;
+}
+
+.form-group .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg);
+    box-shadow: 0 0 0 4px rgba(51, 101, 175, .13);
+}
+
+.form-group .form-control:read-only,
+.form-group .form-control[readonly] {
+    background: #f1f5f9;
+    color: var(--text-dark);
+    cursor: default;
+}
+
+textarea.form-control {
+    resize: none;
+    min-height: 120px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .detail-profile-preview {
+        flex-direction: column;
+        text-align: center;
+        padding: var(--space-5);
+        gap: var(--space-4);
+    }
+
+    .detail-avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .detail-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        font-size: var(--fs-lg);
+    }
+
+    .detail-profile-preview h3 {
+        font-size: var(--fs-sm);
+    }
+
+    .detail-profile-preview p {
+        font-size: var(--fs-xxs);
+    }
+
+    .form-group .form-control {
+        font-size: var(--fs-xxs);
+        padding: 10px 12px;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+    }
+
+    .form-group label {
+        font-size: var(--fs-xxs);
+    }
+}
+
+@media (max-width: 576px) {
+    .detail-card {
+        padding: var(--space-4);
+    }
+
+    .detail-profile-preview {
+        padding: var(--space-4);
+        gap: var(--space-3);
+    }
+
+    .detail-avatar {
+        width: 70px;
+        height: 70px;
+    }
+
+    .detail-avatar-placeholder {
+        width: 70px;
+        height: 70px;
+        font-size: var(--fs-md);
+    }
+
+    .detail-profile-preview h3 {
+        font-size: var(--fs-xs);
+    }
+
+    .form-group .form-control {
+        font-size: 11px;
+        padding: 8px 10px;
+    }
+
+    textarea.form-control {
+        min-height: 80px;
+        font-size: 11px;
+    }
+
+    .form-group label {
+        font-size: 11px;
+    }
+
+    .form-wrapper {
+        gap: var(--space-3);
+    }
+}

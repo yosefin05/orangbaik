@@ -1,0 +1,223 @@
+/* ============================================================
+   TOPBAR - ORANGBAIK.ID
+   ============================================================ */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 82px;
+    padding: 0 var(--space-8);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.2;
+    letter-spacing: -.03em;
+}
+
+/* ============================================================
+   TOPBAR USER
+   ============================================================ */
+
+.topbar-user {
+    position: relative;
+    width: fit-content;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg-soft);
+}
+
+.topbar-user-button {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    border: none;
+    border-radius: var(--radius-full);
+    background: transparent;
+    transition: .2s ease;
+}
+
+.topbar-user-button:hover {
+    background: #f8fafc;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+}
+
+.user-name {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.user-role {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+}
+
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-dropdown-icon {
+    color: var(--muted);
+    font-size: 13px;
+    transition: .2s ease;
+}
+
+.topbar-user:hover .user-dropdown-icon {
+    transform: rotate(180deg);
+}
+
+/* ============================================================
+   TOPBAR DROPDOWN
+   ============================================================ */
+
+.topbar-user-dropdown {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    z-index: 200;
+    width: 220px;
+    padding: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 14px 38px rgba(0, 0, 0, .14);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: .2s ease;
+}
+
+.topbar-user:hover .topbar-user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.topbar-user-dropdown a,
+.topbar-user-dropdown button {
+    width: 100%;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    text-align: left;
+}
+
+.topbar-user-dropdown a i,
+.topbar-user-dropdown button i {
+    width: 18px;
+    font-size: 16px;
+    line-height: 1;
+    text-align: center;
+}
+
+.topbar-user-dropdown a:hover,
+.topbar-user-dropdown button:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.topbar-user-dropdown form {
+    margin: 0;
+}
+
+.topbar-user-dropdown form button {
+    color: var(--danger);
+}
+
+.topbar-user-dropdown form button:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* ============================================================
+   TOPBAR RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 860px) {
+    .topbar {
+        position: relative;
+        height: auto;
+        padding: 18px 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-4);
+    }
+
+    .topbar h1 {
+        font-size: var(--fs-sm);
+    }
+
+    .topbar-user {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .topbar-user-button {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .topbar-user-dropdown {
+        width: 100%;
+        top: calc(100% + 10px);
+    }
+
+    .user-info {
+        align-items: flex-start;
+    }
+}

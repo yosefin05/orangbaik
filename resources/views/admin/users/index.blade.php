@@ -37,9 +37,7 @@
                         <tr>
                             <td>
                                 @if($user->foto_profil)
-                                    <img
-                                        src="{{ asset('storage/' . $user->foto_profil) }}"
-                                        alt="{{ $user->name }}"
+                                    <img src="{{ asset('storage/' . $user->foto_profil) }}" alt="{{ $user->name }}"
                                         class="table-avatar">
                                 @else
                                     <div class="table-avatar table-avatar-placeholder">
@@ -80,10 +78,11 @@
 
                             <td class="text-center">
                                 <div class="action-group action-group-center">
-                                    <form
-                                        action="{{ route('admin.users.destroy', $user) }}"
-                                        method="POST"
-                                        class="inline-form"
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="action-link link-blue">
+                                        <i class="bi bi-pencil-square"></i>
+                                        Edit
+                                    </a>
+                                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline-form"
                                         onsubmit="return confirm('Yakin ingin menghapus user ini?')">
 
                                         @csrf

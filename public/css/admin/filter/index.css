@@ -1,0 +1,55 @@
+/* ============================================================
+   FILTER INDEX - ORANGBAIK.ID
+   ============================================================ */
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.cell-title {
+    margin: 0;
+    color: var(--text-dark);
+    font-weight: var(--fw-bold);
+    line-height: 1.5;
+}
+
+.cell-slug {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        margin: 0 calc(-1 * var(--space-4));
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .data-table {
+        min-width: 500px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 14px;
+        font-size: var(--fs-xxs);
+    }
+}
+
+@media (max-width: 576px) {
+    .data-table th,
+    .data-table td {
+        padding: 10px 12px;
+    }
+
+    .cell-title {
+        font-size: var(--fs-xxs);
+    }
+}   

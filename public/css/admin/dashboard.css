@@ -1,0 +1,277 @@
+/* ============================================================
+   DASHBOARD - ORANGBAIK.ID
+   ============================================================ */
+
+/* ============================================================
+   WELCOME BANNER
+   ============================================================ */
+
+.welcome-banner {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-8);
+    padding: var(--space-8);
+    background:
+        radial-gradient(circle at 90% 20%, rgba(255, 255, 255, .28), transparent 26%),
+        linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.welcome-banner::after {
+    content: "";
+    position: absolute;
+    right: -70px;
+    bottom: -90px;
+    width: 230px;
+    height: 230px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, .12);
+}
+
+.welcome-banner > div,
+.welcome-banner form {
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-banner h2 {
+    margin: 0 0 var(--space-2);
+    color: var(--bg);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.25;
+    letter-spacing: -.03em;
+}
+
+.welcome-banner h2 i {
+    font-size: 22px;
+}
+
+.welcome-banner p {
+    margin: 0;
+    color: rgba(255, 255, 255, .86);
+    font-size: var(--fs-xs);
+    line-height: 1.7;
+}
+
+.btn-logout {
+    position: relative;
+    z-index: 1;
+    min-height: 42px;
+    padding: 11px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    border: 1px solid rgba(255, 255, 255, .36);
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, .13);
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+    transition: .2s ease;
+}
+
+.btn-logout:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   STATS
+   ============================================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 122px;
+    padding: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    transition: .2s ease;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: linear-gradient(180deg, var(--primary), var(--secondary));
+    opacity: .9;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(51, 101, 175, .28);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-icon {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+}
+
+.stat-icon i {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.stat-icon.icon-blue {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.stat-icon.icon-green {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.stat-icon.icon-orange {
+    background: var(--secondary-light);
+    color: var(--secondary);
+}
+
+.stat-icon.icon-red {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.stat-icon.icon-purple {
+    background: rgba(142, 68, 173, .13);
+    color: #8e44ad;
+}
+
+.stat-icon.icon-teal {
+    background: rgba(20, 184, 166, .13);
+    color: #14b8a6;
+}
+
+.stat-label {
+    margin: 0 0 var(--space-1);
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.4;
+}
+
+.stat-value {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.1;
+}
+
+/* ============================================================
+   MENU GRID
+   ============================================================ */
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-4);
+}
+
+.menu-item {
+    min-height: 142px;
+    padding: var(--space-6) var(--space-5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    text-align: center;
+    background: linear-gradient(180deg, var(--bg), var(--bg-soft));
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    box-shadow: 0 10px 24px rgba(31, 41, 55, .05);
+    transition: .2s ease;
+}
+
+.menu-item:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--bg);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.menu-icon {
+    font-size: 30px;
+    line-height: 1;
+    transition: .2s ease;
+}
+
+.menu-item:hover .menu-icon {
+    transform: scale(1.12) rotate(-4deg);
+}
+
+/* ============================================================
+   RESPONSIVE DASHBOARD
+   ============================================================ */
+
+@media (max-width: 1100px) {
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .welcome-banner {
+        align-items: stretch;
+        padding: var(--space-6);
+    }
+
+    .welcome-banner h2 {
+        font-size: var(--fs-md);
+    }
+
+    .welcome-banner form,
+    .btn-logout {
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: var(--space-5);
+    }
+
+    .stat-value {
+        font-size: var(--fs-md);
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+}

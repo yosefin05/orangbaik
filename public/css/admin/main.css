@@ -1,0 +1,72 @@
+body {
+    background:
+        radial-gradient(circle at 10% 0%, rgba(51, 101, 175, .12), transparent 28%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg-soft) 100%);
+    color: var(--text);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* ============================================================
+   ADMIN LAYOUT
+   ============================================================ */
+
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-area {
+    padding: var(--space-8);
+}
+
+.content-area > .ob-card,
+.content-area > .card,
+.content-area > .info-grid {
+    margin-bottom: var(--space-6);
+}
+
+.content-area > :last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================================
+   RESPONSIVE MAIN
+   ============================================================ */
+
+@media (max-width: 860px) {
+    .admin-wrapper {
+        flex-direction: column;
+    }
+
+    .content-area {
+        padding: var(--space-6);
+    }
+}
+
+@media (max-width: 576px) {
+    .content-area {
+        padding: var(--space-4);
+    }
+}

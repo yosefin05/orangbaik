@@ -2,6 +2,10 @@
 
 @section('page-title', 'Detail Campaign')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/campaign/show.css') }}">
+@endpush
+
 @section('content')
 
     {{-- Header Campaign --}}

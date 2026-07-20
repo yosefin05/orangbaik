@@ -1,0 +1,115 @@
+/* ============================================================
+   USERS INDEX - ORANGBAIK.ID
+   ============================================================ */
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.table-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    box-shadow: var(--shadow-soft);
+}
+
+.table-avatar-placeholder {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.cell-title {
+    margin: 0;
+    color: var(--text-dark);
+    font-weight: var(--fw-bold);
+    line-height: 1.5;
+}
+
+.cell-email {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.4;
+}
+
+/* ============================================================
+   STATUS BADGE
+   ============================================================ */
+
+.badge-verified {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.badge-unverified {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.badge-suspended {
+    background: var(--secondary-light);
+    color: var(--secondary);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        margin: 0 calc(-1 * var(--space-4));
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .data-table {
+        min-width: 600px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 14px;
+        font-size: var(--fs-xxs);
+    }
+
+    .table-avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .table-avatar-placeholder {
+        width: 36px;
+        height: 36px;
+        font-size: var(--fs-xxs);
+    }
+}
+
+@media (max-width: 576px) {
+    .data-table th,
+    .data-table td {
+        padding: 10px 12px;
+    }
+
+    .cell-title {
+        font-size: var(--fs-xxs);
+    }
+
+    .cell-email {
+        font-size: 10px;
+    }
+
+    .badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+}

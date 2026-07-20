@@ -2,6 +2,10 @@
 
 @section('page-title', 'Edit Berita')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/admin/berita/edit.css') }}">
+@endpush
+
 @section('content')
 
     <section class="ob-card ob-card-lg form-card">
