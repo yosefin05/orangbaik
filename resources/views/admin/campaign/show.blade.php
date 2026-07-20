@@ -26,9 +26,17 @@
                 $tanggalBerakhir = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
             @endphp
 
-            @if($hariIni->lte($tanggalBerakhir))
+            @if($hariIni->lte($tanggalBerakhir) && $campaign->is_active && $campaign->isApproved())
                 <span class="badge badge-green">
                     Aktif
+                </span>
+            @elseif(!$campaign->is_active)
+                <span class="badge badge-red">
+                    Tidak Aktif
+                </span>
+            @elseif($campaign->approval_status == 'pending')
+                <span class="badge badge-yellow">
+                    Menunggu Approval
                 </span>
             @else
                 <span class="badge badge-red">
@@ -39,131 +47,209 @@
 
     </section>
 
-    {{-- Emergency Approval Section --}}
-    @if(in_array($campaign->campaign_type, ['emergency', 'sustainable']))
-        <section class="ob-card ob-card-lg"
-            style="border-left: 4px solid {{ $campaign->campaign_type == 'emergency' ? '#dc3545' : '#28a745' }};">
-            <div class="card-topbar">
-                <div>
-                    <h2>
-                        @if($campaign->campaign_type == 'emergency')
-                            <span class="badge badge-red">🔥 Darurat</span>
-                        @else
-                            <span class="badge badge-green">♻️ Berkelanjutan</span>
-                        @endif
-                        Approval Status
-                    </h2>
-                    <p class="card-subtitle">
-                        Status persetujuan untuk campaign
-                        {{ $campaign->campaign_type == 'emergency' ? 'darurat' : 'berkelanjutan' }}.
-                    </p>
-                </div>
+    {{-- Approval Section --}}
+    <section class="ob-card ob-card-lg"
+        style="border-left: 4px solid {{ $campaign->campaign_type == 'emergency' ? '#dc3545' : ($campaign->campaign_type == 'sustainable' ? '#28a745' : '#6c757d') }};">
+        <div class="card-topbar">
+            <div>
+                <h2>
+                    @if($campaign->campaign_type == 'emergency')
+                        <span class="badge badge-red">🔥 Darurat</span>
+                    @elseif($campaign->campaign_type == 'sustainable')
+                        <span class="badge badge-green">♻️ Berkelanjutan</span>
+                    @else
+                        <span class="badge badge-blue">📋 Regular</span>
+                    @endif
+                    Status Approval
+                </h2>
+                <p class="card-subtitle">
+                    Status persetujuan campaign. Campaign emergency & sustainable perlu approval sebelum tampil di landing page.
+                </p>
             </div>
+        </div>
 
-            <table class="data-table data-table-kv">
-                <tbody>
+        <table class="data-table data-table-kv">
+            <tbody>
+                <tr>
+                    <th>Tipe Campaign</th>
+                    <td>
+                        @if($campaign->campaign_type == 'emergency')
+                            <span class="badge badge-red">Darurat</span>
+                        @elseif($campaign->campaign_type == 'sustainable')
+                            <span class="badge badge-green">Berkelanjutan</span>
+                        @else
+                            <span class="badge badge-blue">Regular</span>
+                        @endif
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Status Approval</th>
+                    <td>
+                        @if($campaign->approval_status == 'pending')
+                            <span class="badge badge-yellow">⏳ Menunggu Persetujuan</span>
+                        @elseif($campaign->approval_status == 'approved')
+                            <span class="badge badge-green">✅ Disetujui</span>
+                        @elseif($campaign->approval_status == 'rejected')
+                            <span class="badge badge-red">❌ Ditolak</span>
+                        @else
+                            <span class="badge badge-blue">ℹ️ Tidak Perlu Approval</span>
+                        @endif
+                    </td>
+                </tr>
+
+                @if($campaign->approval_status == 'approved')
                     <tr>
-                        <th>Tipe Campaign</th>
+                        <th>Disetujui Oleh</th>
+                        <td>{{ $campaign->approvedBy->name ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tanggal Disetujui</th>
+                        <td>{{ $campaign->approved_at ? \Carbon\Carbon::parse($campaign->approved_at)->format('d M Y H:i') : '-' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Status Tampil di Landing Page</th>
                         <td>
-                            @if($campaign->campaign_type == 'emergency')
-                                <span class="badge badge-red">Darurat</span>
+                            @if($campaign->is_active && $campaign->isApproved())
+                                <span class="badge badge-green">✅ Tampil</span>
+                            @elseif($campaign->is_active && !$campaign->isApproved())
+                                <span class="badge badge-yellow">⏳ Menunggu Approval</span>
                             @else
-                                <span class="badge badge-green">Berkelanjutan</span>
+                                <span class="badge badge-red">❌ Tidak Tampil</span>
                             @endif
                         </td>
                     </tr>
+                @endif
 
+                @if($campaign->approval_status == 'rejected' && $campaign->rejection_reason)
                     <tr>
-                        <th>Status Approval</th>
+                        <th>Alasan Penolakan</th>
                         <td>
-                            @if($campaign->emergency_approval == 'pending')
-                                <span class="badge badge-yellow">Menunggu Persetujuan</span>
-                            @elseif($campaign->emergency_approval == 'approved')
-                                <span class="badge badge-green">Disetujui</span>
-                            @elseif($campaign->emergency_approval == 'rejected')
-                                <span class="badge badge-red">Ditolak</span>
-                            @else
-                                <span class="badge badge-blue">Tidak Perlu Approval</span>
-                            @endif
+                            <div class="alert alert-danger mb-0">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                {{ $campaign->rejection_reason }}
+                            </div>
                         </td>
                     </tr>
+                @endif
+            </tbody>
+        </table>
 
-                    @if($campaign->emergency_approval == 'approved')
-                        <tr>
-                            <th>Disetujui Oleh</th>
-                            <td>{{ $campaign->emergencyApprovedBy->name ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <th>Tanggal Disetujui</th>
-                            <td>{{ $campaign->emergency_approved_at ? \Carbon\Carbon::parse($campaign->emergency_approved_at)->format('d M Y H:i') : '-' }}
-                            </td>
-                        </tr>
-                    @endif
-
-                    @if($campaign->emergency_approval == 'rejected' && $campaign->emergency_rejection_reason)
-                        <tr>
-                            <th>Alasan Penolakan</th>
-                            <td>
-                                <div class="alert alert-danger mb-0">
-                                    {{ $campaign->emergency_rejection_reason }}
-                                </div>
-                            </td>
-                        </tr>
-                    @endif
-                </tbody>
-            </table>
-
-            {{-- Action Buttons --}}
-            @if($campaign->emergency_approval == 'pending')
-                <div class="mt-3 d-flex gap-2">
-                    <form action="{{ route('admin.campaign.emergency.approve', $campaign->id) }}" method="POST" class="d-inline">
+        {{-- ACTION BUTTONS UNTUK EMERGENCY & SUSTAINABLE --}}
+        @if(in_array($campaign->campaign_type, ['emergency', 'sustainable']))
+            
+            {{-- Tombol untuk status PENDING --}}
+            @if($campaign->approval_status == 'pending')
+                <div class="mt-4 d-flex gap-3 flex-wrap">
+                    <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST" class="d-inline">
                         @csrf
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Setujui Campaign
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle-fill"></i>
+                            ✅ Setujui & Tampilkan di Landing Page
                         </button>
+                        <small class="d-block text-muted mt-1">
+                            Campaign akan langsung tampil di landing page setelah disetujui.
+                        </small>
                     </form>
 
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
-                        <i class="bi bi-x-circle"></i> Tolak Campaign
+                    <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                        <i class="bi bi-x-circle-fill"></i>
+                        ❌ Tolak Campaign
                     </button>
                 </div>
 
                 <!-- Modal Reject -->
                 <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-lg">
                         <div class="modal-content">
-                            <form action="{{ route('admin.campaign.emergency.reject', $campaign->id) }}" method="POST">
+                            <form action="{{ route('admin.campaign.reject', $campaign->id) }}" method="POST">
                                 @csrf
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Tolak Campaign</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                                    <h5 class="modal-title">
+                                        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                        Tolak Campaign
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
                                 </div>
                                 <div class="modal-body">
                                     <div class="mb-3">
-                                        <label class="form-label">
+                                        <label class="form-label fw-bold">
                                             Alasan Penolakan <span class="text-danger">*</span>
                                         </label>
-                                        <textarea name="rejection_reason" 
-                                                  class="form-control" 
-                                                  rows="4" 
-                                                  placeholder="Masukkan alasan penolakan campaign ini..."
-                                                  required></textarea>
-                                        <small class="text-muted">Alasan ini akan ditampilkan kepada penggalang dana.</small>
+                                        <textarea name="rejection_reason" class="form-control" rows="5"
+                                            placeholder="Masukkan alasan penolakan campaign ini dengan jelas..." required></textarea>
+                                        <small class="text-muted">
+                                            <i class="bi bi-info-circle"></i>
+                                            Alasan ini akan ditampilkan kepada penggalang dana.
+                                        </small>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                                     <button type="submit" class="btn btn-danger">
-                                        <i class="bi bi-x-circle"></i> Tolak
+                                        <i class="bi bi-x-circle"></i> Ya, Tolak Campaign
                                     </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
+
+            {{-- Tombol untuk status APPROVED --}}
+            @elseif($campaign->approval_status == 'approved')
+                <div class="mt-4">
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>✅ Campaign sudah disetujui</strong> dan akan tampil di landing page.
+                        @if(!$campaign->is_active)
+                            <br>
+                            <span class="text-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                ⚠️ Namun campaign sedang tidak aktif. Aktifkan campaign untuk menampilkannya.
+                            </span>
+                        @endif
+                    </div>
+                    
+                    {{-- Tombol untuk membatalkan approval (opsional) --}}
+                    <form action="{{ route('admin.campaign.unapprove', $campaign->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-warning" onclick="return confirm('Yakin ingin membatalkan approval?')">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            Batalkan Approval
+                        </button>
+                    </form>
+                </div>
+
+            {{-- Tombol untuk status REJECTED --}}
+            @elseif($campaign->approval_status == 'rejected')
+                <div class="mt-4">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-x-circle-fill"></i>
+                        <strong>❌ Campaign ditolak</strong> dengan alasan di atas.
+                    </div>
+                    
+                    {{-- Tombol untuk approve ulang jika sudah diperbaiki --}}
+                    <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Setujui Ulang Campaign
+                        </button>
+                    </form>
+                </div>
             @endif
-        </section>
-    @endif
+
+        @else
+            {{-- Untuk Regular Campaign --}}
+            <div class="mt-4">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    ℹ️ Campaign regular tidak memerlukan approval dan langsung dapat tampil di landing page.
+                </div>
+            </div>
+        @endif
+    </section>
 
     {{-- Informasi Campaign --}}
     <section class="ob-card ob-card-lg">
@@ -229,6 +315,28 @@
                         {{ $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') : '-' }}
                     </td>
                 </tr>
+
+                <tr>
+                    <th>Status Campaign</th>
+                    <td>
+                        @if($campaign->is_active)
+                            <span class="badge badge-green">Aktif</span>
+                        @else
+                            <span class="badge badge-red">Tidak Aktif</span>
+                        @endif
+                    </td>
+                </tr>
+
+                @if($campaign->verified_at)
+                    <tr>
+                        <th>Diverifikasi Oleh</th>
+                        <td>{{ $campaign->verifier->name ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tanggal Verifikasi</th>
+                        <td>{{ $campaign->verified_at ? \Carbon\Carbon::parse($campaign->verified_at)->format('d M Y H:i') : '-' }}</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
 
@@ -294,9 +402,9 @@
 
         @if($campaign->campaignFilter->count())
             <div class="badge-group">
-                @foreach($campaign->campaignFilter as $filter)
+                @foreach($campaign->campaignFilter as $campaignFilter)
                     <span class="badge badge-blue">
-                        {{ $filter->filter->nama_filter ?? '-' }}
+                        {{ $campaignFilter->filter->nama_filter ?? '-' }}
                     </span>
                 @endforeach
             </div>
@@ -334,7 +442,7 @@
                 </tr>
 
                 <tr>
-                    <th>Nama Pekurban</th>
+                    <th>Nama Donatur</th>
                     <td>
                         @if($campaign->enable_nama_donatur)
                             <span class="badge badge-green">Aktif</span>
@@ -457,193 +565,317 @@
 
     </section>
 
+    {{-- Packages --}}
+    <section class="ob-card ob-card-lg">
+
+        <div class="card-topbar">
+            <div>
+                <h2>Package Campaign</h2>
+                <p class="card-subtitle">
+                    Daftar package donasi yang tersedia untuk campaign ini.
+                </p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Nama Package</th>
+                        <th>Nominal</th>
+                        <th>Deskripsi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse($campaign->packages as $package)
+                        <tr>
+                            <td>
+                                <p class="cell-title">
+                                    {{ $package->nama_package }}
+                                </p>
+                            </td>
+                            <td>
+                                <span class="text-muted-strong">
+                                    Rp {{ number_format($package->nominal, 0, ',', '.') }}
+                                </span>
+                            </td>
+                            <td>
+                                {{ $package->deskripsi ?? '-' }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="empty-state">
+                                Belum ada package.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
+        </div>
+
+    </section>
+
 @endsection
 
 @push('styles')
-<style>
-    /* Emergency Section */
-    .emergency-section {
-        border-left: 4px solid var(--primary);
-        transition: all 0.3s ease;
-    }
-
-    .emergency-section.emergency {
-        border-left-color: var(--danger);
-    }
-
-    .emergency-section.sustainable {
-        border-left-color: var(--success);
-    }
-
-    /* Alert */
-    .alert-danger {
-        background-color: var(--danger-light);
-        color: var(--danger);
-        padding: var(--space-3) var(--space-4);
-        border-radius: var(--radius-sm);
-        border-left: 3px solid var(--danger);
-    }
-
-    /* Modal */
-    .modal-content {
-        border-radius: var(--radius);
-        border: none;
-        box-shadow: var(--shadow-hover);
-    }
-
-    .modal-header {
-        border-bottom: 1px solid var(--border);
-        padding: var(--space-4) var(--space-5);
-    }
-
-    .modal-header .modal-title {
-        font-size: var(--fs-sm);
-        font-weight: var(--fw-semibold);
-        color: var(--text-dark);
-    }
-
-    .modal-body {
-        padding: var(--space-5);
-    }
-
-    .modal-footer {
-        border-top: 1px solid var(--border);
-        padding: var(--space-4) var(--space-5);
-    }
-
-    .btn-close {
-        background: none;
-        border: none;
-        font-size: var(--fs-lg);
-        color: var(--muted);
-        cursor: pointer;
-        padding: 0;
-        line-height: 1;
-        transition: color 0.2s ease;
-    }
-
-    .btn-close:hover {
-        color: var(--text);
-    }
-
-    /* Form */
-    .form-label {
-        font-size: var(--fs-xs);
-        font-weight: var(--fw-medium);
-        color: var(--text);
-        margin-bottom: var(--space-2);
-        display: block;
-    }
-
-    .form-label .text-danger {
-        color: var(--danger);
-    }
-
-    .form-control {
-        width: 100%;
-        padding: var(--space-2) var(--space-3);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        font-size: var(--fs-xs);
-        color: var(--text);
-        background: var(--bg);
-        transition: all 0.2s ease;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px var(--primary-light);
-    }
-
-    .form-control::placeholder {
-        color: var(--muted-light);
-    }
-
-    .text-muted {
-        font-size: var(--fs-xxs);
-        color: var(--muted);
-        margin-top: var(--space-1);
-        display: block;
-    }
-
-    /* Buttons */
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        padding: var(--space-2) var(--space-5);
-        border: none;
-        border-radius: var(--radius-sm);
-        font-size: var(--fs-xs);
-        font-weight: var(--fw-medium);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
-    }
-
-    .btn-success {
-        background-color: var(--success);
-        color: #fff;
-    }
-    .btn-success:hover {
-        background-color: #16a34a;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-soft);
-    }
-
-    .btn-danger {
-        background-color: var(--danger);
-        color: #fff;
-    }
-    .btn-danger:hover {
-        background-color: #dc2626;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-soft);
-    }
-
-    .btn-secondary {
-        background-color: var(--bg-soft);
-        color: var(--text);
-        border: 1px solid var(--border);
-    }
-    .btn-secondary:hover {
-        background-color: var(--border);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-soft);
-    }
-
-    /* Utility */
-    .d-flex {
-        display: flex;
-    }
-    .d-inline {
-        display: inline;
-    }
-    .gap-2 {
-        gap: var(--space-2);
-    }
-    .mt-3 {
-        margin-top: var(--space-3);
-    }
-    .mb-0 {
-        margin-bottom: 0;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .d-flex.gap-2 {
-            flex-direction: column;
+    <style>
+        /* Approval Section */
+        .ob-card {
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
         }
-        
-        .d-flex.gap-2 .btn {
+
+        /* Alert */
+        .alert {
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid;
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-2);
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            color: #166534;
+            border-left-color: #22c55e;
+        }
+
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-left-color: #ef4444;
+        }
+
+        .alert-info {
+            background-color: #eff6ff;
+            color: #1e40af;
+            border-left-color: #3b82f6;
+        }
+
+        .alert .text-warning {
+            color: #d97706;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-5);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--fs-xs);
+            font-weight: var(--fw-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-lg {
+            padding: var(--space-3) var(--space-6);
+            font-size: var(--fs-sm);
+        }
+
+        .btn-success {
+            background-color: #22c55e;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background-color: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-warning {
+            background-color: #f59e0b;
+            color: #fff;
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-soft);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* Modal */
+        .modal-content {
+            border-radius: var(--radius);
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border);
+            padding: var(--space-4) var(--space-5);
+        }
+
+        .modal-header .modal-title {
+            font-size: var(--fs-sm);
+            font-weight: var(--fw-semibold);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .modal-body {
+            padding: var(--space-5);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border);
+            padding: var(--space-4) var(--space-5);
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: var(--fs-lg);
+            color: var(--muted);
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+
+        .btn-close:hover {
+            color: var(--text);
+        }
+
+        /* Form */
+        .form-label {
+            font-size: var(--fs-xs);
+            font-weight: var(--fw-medium);
+            color: var(--text);
+            margin-bottom: var(--space-2);
+            display: block;
+        }
+
+        .form-label .text-danger {
+            color: #ef4444;
+        }
+
+        .form-control {
             width: 100%;
-            justify-content: center;
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: var(--fs-xs);
+            color: var(--text);
+            background: var(--bg);
+            transition: all 0.2s ease;
         }
-        
-        .modal-dialog {
-            margin: var(--space-3);
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
-    }
-</style>
+
+        .form-control::placeholder {
+            color: var(--muted-light);
+        }
+
+        .text-muted {
+            font-size: var(--fs-xxs);
+            color: var(--muted);
+            margin-top: var(--space-1);
+            display: block;
+        }
+
+        /* Utility */
+        .d-flex {
+            display: flex;
+        }
+
+        .d-inline {
+            display: inline;
+        }
+
+        .d-block {
+            display: block;
+        }
+
+        .gap-2 {
+            gap: var(--space-2);
+        }
+
+        .gap-3 {
+            gap: var(--space-3);
+        }
+
+        .mt-1 {
+            margin-top: var(--space-1);
+        }
+
+        .mt-3 {
+            margin-top: var(--space-3);
+        }
+
+        .mt-4 {
+            margin-top: var(--space-4);
+        }
+
+        .mb-0 {
+            margin-bottom: 0;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .fw-bold {
+            font-weight: var(--fw-bold);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .d-flex.gap-3 {
+                flex-direction: column;
+            }
+
+            .d-flex.gap-3 .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .modal-dialog {
+                margin: var(--space-3);
+            }
+
+            .btn-lg {
+                padding: var(--space-2) var(--space-4);
+                font-size: var(--fs-xs);
+            }
+        }
+    </style>
 @endpush

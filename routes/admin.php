@@ -61,30 +61,22 @@ Route::middleware(['auth', 'admin'])
         Route::patch('/penggalang_dana/{penggalangDana}/unverify', [PenggalangDanaController::class, 'unverify'])
             ->name('penggalang_dana.unverify');
 
-        Route::get(
-            '/campaign',
-            [CampaignController::class, 'index']
-        )->name('campaign.index');
-        Route::get(
-            '/campaign/{campaign}',
-            [CampaignController::class, 'show']
-        )->name('campaign.show');
-        Route::patch(
-            '/campaign/{campaign}/approve',
-            [CampaignController::class, 'approve']
-        )->name('campaign.approve');
-        Route::patch(
-            '/campaign/{campaign}/reject',
-            [CampaignController::class, 'reject']
-        )->name('campaign.reject');
-
-        Route::get('/campaigns/emergency-approvals', [CampaignController::class, 'emergencyApprovals'])
+        // ==================== CAMPAIGN ROUTES ====================
+        // Index & Show
+        Route::get('/campaign', [CampaignController::class, 'index'])->name('campaign.index');
+        Route::get('/campaign/{campaign}', [CampaignController::class, 'show'])->name('campaign.show');
+        
+        // Approval Actions (Approve & Reject)
+        Route::patch('/campaign/{campaign}/approve', [CampaignController::class, 'approve'])->name('campaign.approve');
+        Route::patch('/campaign/{campaign}/reject', [CampaignController::class, 'reject'])->name('campaign.reject');
+        
+        // Unapprove (optional - untuk membatalkan approval)
+        Route::patch('/campaign/{campaign}/unapprove', [CampaignController::class, 'unapprove'])->name('campaign.unapprove');
+        
+        // Halaman khusus untuk melihat campaign yang perlu approval
+        Route::get('/campaign/emergency-approvals', [CampaignController::class, 'emergencyApprovals'])
             ->name('campaign.emergency.approvals');
-        Route::post('/campaigns/{campaign}/approve-emergency', [CampaignController::class, 'approveEmergency'])
-            ->name('campaign.emergency.approve');
-        Route::post('/campaigns/{campaign}/reject-emergency', [CampaignController::class, 'rejectEmergency'])
-            ->name('campaign.emergency.reject');
-
+        // ========================================================
 
         Route::resource('testimoni', TestimoniController::class);
     });

@@ -63,22 +63,22 @@ class Campaign extends Model
         return $this->hasMany(Campaign_Package::class);
     }
 
-    public function emergencyApprovedBy()
+    public function approvedBy()
     {
-        return $this->belongsTo(User::class, 'emergency_approved_by');
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     // Scopes untuk filter di landing page
     public function scopeEmergency($query)
     {
         return $query->where('campaign_type', 'emergency')
-            ->where('emergency_approval', 'approved');
+            ->where('approval_status', 'approved');
     }
 
     public function scopeSustainable($query)
     {
         return $query->where('campaign_type', 'sustainable')
-            ->where('emergency_approval', 'approved');
+            ->where('approval_status', 'approved');
     }
 
     public function scopeRegular($query)
@@ -87,23 +87,23 @@ class Campaign extends Model
     }
 
     // Scope untuk admin approval
-    public function scopePendingEmergencyApproval($query)
+    public function scopePendingApproval($query)
     {
         return $query->whereIn('campaign_type', ['emergency', 'sustainable'])
-            ->where('emergency_approval', 'pending');
+            ->where('approval_status', 'pending');
     }
 
     // Helper methods
-    public function needsEmergencyApproval()
+    public function needsApproval()
     {
         return in_array($this->campaign_type, ['emergency', 'sustainable'])
-            && $this->emergency_approval === 'pending';
+            && $this->approval_status === 'pending';
     }
 
-    public function isEmergencyApproved()
+    public function isApproved()
     {
         if (in_array($this->campaign_type, ['emergency', 'sustainable'])) {
-            return $this->emergency_approval === 'approved';
+            return $this->approval_status === 'approved';
         }
         return true; // Regular campaign selalu approved
     }
@@ -127,15 +127,14 @@ class Campaign extends Model
         'enable_nama_donatur',
         'enable_custom_nominal',
         'campaign_type',
-        'emergency_approval',
-        'emergency_approved_at',
-        'emergency_approved_by',
-        'emergency_rejection_reason'
+        'approval_status',
+        'approved_at',
+        'approved_by',
+        'rejection_reason'
     ];
 
     protected $casts = [
         'verified_at' => 'datetime',
-        'verified_at' => 'datetime',
-        'emergency_approved_at' => 'datetime',
+        'approved_at' => 'datetime',
     ];
 }

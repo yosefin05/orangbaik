@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
+use Illuminate\Http\Request;
 
 class CampaignController extends Controller
 {
@@ -34,7 +35,9 @@ class CampaignController extends Controller
             'campaignFilter.filter',
             'campaignUpdates.user',
             'campaignFundraisers.user',
-            'verifier'
+            'packages', // tambahin packages
+            'verifier',
+            'approvedBy' // tambahin approvedBy
         ]);
 
         return view(
@@ -46,7 +49,7 @@ class CampaignController extends Controller
     public function emergencyApprovals()
     {
         $pendingCampaigns = Campaign::whereIn('campaign_type', ['emergency', 'sustainable'])
-            ->where('emergency_approval', 'pending')
+            ->where('approval_status', 'pending')
             ->where('is_active', true)
             ->with(['penggalangDana', 'kategori'])
             ->latest()
@@ -58,47 +61,63 @@ class CampaignController extends Controller
     /**
      * Menyetujui campaign emergency/sustainable
      */
-    public function approveEmergency(Campaign $campaign)
+    public function approve(Campaign $campaign)
     {
-        // Check if campaign needs emergency approval
+        // Check if campaign needs approval
         if (!in_array($campaign->campaign_type, ['emergency', 'sustainable'])) {
-            return back()->with('error', 'Campaign ini tidak membutuhkan approval emergency.');
+            return back()->with('error', 'Campaign ini tidak membutuhkan approval.');
         }
 
         // Check if already approved
-        if ($campaign->emergency_approval === 'approved') {
+        if ($campaign->approval_status === 'approved') {
             return back()->with('error', 'Campaign ini sudah disetujui.');
         }
 
         $campaign->update([
-            'emergency_approval' => 'approved',
-            'emergency_approved_at' => now(),
-            'emergency_approved_by' => auth()->id(),
+            'approval_status' => 'approved',
+            'approved_at' => now(),
+            'approved_by' => auth()->id(),
         ]);
 
-        return back()->with('success', 'Campaign emergency/sustainable berhasil disetujui.');
+        return back()->with('success', 'Campaign berhasil disetujui.');
     }
 
     /**
      * Menolak campaign emergency/sustainable
      */
-    public function rejectEmergency(Request $request, Campaign $campaign)
+    public function reject(Request $request, Campaign $campaign)
     {
         $request->validate([
             'rejection_reason' => 'required|string|max:500',
         ]);
 
         if (!in_array($campaign->campaign_type, ['emergency', 'sustainable'])) {
-            return back()->with('error', 'Campaign ini tidak membutuhkan approval emergency.');
+            return back()->with('error', 'Campaign ini tidak membutuhkan approval.');
         }
 
         $campaign->update([
-            'emergency_approval' => 'rejected',
-            'emergency_rejection_reason' => $request->rejection_reason,
-            'emergency_approved_at' => now(),
-            'emergency_approved_by' => auth()->id(),
+            'approval_status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
         ]);
 
-        return back()->with('success', 'Campaign emergency/sustainable berhasil ditolak.');
+        return back()->with('success', 'Campaign berhasil ditolak.');
+    }
+
+    /**
+     * Membatalkan approval campaign
+     */
+    public function unapprove(Campaign $campaign)
+    {
+        if (!in_array($campaign->campaign_type, ['emergency', 'sustainable'])) {
+            return back()->with('error', 'Campaign ini tidak membutuhkan approval.');
+        }
+
+        $campaign->update([
+            'approval_status' => 'pending',
+            'approved_at' => null,
+            'approved_by' => null,
+        ]);
+
+        return back()->with('success', 'Approval campaign berhasil dibatalkan.');
     }
 }

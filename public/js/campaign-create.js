@@ -2,8 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("=== CAMPAIGN CREATE PAGE LOADED ===");
 
     // === DOM ELEMENTS ===
-    const form = document.getElementById("campaignCreateForm");
-    const publishBtn = document.getElementById("publishBtn") || document.getElementById("forceSubmitBtn");
+    const publishBtn =
+        document.getElementById("publishBtn") ||
+        document.getElementById("forceSubmitBtn");
     const moneyInputs = document.querySelectorAll("[data-money]");
     const fileInputs = document.querySelectorAll('input[type="file"]');
     const filterInputs = document.querySelectorAll('input[name="filter[]"]');
@@ -14,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const toggleQuantity = document.getElementById("toggleQuantity");
     const toggleDonatur = document.getElementById("toggleDonatur");
     const toggleNominal = document.getElementById("toggleNominal");
+    const form = document.getElementById("campaignCreateForm");
 
     // Debug form
     console.log("Form element:", form);
@@ -46,6 +48,45 @@ document.addEventListener("DOMContentLoaded", function () {
         return "Rp" + Number(clean).toLocaleString("id-ID");
     }
 
+    // === SHOW VALIDATION ERRORS ===
+    function showValidationErrors(errors) {
+        // Hapus error container lama
+        const oldErrorContainer = document.getElementById("validationErrors");
+        if (oldErrorContainer) {
+            oldErrorContainer.remove();
+        }
+
+        // Buat container baru
+        const errorContainer = document.createElement("div");
+        errorContainer.id = "validationErrors";
+        errorContainer.className = "validation-error-container";
+        errorContainer.style.cssText = `
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+            animation: fadeIn 0.3s ease;
+        `;
+
+        errorContainer.innerHTML = `
+            <strong>⚠️ Mohon perbaiki kesalahan berikut:</strong>
+            <ul style="margin: 10px 0 0 20px; padding: 0;">
+                ${errors.map((err) => `<li>${err}</li>`).join("")}
+            </ul>
+        `;
+
+        // Insert di atas form
+        const formElement = document.getElementById("campaignCreateForm");
+        if (formElement) {
+            formElement.parentNode.insertBefore(errorContainer, formElement);
+        }
+
+        // Scroll ke error container
+        errorContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
     // === MONEY INPUT FORMATTING ===
     moneyInputs.forEach(function (input) {
         input.addEventListener("input", function () {
@@ -63,16 +104,20 @@ document.addEventListener("DOMContentLoaded", function () {
             const file = input.files[0];
             if (!file) return;
 
-            const preview = document.querySelector('[data-preview="' + input.id + '"]');
+            const preview = document.querySelector(
+                '[data-preview="' + input.id + '"]',
+            );
             if (!preview) return;
 
             preview.src = URL.createObjectURL(file);
             preview.hidden = false;
-            
+
             // Hide placeholder
-            const placeholder = preview.parentElement.querySelector('.campaign-upload-placeholder');
+            const placeholder = preview.parentElement.querySelector(
+                ".campaign-upload-placeholder",
+            );
             if (placeholder) {
-                placeholder.style.display = 'none';
+                placeholder.style.display = "none";
             }
         });
     });
@@ -80,7 +125,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // === FILTER VALIDATION ===
     filterInputs.forEach(function (input) {
         input.addEventListener("change", function () {
-            const checked = document.querySelectorAll('input[name="filter[]"]:checked');
+            const checked = document.querySelectorAll(
+                'input[name="filter[]"]:checked',
+            );
 
             if (checked.length > 4) {
                 input.checked = false;
@@ -138,16 +185,19 @@ document.addEventListener("DOMContentLoaded", function () {
             fileInput.addEventListener("change", function () {
                 const file = this.files[0];
                 if (!file) return;
-                
-                const label = this.closest('.package-image-upload');
-                const placeholder = label.querySelector('span');
-                const small = label.querySelector('small');
-                
+
+                const label = this.closest(".package-image-upload");
+                const placeholder = label.querySelector("span");
+                const small = label.querySelector("small");
+
                 if (placeholder) {
-                    placeholder.innerHTML = '<i class="bi bi-check-circle-fill" style="color: #28a745;"></i>';
+                    placeholder.innerHTML =
+                        '<i class="bi bi-check-circle-fill" style="color: #28a745;"></i>';
                 }
                 if (small) {
-                    small.textContent = file.name.substring(0, 20) + (file.name.length > 20 ? '...' : '');
+                    small.textContent =
+                        file.name.substring(0, 20) +
+                        (file.name.length > 20 ? "..." : "");
                 }
                 renderPreview();
             });
@@ -219,13 +269,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const donaturChecked = toggleDonatur?.checked || false;
         const nominalChecked = toggleNominal?.checked || false;
 
-        document.querySelectorAll(".package-extra-feature").forEach(function (feature) {
-            feature.innerHTML = "";
+        document
+            .querySelectorAll(".package-extra-feature")
+            .forEach(function (feature) {
+                feature.innerHTML = "";
 
-            if (donaturChecked) {
-                feature.insertAdjacentHTML(
-                    "beforeend",
-                    `
+                if (donaturChecked) {
+                    feature.insertAdjacentHTML(
+                        "beforeend",
+                        `
                     <div class="campaign-field compact">
                         <label>Nama Pekurban</label>
                         <div class="campaign-input-wrap">
@@ -233,14 +285,14 @@ document.addEventListener("DOMContentLoaded", function () {
                             <i class="bi bi-pencil-fill"></i>
                         </div>
                     </div>
-                `
-                );
-            }
+                `,
+                    );
+                }
 
-            let html = '<div class="package-price-row">';
-            
-            if (nominalChecked) {
-                html += `
+                let html = '<div class="package-price-row">';
+
+                if (nominalChecked) {
+                    html += `
                     <div class="campaign-field compact custom-nominal">
                         <label>Nominal Lainnya</label>
                         <div class="campaign-money-wrap">
@@ -249,10 +301,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
                 `;
-            }
+                }
 
-            if (quantityChecked) {
-                html += `
+                if (quantityChecked) {
+                    html += `
                     <div class="package-quantity">
                         <label>Jumlah</label>
                         <div class="feature-counter">
@@ -266,11 +318,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
                 `;
-            }
+                }
 
-            html += '</div>';
-            feature.insertAdjacentHTML("beforeend", html);
-        });
+                html += "</div>";
+                feature.insertAdjacentHTML("beforeend", html);
+            });
 
         // Re-bind money inputs
         document.querySelectorAll("[data-money]").forEach(function (input) {
@@ -281,9 +333,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // === FEATURE TOGGLES ===
-    if (toggleQuantity) toggleQuantity.addEventListener("change", renderPackageFeature);
-    if (toggleDonatur) toggleDonatur.addEventListener("change", renderPackageFeature);
-    if (toggleNominal) toggleNominal.addEventListener("change", renderPackageFeature);
+    if (toggleQuantity)
+        toggleQuantity.addEventListener("change", renderPackageFeature);
+    if (toggleDonatur)
+        toggleDonatur.addEventListener("change", renderPackageFeature);
+    if (toggleNominal)
+        toggleNominal.addEventListener("change", renderPackageFeature);
 
     // === ADD PACKAGE ===
     if (addPackageButton && packageList) {
@@ -312,15 +367,24 @@ document.addEventListener("DOMContentLoaded", function () {
         const packages = document.querySelectorAll("[data-package-item]");
 
         if (packages.length === 0) {
-            previewContainer.innerHTML = '<p class="text-muted">Belum ada package</p>';
+            previewContainer.innerHTML =
+                '<p class="text-muted">Belum ada package</p>';
             return;
         }
 
         packages.forEach((item) => {
-            const title = item.querySelector('input[name*="[title]"]')?.value?.trim() || "Package";
-            const description = item.querySelector('textarea[name*="[description]"]')?.value?.trim() || "";
-            const nominal = item.querySelector('input[name*="[nominal]"]')?.value || "0";
-            const imageInput = item.querySelector('input[type="file"][name*="[image]"]');
+            const title =
+                item.querySelector('input[name*="[title]"]')?.value?.trim() ||
+                "Package";
+            const description =
+                item
+                    .querySelector('textarea[name*="[description]"]')
+                    ?.value?.trim() || "";
+            const nominal =
+                item.querySelector('input[name*="[nominal]"]')?.value || "0";
+            const imageInput = item.querySelector(
+                'input[type="file"][name*="[image]"]',
+            );
 
             let imageHTML = `<div class="preview-package-placeholder"><i class="bi bi-image"></i></div>`;
             if (imageInput?.files?.length > 0) {
@@ -363,7 +427,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                     ${counterHTML}
                 </div>
-            `
+            `,
             );
         });
 
@@ -380,7 +444,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
                 </div>
-            `
+            `,
             );
         }
     }
@@ -413,37 +477,99 @@ document.addEventListener("DOMContentLoaded", function () {
         let isValid = true;
         let errorMessages = [];
 
+        console.log("🔍 Validating form...");
+
+        // Hapus semua error styling sebelumnya
+        document
+            .querySelectorAll(".is-invalid")
+            .forEach((el) => el.classList.remove("is-invalid"));
+
         // Cek semua field required
         const requiredFields = form.querySelectorAll("[required]");
+        console.log(`📋 Found ${requiredFields.length} required fields`);
+
         requiredFields.forEach((field) => {
             let value = field.value;
+            let fieldName = field.name || field.id || "unknown";
 
+            // Skip jika field hidden atau disabled
+            if (field.type === "hidden" || field.disabled) return;
+
+            console.log(`  Checking: ${fieldName} = "${value}"`);
+
+            // Special handling for file inputs
+            if (field.type === "file") {
+                if (field.files.length === 0) {
+                    // Cari label terdekat
+                    let label = field
+                        .closest(".campaign-field")
+                        ?.querySelector("label")
+                        ?.textContent?.trim();
+                    if (!label) {
+                        const parentLabel = field.closest("label");
+                        if (parentLabel) {
+                            label = parentLabel.textContent?.trim() || "File";
+                        }
+                    }
+                    if (!label) label = field.id || "File";
+
+                    errorMessages.push(`${label} wajib diupload`);
+                    field.classList.add("is-invalid");
+                    isValid = false;
+                    console.log(`    ❌ File required: ${fieldName}`);
+                }
+                return;
+            }
+
+            // Handle money input
             if (field.hasAttribute("data-money")) {
                 value = cleanMoney(value);
+                console.log(`    Cleaned money: "${value}"`);
             }
 
             if (!value || value === "0" || value.trim() === "") {
-                const label = field.closest(".campaign-field")?.querySelector("label")?.textContent || field.name || "Field";
+                let label = field
+                    .closest(".campaign-field")
+                    ?.querySelector("label")
+                    ?.textContent?.trim();
+                if (!label) {
+                    const parentLabel = field.closest("label");
+                    if (parentLabel) {
+                        label = parentLabel.textContent?.trim() || fieldName;
+                    }
+                }
+                if (!label) label = fieldName;
+
                 errorMessages.push(`${label} wajib diisi`);
-                field.style.borderColor = "#dc3545";
+                field.classList.add("is-invalid");
                 isValid = false;
+                console.log(`    ❌ Empty field: ${fieldName}`);
             } else {
-                field.style.borderColor = "";
+                field.classList.remove("is-invalid");
+                console.log(`    ✅ Valid: ${fieldName}`);
             }
         });
 
-        // Cek file thumbnail
+        // Cek thumbnail secara khusus
         const thumbnail = document.getElementById("thumbnail");
         if (thumbnail && thumbnail.files.length === 0) {
             errorMessages.push("Thumbnail wajib diupload");
+            thumbnail.classList.add("is-invalid");
             isValid = false;
+            console.log("❌ No thumbnail uploaded");
         }
 
         // Cek filter minimal 1
-        const checkedFilters = document.querySelectorAll('input[name="filter[]"]:checked');
+        const checkedFilters = document.querySelectorAll(
+            'input[name="filter[]"]:checked',
+        );
         if (checkedFilters.length === 0) {
             errorMessages.push("Minimal pilih 1 filter");
+            document
+                .querySelector(".campaign-filter-grid")
+                ?.classList.add("is-invalid");
             isValid = false;
+            console.log("❌ No filter selected");
         }
 
         // Cek packages
@@ -451,6 +577,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (packages.length === 0) {
             errorMessages.push("Minimal buat 1 package");
             isValid = false;
+            console.log("❌ No packages");
         }
 
         packages.forEach((pkg, index) => {
@@ -458,134 +585,133 @@ document.addEventListener("DOMContentLoaded", function () {
             if (nominal) {
                 const cleanVal = cleanMoney(nominal.value);
                 if (!cleanVal || cleanVal === "0") {
-                    errorMessages.push(`Package ${index + 1}: Nominal wajib diisi`);
-                    nominal.style.borderColor = "#dc3545";
+                    errorMessages.push(
+                        `Package ${index + 1}: Nominal wajib diisi`,
+                    );
+                    nominal.classList.add("is-invalid");
                     isValid = false;
+                    console.log(`❌ Package ${index + 1}: nominal invalid`);
                 }
             }
         });
 
         if (!isValid) {
-            alert("⚠️ Error Validasi:\n\n- " + errorMessages.join("\n- "));
+            console.log("❌ Validation failed:", errorMessages);
+            showValidationErrors(errorMessages);
+        } else {
+            console.log("✅ Validation passed!");
+            // Hapus error container jika ada
+            const errorContainer = document.getElementById("validationErrors");
+            if (errorContainer) errorContainer.remove();
         }
 
         return isValid;
     }
 
-    // === FORM SUBMIT HANDLER ===
-    if (publishBtn) {
-        publishBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            console.log("=== PUBLISH BUTTON CLICKED ===");
-
-            if (!validateForm()) {
-                console.log("Validasi gagal");
-                return;
-            }
-
-            // Siapkan FormData
-            const formData = new FormData(form);
-
-            // Bersihkan semua input money
-            document.querySelectorAll("[data-money]").forEach((input) => {
-                const clean = cleanMoney(input.value);
-                formData.set(input.name, clean);
-                input.value = clean;
-            });
-
-            // Log data
-            console.log("=== FORM DATA ===");
-            for (let pair of formData.entries()) {
-                if (pair[1] instanceof File) {
-                    console.log(pair[0] + ":", pair[1].name, `(${pair[1].size} bytes)`);
-                } else {
-                    console.log(pair[0] + ":", pair[1]);
-                }
-            }
-
-            // Disable button
-            publishBtn.disabled = true;
-            publishBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> <span>Menyimpan...</span>';
-            publishBtn.classList.add("btn-loading");
-
-            // Submit dengan fetch
-            fetch(form.action, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value,
-                    Accept: "application/json",
-                },
-            })
-            .then((response) => {
-                console.log("Response status:", response.status);
-
-                if (response.redirected) {
-                    console.log("Redirect to:", response.url);
-                    window.location.href = response.url;
-                    return;
-                }
-
-                return response.json().catch(() => {
-                    return response.text().then((text) => {
-                        try {
-                            return JSON.parse(text);
-                        } catch {
-                            return { html: text };
-                        }
-                    });
-                });
-            })
-            .then((data) => {
-                console.log("Response data:", data);
-
-                if (data && data.errors) {
-                    let errorMsg = "❌ Error Validasi:\n\n";
-                    Object.keys(data.errors).forEach((key) => {
-                        errorMsg += `- ${data.errors[key].join("\n  ")}\n`;
-                    });
-                    alert(errorMsg);
-                } else if (data && data.message) {
-                    alert("✅ " + data.message);
-                    if (data.redirect) {
-                        window.location.href = data.redirect;
-                    }
-                } else if (data && data.html) {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(data.html, "text/html");
-                    const errors = doc.querySelectorAll(".text-danger, .alert-danger");
-                    if (errors.length > 0) {
-                        let msg = "❌ Error:\n\n";
-                        errors.forEach((err) => {
-                            msg += `- ${err.textContent.trim()}\n`;
-                        });
-                        alert(msg);
-                    } else {
-                        alert("Terjadi kesalahan. Silakan coba lagi.");
-                    }
-                } else {
-                    alert("Campaign berhasil dibuat!");
-                    window.location.href = "/donasi";
-                }
-
-                // Reset button
-                publishBtn.disabled = false;
-                publishBtn.innerHTML = '<i class="bi bi-send-fill"></i> <span>Publikasikan Campaign</span>';
-                publishBtn.classList.remove("btn-loading");
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                alert("❌ Terjadi error: " + error.message);
-                publishBtn.disabled = false;
-                publishBtn.innerHTML = '<i class="bi bi-send-fill"></i> <span>Publikasikan Campaign</span>';
-                publishBtn.classList.remove("btn-loading");
-            });
-        });
-    }
-
     // === INITIAL RENDER ===
     renderPackageFeature();
     renderPreview();
+
+    // === FORM SUBMIT HANDLER - SINGLE HANDLER ===
+    if (form) {
+        console.log("🔗 Attaching submit handler to form");
+
+        form.addEventListener("submit", function (e) {
+            console.log("🚀 Form submit triggered!");
+
+            // Hapus error container sebelumnya
+            const oldErrors = document.getElementById("validationErrors");
+            if (oldErrors) oldErrors.remove();
+
+            // Validasi
+            if (!validateForm()) {
+                console.log("⛔ Validation failed, preventing submit");
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
+            console.log("✅ Validation passed, submitting...");
+
+            // Disable button untuk mencegah double submit
+            if (publishBtn) {
+                publishBtn.disabled = true;
+                publishBtn.classList.add("btn-loading");
+                publishBtn.innerHTML =
+                    '<i class="bi bi-hourglass-split"></i><span>Menyimpan...</span>';
+            }
+
+            // Form akan submit secara normal
+            return true;
+        });
+    } else {
+        console.error("❌ Form not found! Cannot attach submit handler.");
+    }
+
+    // === TAMBAHKAN CSS UNTUK VALIDASI ===
+    // Inject CSS untuk styling error
+    const style = document.createElement("style");
+    style.textContent = `
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25) !important;
+        }
+        
+        .is-invalid ~ .campaign-input-wrap i,
+        .is-invalid ~ .campaign-money-wrap i,
+        .is-invalid + .campaign-input-wrap i,
+        .is-invalid + .campaign-money-wrap i {
+            color: #dc3545 !important;
+        }
+        
+        .validation-error-container {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .campaign-field .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        
+        .campaign-filter-grid.is-invalid {
+            border: 2px solid #dc3545;
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(220, 53, 69, 0.05);
+        }
+        
+        .btn-loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .btn-loading i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // === TAMBAHKAN KEYBOARD SHORTCUT (Opsional) ===
+    document.addEventListener("keydown", function (e) {
+        // Ctrl+Enter untuk submit cepat
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            const activeElement = document.activeElement;
+            if (activeElement && form.contains(activeElement)) {
+                e.preventDefault();
+                form.dispatchEvent(new Event("submit"));
+            }
+        }
+    });
 
     console.log("=== CAMPAIGN CREATE PAGE INITIALIZED SUCCESSFULLY ===");
 });

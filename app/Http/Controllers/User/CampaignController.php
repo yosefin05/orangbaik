@@ -180,8 +180,6 @@ class CampaignController extends Controller
                 'enable_custom_nominal' => $request->boolean('enable_custom_nominal'),
             ]);
 
-            dd($campaign);
-
             /*
             |--------------------------------------------------------------------------
             | Simpan Filter

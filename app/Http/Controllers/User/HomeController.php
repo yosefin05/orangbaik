@@ -29,15 +29,24 @@ class HomeController extends Controller
             $campaigns->where('kategori_id', $request->kategori);
         }
 
-        $campaigns = $campaigns
+        $campaigns = Campaign::with(['penggalangDana', 'donasi'])
+            ->regular()
             ->latest()
-            ->take(8)
             ->get();
 
-        $campaignTerbaru = Campaign::with('penggalangDana')
-            ->where('is_active', true)
+        $campaignDarurat = Campaign::with(['penggalangDana', 'donasi'])
+            ->emergency()
             ->latest()
-            ->take(2)
+            ->get();
+
+        $campaignBerkelanjutan = Campaign::with(['penggalangDana', 'donasi'])
+            ->sustainable()
+            ->latest()
+            ->get();
+
+        $campaignTerbaru = Campaign::with(['penggalangDana'])
+            ->latest()
+            ->take(4)
             ->get();
 
         return view('pages.home', compact(
@@ -45,6 +54,8 @@ class HomeController extends Controller
             'kategori',
             'berita',
             'campaigns',
+            'campaignDarurat',
+            'campaignBerkelanjutan',
             'campaignTerbaru'
         ));
     }

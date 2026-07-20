@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('campaign_id')
                 ->constrained('campaign')
                 ->cascadeOnDelete();
-            $table->string('judul');
+            $table->string('judul')->nullable();
             $table->text('deskripsi')->nullable();
             $table->unsignedBigInteger('nominal');
             $table->string('gambar')->nullable();

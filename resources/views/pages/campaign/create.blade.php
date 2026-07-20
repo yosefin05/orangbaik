@@ -358,7 +358,7 @@
                                 <div id="previewPackageList"></div>
                             </div>
                         </section>
-                        <button type="button" class="campaign-submit-button" id="publishBtn">
+                        <button type="submit" class="campaign-submit-button" id="publishBtn">
                             <i class="bi bi-send-fill"></i>
                             <span>Publikasikan Campaign</span>
                         </button>

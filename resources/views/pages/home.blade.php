@@ -103,7 +103,7 @@
                 </h2>
 
                 <div class="campaign-grid">
-                    @forelse ($campaigns as $campaign)
+                    @forelse ($campaignDarurat as $campaign)
                         @php
                             $terkumpul = $campaign->donasi->sum('nominal');
                             $persen = $campaign->target_donasi
@@ -171,7 +171,7 @@
                 <h2 class="section-title">Pemberdayaan Berkelanjutan</h2>
 
                 <div class="campaign-grid">
-                    @foreach ($campaigns as $campaign)
+                    @foreach ($campaignBerkelanjutan as $campaign)
                         <article class="campaign-card">
                             <a href="{{ url('donasi') }}">
                                 <img class="campaign-image" src="{{ asset($campaign['image']) }}"
