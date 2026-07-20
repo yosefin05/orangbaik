@@ -27,6 +27,7 @@
                         <th>Penggalang Dana</th>
                         <th>Target</th>
                         <th>Status</th>
+                        <th>Tipe Campaign</th>
                         <th>Galeri</th>
                         <th>Update</th>
                         <th class="text-center">Aksi</th>
@@ -85,6 +86,33 @@
                                         Berakhir
                                     </span>
                                 @endif
+                            </td>
+
+                            <td>
+                                @php
+                                    $badgeClass = match ($item->campaign_type) {
+                                        'emergency' => 'badge-red',
+                                        'sustainable' => 'badge-green',
+                                        default => 'badge-blue',
+                                    };
+
+                                    $icon = match ($item->campaign_type) {
+                                        'emergency' => 'bi-exclamation-triangle-fill',
+                                        'sustainable' => 'bi-recycle',
+                                        default => 'bi-file-text',
+                                    };
+
+                                    $label = match ($item->campaign_type) {
+                                        'emergency' => 'Darurat',
+                                        'sustainable' => 'Berkelanjutan',
+                                        default => 'Regular',
+                                    };
+                                @endphp
+
+                                <span class="badge {{ $badgeClass }}">
+                                    <i class="bi {{ $icon }}"></i>
+                                    {{ $label }}
+                                </span>
                             </td>
 
                             <td>

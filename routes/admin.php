@@ -20,7 +20,7 @@ Route::middleware(['auth', 'admin'])
             '/dashboard',
             [DashboardController::class, 'index']
         )->name('dashboard');
-        
+
         Route::resource('filter', FilterController::class)
             ->except(['show']);
 
@@ -61,22 +61,20 @@ Route::middleware(['auth', 'admin'])
         Route::patch('/penggalang_dana/{penggalangDana}/unverify', [PenggalangDanaController::class, 'unverify'])
             ->name('penggalang_dana.unverify');
 
-        // ==================== CAMPAIGN ROUTES ====================
-        // Index & Show
-        Route::get('/campaign', [CampaignController::class, 'index'])->name('campaign.index');
-        Route::get('/campaign/{campaign}', [CampaignController::class, 'show'])->name('campaign.show');
-        
-        // Approval Actions (Approve & Reject)
-        Route::patch('/campaign/{campaign}/approve', [CampaignController::class, 'approve'])->name('campaign.approve');
-        Route::patch('/campaign/{campaign}/reject', [CampaignController::class, 'reject'])->name('campaign.reject');
-        
-        // Unapprove (optional - untuk membatalkan approval)
-        Route::patch('/campaign/{campaign}/unapprove', [CampaignController::class, 'unapprove'])->name('campaign.unapprove');
-        
-        // Halaman khusus untuk melihat campaign yang perlu approval
-        Route::get('/campaign/emergency-approvals', [CampaignController::class, 'emergencyApprovals'])
-            ->name('campaign.emergency.approvals');
-        // ========================================================
+        // ==================== CAMPAIGN ROUTES ===================
+        Route::prefix('campaign')->name('campaign.')->group(function () {
+
+            // List & Detail
+            Route::get('/', [CampaignController::class, 'index'])->name('index');
+            Route::get('/{campaign}', [CampaignController::class, 'show'])->name('show');
+
+            // ============================================
+            // APPROVAL ROUTES - TAMBAHKAN INI!
+            // ============================================
+            Route::post('/{campaign}/approve', [CampaignController::class, 'approve'])->name('approve');
+            Route::post('/{campaign}/reject', [CampaignController::class, 'reject'])->name('reject');
+            Route::post('/{campaign}/unapprove', [CampaignController::class, 'unapprove'])->name('unapprove');
+        });
 
         Route::resource('testimoni', TestimoniController::class);
     });

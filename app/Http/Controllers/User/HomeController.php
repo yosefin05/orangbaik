@@ -23,16 +23,13 @@ class HomeController extends Controller
             'penggalangDana',
             'donasi'
         ])
-            ->where('is_active', true);
+            ->where('is_active', true)
+            ->latest()
+            ->get();
 
         if ($request->filled('kategori')) {
             $campaigns->where('kategori_id', $request->kategori);
-        }
-
-        $campaigns = Campaign::with(['penggalangDana', 'donasi'])
-            ->regular()
-            ->latest()
-            ->get();
+        }            
 
         $campaignDarurat = Campaign::with(['penggalangDana', 'donasi'])
             ->emergency()
@@ -46,7 +43,7 @@ class HomeController extends Controller
 
         $campaignTerbaru = Campaign::with(['penggalangDana'])
             ->latest()
-            ->take(4)
+            ->take(2)
             ->get();
 
         return view('pages.home', compact(

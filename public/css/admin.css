@@ -927,18 +927,307 @@ button {
    EMERGENCY APPROVAL SPECIFIC
    ============================ */
 
-/* Emergency Section Border */
-.emergency-section {
+/* ============================
+   EMERGENCY APPROVAL SPECIFIC - DETAIL PAGE
+   ============================ */
+
+/* Action Buttons Container */
+.approval-actions {
+    margin-top: var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.approval-actions .btn {
+    min-height: 48px;
+    padding: 12px 28px;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    border-radius: var(--radius-md);
+    transition: all 0.25s ease;
+}
+
+.approval-actions .btn i {
+    font-size: 18px;
+}
+
+/* Approve Button */
+.btn-approve {
+    background: linear-gradient(135deg, var(--success), #16a34a);
+    color: var(--bg);
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+}
+
+.btn-approve:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.45);
+}
+
+.btn-approve:active {
+    transform: translateY(0);
+}
+
+/* Reject Button */
+.btn-reject {
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+    color: var(--bg);
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+}
+
+.btn-reject:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.45);
+}
+
+.btn-reject:active {
+    transform: translateY(0);
+}
+
+/* Unapprove Button */
+.btn-unapprove {
+    background: linear-gradient(135deg, var(--warning), #d97706);
+    color: var(--bg);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.btn-unapprove:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.45);
+}
+
+.btn-unapprove:active {
+    transform: translateY(0);
+}
+
+/* Small helper text */
+.btn-helper {
+    display: block;
+    margin-top: var(--space-2);
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
+    line-height: 1.5;
+}
+
+/* Approval Status Badge dengan Icon */
+.badge-approval {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 6px 16px;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    border-radius: var(--radius-full);
+}
+
+.badge-approval i {
+    font-size: 16px;
+}
+
+.badge-approval.pending {
+    background: var(--secondary-light);
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.badge-approval.approved {
+    background: var(--success-light);
+    color: #166534;
+    border: 1px solid #86efac;
+}
+
+.badge-approval.rejected {
+    background: var(--danger-light);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.badge-approval.no-approval {
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid #93c5fd;
+}
+
+/* Alert Cards untuk Approval Status */
+.alert-approval {
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.alert-approval i {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.alert-approval .alert-content {
+    flex: 1;
+}
+
+.alert-approval .alert-title {
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+    margin-bottom: var(--space-1);
+}
+
+.alert-approval .alert-text {
+    font-size: var(--fs-xs);
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+.alert-approval.success {
+    background: var(--success-light);
+    border-left: 4px solid var(--success);
+    color: #166534;
+}
+
+.alert-approval.success i {
+    color: var(--success);
+}
+
+.alert-approval.danger {
+    background: var(--danger-light);
+    border-left: 4px solid var(--danger);
+    color: #991b1b;
+}
+
+.alert-approval.danger i {
+    color: var(--danger);
+}
+
+.alert-approval.info {
+    background: var(--primary-light);
     border-left: 4px solid var(--primary);
-    transition: all 0.3s ease;
+    color: #1e40af;
 }
 
-.emergency-section.emergency {
-    border-left-color: var(--danger);
+.alert-approval.info i {
+    color: var(--primary);
 }
 
-.emergency-section.sustainable {
-    border-left-color: var(--success);
+.alert-approval.warning {
+    background: var(--secondary-light);
+    border-left: 4px solid var(--warning);
+    color: #92400e;
+}
+
+.alert-approval.warning i {
+    color: var(--warning);
+}
+
+.alert-approval .text-warning {
+    color: #d97706;
+    font-weight: var(--fw-semibold);
+}
+
+/* Modal Rejection */
+.modal-reject .modal-header {
+    background: var(--danger-light);
+    border-bottom: 2px solid var(--danger);
+}
+
+.modal-reject .modal-title {
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.modal-reject .modal-title i {
+    font-size: 24px;
+}
+
+.modal-reject .form-label .text-danger {
+    color: var(--danger);
+}
+
+.modal-reject textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-size: var(--fs-xs);
+    line-height: 1.6;
+}
+
+.modal-reject textarea:focus {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.modal-reject .btn-danger {
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+    color: var(--bg);
+    min-height: 42px;
+    padding: 10px 24px;
+}
+
+.modal-reject .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+}
+
+/* Rejection Reason Display */
+.rejection-reason-box {
+    background: var(--danger-light);
+    border: 1px solid #fca5a5;
+    border-radius: var(--radius-sm);
+    padding: var(--space-4);
+    margin-top: var(--space-2);
+    color: #991b1b;
+    font-size: var(--fs-xs);
+    line-height: 1.7;
+}
+
+.rejection-reason-box i {
+    color: var(--danger);
+    margin-right: var(--space-2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .approval-actions {
+        flex-direction: column;
+    }
+    
+    .approval-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .alert-approval {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .modal-reject .modal-dialog {
+        margin: var(--space-3);
+    }
+}
+
+@media (max-width: 576px) {
+    .badge-approval {
+        font-size: var(--fs-xxs);
+        padding: 4px 12px;
+    }
+    
+    .badge-approval i {
+        font-size: 14px;
+    }
+    
+    .approval-actions .btn {
+        min-height: 44px;
+        padding: 10px 20px;
+        font-size: var(--fs-xs);
+    }
+    
+    .approval-actions .btn i {
+        font-size: 16px;
+    }
 }
 
 /* Alert untuk alasan penolakan */

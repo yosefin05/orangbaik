@@ -34,17 +34,12 @@
                 <span class="badge badge-red">
                     Tidak Aktif
                 </span>
-            @elseif($campaign->approval_status == 'pending')
-                <span class="badge badge-yellow">
-                    Menunggu Approval
-                </span>
             @else
                 <span class="badge badge-red">
                     Berakhir
                 </span>
             @endif
         </div>
-
     </section>
 
     {{-- Approval Section --}}
@@ -63,7 +58,8 @@
                     Status Approval
                 </h2>
                 <p class="card-subtitle">
-                    Status persetujuan campaign. Campaign emergency & sustainable perlu approval sebelum tampil di landing page.
+                    Status persetujuan campaign. Campaign emergency & sustainable perlu approval sebelum tampil di landing
+                    page.
                 </p>
             </div>
         </div>
@@ -138,114 +134,89 @@
 
         {{-- ACTION BUTTONS UNTUK EMERGENCY & SUSTAINABLE --}}
         @if(in_array($campaign->campaign_type, ['emergency', 'sustainable']))
-            
+
             {{-- Tombol untuk status PENDING --}}
             @if($campaign->approval_status == 'pending')
-                <div class="mt-4 d-flex gap-3 flex-wrap">
-                    <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST" class="d-inline">
+                <div class="approval-actions">
+                    <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-success btn-lg">
+                        <button type="submit" class="btn btn-approve">
                             <i class="bi bi-check-circle-fill"></i>
-                            ✅ Setujui & Tampilkan di Landing Page
+                            Setujui & Tampilkan di Landing Page
                         </button>
-                        <small class="d-block text-muted mt-1">
+                        <small class="btn-helper">
                             Campaign akan langsung tampil di landing page setelah disetujui.
                         </small>
                     </form>
 
-                    <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                    <button type="button" class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#rejectModal">
                         <i class="bi bi-x-circle-fill"></i>
-                        ❌ Tolak Campaign
+                        Tolak Campaign
                     </button>
                 </div>
 
-                <!-- Modal Reject -->
-                <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <form action="{{ route('admin.campaign.reject', $campaign->id) }}" method="POST">
-                                @csrf
-                                <div class="modal-header">
-                                    <h5 class="modal-title">
-                                        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
-                                        Tolak Campaign
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">
-                                            Alasan Penolakan <span class="text-danger">*</span>
-                                        </label>
-                                        <textarea name="rejection_reason" class="form-control" rows="5"
-                                            placeholder="Masukkan alasan penolakan campaign ini dengan jelas..." required></textarea>
-                                        <small class="text-muted">
-                                            <i class="bi bi-info-circle"></i>
-                                            Alasan ini akan ditampilkan kepada penggalang dana.
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="bi bi-x-circle"></i> Ya, Tolak Campaign
-                                    </button>
-                                </div>
-                            </form>
+                {{-- Tombol untuk status APPROVED --}}
+            @elseif($campaign->approval_status == 'approved')
+                <div class="alert-approval success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">✅ Campaign sudah disetujui</div>
+                        <div class="alert-text">
+                            Campaign akan tampil di landing page.
+                            @if(!$campaign->is_active)
+                                <br>
+                                <span class="text-warning">
+                                    ⚠️ Namun campaign sedang tidak aktif. Aktifkan campaign untuk menampilkannya.
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
 
-            {{-- Tombol untuk status APPROVED --}}
-            @elseif($campaign->approval_status == 'approved')
-                <div class="mt-4">
-                    <div class="alert alert-success">
-                        <i class="bi bi-check-circle-fill"></i>
-                        <strong>✅ Campaign sudah disetujui</strong> dan akan tampil di landing page.
-                        @if(!$campaign->is_active)
-                            <br>
-                            <span class="text-warning">
-                                <i class="bi bi-exclamation-triangle"></i>
-                                ⚠️ Namun campaign sedang tidak aktif. Aktifkan campaign untuk menampilkannya.
-                            </span>
-                        @endif
+                <form action="{{ route('admin.campaign.unapprove', $campaign->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-unapprove" onclick="return confirm('Yakin ingin membatalkan approval?')">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Batalkan Approval
+                    </button>
+                </form>
+
+                {{-- Tombol untuk status REJECTED --}}
+            @elseif($campaign->approval_status == 'rejected')
+                <div class="alert-approval danger">
+                    <i class="bi bi-x-circle-fill"></i>
+                    <div class="alert-content">
+                        <div class="alert-title">❌ Campaign ditolak</div>
+                        <div class="alert-text">
+                            Campaign ini telah ditolak.
+                            @if($campaign->rejection_reason)
+                                <div class="rejection-reason-box">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <strong>Alasan:</strong> {{ $campaign->rejection_reason }}
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                    
-                    {{-- Tombol untuk membatalkan approval (opsional) --}}
-                    <form action="{{ route('admin.campaign.unapprove', $campaign->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-warning" onclick="return confirm('Yakin ingin membatalkan approval?')">
-                            <i class="bi bi-arrow-counterclockwise"></i>
-                            Batalkan Approval
-                        </button>
-                    </form>
                 </div>
 
-            {{-- Tombol untuk status REJECTED --}}
-            @elseif($campaign->approval_status == 'rejected')
-                <div class="mt-4">
-                    <div class="alert alert-danger">
-                        <i class="bi bi-x-circle-fill"></i>
-                        <strong>❌ Campaign ditolak</strong> dengan alasan di atas.
-                    </div>
-                    
-                    {{-- Tombol untuk approve ulang jika sudah diperbaiki --}}
-                    <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle-fill"></i>
-                            Setujui Ulang Campaign
-                        </button>
-                    </form>
-                </div>
+                <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-approve">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Setujui Ulang Campaign
+                    </button>
+                </form>
             @endif
 
         @else
             {{-- Untuk Regular Campaign --}}
-            <div class="mt-4">
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle-fill"></i>
-                    ℹ️ Campaign regular tidak memerlukan approval dan langsung dapat tampil di landing page.
+            <div class="alert-approval info">
+                <i class="bi bi-info-circle-fill"></i>
+                <div class="alert-content">
+                    <div class="alert-title">ℹ️ Campaign Regular</div>
+                    <div class="alert-text">
+                        Campaign regular tidak memerlukan approval dan langsung dapat tampil di landing page.
+                    </div>
                 </div>
             </div>
         @endif
@@ -334,7 +305,8 @@
                     </tr>
                     <tr>
                         <th>Tanggal Verifikasi</th>
-                        <td>{{ $campaign->verified_at ? \Carbon\Carbon::parse($campaign->verified_at)->format('d M Y H:i') : '-' }}</td>
+                        <td>{{ $campaign->verified_at ? \Carbon\Carbon::parse($campaign->verified_at)->format('d M Y H:i') : '-' }}
+                        </td>
                     </tr>
                 @endif
             </tbody>

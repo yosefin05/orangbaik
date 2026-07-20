@@ -131,7 +131,7 @@
     display: none;
 }
 
-/* Desktop: 4 card terlihat */
+/* Desktop: 4 card t erlihat */
 .donasi-card {
     flex: 0 0 calc((100% - 72px) / 4);
     scroll-snap-align: start;

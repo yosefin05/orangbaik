@@ -1,9 +1,14 @@
-/* ============================
+/* ============================================================
    GLOBAL CSS - ORANGBAIK.ID
    Pondasi utama: warna, font, spacing, container, card, button
-   ============================ */
+   ============================================================ */
+
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* ============================================================
+   ROOT VARIABLES
+   ============================================================ */
 
 :root {
     /* ============================
@@ -122,9 +127,9 @@
     --card-padding-lg: 32px;
 }
 
-/* ============================
+/* ============================================================
    RESET
-   ============================ */
+   ============================================================ */
 
 *,
 *::before,
@@ -177,9 +182,9 @@ ol {
     list-style-position: inside;
 }
 
-/* ============================
+/* ============================================================
    TYPOGRAPHY
-   ============================ */
+   ============================================================ */
 
 h1,
 h2,
@@ -221,9 +226,9 @@ p {
     color: var(--danger);
 }
 
-/* ============================
+/* ============================================================
    CONTAINER
-   ============================ */
+   ============================================================ */
 
 .container {
     width: min(100% - 40px, var(--container));
@@ -245,9 +250,9 @@ p {
     margin-inline: auto;
 }
 
-/* ============================
+/* ============================================================
    SECTION / PAGE LAYOUT
-   ============================ */
+   ============================================================ */
 
 .section {
     padding-block: var(--section-space);
@@ -308,9 +313,9 @@ p {
     line-height: 1.7;
 }
 
-/* ============================
+/* ============================================================
    CARD GLOBAL
-   ============================ */
+   ============================================================ */
 
 .ob-card {
     background: var(--bg);
@@ -348,9 +353,9 @@ p {
     line-height: 1.6;
 }
 
-/* ============================
+/* ============================================================
    GRID HELPERS
-   ============================ */
+   ============================================================ */
 
 .grid {
     display: grid;
@@ -375,9 +380,9 @@ p {
     gap: var(--space-6);
 }
 
-/* ============================
+/* ============================================================
    BUTTONS GLOBAL
-   ============================ */
+   ============================================================ */
 
 .btn,
 .btn-primary,
@@ -463,9 +468,9 @@ p {
     font-size: var(--fs-sm);
 }
 
-/* ============================
+/* ============================================================
    FORM GLOBAL
-   ============================ */
+   ============================================================ */
 
 .form-group {
     display: flex;
@@ -528,9 +533,9 @@ textarea.form-control,
     margin-top: var(--space-6);
 }
 
-/* ============================
+/* ============================================================
    TABLE GLOBAL
-   ============================ */
+   ============================================================ */
 
 .table-wrapper {
     width: 100%;
@@ -575,9 +580,9 @@ textarea.form-control,
     background: var(--primary-light);
 }
 
-/* ============================
+/* ============================================================
    BADGE GLOBAL
-   ============================ */
+   ============================================================ */
 
 .badge {
     display: inline-flex;
@@ -593,6 +598,11 @@ textarea.form-control,
     font-weight: var(--fw-bold);
     line-height: 1;
     text-transform: capitalize;
+}
+
+.badge i {
+    font-size: 13px;
+    margin-right: 4px;
 }
 
 .badge-blue {
@@ -615,9 +625,22 @@ textarea.form-control,
     color: var(--secondary);
 }
 
-/* ============================
+.badge-info {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
+}
+
+.badge-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+/* ============================================================
    ALERT GLOBAL
-   ============================ */
+   ============================================================ */
 
 .alert {
     padding: 14px 18px;
@@ -646,9 +669,15 @@ textarea.form-control,
     border: 1px solid rgba(245, 158, 11, .22);
 }
 
-/* ============================
+.alert-info {
+    background: var(--info-light);
+    color: #0369a1;
+    border: 1px solid rgba(14, 165, 233, .18);
+}
+
+/* ============================================================
    UTILITY SPACING
-   ============================ */
+   ============================================================ */
 
 .mt-1 { margin-top: var(--space-1); }
 .mt-2 { margin-top: var(--space-2); }
@@ -673,9 +702,9 @@ textarea.form-control,
 .gap-6 { gap: var(--space-6); }
 .gap-8 { gap: var(--space-8); }
 
-/* ============================
+/* ============================================================
    ACCESSIBILITY
-   ============================ */
+   ============================================================ */
 
 a:focus-visible,
 button:focus-visible,
@@ -686,9 +715,9 @@ select:focus-visible {
     outline-offset: 3px;
 }
 
-/* ============================
-   RESPONSIVE
-   ============================ */
+/* ============================================================
+   RESPONSIVE GLOBAL
+   ============================================================ */
 
 @media (max-width: 992px) {
     .grid-3,
@@ -768,10 +797,61 @@ select:focus-visible {
     .btn-danger,
     .btn-outline {
         width: 100%;
+        justify-content: center;
     }
 
     .form-actions {
         flex-direction: column;
         align-items: stretch;
+    }
+}
+
+/* ============================================================
+   ADMIN LAYOUT - Hanya untuk halaman admin
+   ============================================================ */
+
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-wrapper .main-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-wrapper .content-area {
+    padding: var(--space-8);
+}
+
+.admin-wrapper .content-area > .ob-card,
+.admin-wrapper .content-area > .card,
+.admin-wrapper .content-area > .info-grid {
+    margin-bottom: var(--space-6);
+}
+
+.admin-wrapper .content-area > :last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================================
+   ADMIN RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 860px) {
+    .admin-wrapper {
+        flex-direction: column;
+    }
+
+    .admin-wrapper .content-area {
+        padding: var(--space-6);
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-wrapper .content-area {
+        padding: var(--space-4);
     }
 }

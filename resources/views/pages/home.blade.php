@@ -173,31 +173,28 @@
                 <div class="campaign-grid">
                     @foreach ($campaignBerkelanjutan as $campaign)
                         <article class="campaign-card">
-                            <a href="{{ url('donasi') }}">
-                                <img class="campaign-image" src="{{ asset($campaign['image']) }}"
-                                    alt="{{ $campaign['title'] }}" loading="lazy">
+                            <a href="{{ route('campaign.show', $campaign->slug) }}">
+                                <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                    alt="{{ $campaign->judul }}" loading="lazy">
                             </a>
-
                             <div class="campaign-body">
-                                <h3>{{ $campaign['title'] }}</h3>
-
+                                <h3>{{ $campaign->judul }}</h3>
                                 <p>
-                                    {{ $campaign['organizer'] }}
+                                    {{ $campaign->penggalangDana->nama_penggalang }}
                                     <span>●</span>
                                 </p>
-
                                 <div class="campaign-price">
-                                    <strong>{{ $campaign['amount'] }}</strong>
+                                    <strong>
+                                        Rp {{ number_format($terkumpul, 0, ',', '.') }}
+                                    </strong>
                                     <span>Terkumpul</span>
                                 </div>
-
                                 <div class="progress">
-                                    <div class="progress-fill" style="width: {{ $campaign['progress'] }}"></div>
+                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
                                 </div>
-
                                 <div class="campaign-meta">
-                                    <span>100rb+ donatur</span>
-                                    <span>∞</span>
+                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ $hari }} Hari</span>
                                 </div>
                             </div>
                         </article>
