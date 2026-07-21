@@ -57,6 +57,11 @@
     font-weight: var(--fw-bold);
 }
 
+.form-group label .text-danger {
+    color: var(--danger);
+    font-weight: var(--fw-bold);
+}
+
 .form-control {
     width: 100%;
     padding: 12px 14px;
@@ -81,6 +86,12 @@ textarea.form-control {
     min-height: 200px;
 }
 
+.form-group .text-danger {
+    color: var(--danger);
+    font-size: var(--fs-xxs);
+    margin-top: var(--space-1);
+}
+
 .form-group .text-muted {
     color: var(--muted);
     font-size: var(--fs-xxs);
@@ -100,8 +111,17 @@ textarea.form-control {
     box-shadow: var(--shadow-soft);
 }
 
+.current-thumbnail.table-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-soft);
+    color: var(--muted);
+    font-size: var(--fs-xl);
+}
+
 /* ============================================================
-   GALLERY GRID
+   GALLERY GRID (Existing Gallery)
    ============================================================ */
 
 .gallery-grid {
@@ -127,8 +147,21 @@ textarea.form-control {
     display: block;
 }
 
+.gallery-item .gallery-index {
+    position: absolute;
+    bottom: var(--space-2);
+    left: var(--space-2);
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    z-index: 2;
+}
+
 /* ============================================================
-   DELETE IMAGE BUTTON
+   DELETE IMAGE BUTTON (Existing Gallery)
    ============================================================ */
 
 .delete-image-btn {
@@ -159,6 +192,293 @@ textarea.form-control {
 .delete-image-btn i {
     font-size: 16px;
     line-height: 1;
+}
+
+/* ============================================================
+   UPLOAD DROPZONE
+   ============================================================ */
+
+.upload-dropzone {
+    position: relative;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-6);
+    background: var(--bg-soft);
+    transition: all 0.3s ease;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.upload-dropzone:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.upload-dropzone.dragover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: scale(1.01);
+}
+
+.upload-dropzone.has-preview {
+    padding: var(--space-4);
+    min-height: auto;
+    border-color: var(--success);
+    background: var(--bg);
+    cursor: default;
+}
+
+/* ============================================================
+   UPLOAD PLACEHOLDER
+   ============================================================ */
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    text-align: center;
+    color: var(--muted);
+    z-index: 1;
+    pointer-events: none;
+    padding: var(--space-4);
+}
+
+.upload-placeholder i {
+    font-size: 56px;
+    color: var(--muted-light);
+    transition: all 0.3s ease;
+}
+
+.upload-dropzone:hover .upload-placeholder i {
+    color: var(--primary);
+    transform: translateY(-4px);
+}
+
+.upload-placeholder p {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--text-dark);
+}
+
+.upload-placeholder .text-muted {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+}
+
+/* ============================================================
+   INPUT FILE - TERSEMBUNYI
+   ============================================================ */
+
+.upload-input-hidden {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+/* ============================================================
+   UPLOAD BUTTON WRAPPER
+   ============================================================ */
+
+.upload-btn-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    margin-top: var(--space-3);
+    border-top: 1px dashed var(--border-soft);
+    width: 100%;
+    z-index: 5;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.upload-dropzone.has-preview .upload-btn-wrapper {
+    display: none !important;
+}
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 10px 24px;
+    background: var(--primary);
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.upload-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.upload-btn i {
+    font-size: 18px;
+}
+
+.upload-hint {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+}
+
+/* ============================================================
+   THUMBNAIL PREVIEW - 16:9
+   ============================================================ */
+
+.upload-preview.thumbnail-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-2);
+    width: 100%;
+    z-index: 10;
+    position: relative;
+}
+
+.thumbnail-wrapper {
+    width: 100%;
+    max-width: 400px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+}
+
+.thumbnail-wrapper img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+}
+
+.btn-remove-thumbnail {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    z-index: 9999 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+}
+
+.btn-remove-thumbnail:hover {
+    background: var(--danger);
+    transform: scale(1.1);
+}
+
+.btn-remove-thumbnail i {
+    font-size: 18px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* ============================================================
+   GALLERY PREVIEW GRID (Preview Tambahan)
+   ============================================================ */
+
+.gallery-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-3);
+    width: 100%;
+    z-index: 1;
+    position: relative;
+    padding: var(--space-2);
+}
+
+.gallery-preview-item {
+    position: relative;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    aspect-ratio: 1 / 1;
+    background: var(--bg);
+    border: 2px solid var(--border-soft);
+    transition: all 0.2s ease;
+}
+
+.gallery-preview-item:hover {
+    border-color: var(--primary);
+    transform: scale(1.02);
+}
+
+.gallery-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.gallery-preview-item .btn-remove-image {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-preview-item .btn-remove-image:hover {
+    background: var(--danger);
+    transform: scale(1.1);
+}
+
+.gallery-preview-item .btn-remove-image i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.gallery-preview-item .gallery-index {
+    position: absolute;
+    bottom: var(--space-2);
+    left: var(--space-2);
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    z-index: 3;
 }
 
 /* ============================================================
@@ -229,13 +549,45 @@ textarea.form-control {
    ============================================================ */
 
 @media (max-width: 768px) {
+    .upload-dropzone {
+        min-height: 160px;
+        padding: var(--space-4);
+    }
+
+    .upload-placeholder i {
+        font-size: 40px;
+    }
+
+    .upload-placeholder p {
+        font-size: var(--fs-xs);
+    }
+
     .current-thumbnail {
         width: 150px;
+    }
+
+    .thumbnail-wrapper {
+        max-width: 100%;
     }
 
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: var(--space-2);
+    }
+
+    .gallery-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: var(--space-2);
+    }
+
+    .btn-remove-thumbnail {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+    }
+
+    .btn-remove-thumbnail i {
+        font-size: 16px;
     }
 
     .delete-image-btn {
@@ -248,6 +600,12 @@ textarea.form-control {
 
     .delete-image-btn i {
         font-size: 14px;
+    }
+
+    .gallery-preview-item .btn-remove-image {
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
     }
 
     .form-actions {
@@ -263,8 +621,31 @@ textarea.form-control {
 }
 
 @media (max-width: 576px) {
+    .upload-dropzone {
+        min-height: 130px;
+        padding: var(--space-3);
+    }
+
+    .upload-placeholder i {
+        font-size: 32px;
+    }
+
+    .upload-placeholder p {
+        font-size: var(--fs-xxs);
+    }
+
+    .upload-placeholder .text-muted {
+        font-size: 10px;
+    }
+
     .current-thumbnail {
         width: 120px;
+    }
+
+    .upload-preview.thumbnail-preview {
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        padding: var(--space-1);
     }
 
     .gallery-grid {
@@ -276,6 +657,40 @@ textarea.form-control {
         border-radius: var(--radius-sm);
     }
 
+    .gallery-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: var(--space-2);
+    }
+
+    .gallery-preview-item .btn-remove-image {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+        top: var(--space-1);
+        right: var(--space-1);
+    }
+
+    .gallery-preview-item .btn-remove-image i {
+        font-size: 11px;
+    }
+
+    .gallery-preview-item .gallery-index {
+        font-size: 9px;
+        padding: 1px 8px;
+        bottom: var(--space-1);
+        left: var(--space-1);
+    }
+
+    .btn-remove-thumbnail {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .btn-remove-thumbnail i {
+        font-size: 14px;
+    }
+
     .delete-image-btn {
         width: 22px;
         height: 22px;
@@ -284,6 +699,15 @@ textarea.form-control {
 
     .delete-image-btn i {
         font-size: 12px;
+    }
+
+    .upload-btn {
+        padding: 8px 18px;
+        font-size: var(--fs-xxs);
+    }
+
+    .upload-btn i {
+        font-size: 14px;
     }
 
     .form-control {

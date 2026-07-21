@@ -1,5 +1,5 @@
 /* ============================================================
-   TESTIMONI CREATE - ORANGBAIK.ID
+   TESTIMONI EDIT - ORANGBAIK.ID
    ============================================================ */
 
 /* ============================================================
@@ -57,6 +57,40 @@ textarea.form-control {
     color: var(--danger);
     font-size: var(--fs-xxs);
     margin-top: var(--space-1);
+}
+
+.form-group .text-muted {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+}
+
+/* ============================================================
+   CURRENT PHOTO (Foto Lama)
+   ============================================================ */
+
+.current-photo-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.current-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border);
+    box-shadow: var(--shadow-soft);
+}
+
+.current-photo.table-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-extrabold);
+    border: 3px solid var(--border);
 }
 
 /* ============================================================
@@ -362,6 +396,11 @@ textarea.form-control {
         gap: var(--space-3);
     }
 
+    .current-photo {
+        width: 80px;
+        height: 80px;
+    }
+
     .form-actions {
         flex-direction: column;
         align-items: stretch;
@@ -416,6 +455,12 @@ textarea.form-control {
     .upload-btn {
         padding: 8px 18px;
         font-size: var(--fs-xxs);
+    }
+
+    .current-photo {
+        width: 70px;
+        height: 70px;
+        font-size: var(--fs-md);
     }
 
     .form-control {

@@ -84,9 +84,7 @@
    BADGE
    ============================================================ */
 
-.badge-blue {
-    background: var(--primary-light);
-    color: var(--primary);
+.badge {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
@@ -94,6 +92,12 @@
     border-radius: var(--radius-full);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
+    line-height: 1.5;
+}
+
+.badge-blue {
+    background: var(--primary-light);
+    color: var(--primary);
 }
 
 /* ============================================================
@@ -159,6 +163,23 @@
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     font-style: italic;
     color: var(--muted);
+}
+
+.detail-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-4) 0;
+}
+
+.detail-content table th,
+.detail-content table td {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border);
+}
+
+.detail-content table th {
+    background: var(--bg-soft);
+    font-weight: var(--fw-bold);
 }
 
 /* ============================================================

@@ -76,18 +76,15 @@
                                 {{--
                                 PHP
                                 --}}
-                                @php
-                                    $hariIni = now();
-                                    $tanggalBerakhir = \Carbon\Carbon::parse($item->tanggal_berakhir);
-                                @endphp
-
-                                @if($hariIni->lte($tanggalBerakhir))
+                                @if($item->is_active)
                                     <span class="badge badge-green">
+                                        <i class="bi bi-check-circle-fill"></i>
                                         Aktif
                                     </span>
                                 @else
                                     <span class="badge badge-red">
-                                        Berakhir
+                                        <i class="bi bi-x-circle-fill"></i>
+                                        Tidak Aktif
                                     </span>
                                 @endif
                             </td>
@@ -132,7 +129,7 @@
                             </td>
 
                             <td class="text-center">
-                                <div class="action-group action-group-center">
+                                <div class="action-group">
 
                                     <a href="{{ route('admin.campaign.show', $item) }}" class="action-link link-blue">
                                         <i class="bi bi-eye"></i>

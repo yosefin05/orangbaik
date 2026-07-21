@@ -49,7 +49,7 @@
                             </td>
 
                             <td class="text-center">
-                                <div class="action-group action-group-center">
+                                <div class="action-group">
 
                                     <a
                                         href="{{ route('admin.filter.edit', $filter) }}"

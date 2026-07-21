@@ -98,7 +98,7 @@
                             </td>
 
                             <td class="text-center">
-                                <div class="action-group action-group-center">
+                                <div class="action-group">
                                     <a href="{{ route('admin.penggalang_dana.show', $item) }}" class="action-link link-blue">
                                         <i class="bi bi-eye"></i>
                                         Detail

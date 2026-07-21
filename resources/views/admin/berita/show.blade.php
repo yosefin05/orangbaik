@@ -2,8 +2,8 @@
 
 @section('page-title', 'Detail Berita')
 
-@push('style')
-<link rel="stylesheet" href="{{ asset('css/admin/berita/show.css') }}">
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/berita/show.css') }}">
 @endpush
 
 @section('content')
@@ -24,11 +24,12 @@
             </a>
         </div>
 
-        @if($berita->thumbnail)
+        @if ($berita->thumbnail)
             <img
                 src="{{ asset('storage/' . $berita->thumbnail) }}"
                 alt="{{ $berita->judul }}"
-                class="detail-thumbnail">
+                class="detail-thumbnail"
+            />
         @else
             <div class="detail-thumbnail detail-thumbnail-placeholder">
                 <i class="bi bi-image"></i>
@@ -79,28 +80,21 @@
         <div class="detail-section">
             <h3>Galeri Berita</h3>
 
-            @if($berita->gambar->count() > 0)
-
+            @if ($berita->gambar->count() > 0)
                 <div class="gallery-grid">
-
-                    @foreach($berita->gambar as $gambar)
-
+                    @foreach ($berita->gambar as $gambar)
                         <div class="gallery-item">
                             <img
                                 src="{{ asset('storage/' . $gambar->gambar) }}"
-                                alt="Galeri {{ $loop->iteration }}">
+                                alt="Galeri {{ $loop->iteration }}"
+                            />
                         </div>
-
                     @endforeach
-
                 </div>
-
             @else
-
                 <p class="text-muted">
                     Tidak ada galeri.
                 </p>
-
             @endif
         </div>
 
@@ -115,8 +109,8 @@
                 action="{{ route('admin.berita.destroy', $berita) }}"
                 method="POST"
                 class="inline-form"
-                onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
-
+                onsubmit="return confirm('Yakin ingin menghapus berita ini?')"
+            >
                 @csrf
                 @method('DELETE')
 

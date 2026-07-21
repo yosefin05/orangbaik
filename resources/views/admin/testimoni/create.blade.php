@@ -35,14 +35,12 @@
 
             <div class="form-wrapper">
 
-                {{-- ====================================================== --}}
-                {{-- FOTO PROFIL - Dengan Preview Lingkaran                  --}}
-                {{-- ====================================================== --}}
+                {{-- FOTO PROFIL --}}
                 <div class="form-group">
                     <label for="foto_profil">Foto Profil <span class="text-danger">*</span></label>
 
-                    {{-- Dropzone Area --}}
                     <div class="upload-dropzone" id="foto_profilDropzone">
+                        
                         {{-- Placeholder --}}
                         <div class="upload-placeholder" id="foto_profilPlaceholder">
                             <i class="bi bi-person-circle"></i>
@@ -50,19 +48,30 @@
                             <span class="text-muted">Format: JPG, PNG, JPEG • Maks: 2MB</span>
                         </div>
 
-                        {{-- Preview --}}
+                        {{-- PREVIEW - PAKAI avatar-preview --}}
                         <div class="upload-preview avatar-preview" id="foto_profilPreview" style="display: none;">
-                            <img id="foto_profilPreviewImg" src="#" alt="Foto Preview" />
-                            <button type="button" class="btn-remove-image" id="foto_profilRemoveBtn" title="Hapus foto">
+                            <div class="avatar-wrapper">
+                                <img id="foto_profilPreviewImg" src="#" alt="Foto Preview" />
+                            </div>
+                            <button type="button" class="btn-remove-avatar" id="foto_profilRemoveBtn" title="Hapus foto">
                                 <i class="bi bi-x-lg"></i>
                             </button>
+                        </div>
+
+                        {{-- Tombol Upload --}}
+                        <div class="upload-btn-wrapper" id="uploadBtnWrapper">
+                            <button type="button" class="upload-btn" onclick="document.getElementById('foto_profil').click()">
+                                <i class="bi bi-cloud-upload"></i>
+                                <span>Pilih Foto</span>
+                            </button>
+                            <span class="upload-hint">atau seret gambar ke sini</span>
                         </div>
 
                         <input
                             type="file"
                             id="foto_profil"
                             name="foto_profil"
-                            class="upload-input"
+                            class="upload-input-hidden"
                             accept="image/*"
                             required
                         />
@@ -74,7 +83,7 @@
                 </div>
 
                 {{-- ====================================================== --}}
-                {{-- NAMA                                                    --}}
+                {{-- NAMA --}}
                 {{-- ====================================================== --}}
                 <div class="form-group">
                     <label for="nama">Nama <span class="text-danger">*</span></label>
@@ -93,7 +102,7 @@
                 </div>
 
                 {{-- ====================================================== --}}
-                {{-- JABATAN                                                 --}}
+                {{-- JABATAN --}}
                 {{-- ====================================================== --}}
                 <div class="form-group">
                     <label for="jabatan">Jabatan <span class="text-danger">*</span></label>
@@ -112,7 +121,7 @@
                 </div>
 
                 {{-- ====================================================== --}}
-                {{-- ISI TESTIMONI                                           --}}
+                {{-- ISI TESTIMONI --}}
                 {{-- ====================================================== --}}
                 <div class="form-group">
                     <label for="isi_testimoni">Isi Testimoni <span class="text-danger">*</span></label>
@@ -132,7 +141,7 @@
             </div>
 
             {{-- ========================================================== --}}
-            {{-- FORM ACTIONS                                               --}}
+            {{-- FORM ACTIONS --}}
             {{-- ========================================================== --}}
             <div class="form-footer">
                 <div class="form-actions">

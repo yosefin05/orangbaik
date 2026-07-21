@@ -25,23 +25,10 @@
             <p class="profile-type">
                 {{ $campaign->kategori->nama_kategori ?? 'Kategori tidak ditemukan' }}
             </p>
-            @php
-                $hariIni = now();
-                $tanggalBerakhir = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
-            @endphp
-
-            @if($hariIni->lte($tanggalBerakhir) && $campaign->is_active && $campaign->isApproved())
-                <span class="badge badge-green">
-                    Aktif
-                </span>
-            @elseif(!$campaign->is_active)
-                <span class="badge badge-red">
-                    Tidak Aktif
-                </span>
+            @if($campaign->is_active)
+                <span class="badge badge-green">Aktif</span>
             @else
-                <span class="badge badge-red">
-                    Berakhir
-                </span>
+                <span class="badge badge-red">Tidak Aktif</span>
             @endif
         </div>
     </section>

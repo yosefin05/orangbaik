@@ -61,7 +61,7 @@
                             </td>
 
                             <td class="text-center">
-                                <div class="action-group action-group-center">
+                                <div class="action-group">
 
                                     @if($item->berita)
                                         <a
