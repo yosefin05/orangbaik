@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('campaign_id')->constrained('campaign')->onDelete('cascade');
             $table->timestamps();
+
+            // Biar user ga bisa daftar 2 kali di campaign yang sama
+            $table->unique(['user_id', 'campaign_id']);
         });
     }
 
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign__fundraiser');
+        Schema::dropIfExists('campaign_fundraiser');
     }
 };

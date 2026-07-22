@@ -38,7 +38,7 @@ class Campaign extends Model
     }
     public function campaignUpdates()
     {
-        return $this->hasMany(Campaign_Update::class);
+        return $this->hasMany(Campaign_Update::class)->latest();
     }
     public function campaignFundraisers()
     {
@@ -106,6 +106,18 @@ class Campaign extends Model
             return $this->approval_status === 'approved';
         }
         return true; // Regular campaign selalu approved
+    }
+
+    public function isOwner($userId)
+    {
+        return $this->penggalang_dana_id === $userId;
+    }
+
+    public function isFundraiser($userId)
+    {
+        return $this->campaignFundraisers()
+            ->where('user_id', $userId)
+            ->exists();
     }
 
     protected $table = 'campaign';

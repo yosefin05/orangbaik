@@ -30,11 +30,12 @@ class CampaignController extends Controller
             'donasi'
         ])->where('is_active', true);
 
-        // Perbaiki query - gunakan approval_status, bukan emergency_approval
+        // Tambahkan ini: Tampilkan semua campaign (termasuk yang pending)
+        // Hanya sembunyikan yang rejected
         $query->where(function ($q) {
             $q->where('campaign_type', 'regular')
-                ->orWhere('approval_status', 'approved') // Perubahan di sini
-                ->orWhereNull('approval_status'); // Untuk campaign regular yang tidak butuh approval
+                ->orWhere('approval_status', 'approved')
+                ->orWhereNull('approval_status');
         });
 
         if ($request->filled('kategori')) {
@@ -156,8 +157,8 @@ class CampaignController extends Controller
 
             // Set approval only for emergency and sustainable
             $approvalStatus = in_array($request->campaign_type, ['emergency', 'sustainable'])
-                ? 'pending'  // Butuh approval
-                : 'approved'; // Tidak perlu approval (regular)
+                ? 'pending'
+                : 'approved';
 
             // Simpan Campaign
             $campaign = Campaign::create([
@@ -171,13 +172,14 @@ class CampaignController extends Controller
                 'minimal_donasi' => $request->minimal_donasi,
                 'kategori_id' => $request->kategori_id,
                 'campaign_type' => $request->campaign_type,
-                'approval_status' => $approvalStatus, // <-- PERUBAHAN DI SINI
+                'approval_status' => $approvalStatus,
                 'penggalang_dana_id' => $penggalang->id,
                 'is_active' => true,
                 'enable_quantity' => $request->boolean('enable_quantity'),
                 'enable_nama_donatur' => $request->boolean('enable_donatur_name'),
                 'enable_custom_nominal' => $request->boolean('enable_custom_nominal'),
             ]);
+
             /*
             |--------------------------------------------------------------------------
             | Simpan Filter
@@ -241,7 +243,7 @@ class CampaignController extends Controller
 
             DB::commit();
 
-            $message = $approvalStatus === 'pending'
+            $message = $campaign->approval_status === 'pending'
                 ? 'Campaign berhasil dibuat dan menunggu persetujuan admin untuk tampil di section Darurat/Berkelanjutan'
                 : 'Campaign berhasil dibuat.';
 
@@ -277,14 +279,36 @@ class CampaignController extends Controller
             'penggalangDana',
             'campaignGambar',
             'packages',
-            'campaignFilter.filter'
+            'campaignFilter.filter',
+            'donasi.user',
+            'campaignUpdates.campaign_update_gambar',
+            'campaignFundraisers.user'
         ])
-            ->where('slug', $slug)
-            ->where('is_active', true)
-            ->firstOrFail();
+        ->where('slug', $slug)
+        ->where('is_active', true)
+        ->firstOrFail();
 
-        return view('pages.campaign.show', compact('campaign'));
+        // Hitung terkumpul dan donasi count
+        $campaign->terkumpul = $campaign->donasi->sum('nominal');
+        $campaign->donasi_count = $campaign->donasi->count();
+
+        // Siapkan data updates untuk JavaScript (modal)
+        $updatesData = $campaign->campaignUpdates->map(function($update) {
+            return [
+                'id' => $update->id,
+                'judul' => $update->judul_update,
+                'isi' => $update->isi_update,
+                'tanggal' => $update->created_at->translatedFormat('d F Y'),
+                'gambar' => $update->campaign_update_gambar->map(function($gambar) {
+                    return asset('storage/' . $gambar->gambar_update);
+                })->values(),
+            ];
+        });
+
+        return view('pages.campaign.show', compact('campaign', 'updatesData'));
     }
+
+}
 
     public function edit(Campaign $campaign)
     {
@@ -354,16 +378,14 @@ class CampaignController extends Controller
         DB::beginTransaction();
 
         try {
-            // Reset approval jika tipe berubah ke emergency/sustainable
+            // Reset approval if type changed to emergency/sustainable
             $approvalStatus = $campaign->approval_status;
 
-            if (
-                in_array($request->campaign_type, ['emergency', 'sustainable']) &&
-                $campaign->campaign_type != $request->campaign_type
-            ) {
-                $approvalStatus = 'pending'; // Butuh approval ulang
+            if (in_array($request->campaign_type, ['emergency', 'sustainable']) &&
+                $campaign->campaign_type != $request->campaign_type) {
+                $approvalStatus = 'pending';
             } elseif (!in_array($request->campaign_type, ['emergency', 'sustainable'])) {
-                $approvalStatus = 'approved'; // Regular tidak perlu approval
+                $approvalStatus = null;
             }
 
             // Update data
@@ -376,7 +398,7 @@ class CampaignController extends Controller
                 'minimal_donasi' => $validated['minimal_donasi'],
                 'kategori_id' => $validated['kategori_id'],
                 'campaign_type' => $request->campaign_type,
-                'approval_status' => $approvalStatus, // <-- PERUBAHAN DI SINI
+                'approval_status' => $approvalStatus,
                 'enable_quantity' => $request->boolean('enable_quantity'),
                 'enable_nama_donatur' => $request->boolean('enable_donatur_name'),
                 'enable_custom_nominal' => $request->boolean('enable_custom_nominal'),
@@ -519,7 +541,7 @@ class CampaignController extends Controller
 
             DB::commit();
 
-            $message = $approvalStatus === 'pending'
+            $message = $campaign->approval_status === 'pending'
                 ? 'Campaign berhasil diupdate dan menunggu persetujuan admin'
                 : 'Campaign berhasil diupdate';
 

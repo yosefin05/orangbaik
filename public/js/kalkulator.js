@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         emas: {
             title: "Zakat Emas",
             percent: 2.5,
-            nisab: "85 gram emas",
+            nisab: "Nishab zakat penghasilan 2024: Rp6.859.394/bulan (setara 85 gram emas/tahun).",
             note: "Zakat emas dihitung dari total nilai emas yang dimiliki.",
             law: "Zakat emas dikenakan apabila emas yang dimiliki telah mencapai nisab dan memenuhi ketentuan haul.",
             fields: [
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
         tabungan: {
             title: "Zakat Tabungan",
             percent: 2.5,
-            nisab: "Setara 85 gram emas",
+            nisab: "Nishab zakat penghasilan 2024: Rp6.859.394/bulan (setara 85 gram emas/tahun).",
             note: "Zakat tabungan dihitung dari total simpanan bersih.",
             law: "Zakat tabungan dikenakan apabila simpanan telah mencapai nisab dan memenuhi ketentuan haul.",
             fields: [
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         perdagangan: {
             title: "Zakat Perniagaan",
             percent: 2.5,
-            nisab: "Setara 85 gram emas",
+            nisab: "Nishab zakat penghasilan 2024: Rp6.859.394/bulan (setara 85 gram emas/tahun).",
             note: "Zakat perniagaan dihitung dari aset usaha bersih.",
             law: "Zakat perniagaan dihitung dari harta usaha bersih seperti kas, stok barang, dan piutang lancar setelah dikurangi hutang.",
             fields: [

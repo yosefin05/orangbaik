@@ -8,6 +8,8 @@ use App\Http\Controllers\User\KomentarController;
 use App\Http\Controllers\User\KalkulatorController;
 use App\Http\Controllers\User\CampaignController;
 use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\CampaignUpdateController;
+use App\Http\Controllers\User\FundraiserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -154,6 +156,17 @@ Route::middleware('auth')->group(function () {
         '/campaign/{campaign}',
         [CampaignController::class, 'destroy']
     )->name('campaign.destroy');
+
+    Route::middleware(['auth'])->prefix('campaign')->group(function () {
+    Route::get('/{slug}/update/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
+    Route::post('/{slug}/update', [CampaignUpdateController::class, 'store'])->name('campaign.update.store');
+    Route::delete('/{slug}/update/{id}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');
+    });
+
+    Route::middleware(['auth'])->prefix('fundraiser')->group(function () {
+    Route::post('/{slug}', [FundraiserController::class, 'store'])->name('fundraiser.store');
+    Route::delete('/{slug}', [FundraiserController::class, 'destroy'])->name('fundraiser.destroy');
+});
 
     // profil
     Route::get(

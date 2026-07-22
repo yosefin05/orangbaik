@@ -6,17 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Campaign_Fundraiser extends Model
 {
-    public function campaign()
-    {
-        return $this->belongsTo(Campaign::class);
-    }
+    protected $table = 'campaign_fundraiser';
+
+    protected $fillable = [
+        'user_id',
+        'campaign_id',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    protected $table = 'campaign_fundraiser';
-    protected $fillable = [
-        'user_id',
-        'campaign_id'
-    ];
+
+    public function campaign()
+    {
+        return $this->belongsTo(Campaign::class);
+    }
 }
