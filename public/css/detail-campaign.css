@@ -3,6 +3,15 @@
    ============================================================ */
 
 /* ============================================================
+   GLOBAL OVERFLOW PROTECTION
+   (mencegah halaman melebar akibat teks panjang tanpa spasi)
+   ============================================================ */
+
+body {
+    overflow-x: hidden;
+}
+
+/* ============================================================
    ALERT
    ============================================================ */
 
@@ -49,27 +58,34 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
+    min-width: 0; /* wajib: biar grid item bisa menyempit, tidak dorong layout */
 }
 
 .campaign-hero-image {
     width: 100%;
-    max-height: 400px;
+    height: 360px;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: var(--radius);
     border: 1px solid var(--border);
+    display: block;
 }
 
 .description-section h1 {
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-extrabold);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
     color: var(--text-dark);
     margin-bottom: var(--space-3);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .description-section p {
     color: var(--text);
     font-size: var(--fs-sm);
     line-height: 1.8;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* ============================================================
@@ -87,8 +103,8 @@
 
 .section-header h2 {
     margin: 0;
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-extrabold);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
     color: var(--text-dark);
 }
 
@@ -138,24 +154,28 @@
     box-shadow: var(--shadow-soft);
 }
 
+/* Thumbnail update: ukuran FIX, tidak ikut molor ke bawah
+   walau teks di sampingnya panjang */
 .update-thumbnail {
     width: 180px;
-    min-height: 120px;
-    flex-shrink: 0;
+    height: 120px;
+    flex: 0 0 180px; /* flex-shrink 0 + flex-grow 0, ukuran terkunci */
     border-radius: var(--radius-sm);
     overflow: hidden;
     border: 1px solid var(--border);
+    align-self: flex-start; /* jangan ikut stretch tinggi ke content sebelah */
 }
 
 .update-thumbnail img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
 .update-content-wrapper {
     flex: 1;
-    min-width: 0;
+    min-width: 0; /* wajib: biar teks panjang di kolom ini yang wrap, bukan dorong lebar */
 }
 
 .update-title {
@@ -164,6 +184,8 @@
     color: var(--text-dark);
     margin: 0 0 var(--space-1);
     line-height: 1.3;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .update-meta {
@@ -191,7 +213,13 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
+
+/* ============================================================
+   BUTTON READ MORE
+   ============================================================ */
 
 .btn-read-more {
     display: inline-flex;
@@ -204,7 +232,7 @@
     font-size: var(--fs-xs);
     cursor: pointer;
     padding: 0;
-    transition: all 0.2s ease;
+    transition: gap 0.2s ease, color 0.2s ease;
 }
 
 .btn-read-more:hover {
@@ -216,6 +244,139 @@
     font-size: 14px;
     transition: transform 0.3s ease;
 }
+
+.btn-read-more i.rotated {
+    transform: rotate(180deg);
+}
+
+/* ============================================================
+   UPDATE DETAIL (EXPAND) — smooth height animation
+   ============================================================ */
+
+.update-detail-wrapper {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.update-detail-content {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-soft);
+}
+
+.update-full-body {
+    font-size: var(--fs-xs);
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--primary-light);
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.update-detail-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-2);
+}
+
+.update-detail-gallery-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.update-detail-gallery-item:hover {
+    transform: scale(1.03);
+    box-shadow: var(--shadow-soft);
+}
+
+.update-detail-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.update-detail-gallery-item .zoom-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.update-detail-gallery-item:hover .zoom-overlay {
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 1;
+}
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    padding: var(--space-6);
+}
+
+.lightbox-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.lightbox-overlay img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* ============================================================
+   UPDATE FOOTER
+   ============================================================ */
 
 .update-footer {
     margin-top: var(--space-3);
@@ -300,6 +461,7 @@
     gap: var(--space-5);
     position: sticky;
     top: 100px;
+    min-width: 0; /* wajib: biar grid item bisa menyempit, tidak dorong layout */
 }
 
 /* ============================================================
@@ -319,6 +481,8 @@
     font-weight: var(--fw-bold);
     color: var(--text-dark);
     margin-bottom: var(--space-3);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .summary-amount {
@@ -408,11 +572,13 @@
     gap: var(--space-3);
     text-decoration: none;
     color: inherit;
+    min-width: 0;
 }
 
 .fundraiser-profile img {
     width: 50px;
     height: 50px;
+    flex: 0 0 50px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--border);
@@ -422,6 +588,8 @@
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     color: var(--text-dark);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* ============================================================
@@ -448,6 +616,7 @@
     gap: var(--space-3);
     padding: var(--space-2) 0;
     border-bottom: 1px solid var(--border-soft);
+    min-width: 0;
 }
 
 .side-list-item:last-child {
@@ -462,7 +631,7 @@
     align-items: center;
     justify-content: center;
     background: var(--primary-light);
-    flex-shrink: 0;
+    flex: 0 0 40px;
     overflow: hidden;
     font-size: 20px;
 }
@@ -473,17 +642,25 @@
     object-fit: cover;
 }
 
+.side-list-item > div {
+    min-width: 0; /* biar nama/nominal donatur yang panjang wrap, bukan dorong lebar */
+}
+
 .side-list-item h4 {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     color: var(--text-dark);
     margin: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .side-list-item p {
     font-size: var(--fs-xxs);
     color: var(--muted);
     margin: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .side-list-item span {
@@ -585,132 +762,243 @@
     background: var(--border);
 }
 
+.fundraiser-referral-card {
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.fundraiser-referral-card h4 {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    margin-bottom: var(--space-1);
+}
+
+.fundraiser-referral-card p {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    margin-bottom: var(--space-2);
+}
+
+.referral-link-box {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.referral-link-box input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    background: var(--bg-soft);
+    color: var(--text);
+}
+
+.btn-copy-link {
+    padding: 8px 14px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
 /* ============================================================
-   MODAL DETAIL UPDATE
+   REFERRAL CARD - QR CODE (tampil langsung, tanpa modal)
    ============================================================ */
 
-.update-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    display: none;
+.referral-qr-section {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px dashed var(--border-soft);
+    text-align: center;
+}
+
+.qr-canvas-wrapper {
+    display: inline-flex;
+    justify-content: center;
+    padding: var(--space-3);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-soft);
+    margin-bottom: var(--space-3);
+}
+
+.btn-download-qr {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-4);
-}
-
-.update-modal.active {
-    display: flex;
-}
-
-.update-modal-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    cursor: pointer;
-}
-
-.update-modal-content {
-    position: relative;
-    max-width: 700px;
+    gap: var(--space-2);
     width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--bg);
-    border-radius: var(--radius);
-    padding: var(--space-6);
-    box-shadow: var(--shadow-hover);
-    animation: modalSlideIn 0.3s ease;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+.btn-download-qr:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
 }
 
-.update-modal-close {
-    position: sticky;
-    top: 0;
-    float: right;
-    background: var(--bg-soft);
+/* ============================================================
+   LIGHTBOX - SLIDE GAMBAR (TAMBAHAN)
+   ============================================================ */
+
+.lightbox-prev,
+.lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.15);
     border: none;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+    width: 50px;
+    height: 50px;
+    color: #fff;
+    font-size: 28px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
     z-index: 10;
-    box-shadow: var(--shadow-soft);
 }
 
-.update-modal-close:hover {
-    background: var(--danger);
-    color: #fff;
-    transform: rotate(90deg);
+.lightbox-prev {
+    left: 20px;
 }
 
-.update-detail-title {
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-extrabold);
-    color: var(--text-dark);
-    margin: 0 0 var(--space-2);
-    padding-right: 50px;
+.lightbox-next {
+    right: 20px;
 }
 
-.update-detail-meta {
-    margin-bottom: var(--space-4);
-    color: var(--muted);
+.lightbox-prev:hover,
+.lightbox-next:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.lightbox-image-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+}
+
+.lightbox-image-wrapper img {
+    max-width: 90vw;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+}
+
+.lightbox-footer {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    z-index: 10;
+}
+
+#lightboxCounter {
+    color: rgba(255, 255, 255, 0.6);
     font-size: var(--fs-xs);
 }
 
-.update-detail-meta i {
-    margin-right: var(--space-1);
-}
-
-.update-detail-body {
-    font-size: var(--fs-sm);
-    line-height: 1.8;
-    color: var(--text);
-    margin-bottom: var(--space-4);
-}
-
-.update-detail-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: var(--space-3);
-    margin: var(--space-4) 0;
-}
-
-.update-detail-gallery-item {
-    aspect-ratio: 1 / 1;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--border);
-}
-
-.update-detail-gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.update-detail-footer {
-    margin-top: var(--space-4);
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--border-soft);
+.lightbox-dots {
     display: flex;
-    justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+.lightbox-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lightbox-dot.active {
+    background: #fff;
+    width: 24px;
+    border-radius: var(--radius-full);
+}
+
+.lightbox-dot:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Lightbox */
+@media (max-width: 768px) {
+    .lightbox-prev,
+    .lightbox-next {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .lightbox-prev {
+        left: 10px;
+    }
+
+    .lightbox-next {
+        right: 10px;
+    }
+
+    .lightbox-image-wrapper img {
+        max-height: 70vh;
+    }
+}
+
+@media (max-width: 576px) {
+    .lightbox-prev,
+    .lightbox-next {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+    }
+
+    .lightbox-prev {
+        left: 6px;
+    }
+
+    .lightbox-next {
+        right: 6px;
+    }
+
+    .lightbox-image-wrapper img {
+        max-height: 60vh;
+    }
+
+    .lightbox-footer {
+        bottom: 16px;
+    }
+
+    .lightbox-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .lightbox-dot.active {
+        width: 18px;
+    }
 }
 
 /* ============================================================
@@ -733,7 +1021,7 @@
     }
 
     .campaign-hero-image {
-        max-height: 250px;
+        height: 220px;
     }
 
     .description-section h1 {
@@ -748,7 +1036,8 @@
 
     .update-thumbnail {
         width: 100%;
-        min-height: 160px;
+        height: 160px;
+        flex: 0 0 160px;
     }
 
     .update-title {
@@ -759,36 +1048,15 @@
         font-size: var(--fs-lg);
     }
 
-    .update-modal-content {
-        padding: var(--space-4);
-        margin: var(--space-2);
-        max-height: 95vh;
-    }
-
-    .update-detail-title {
-        font-size: var(--fs-md);
-        padding-right: 40px;
-    }
-
-    .update-detail-body {
-        font-size: var(--fs-xs);
-    }
-
     .update-detail-gallery {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--space-2);
-    }
-
-    .update-modal-close {
-        width: 34px;
-        height: 34px;
-        font-size: 16px;
     }
 }
 
 @media (max-width: 576px) {
     .campaign-hero-image {
-        max-height: 180px;
+        height: 180px;
     }
 
     .description-section h1 {
@@ -804,7 +1072,8 @@
     }
 
     .update-thumbnail {
-        min-height: 120px;
+        height: 140px;
+        flex: 0 0 140px;
     }
 
     .update-preview-text {
@@ -816,11 +1085,7 @@
         gap: var(--space-1);
     }
 
-    .update-detail-title {
-        font-size: var(--fs-sm);
-    }
-
-    .update-detail-body {
+    .update-full-body {
         font-size: var(--fs-xxs);
     }
 
@@ -833,16 +1098,6 @@
     .fundraiser-info-card,
     .fundraiser-join-card {
         padding: var(--space-3);
-    }
-
-    .update-modal-content {
-        padding: var(--space-3);
-    }
-
-    .update-modal-close {
-        width: 30px;
-        height: 30px;
-        font-size: 14px;
     }
 
     .btn-fundraiser-join,

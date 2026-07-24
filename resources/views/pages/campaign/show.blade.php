@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/detail-campaign.css') }}">
+
+    {{-- QR Code library (Client-side) --}}
+    <script src="{{ asset('js/qrcode.min.js') }}"></script>
 </head>
 
 <body>
@@ -17,21 +20,14 @@
 
     <main class="campaign-detail-page">
 
-        {{-- Alert --}}
         @if (session('success'))
-            <div class="alert-success">
-                {{ session('success') }}
-            </div>
+            <div class="alert-success">{{ session('success') }}</div>
         @endif
-
         @if (session('error'))
-            <div class="alert-error">
-                {{ session('error') }}
-            </div>
+            <div class="alert-error">{{ session('error') }}</div>
         @endif
 
         <div class="container detail-container">
-
             <div class="detail-layout">
 
                 {{-- ========================================================== --}}
@@ -39,11 +35,9 @@
                 {{-- ========================================================== --}}
                 <div class="detail-main">
 
-                    {{-- Thumbnail --}}
                     <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
                         class="campaign-hero-image">
 
-                    {{-- Deskripsi --}}
                     <section class="description-section">
                         <h1>{{ $campaign->judul }}</h1>
                         <p>{{ $campaign->deskripsi }}</p>
@@ -58,8 +52,7 @@
                             @auth
                                 @if ($campaign->isOwner(Auth::id()))
                                     <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn-add-update">
-                                        <i class="bi bi-plus-circle"></i>
-                                        Tambah Update
+                                        <i class="bi bi-plus-circle"></i> Tambah Update
                                     </a>
                                 @endif
                             @endauth
@@ -70,22 +63,19 @@
                                 @foreach ($campaign->campaignUpdates as $update)
                                     @php
                                         $firstImage = $update->campaign_update_gambar->first();
-                                        $thumbnailImage = $firstImage 
-                                            ? asset('storage/' . $firstImage->gambar_update) 
+                                        $thumbnailImage = $firstImage
+                                            ? asset('storage/' . $firstImage->gambar_update)
                                             : asset('storage/' . $campaign->thumbnail);
                                     @endphp
 
                                     <div class="update-card" id="update-{{ $update->id }}">
-                                        {{-- Gambar Thumbnail --}}
                                         <div class="update-thumbnail">
                                             <img src="{{ $thumbnailImage }}" alt="{{ $update->judul_update }}">
                                         </div>
 
                                         <div class="update-content-wrapper">
-                                            {{-- Judul --}}
                                             <h3 class="update-title">{{ $update->judul_update }}</h3>
 
-                                            {{-- Tanggal --}}
                                             <div class="update-meta">
                                                 <span class="update-date">
                                                     <i class="bi bi-calendar3"></i>
@@ -93,18 +83,45 @@
                                                 </span>
                                             </div>
 
-                                            {{-- Preview Isi --}}
                                             <div class="update-preview-text">
                                                 {{ Str::limit($update->isi_update, 120) }}
                                             </div>
 
-                                            {{-- Tombol Baca Selengkapnya --}}
-                                            <button class="btn-read-more" onclick="openUpdateModal({{ $update->id }})">
-                                                <span>Baca Selengkapnya</span>
-                                                <i class="bi bi-chevron-down"></i>
+                                            {{-- Tombol Baca Selengkapnya (expand) --}}
+                                            <button class="btn-read-more" onclick="toggleUpdateDetail({{ $update->id }})">
+                                                <span id="toggleText-{{ $update->id }}">Baca Selengkapnya</span>
+                                                <i class="bi bi-chevron-down" id="toggleIcon-{{ $update->id }}"></i>
                                             </button>
 
-                                            {{-- Tombol Hapus (untuk owner) --}}
+                                            {{-- Detail Lengkap (expand) --}}
+                                            <div class="update-detail-wrapper" id="detailContent-{{ $update->id }}">
+                                                <div class="update-detail-content">
+                                                    <div class="update-full-body">
+                                                        {!! nl2br(e($update->isi_update)) !!}
+                                                    </div>
+
+                                                    @if ($update->campaign_update_gambar->count() > 0)
+                                                        @php
+                                                            $allImages = $update->campaign_update_gambar->map(function ($g) {
+                                                                return asset('storage/' . $g->gambar_update);
+                                                            })->toArray();
+                                                            $allImagesJson = json_encode($allImages);
+                                                        @endphp
+                                                        <div class="update-detail-gallery">
+                                                            @foreach ($update->campaign_update_gambar as $gambar)
+                                                                <div class="update-detail-gallery-item"
+                                                                    onclick="openLightbox('{{ asset('storage/' . $gambar->gambar_update) }}', {{ $allImagesJson }})">
+                                                                    <img src="{{ asset('storage/' . $gambar->gambar_update) }}" alt="Gambar update">
+                                                                    <div class="zoom-overlay">
+                                                                        <i class="bi bi-zoom-in"></i>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+
                                             @auth
                                                 @if ($campaign->isOwner(Auth::id()))
                                                     <div class="update-footer">
@@ -112,8 +129,7 @@
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn-delete-update" onclick="return confirm('Yakin ingin menghapus update ini?')">
-                                                                <i class="bi bi-trash"></i>
-                                                                Hapus
+                                                                <i class="bi bi-trash"></i> Hapus
                                                             </button>
                                                         </form>
                                                     </div>
@@ -234,7 +250,9 @@
                         @endif
                     </div>
 
-                    {{-- Fundraiser --}}
+                    {{-- ========================================================== --}}
+                    {{-- FUNDRAISER SECTION                                         --}}
+                    {{-- ========================================================== --}}
                     @auth
                         @php
                             $isFundraiser = $campaign->isFundraiser(Auth::id());
@@ -248,10 +266,36 @@
                                 <form action="{{ route('fundraiser.store', $campaign->slug) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn-fundraiser-join">
-                                        <i class="bi bi-megaphone"></i>
-                                        Gabung Jadi Fundraiser
+                                        <i class="bi bi-megaphone"></i> Gabung Jadi Fundraiser
                                     </button>
                                 </form>
+                            </div>
+                        @endif
+
+                        @if ($isFundraiser && !$isOwner)
+                            @php
+                                $fundraiser = $campaign->getFundraiserByUser(Auth::id());
+                            @endphp
+                            <div class="fundraiser-referral-card">
+                                <h4>🔗 Link Referral Anda</h4>
+                                <p>Bagikan link ini untuk mengajak donasi:</p>
+                                <div class="referral-link-box">
+                                    <input type="text" id="referralLink" value="{{ $fundraiser->referral_url }}" readonly>
+                                    <button onclick="copyReferralLink()" class="btn-copy-link">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
+
+                                {{-- QR Code langsung tampil, tanpa perlu diklik --}}
+                                <div class="referral-qr-section">
+                                    <div class="qr-canvas-wrapper">
+                                        <canvas id="referralQrCanvas" data-url="{{ $fundraiser->referral_url }}"></canvas>
+                                    </div>
+                                    <button type="button" class="btn-download-qr" onclick="downloadReferralQr()">
+                                        <i class="bi bi-download"></i> Download QR Code
+                                    </button>
+                                </div>
                             </div>
                         @endif
 
@@ -263,8 +307,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn-fundraiser-leave" onclick="return confirm('Yakin ingin berhenti menjadi fundraiser?')">
-                                        <i class="bi bi-x-circle"></i>
-                                        Berhenti
+                                        <i class="bi bi-x-circle"></i> Berhenti
                                     </button>
                                 </form>
                             </div>
@@ -284,89 +327,202 @@
             </div>
         </div>
 
-        {{-- ========================================================== --}}
-        {{-- MODAL DETAIL UPDATE                                        --}}
-        {{-- ========================================================== --}}
-        <div class="update-modal" id="updateModal">
-            <div class="update-modal-overlay" onclick="closeUpdateModal()"></div>
-            <div class="update-modal-content">
-                <button class="update-modal-close" onclick="closeUpdateModal()">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-
-                <div id="updateModalBody">
-                    {{-- Konten akan diisi oleh JavaScript --}}
-                </div>
-            </div>
-        </div>
-
     </main>
+
+    {{-- ========================================================== --}}
+    {{-- LIGHTBOX MODAL (GALERI UPDATE)                             --}}
+    {{-- ========================================================== --}}
+    <div class="lightbox-overlay" id="lightboxOverlay">
+        <button class="lightbox-close" onclick="closeLightbox()"><i class="bi bi-x-lg"></i></button>
+        <button class="lightbox-prev" onclick="changeImage(-1)"><i class="bi bi-chevron-left"></i></button>
+        <div class="lightbox-image-wrapper">
+            <img id="lightboxImage" src="" alt="Gambar">
+        </div>
+        <button class="lightbox-next" onclick="changeImage(1)"><i class="bi bi-chevron-right"></i></button>
+        <div class="lightbox-footer">
+            <span id="lightboxCounter">1 / 1</span>
+            <div class="lightbox-dots" id="lightboxDots"></div>
+        </div>
+    </div>
 
     @include('components.footer')
 
-    @push('scripts')
+    {{-- ========================================================== --}}
+    {{-- SCRIPTS                                                    --}}
+    {{-- ========================================================== --}}
     <script>
-        // Data dari controller
-        const updatesData = @json($updatesData);
-        const isOwner = {{ auth()->check() && $campaign->isOwner(Auth::id()) ? 'true' : 'false' }};
-        const slug = '{{ $campaign->slug }}';
+        /* ============================================================
+           REFERRAL LINK - COPY
+           ============================================================ */
+        function copyReferralLink() {
+            const input = document.getElementById('referralLink');
+            if (!input) return;
+            input.select();
+            document.execCommand('copy');
+            alert('Link referral berhasil disalin!');
+        }
 
-        const modal = document.getElementById('updateModal');
-        const modalBody = document.getElementById('updateModalBody');
+        /* ============================================================
+           TOGGLE UPDATE DETAIL (EXPAND/COLLAPSE)
+           ============================================================ */
+        function toggleUpdateDetail(id) {
+            const wrapper = document.getElementById('detailContent-' + id);
+            const toggleText = document.getElementById('toggleText-' + id);
+            const icon = document.getElementById('toggleIcon-' + id);
+            if (!wrapper || !toggleText || !icon) return;
 
-        function openUpdateModal(id) {
-            const update = updatesData.find(u => u.id === id);
-            if (!update) return;
+            const isOpen = wrapper.classList.contains('is-open');
 
-            modalBody.innerHTML = `
-                <div class="update-detail">
-                    <h2 class="update-detail-title">${update.judul}</h2>
-                    <div class="update-detail-meta">
-                        <span><i class="bi bi-calendar3"></i> ${update.tanggal}</span>
-                    </div>
-                    <div class="update-detail-body">
-                        ${update.isi.replace(/\n/g, '<br>')}
-                    </div>
-                    ${update.gambar.length > 0 ? `
-                        <div class="update-detail-gallery">
-                            ${update.gambar.map(img => `
-                                <div class="update-detail-gallery-item">
-                                    <img src="${img}" alt="Gambar update">
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-                    ${isOwner ? `
-                        <div class="update-detail-footer">
-                            <form action="/campaign/${slug}/update/${update.id}" method="POST" onsubmit="return confirm('Yakin ingin menghapus update ini?')">
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn-delete-update">
-                                    <i class="bi bi-trash"></i>
-                                    Hapus Update
-                                </button>
-                            </form>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
+            if (isOpen) {
+                wrapper.style.maxHeight = wrapper.scrollHeight + 'px';
+                requestAnimationFrame(() => {
+                    wrapper.style.maxHeight = '0px';
+                });
+                wrapper.classList.remove('is-open');
+                toggleText.textContent = 'Baca Selengkapnya';
+                icon.classList.remove('rotated');
+            } else {
+                wrapper.classList.add('is-open');
+                wrapper.style.maxHeight = wrapper.scrollHeight + 'px';
+                toggleText.textContent = 'Sembunyikan';
+                icon.classList.add('rotated');
 
-            modal.classList.add('active');
+                wrapper.addEventListener('transitionend', function handler(e) {
+                    if (e.propertyName === 'max-height' && wrapper.classList.contains('is-open')) {
+                        wrapper.style.maxHeight = 'none';
+                    }
+                    wrapper.removeEventListener('transitionend', handler);
+                });
+            }
+        }
+
+        /* ============================================================
+           LIGHTBOX GALLERY
+           ============================================================ */
+        let lightboxImages = [];
+        let currentImageIndex = 0;
+
+        function openLightbox(imageSrc, allImages) {
+            lightboxImages = allImages || [imageSrc];
+            currentImageIndex = lightboxImages.indexOf(imageSrc);
+            if (currentImageIndex === -1) {
+                currentImageIndex = 0;
+                lightboxImages = [imageSrc];
+            }
+
+            const overlay = document.getElementById('lightboxOverlay');
+            const img = document.getElementById('lightboxImage');
+            const counter = document.getElementById('lightboxCounter');
+            const dots = document.getElementById('lightboxDots');
+
+            img.src = lightboxImages[currentImageIndex];
+            counter.textContent = (currentImageIndex + 1) + ' / ' + lightboxImages.length;
+
+            dots.innerHTML = '';
+            lightboxImages.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.className = 'lightbox-dot' + (i === currentImageIndex ? ' active' : '');
+                dot.onclick = function(e) {
+                    e.stopPropagation();
+                    goToImage(i);
+                };
+                dots.appendChild(dot);
+            });
+
+            overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            document.addEventListener('keydown', lightboxKeydown);
         }
 
-        function closeUpdateModal() {
-            modal.classList.remove('active');
+        function closeLightbox() {
+            document.getElementById('lightboxOverlay').classList.remove('active');
             document.body.style.overflow = '';
+            document.removeEventListener('keydown', lightboxKeydown);
         }
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeUpdateModal();
+        function changeImage(direction) {
+            const total = lightboxImages.length;
+            if (total <= 1) return;
+            currentImageIndex = (currentImageIndex + direction + total) % total;
+            updateLightboxImage();
+        }
+
+        function goToImage(index) {
+            if (index < 0 || index >= lightboxImages.length) return;
+            currentImageIndex = index;
+            updateLightboxImage();
+        }
+
+        function updateLightboxImage() {
+            const img = document.getElementById('lightboxImage');
+            const counter = document.getElementById('lightboxCounter');
+            const dots = document.querySelectorAll('.lightbox-dot');
+            img.src = lightboxImages[currentImageIndex];
+            counter.textContent = (currentImageIndex + 1) + ' / ' + lightboxImages.length;
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentImageIndex);
+            });
+        }
+
+        function lightboxKeydown(e) {
+            if (e.key === 'ArrowLeft') changeImage(-1);
+            if (e.key === 'ArrowRight') changeImage(1);
+            if (e.key === 'Escape') closeLightbox();
+        }
+
+        let touchStartX = 0,
+            touchEndX = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            const wrapper = document.querySelector('.lightbox-image-wrapper');
+            if (wrapper) {
+                wrapper.addEventListener('touchstart', function(e) {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+                wrapper.addEventListener('touchend', function(e) {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const diff = touchStartX - touchEndX;
+                    if (Math.abs(diff) > 50) {
+                        changeImage(diff > 0 ? 1 : -1);
+                    }
+                }, { passive: true });
             }
         });
+
+        document.getElementById('lightboxOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeLightbox();
+        });
+
+        /* ============================================================
+           QR CODE REFERRAL - TAMPIL OTOMATIS
+           ============================================================ */
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('referralQrCanvas');
+            if (!canvas) return; // hanya render kalau user adalah fundraiser (elemen ada di DOM)
+
+            const url = canvas.dataset.url;
+
+            QRCode.toCanvas(canvas, url, {
+                width: 180,
+                margin: 2,
+                color: {
+                    dark: '#1a1a1a',
+                    light: '#ffffff'
+                }
+            }, function(error) {
+                if (error) console.error('Gagal membuat QR code:', error);
+            });
+        });
+
+        function downloadReferralQr() {
+            const canvas = document.getElementById('referralQrCanvas');
+            if (!canvas) return;
+
+            const link = document.createElement('a');
+            link.download = 'qr-referral-orangbaik.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
     </script>
-    @endpush
 
 </body>
 

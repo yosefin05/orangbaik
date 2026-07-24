@@ -275,11 +275,7 @@ class CampaignController extends Controller
     public function show($slug)
     {
         $campaign = Campaign::with([
-            'kategori',
             'penggalangDana',
-            'campaignGambar',
-            'packages',
-            'campaignFilter.filter',
             'donasi.user',
             'campaignUpdates.campaign_update_gambar',
             'campaignFundraisers.user'
@@ -288,11 +284,10 @@ class CampaignController extends Controller
         ->where('is_active', true)
         ->firstOrFail();
 
-        // Hitung terkumpul dan donasi count
         $campaign->terkumpul = $campaign->donasi->sum('nominal');
         $campaign->donasi_count = $campaign->donasi->count();
 
-        // Siapkan data updates untuk JavaScript (modal)
+        // Siapkan data untuk modal
         $updatesData = $campaign->campaignUpdates->map(function($update) {
             return [
                 'id' => $update->id,
@@ -307,8 +302,6 @@ class CampaignController extends Controller
 
         return view('pages.campaign.show', compact('campaign', 'updatesData'));
     }
-
-}
 
     public function edit(Campaign $campaign)
     {
