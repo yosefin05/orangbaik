@@ -111,7 +111,7 @@
                                     </div>
                                 </a>
                             </article>
-                        @endforeach
+                        
                     </div>
                 </div>
             </div>
@@ -133,7 +133,7 @@
                     @empty
                         <p>Belum ada campaign terbaru.</p>
                     @endforelse
-                </div>
+                </div> 
             </div>
             </div>
         </section>
@@ -175,6 +175,7 @@
                         </a>
                     </div>
                 </div>
+                @endforeach
             </div>
         </section>
     </main>
