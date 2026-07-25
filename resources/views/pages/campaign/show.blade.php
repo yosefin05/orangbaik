@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ asset('css/detail-campaign.css') }}">
 
     {{-- QR Code library (Client-side) --}}
-    <script src="{{ asset('js/qrcode.min.js') }}"></script>
+    {{-- <script src="{{ asset('js/qrcode.min.js') }}"></script> --}}
 </head>
 
 <body>
@@ -287,14 +287,23 @@
                                 </div>
                                 <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
 
-                                {{-- QR Code langsung tampil, tanpa perlu diklik --}}
+                                {{-- QR Code dari server --}}
                                 <div class="referral-qr-section">
-                                    <div class="qr-canvas-wrapper">
-                                        <canvas id="referralQrCanvas" data-url="{{ $fundraiser->referral_url }}"></canvas>
-                                    </div>
-                                    <button type="button" class="btn-download-qr" onclick="downloadReferralQr()">
-                                        <i class="bi bi-download"></i> Download QR Code
-                                    </button>
+                                    @if ($fundraiser->qr_path && Storage::disk('public')->exists($fundraiser->qr_path))
+                                        <div class="qr-canvas-wrapper">
+                                            <img id="referralQrImg"
+                                                src="{{ asset('storage/' . $fundraiser->qr_path) }}"
+                                                alt="QR Code Referral"
+                                                width="180" height="180">
+                                        </div>
+                                        <a class="btn-download-qr"
+                                            href="{{ asset('storage/' . $fundraiser->qr_path) }}"
+                                            download="qr-referral-{{ $fundraiser->referral_code }}.svg">
+                                            <i class="bi bi-download"></i> Download QR Code
+                                        </a>
+                                    @else
+                                        <p class="text-muted" style="font-size:13px">QR Code sedang dibuat...</p>
+                                    @endif
                                 </div>
                             </div>
                         @endif
@@ -492,36 +501,6 @@
             if (e.target === this) closeLightbox();
         });
 
-        /* ============================================================
-           QR CODE REFERRAL - TAMPIL OTOMATIS
-           ============================================================ */
-        document.addEventListener('DOMContentLoaded', function() {
-            const canvas = document.getElementById('referralQrCanvas');
-            if (!canvas) return; // hanya render kalau user adalah fundraiser (elemen ada di DOM)
-
-            const url = canvas.dataset.url;
-
-            QRCode.toCanvas(canvas, url, {
-                width: 180,
-                margin: 2,
-                color: {
-                    dark: '#1a1a1a',
-                    light: '#ffffff'
-                }
-            }, function(error) {
-                if (error) console.error('Gagal membuat QR code:', error);
-            });
-        });
-
-        function downloadReferralQr() {
-            const canvas = document.getElementById('referralQrCanvas');
-            if (!canvas) return;
-
-            const link = document.createElement('a');
-            link.download = 'qr-referral-orangbaik.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
     </script>
 
 </body>

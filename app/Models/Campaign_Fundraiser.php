@@ -13,6 +13,7 @@ class Campaign_Fundraiser extends Model
         'campaign_id',
         'user_id',
         'referral_code',
+        'qr_path',
         'total_donasi',
         'status',
     ];
