@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ asset('css/detail-campaign.css') }}">
 
     {{-- QR Code library (Client-side) --}}
-    <script src="{{ asset('js/qrcode.min.js') }}"></script>
+    {{-- <script src="{{ asset('js/qrcode.min.js') }}"></script> --}}
 </head>
 
 <body>
@@ -287,14 +287,20 @@
                                 </div>
                                 <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
 
-                                {{-- QR Code langsung tampil, tanpa perlu diklik --}}
+                                {{-- QR Code inline SVG --}}
                                 <div class="referral-qr-section">
+                                    @php
+                                        $qrSvg = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+                                            ->size(180)->margin(1)
+                                            ->generate($fundraiser->referral_url);
+                                    @endphp
                                     <div class="qr-canvas-wrapper">
-                                        <canvas id="referralQrCanvas" data-url="{{ $fundraiser->referral_url }}"></canvas>
+                                        {!! $qrSvg !!}
                                     </div>
-                                    <button type="button" class="btn-download-qr" onclick="downloadReferralQr()">
+                                    <a class="btn-download-qr" id="btnDownloadQr" href="#"
+                                        download="qr-referral-{{ $fundraiser->referral_code }}.svg">
                                         <i class="bi bi-download"></i> Download QR Code
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         @endif
@@ -493,35 +499,17 @@
         });
 
         /* ============================================================
-           QR CODE REFERRAL - TAMPIL OTOMATIS
+           QR CODE - DOWNLOAD SVG
            ============================================================ */
-        document.addEventListener('DOMContentLoaded', function() {
-            const canvas = document.getElementById('referralQrCanvas');
-            if (!canvas) return; // hanya render kalau user adalah fundraiser (elemen ada di DOM)
-
-            const url = canvas.dataset.url;
-
-            QRCode.toCanvas(canvas, url, {
-                width: 180,
-                margin: 2,
-                color: {
-                    dark: '#1a1a1a',
-                    light: '#ffffff'
-                }
-            }, function(error) {
-                if (error) console.error('Gagal membuat QR code:', error);
-            });
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('btnDownloadQr');
+            if (!btn) return;
+            const svg = btn.closest('.referral-qr-section').querySelector('svg');
+            if (!svg) return;
+            const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
+            btn.href = URL.createObjectURL(blob);
         });
 
-        function downloadReferralQr() {
-            const canvas = document.getElementById('referralQrCanvas');
-            if (!canvas) return;
-
-            const link = document.createElement('a');
-            link.download = 'qr-referral-orangbaik.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
     </script>
 
 </body>

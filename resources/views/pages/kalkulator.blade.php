@@ -39,11 +39,6 @@
                         <a href="#zakatCalculator" class="zakat-primary-link">
                             Mulai Hitung
                         </a>
-
-                        <a href="https://baznas.go.id/assets/pdf/ppid/tentang%20zakat/SK_01_2024.pdf" target="_blank"
-                            rel="noopener noreferrer" class="zakat-secondary-link">
-                            Pelajari Zakat
-                        </a>
                     </div>
                 </div>
 
@@ -178,7 +173,7 @@
 
                         <button type="submit" class="zakat-submit-button">
                             <i class="bi bi-calculator-fill"></i>
-                            <span>Hitung Zakat</span>
+                            <span>Lihat Secara Rinci</span>
                         </button>
                     </form>
 

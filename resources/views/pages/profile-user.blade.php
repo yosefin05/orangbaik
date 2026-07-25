@@ -151,7 +151,11 @@
                             </a>
 
                         @elseif($penggalangStatus === 'pending')
+<<<<<<< HEAD
                             <a href="{{ route('profil.penggalang', $penggalang->id) }}" class="profile-menu-item">
+=======
+                            <a href="{{ route('profil.penggalang' , $penggalang->id) }}" class="profile-menu-item">
+>>>>>>> 15dbd06b99467f4eb6a85971f4babac48d9f53a5
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'handshake'])
                                 </span>
