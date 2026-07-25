@@ -287,23 +287,20 @@
                                 </div>
                                 <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
 
-                                {{-- QR Code dari server --}}
+                                {{-- QR Code inline SVG --}}
                                 <div class="referral-qr-section">
-                                    @if ($fundraiser->qr_path && Storage::disk('public')->exists($fundraiser->qr_path))
-                                        <div class="qr-canvas-wrapper">
-                                            <img id="referralQrImg"
-                                                src="{{ asset('storage/' . $fundraiser->qr_path) }}"
-                                                alt="QR Code Referral"
-                                                width="180" height="180">
-                                        </div>
-                                        <a class="btn-download-qr"
-                                            href="{{ asset('storage/' . $fundraiser->qr_path) }}"
-                                            download="qr-referral-{{ $fundraiser->referral_code }}.svg">
-                                            <i class="bi bi-download"></i> Download QR Code
-                                        </a>
-                                    @else
-                                        <p class="text-muted" style="font-size:13px">QR Code sedang dibuat...</p>
-                                    @endif
+                                    @php
+                                        $qrSvg = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+                                            ->size(180)->margin(1)
+                                            ->generate($fundraiser->referral_url);
+                                    @endphp
+                                    <div class="qr-canvas-wrapper">
+                                        {!! $qrSvg !!}
+                                    </div>
+                                    <a class="btn-download-qr" id="btnDownloadQr" href="#"
+                                        download="qr-referral-{{ $fundraiser->referral_code }}.svg">
+                                        <i class="bi bi-download"></i> Download QR Code
+                                    </a>
                                 </div>
                             </div>
                         @endif
@@ -499,6 +496,18 @@
 
         document.getElementById('lightboxOverlay').addEventListener('click', function(e) {
             if (e.target === this) closeLightbox();
+        });
+
+        /* ============================================================
+           QR CODE - DOWNLOAD SVG
+           ============================================================ */
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('btnDownloadQr');
+            if (!btn) return;
+            const svg = btn.closest('.referral-qr-section').querySelector('svg');
+            if (!svg) return;
+            const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
+            btn.href = URL.createObjectURL(blob);
         });
 
     </script>
