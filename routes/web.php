@@ -9,21 +9,9 @@ use App\Http\Controllers\User\KalkulatorController;
 use App\Http\Controllers\User\CampaignController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\CampaignUpdateController;
-use App\Http\Controllers\User\FundraiserController; // tambahkan ini (tanpa alias)
+use App\Http\Controllers\User\FundraiserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// ============================================================
-// HAPUS ROUTE QR (KARENA QR SUDAH VIA JAVASCRIPT)
-// ============================================================
-// Route::get('/fundraiser/qr/{code}', function ($code) { ... });
-// Route::get('/fundraiser/qr/{code}', [UserFundraiserController::class, 'downloadQr'])->name('fundraiser.qr.download');
 
 // ============================================================
 // HOMEPAGE
@@ -36,7 +24,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 require __DIR__ . '/auth.php';
 
 // ============================================================
-// SET INTENDED URL (untuk redirect setelah login)
+// SET INTENDED URL
 // ============================================================
 Route::post('/set-intended-url', function (Request $request) {
     session(['url.intended' => $request->url]);
@@ -58,13 +46,12 @@ Route::get('/kalkulator', [KalkulatorController::class, 'index']);
 Route::post('/kalkulator/hitung', [KalkulatorController::class, 'calculate'])->name('kalkulator.hitung');
 
 // ============================================================
-// CAMPAIGN (PUBLIC)
+// CAMPAIGN (PUBLIC - list)
 // ============================================================
 Route::get('/donasi', [CampaignController::class, 'index'])->name('donasi');
-Route::get('/campaign/{slug}', [CampaignController::class, 'show'])->name('campaign.show');
 
 // ============================================================
-// CAMPAIGN (AUTHENTICATED)
+// CAMPAIGN (AUTHENTICATED) - spesifik dulu sebelum wildcard
 // ============================================================
 Route::middleware('auth')->group(function () {
     Route::get('/campaign/create', [CampaignController::class, 'create'])->name('campaign.create');
@@ -74,8 +61,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/campaign/{campaign}', [CampaignController::class, 'destroy'])->name('campaign.destroy');
 });
 
+// Wildcard setelah semua route spesifik
+Route::get('/campaign/{slug}', [CampaignController::class, 'show'])->name('campaign.show');
+
 // ============================================================
-// CAMPAIGN UPDATE (KABAR TERBARU) - HANYA UNTUK OWNER
+// CAMPAIGN UPDATE (KABAR TERBARU)
 // ============================================================
 Route::middleware('auth')->prefix('campaign')->group(function () {
     Route::get('/{slug}/update/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
@@ -84,7 +74,7 @@ Route::middleware('auth')->prefix('campaign')->group(function () {
 });
 
 // ============================================================
-// FUNDRAISER (DAFTAR & BERHENTI)
+// FUNDRAISER
 // ============================================================
 Route::middleware('auth')->prefix('fundraiser')->group(function () {
     Route::post('/{slug}', [FundraiserController::class, 'store'])->name('fundraiser.store');
@@ -92,7 +82,7 @@ Route::middleware('auth')->prefix('fundraiser')->group(function () {
 });
 
 // ============================================================
-// DONASI (PAGE STATIS) - NANTI AKAN DIINTEGRASIKAN
+// DONASI (PAGE STATIS)
 // ============================================================
 Route::get('/donasi/bayar', function () {
     return view('pages.donasi-bayar');
@@ -158,7 +148,6 @@ Route::middleware('auth')->group(function () {
 });
 
 // ============================================================
-// ADMIN ROUTES (DI FILE TERPISAH)
+// ADMIN ROUTES
 // ============================================================
-require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
