@@ -37,7 +37,7 @@
             <div class="container">
                 <x-alert-error />
                 <form action="{{ route('penggalang_dana.individu.store') }}" method="POST" enctype="multipart/form-data"
-                    class="verify-form">
+                    class="verify-form" novalidate>
                     @csrf
                     {{-- PROFIL --}}
                     <section class="verify-card">
@@ -231,7 +231,7 @@
 
                                 <span>Email <b>*</b></span>
 
-                                <input type="email" name="email" value="{{ old('email') }}"
+                                <input type="email" name="email" value="{{ old('email', $user->email) }}"
                                     placeholder="Masukkan Email Organisasi">
 
                                 @error('email')
@@ -244,7 +244,7 @@
 
                                 <span>Nomor Hotline <b>*</b></span>
 
-                                <input type="text" name="no_telepon" value="{{ old('no_telepon') }}"
+                                <input type="text" name="no_telepon" value="{{ old('no_telepon', $user->nomor) }}"
                                     placeholder="Masukkan Nomor Hotline">
 
                                 @error('no_telepon')
@@ -331,36 +331,6 @@
 
     </main>
     @include('components.footer')
-    <script>
-
-        document.getElementById('fotoProfilInput').addEventListener('change', function () {
-
-            const file = this.files[0];
-
-            if (!file) return;
-
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-
-                document.getElementById('avatarPreview').innerHTML = `
-            <img
-                src="${e.target.result}"
-                style="
-                    width:100%;
-                    height:100%;
-                    object-fit:cover;
-                    border-radius:50%;
-                ">
-        `;
-
-            };
-
-            reader.readAsDataURL(file);
-
-        });
-
-    </script>
 
     <script src="{{ asset('js/header.js') }}"></script>
     <script src="{{ asset('js/penggalang-individu.js') }}"></script>

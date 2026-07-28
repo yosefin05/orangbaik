@@ -70,25 +70,15 @@ class CampaignController extends Controller
         Campaign::create([
 
             'judul_campaign'      => $validated['judul_campaign'],
-
             'slug'                => Str::slug($validated['judul_campaign']) . '-' . time(),
-
             'deskripsi_campaign'  => $validated['deskripsi_campaign'],
-
             'thumbnail'           => $thumbnail,
-
             'tanggal_mulai'       => $validated['tanggal_mulai'],
-
             'tanggal_akhir'       => $validated['tanggal_akhir'],
-
             'target_donasi'       => $target,
-
             'minimal_donasi'      => $minimal,
-
             'kategori_id'         => $validated['kategori_campaign'],
-
             'user_id'             => Auth::id(),
-
             'status'              => 'pending',
         ]);
 

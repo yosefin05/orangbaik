@@ -80,7 +80,6 @@
                         </a>
                     @endforeach
 
-                    {{-- Lainnya / Semua Campaign --}}
                     <a href="{{ route('donasi') }}"
                         class="category-item {{ request()->filled('kategori') ? '' : 'active' }}">
 
@@ -110,10 +109,18 @@
                                 ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                 : 0;
 
-                            $hari = max(
-                                0,
-                                (int) now()->diffInDays($campaign->tanggal_berakhir, false)
-                            );
+                            // ♻️ PERHITUNGAN HARI – PASTI INTEGER
+                            $now = \Carbon\Carbon::now();
+                            $end = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
+                            $diff = (int) $now->diffInDays($end, false);
+
+                            if ($diff < 0) {
+                                $labelHari = 'Selesai';
+                            } elseif ($diff == 0) {
+                                $labelHari = 'Hari terakhir';
+                            } else {
+                                $labelHari = $diff . ' Hari';
+                            }
                         @endphp
                         <article class="campaign-card">
                             <a href="{{ route('campaign.show', $campaign->slug) }}">
@@ -137,12 +144,12 @@
                                 </div>
                                 <div class="campaign-meta">
                                     <span>{{ $campaign->donasi->count() }} Donatur</span>
-                                    <span>{{ $hari }} Hari</span>
+                                    <span>{{ $labelHari }}</span>
                                 </div>
                             </div>
                         </article>
                     @empty
-                        <p>Belum ada campaign.</p>
+                        <p>Belum ada campaign darurat.</p>
                     @endforelse
                 </div>
             </div>
@@ -171,7 +178,26 @@
                 <h2 class="section-title">Pemberdayaan Berkelanjutan</h2>
 
                 <div class="campaign-grid">
-                    @foreach ($campaignBerkelanjutan as $campaign)
+                    @forelse ($campaignBerkelanjutan as $campaign)
+                        @php
+                            $terkumpul = $campaign->donasi->sum('nominal');
+                            $persen = $campaign->target_donasi
+                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                : 0;
+
+                            // ♻️ SAMA PERSIS DENGAN DARURAT
+                            $now = \Carbon\Carbon::now();
+                            $end = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
+                            $diff = (int) $now->diffInDays($end, false);
+
+                            if ($diff < 0) {
+                                $labelHari = 'Selesai';
+                            } elseif ($diff == 0) {
+                                $labelHari = 'Hari terakhir';
+                            } else {
+                                $labelHari = $diff . ' Hari';
+                            }
+                        @endphp
                         <article class="campaign-card">
                             <a href="{{ route('campaign.show', $campaign->slug) }}">
                                 <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
@@ -194,11 +220,13 @@
                                 </div>
                                 <div class="campaign-meta">
                                     <span>{{ $campaign->donasi->count() }} Donatur</span>
-                                    <span>{{ $hari }} Hari</span>
+                                    <span>{{ $labelHari }}</span>
                                 </div>
                             </div>
                         </article>
-                    @endforeach
+                    @empty
+                        <p>Belum ada campaign berkelanjutan.</p>
+                    @endforelse
                 </div>
             </div>
         </section>
@@ -269,7 +297,6 @@
                         </a>
                     @endforeach
 
-                    {{-- Lainnya / Semua Campaign --}}
                     <a href="{{ route('home') }}#kategori-favorit"
                         class="category-item {{ request()->filled('kategori') ? '' : 'active' }}">
 
@@ -288,21 +315,28 @@
                             $persen = $campaign->target_donasi
                                 ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                 : 0;
-                            $hari = max(
-                                0,
-                                (int) now()->diffInDays($campaign->tanggal_berakhir, false)
-                            );
+
+                            // ♻️ SAMA LAGI
+                            $now = \Carbon\Carbon::now();
+                            $end = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
+                            $diff = (int) $now->diffInDays($end, false);
+
+                            if ($diff < 0) {
+                                $labelHari = 'Selesai';
+                            } elseif ($diff == 0) {
+                                $labelHari = 'Hari terakhir';
+                            } else {
+                                $labelHari = $diff . ' Hari';
+                            }
                         @endphp
 
                         <article class="list-card">
-
                             <a href="{{ route('campaign.show', $campaign->slug) }}">
                                 <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
                                     loading="lazy">
                             </a>
 
                             <div class="list-body">
-
                                 <h3>{{ $campaign->judul }}</h3>
 
                                 <p>
@@ -310,27 +344,20 @@
                                     <span>●</span>
                                 </p>
 
-                                <strong>
-                                    Rp {{ number_format($terkumpul, 0, ',', '.') }}
-                                </strong>
+                                <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
 
                                 <div class="progress">
-                                    <div class="progress-fill" style="width: {{ $persen }}%;">
-                                    </div>
+                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
                                 </div>
 
                                 <div class="campaign-meta">
                                     <span>{{ $campaign->donasi->count() }} Donatur</span>
-                                    <span>{{ $hari }} Hari</span>
+                                    <span>{{ $labelHari }}</span>
                                 </div>
-
                             </div>
-
                         </article>
                     @empty
-
-                        <p>Belum ada campaign.</p>
-
+                        <p>Belum ada campaign aktif.</p>
                     @endforelse
                 </div>
             </div>

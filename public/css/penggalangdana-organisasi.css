@@ -424,6 +424,135 @@
     transform: translateY(-2px);
 }
 
+.status-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-xxs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-badge.pending {
+    background-color: var(--secondary-light);
+    color: var(--secondary);
+}
+.status-badge.approved {
+    background-color: var(--success-light);
+    color: var(--success);
+}
+.status-badge.rejected {
+    background-color: var(--danger-light);
+    color: var(--danger);
+}
+.alert-warning {
+    background-color: var(--warning-light);
+    border-left: 4px solid var(--warning);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    color: var(--text-dark);
+    margin-top: var(--space-2);
+    font-size: var(--fs-xxs);
+}
+.alert-warning strong {
+    color: var(--warning);
+}
+.disabled-overlay {
+    opacity: 0.6;
+    pointer-events: none;
+}
+.verify-card-disabled {
+    background: var(--bg-soft);
+}
+.info-note {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+.info-note i {
+    font-size: 1.1em;
+}
+.text-danger {
+    color: var(--danger);
+    font-size: var(--fs-xxs);
+    margin-top: var(--space-1);
+    display: block;
+}
+
+/* ============================
+   EDIT ORGANISASI - STYLING
+   ============================ */
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-xxs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-badge.pending {
+    background-color: var(--secondary-light);
+    color: var(--secondary);
+}
+.status-badge.approved {
+    background-color: var(--success-light);
+    color: var(--success);
+}
+.status-badge.rejected {
+    background-color: var(--danger-light);
+    color: var(--danger);
+}
+
+/* Info Note */
+.info-note {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+.info-note i {
+    font-size: 1.1em;
+}
+
+/* Alert Warning */
+.alert-warning {
+    background-color: var(--warning-light);
+    border-left: 4px solid var(--warning);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    color: var(--text-dark);
+    margin-top: var(--space-2);
+    font-size: var(--fs-xxs);
+}
+.alert-warning strong {
+    color: var(--warning);
+}
+
+/* Disabled State */
+.disabled-overlay {
+    opacity: 0.6;
+    pointer-events: none;
+}
+.verify-card-disabled {
+    background: var(--bg-soft);
+}
+
+/* Text Danger */
+.text-danger {
+    color: var(--danger);
+    font-size: var(--fs-xxs);
+    margin-top: var(--space-1);
+    display: block;
+}
+
 /* TABLET */
 @media (max-width: 900px) {
     .verify-heading h1 {

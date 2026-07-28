@@ -153,6 +153,27 @@
                             <span>Profil Saya</span>
                         </a>
 
+                        @php
+                            $penggalang = auth()->user()->penggalangDana;
+                        @endphp
+                        @if($penggalang && $penggalang->status === 'approved')
+                            <a href="{{ route('profil.penggalang', $penggalang->id) }}">
+                                <i class="bi bi-people-fill"></i>
+                                <span>Profil Penggalang</span>
+                            </a>
+                            <a href="{{ route('campaign.create', $penggalang->id) }}">
+                                <i class="bi bi-megaphone-fill"></i>
+                                <span>Tambah Campaign</span>
+                            </a>
+                        @endif
+
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.dashboard') }}">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard Admin</span>
+                            </a>
+                        @endif
+
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="logout-trigger">

@@ -10,6 +10,7 @@ use App\Http\Controllers\User\CampaignController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\CampaignUpdateController;
 use App\Http\Controllers\User\FundraiserController;
+use App\Http\Controllers\User\SearchController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -30,6 +31,9 @@ Route::post('/set-intended-url', function (Request $request) {
     session(['url.intended' => $request->url]);
     return response()->json(['success' => true]);
 })->name('set.intended.url');
+
+// search
+Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 // ============================================================
 // BERITA
@@ -59,6 +63,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/campaign/{campaign}/edit', [CampaignController::class, 'edit'])->name('campaign.edit');
     Route::put('/campaign/{campaign}', [CampaignController::class, 'update'])->name('campaign.update');
     Route::delete('/campaign/{campaign}', [CampaignController::class, 'destroy'])->name('campaign.destroy');
+    Route::get('/campaign/{slug}/update/{update}/edit', [App\Http\Controllers\User\CampaignUpdateController::class, 'edit'])
+        ->name('campaign.update.edit');
+    Route::put('/campaign/{slug}/update/{update}', [App\Http\Controllers\User\CampaignUpdateController::class, 'update'])
+        ->name('campaign.update.update');
+    Route::delete('/campaign/{slug}/update/{update}', [App\Http\Controllers\User\CampaignUpdateController::class, 'destroy'])
+        ->name('campaign.update.destroy');
+    // Route create sudah ada: campaign.update.create
 });
 
 // Wildcard setelah semua route spesifik
@@ -95,9 +106,15 @@ Route::get('/donasi/bayar-login', function () {
 // ============================================================
 // PUSAT INFORMASI (STATIS)
 // ============================================================
-Route::get('/tentang', function () { return view('pages.tentang'); })->name('tentang');
-Route::get('/syarat-ketentuan', function () { return view('pages.syarat-ketentuan'); })->name('syarat.ketentuan');
-Route::get('/pusat-bantuan', function () { return view('pages.pusat-bantuan'); })->name('pusat.bantuan');
+Route::get('/tentang', function () {
+    return view('pages.tentang');
+})->name('tentang');
+Route::get('/syarat-ketentuan', function () {
+    return view('pages.syarat-ketentuan');
+})->name('syarat.ketentuan');
+Route::get('/pusat-bantuan', function () {
+    return view('pages.pusat-bantuan');
+})->name('pusat.bantuan');
 
 // ============================================================
 // PENGGALANG DANA (PUBLIC)
@@ -123,6 +140,8 @@ Route::middleware('auth')->group(function () {
         ->name('penggalang_dana.update');
     Route::get('/penggalang/rejected', [PenggalangDanaController::class, 'rejected'])
         ->name('penggalang_dana.rejected');
+    Route::patch('/penggalang-dana/{id}/resubmit', [PenggalangDanaController::class, 'resubmit'])
+        ->name('penggalang_dana.resubmit');
 });
 
 // ============================================================

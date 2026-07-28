@@ -22,25 +22,18 @@ class PenggalangDanaController extends Controller
     public function storeOrganisasi(Request $request)
     {
         $request->validate([
-
             'thumbnail' => 'required|image|max:2048',
             'foto_profil' => 'required|image|max:2048',
-
             'nama_penggalang' => 'required|max:255',
             'tahun_berdiri' => 'required|digits:4',
             'alamat' => 'required',
             'deskripsi' => 'required',
             'visi' => 'required',
             'misi' => 'required',
-
             'email' => 'required|email',
             'no_telepon' => 'required',
-
             'nama_dokumen.0' => 'required',
-            'nama_dokumen.1' => 'required',
-
             'file_dokumen.0' => 'required|url',
-            'file_dokumen.1' => 'required|url',
         ]);
 
         DB::beginTransaction();
@@ -62,54 +55,37 @@ class PenggalangDanaController extends Controller
                 );
 
             $penggalangDana = Penggalang_Dana::create([
-
                 'user_id' => auth()->id(),
-
                 'jenis_penggalang' =>
                     $request->jenis_penggalang,
-
                 'thumbnail' =>
                     $thumbnail,
-
                 'foto_profil' =>
                     $fotoProfil,
-
                 'nama_penggalang' =>
                     $request->nama_penggalang,
-
                 'tahun_berdiri' =>
                     $request->tahun_berdiri,
-
                 'alamat' =>
                     $request->alamat,
-
                 'deskripsi' =>
                     $request->deskripsi,
-
                 'visi' =>
                     $request->visi,
-
                 'misi' =>
                     $request->misi,
-
                 'email' =>
                     $request->email,
-
                 'no_telepon' =>
                     $request->no_telepon,
-
                 'instagram' =>
                     $request->instagram,
-
                 'facebook' =>
                     $request->facebook,
-
                 'youtube' =>
                     $request->youtube,
-
                 'tiktok' =>
                     $request->tiktok,
-
                 'status' =>
                     'pending',
             ]);
@@ -124,13 +100,10 @@ class PenggalangDanaController extends Controller
                 }
 
                 Penggalang_Dana_Dokumen::create([
-
                     'penggalang_dana_id' =>
                         $penggalangDana->id,
-
                     'nama_dokumen' =>
                         $namaDokumen,
-
                     'file_dokumen' =>
                         $request->file_dokumen[$index],
                 ]);
@@ -139,7 +112,7 @@ class PenggalangDanaController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('home')
+                ->route('profile.user')
                 ->with(
                     'success',
                     'Pengajuan penggalang dana berhasil dikirim.'
@@ -148,7 +121,6 @@ class PenggalangDanaController extends Controller
         } catch (\Exception $e) {
 
             DB::rollBack();
-
             dd($e->getMessage());
         }
 
@@ -156,113 +128,73 @@ class PenggalangDanaController extends Controller
 
     public function storeIndividu(Request $request)
     {
+        // ===== VALIDASI YANG BENAR =====
         $request->validate([
-
             'foto_profil' => 'required|image|max:2048',
-
             'nama_penggalang' => 'required|max:255',
             'alamat' => 'required',
-            'deskripsi' => 'required',
-
+            'deskripsi' => 'nullable', // boleh opsional
             'email' => 'required|email',
             'no_telepon' => 'required',
-
+            // WAJIBKAN dokumen pertama (sama seperti organisasi)
+            'nama_dokumen.0' => 'required|string',
+            'file_dokumen.0' => 'required|url',
+            'visi' => 'nullable',
+            'misi' => 'nullable',
             'instagram' => 'nullable',
             'facebook' => 'nullable',
             'youtube' => 'nullable',
             'tiktok' => 'nullable',
-
         ]);
 
         DB::beginTransaction();
 
         try {
-
-            $fotoProfil = $request
-                ->file('foto_profil')
-                ->store(
-                    'penggalang_dana/profil',
-                    'public'
-                );
+            $fotoProfil = $request->file('foto_profil')
+                ->store('penggalang_dana/profil', 'public');
 
             $penggalangDana = Penggalang_Dana::create([
-
                 'user_id' => auth()->id(),
-
                 'jenis_penggalang' => 'individu',
-
-                // Individu tidak punya banner
                 'thumbnail' => null,
-
                 'foto_profil' => $fotoProfil,
-
                 'nama_penggalang' => $request->nama_penggalang,
-
-                // Individu tidak punya tahun berdiri
                 'tahun_berdiri' => null,
-
                 'alamat' => $request->alamat,
-
                 'deskripsi' => $request->deskripsi,
-
-                // Visi & misi opsional
                 'visi' => $request->visi,
                 'misi' => $request->misi,
-
                 'email' => $request->email,
-
                 'no_telepon' => $request->no_telepon,
-
                 'instagram' => $request->instagram,
-
                 'facebook' => $request->facebook,
-
                 'youtube' => $request->youtube,
-
                 'tiktok' => $request->tiktok,
-
                 'status' => 'pending',
-
-                'nama_dokumen' => 'required|array',
-                'nama_dokumen.*' => 'required|string',
-
-                'file_dokumen' => 'required|array',
-                'file_dokumen.*' => 'required|url',
-
+                // HAPUS baris ini: 'nama_dokumen.0' => 'required', dan 'file_dokumen.0' => 'required|url'
             ]);
-            if ($request->nama_dokumen && $request->file_dokumen) {
 
-                foreach ($request->nama_dokumen as $i => $nama) {
-
-                    if (empty($nama) || empty($request->file_dokumen[$i])) {
-                        continue;
-                    }
-
-                    Penggalang_Dana_Dokumen::create([
-                        'penggalang_dana_id' => $penggalangDana->id,
-                        'nama_dokumen' => $nama,
-                        'file_dokumen' => $request->file_dokumen[$i],
-                    ]);
+            // Simpan dokumen (minimal satu karena sudah divalidasi)
+            foreach ($request->nama_dokumen as $i => $nama) {
+                if (empty($nama) || empty($request->file_dokumen[$i])) {
+                    continue;
                 }
+                Penggalang_Dana_Dokumen::create([
+                    'penggalang_dana_id' => $penggalangDana->id,
+                    'nama_dokumen' => $nama,
+                    'file_dokumen' => $request->file_dokumen[$i],
+                ]);
             }
+
             DB::commit();
 
             return redirect()
                 ->route('profile.user')
-                ->with(
-                    'success',
-                    'Pengajuan penggalang dana berhasil dikirim dan sedang menunggu verifikasi.'
-                );
-
+                ->with('success', 'Pengajuan berhasil dikirim.');
         } catch (\Exception $e) {
-
             DB::rollBack();
-
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'error' => $e->getMessage()
-                ]);
+            // Jangan redirect back dengan error, tapi log error dan tampilkan pesan umum
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
     public function profile()
@@ -328,6 +260,7 @@ class PenggalangDanaController extends Controller
     {
         $penggalang = Penggalang_Dana::findOrFail($id);
 
+        // Validasi dasar
         $validated = $request->validate([
             'nama_penggalang' => 'required|string',
             'email' => 'required|email',
@@ -347,63 +280,82 @@ class PenggalangDanaController extends Controller
             'file_dokumen' => 'nullable|array',
         ]);
 
-        // Upload foto profil
-        if ($request->hasFile('foto_profil')) {
+        // === AMBIL DATA DOKUMEN LAMA ===
+        $oldDokumen = $penggalang->penggalangDanaDokumen()->get()->keyBy('id');
 
-            if (
-                $penggalang->foto_profil &&
-                Storage::disk('public')->exists($penggalang->foto_profil)
-            ) {
+        // === CEK PERUBAHAN DOKUMEN ===
+        $isDokumenChanged = false;
+
+        // Ambil input dokumen baru (array)
+        $newNama = $request->input('nama_dokumen', []);
+        $newFile = $request->input('file_dokumen', []);
+
+        // Bandingkan jumlah & isi
+        if (count($oldDokumen) !== count($newNama)) {
+            $isDokumenChanged = true;
+        } else {
+            foreach ($oldDokumen as $index => $dok) {
+                // Bandingkan nama dan file
+                $oldNama = $dok->nama_dokumen;
+                $oldFile = $dok->file_dokumen;
+                $newNamaVal = $newNama[$index] ?? '';
+                $newFileVal = $newFile[$index] ?? '';
+
+                if ($oldNama !== $newNamaVal || $oldFile !== $newFileVal) {
+                    $isDokumenChanged = true;
+                    break;
+                }
+            }
+        }
+
+        // === UPLOAD FOTO PROFIL ===
+        if ($request->hasFile('foto_profil')) {
+            if ($penggalang->foto_profil && Storage::disk('public')->exists($penggalang->foto_profil)) {
                 Storage::disk('public')->delete($penggalang->foto_profil);
             }
-
-            $validated['foto_profil'] = $request->file('foto_profil')
-                ->store('penggalang_dana/profil', 'public');
+            $validated['foto_profil'] = $request->file('foto_profil')->store('penggalang_dana/profil', 'public');
         }
 
-        // Upload thumbnail
+        // === UPLOAD THUMBNAIL ===
         if ($request->hasFile('thumbnail')) {
-
-            if (
-                $penggalang->thumbnail &&
-                Storage::disk('public')->exists($penggalang->thumbnail)
-            ) {
+            if ($penggalang->thumbnail && Storage::disk('public')->exists($penggalang->thumbnail)) {
                 Storage::disk('public')->delete($penggalang->thumbnail);
             }
-
-            $validated['thumbnail'] = $request->file('thumbnail')
-                ->store('penggalang_dana/thumbnail', 'public');
+            $validated['thumbnail'] = $request->file('thumbnail')->store('penggalang_dana/thumbnail', 'public');
         }
 
-        // Jika sebelumnya ditolak, berarti ini revisi
-        if ($penggalang->status === 'rejected') {
-
+        // === UPDATE STATUS BERDASARKAN PERUBAHAN DOKUMEN ===
+        // Jika ada perubahan dokumen, set ke pending (kecuali sedang pending, tetap pending)
+        if ($isDokumenChanged) {
             $validated['status'] = 'pending';
             $validated['status_read'] = false;
+            // Reset catatan verifikasi jika perlu
             $validated['catatan_verifikasi'] = null;
             $validated['verified_by'] = null;
             $validated['verified_at'] = null;
-            $validated['revision_count'] = $penggalang->revision_count + 1;
-
+            // Increment revision_count jika sebelumnya rejected atau approved
+            if (in_array($penggalang->status, ['rejected', 'approved'])) {
+                $validated['revision_count'] = $penggalang->revision_count + 1;
+            }
+        } else {
+            // Jika tidak ada perubahan dokumen, status tetap seperti semula
+            // Kecuali jika status sebelumnya 'pending' kita biarkan saja
+            // Jika status 'rejected' dan tidak ada perubahan, kita biarkan agar user sadar belum ada perbaikan
         }
 
         // Update data utama
         $penggalang->update($validated);
 
-        // Update dokumen
+        // === UPDATE DOKUMEN ===
         if ($request->filled('nama_dokumen')) {
-
+            // Hapus semua dokumen lama
             $penggalang->penggalangDanaDokumen()->delete();
 
+            // Simpan dokumen baru
             foreach ($request->nama_dokumen as $i => $nama) {
-
-                if (
-                    empty($nama) ||
-                    empty($request->file_dokumen[$i])
-                ) {
+                if (empty($nama) || empty($request->file_dokumen[$i])) {
                     continue;
                 }
-
                 Penggalang_Dana_Dokumen::create([
                     'penggalang_dana_id' => $penggalang->id,
                     'nama_dokumen' => $nama,
@@ -412,9 +364,44 @@ class PenggalangDanaController extends Controller
             }
         }
 
+        // Pesan sukses dengan informasi status
+        $message = 'Data berhasil diperbarui.';
+        if ($isDokumenChanged) {
+            $message .= ' Dokumen berubah, status kini PENDING dan menunggu verifikasi ulang.';
+        }
+
         return redirect()
-            ->route('profil.penggalang')
-            ->with('success', 'Data berhasil diperbarui.');
+            ->route('profil.penggalang', $penggalang->id)
+            ->with('success', $message);
+    }
+
+    /**
+     * RESUBMIT – khusus untuk pengajuan yang ditolak
+     * Status langsung menjadi pending tanpa melihat perubahan dokumen
+     */
+    public function resubmit($id)
+    {
+        $penggalang = Penggalang_Dana::findOrFail($id);
+
+        // Hanya bisa di-resubmit jika status rejected
+        if ($penggalang->status !== 'rejected') {
+            return redirect()->back()->with('error', 'Pengajuan ini tidak dapat diajukan ulang.');
+        }
+
+        // Ubah status ke pending, reset data verifikasi
+        $penggalang->status = 'pending';
+        $penggalang->status_read = false;
+        $penggalang->catatan_verifikasi = null;
+        $penggalang->verified_by = null;
+        $penggalang->verified_at = null;
+        $penggalang->revision_count = $penggalang->revision_count + 1;
+        $penggalang->save();
+
+        // Opsional: kirim notifikasi ke admin bahwa ada pengajuan ulang
+
+        return redirect()
+            ->route('profile.user')
+            ->with('success', 'Pengajuan ulang berhasil! Status kini PENDING, menunggu verifikasi admin.');
     }
 
 

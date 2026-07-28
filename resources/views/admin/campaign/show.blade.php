@@ -25,8 +25,19 @@
             <p class="profile-type">
                 {{ $campaign->kategori->nama_kategori ?? 'Kategori tidak ditemukan' }}
             </p>
-            @if($campaign->is_active)
-                <span class="badge badge-green">Aktif</span>
+
+            {{-- Status Campaign (aktif berdasarkan tanggal) --}}
+            @php
+                $isActiveNow = $campaign->is_time_active ?? $campaign->isTimeActive();
+                $isActiveAndApproved = $isActiveNow && $campaign->isApproved();
+            @endphp
+
+            @if($isActiveAndApproved && $campaign->is_active)
+                <span class="badge badge-green">✅ Aktif (Berjalan)</span>
+            @elseif($campaign->is_active && !$isActiveNow)
+                <span class="badge badge-yellow">⏳ Akan Datang</span>
+            @elseif(!$isActiveNow && $campaign->tanggal_berakhir < now())
+                <span class="badge badge-red">❌ Berakhir</span>
             @else
                 <span class="badge badge-red">Tidak Aktif</span>
             @endif
@@ -49,8 +60,7 @@
                     Status Approval
                 </h2>
                 <p class="card-subtitle">
-                    Status persetujuan campaign. Campaign emergency & sustainable perlu approval sebelum tampil di landing
-                    page.
+                    Status persetujuan campaign. Campaign emergency & sustainable perlu approval sebelum tampil di landing page.
                 </p>
             </div>
         </div>
@@ -92,16 +102,20 @@
                     </tr>
                     <tr>
                         <th>Tanggal Disetujui</th>
-                        <td>{{ $campaign->approved_at ? \Carbon\Carbon::parse($campaign->approved_at)->format('d M Y H:i') : '-' }}
-                        </td>
+                        <td>{{ $campaign->approved_at ? \Carbon\Carbon::parse($campaign->approved_at)->format('d M Y H:i') : '-' }}</td>
                     </tr>
                     <tr>
                         <th>Status Tampil di Landing Page</th>
                         <td>
-                            @if($campaign->is_active && $campaign->isApproved())
+                            @php
+                                $canShow = $campaign->is_active && $campaign->isApproved() && $campaign->isTimeActive();
+                            @endphp
+                            @if($canShow)
                                 <span class="badge badge-green">✅ Tampil</span>
                             @elseif($campaign->is_active && !$campaign->isApproved())
                                 <span class="badge badge-yellow">⏳ Menunggu Approval</span>
+                            @elseif(!$campaign->isTimeActive())
+                                <span class="badge badge-yellow">⏳ Belum Dimulai / Sudah Berakhir</span>
                             @else
                                 <span class="badge badge-red">❌ Tidak Tampil</span>
                             @endif
@@ -126,7 +140,6 @@
         {{-- ACTION BUTTONS UNTUK EMERGENCY & SUSTAINABLE --}}
         @if(in_array($campaign->campaign_type, ['emergency', 'sustainable']))
 
-            {{-- Tombol untuk status PENDING --}}
             @if($campaign->approval_status == 'pending')
                 <div class="approval-actions">
                     <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST">
@@ -146,7 +159,6 @@
                     </button>
                 </div>
 
-                {{-- Tombol untuk status APPROVED --}}
             @elseif($campaign->approval_status == 'approved')
                 <div class="alert-approval success">
                     <i class="bi bi-check-circle-fill"></i>
@@ -156,9 +168,11 @@
                             Campaign akan tampil di landing page.
                             @if(!$campaign->is_active)
                                 <br>
-                                <span class="text-warning">
-                                    ⚠️ Namun campaign sedang tidak aktif. Aktifkan campaign untuk menampilkannya.
-                                </span>
+                                <span class="text-warning">⚠️ Namun campaign sedang tidak aktif.</span>
+                            @endif
+                            @if(!$campaign->isTimeActive())
+                                <br>
+                                <span class="text-warning">⏳ Campaign belum dimulai atau sudah berakhir.</span>
                             @endif
                         </div>
                     </div>
@@ -172,7 +186,6 @@
                     </button>
                 </form>
 
-                {{-- Tombol untuk status REJECTED --}}
             @elseif($campaign->approval_status == 'rejected')
                 <div class="alert-approval danger">
                     <i class="bi bi-x-circle-fill"></i>
@@ -200,7 +213,6 @@
             @endif
 
         @else
-            {{-- Untuk Regular Campaign --}}
             <div class="alert-approval info">
                 <i class="bi bi-info-circle-fill"></i>
                 <div class="alert-content">
@@ -219,626 +231,219 @@
         <div class="card-topbar">
             <div>
                 <h2>Informasi Campaign</h2>
-                <p class="card-subtitle">
-                    Detail utama campaign donasi.
-                </p>
+                <p class="card-subtitle">Detail utama campaign donasi.</p>
             </div>
 
             <a href="{{ route('admin.campaign.index') }}" class="btn-secondary">
-                <i class="bi bi-arrow-left"></i>
-                <span>Kembali</span>
+                <i class="bi bi-arrow-left"></i> <span>Kembali</span>
             </a>
         </div>
 
         <table class="data-table data-table-kv">
             <tbody>
-                <tr>
-                    <th>Slug</th>
-                    <td>
-                        <span class="badge badge-blue">
-                            {{ $campaign->slug }}
-                        </span>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>Penggalang Dana</th>
-                    <td>{{ $campaign->penggalangDana->nama_penggalang ?? '-' }}</td>
-                </tr>
-
-                <tr>
-                    <th>Target Donasi</th>
-                    <td>
-                        <span class="text-muted-strong">
-                            Rp {{ number_format($campaign->target_donasi, 0, ',', '.') }}
-                        </span>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>Minimal Donasi</th>
-                    <td>
-                        <span class="text-muted-strong">
-                            Rp {{ number_format($campaign->minimal_donasi, 0, ',', '.') }}
-                        </span>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>Tanggal Mulai</th>
-                    <td>
-                        {{ $campaign->tanggal_mulai ? \Carbon\Carbon::parse($campaign->tanggal_mulai)->format('d M Y') : '-' }}
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>Tanggal Berakhir</th>
-                    <td>
-                        {{ $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') : '-' }}
-                    </td>
-                </tr>
-
+                <tr><th>Slug</th><td><span class="badge badge-blue">{{ $campaign->slug }}</span></td></tr>
+                <tr><th>Penggalang Dana</th><td>{{ $campaign->penggalangDana->nama_penggalang ?? '-' }}</td></tr>
+                <tr><th>Target Donasi</th><td><span class="text-muted-strong">Rp {{ number_format($campaign->target_donasi, 0, ',', '.') }}</span></td></tr>
+                <tr><th>Minimal Donasi</th><td><span class="text-muted-strong">Rp {{ number_format($campaign->minimal_donasi, 0, ',', '.') }}</span></td></tr>
+                <tr><th>Tanggal Mulai</th><td>{{ $campaign->tanggal_mulai ? \Carbon\Carbon::parse($campaign->tanggal_mulai)->format('d M Y') : '-' }}</td></tr>
+                <tr><th>Tanggal Berakhir</th><td>{{ $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') : '-' }}</td></tr>
                 <tr>
                     <th>Status Campaign</th>
                     <td>
-                        @if($campaign->is_active)
-                            <span class="badge badge-green">Aktif</span>
+                        @php
+                            $isTimeActive = $campaign->isTimeActive();
+                        @endphp
+                        @if($campaign->is_active && $isTimeActive)
+                            <span class="badge badge-green">✅ Aktif (Berjalan)</span>
+                        @elseif($campaign->is_active && !$isTimeActive)
+                            <span class="badge badge-yellow">⏳ Akan Datang</span>
+                        @elseif(!$isTimeActive && $campaign->tanggal_berakhir < now())
+                            <span class="badge badge-red">❌ Berakhir</span>
                         @else
                             <span class="badge badge-red">Tidak Aktif</span>
                         @endif
                     </td>
                 </tr>
-
                 @if($campaign->verified_at)
-                    <tr>
-                        <th>Diverifikasi Oleh</th>
-                        <td>{{ $campaign->verifier->name ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Tanggal Verifikasi</th>
-                        <td>{{ $campaign->verified_at ? \Carbon\Carbon::parse($campaign->verified_at)->format('d M Y H:i') : '-' }}
-                        </td>
-                    </tr>
+                    <tr><th>Diverifikasi Oleh</th><td>{{ $campaign->verifier->name ?? '-' }}</td></tr>
+                    <tr><th>Tanggal Verifikasi</th><td>{{ $campaign->verified_at ? \Carbon\Carbon::parse($campaign->verified_at)->format('d M Y H:i') : '-' }}</td></tr>
                 @endif
             </tbody>
         </table>
-
     </section>
 
     {{-- Deskripsi --}}
     <section class="ob-card ob-card-lg">
-
         <div class="card-topbar">
             <div>
                 <h2>Deskripsi Campaign</h2>
-                <p class="card-subtitle">
-                    Penjelasan lengkap tentang campaign.
-                </p>
+                <p class="card-subtitle">Penjelasan lengkap tentang campaign.</p>
             </div>
         </div>
-
         <div class="detail-content">
             {!! nl2br(e($campaign->deskripsi)) !!}
         </div>
-
     </section>
 
     {{-- Galeri --}}
     <section class="ob-card ob-card-lg">
-
         <div class="card-topbar">
             <div>
                 <h2>Galeri Campaign</h2>
-                <p class="card-subtitle">
-                    Kumpulan gambar pendukung campaign.
-                </p>
+                <p class="card-subtitle">Kumpulan gambar pendukung campaign.</p>
             </div>
         </div>
-
         @if($campaign->campaignGambar->count())
             <div class="gallery-grid">
                 @foreach($campaign->campaignGambar as $gambar)
                     <div class="gallery-item">
-                        <img src="{{ asset('storage/' . $gambar->foto) }}" alt="{{ $campaign->judul }}">
+                        <img src="{{ asset('storage/' . ($gambar->gambar ?? $gambar->foto)) }}" alt="{{ $campaign->judul }}">
                     </div>
                 @endforeach
             </div>
         @else
-            <p class="text-muted">
-                Tidak ada galeri.
-            </p>
+            <p class="text-muted">Tidak ada galeri.</p>
         @endif
-
     </section>
 
     {{-- Filter --}}
     <section class="ob-card ob-card-lg">
-
         <div class="card-topbar">
             <div>
                 <h2>Filter Campaign</h2>
-                <p class="card-subtitle">
-                    Filter atau kategori tambahan yang terhubung dengan campaign.
-                </p>
+                <p class="card-subtitle">Filter atau kategori tambahan yang terhubung dengan campaign.</p>
             </div>
         </div>
-
         @if($campaign->campaignFilter->count())
             <div class="badge-group">
                 @foreach($campaign->campaignFilter as $campaignFilter)
-                    <span class="badge badge-blue">
-                        {{ $campaignFilter->filter->nama_filter ?? '-' }}
-                    </span>
+                    <span class="badge badge-blue">{{ $campaignFilter->filter->nama_filter ?? '-' }}</span>
                 @endforeach
             </div>
         @else
-            <p class="text-muted">
-                Tidak ada filter.
-            </p>
+            <p class="text-muted">Tidak ada filter.</p>
         @endif
-
     </section>
 
     {{-- Fitur Tambahan --}}
     <section class="ob-card ob-card-lg">
-
         <div class="card-topbar">
             <div>
                 <h2>Fitur Tambahan</h2>
-                <p class="card-subtitle">
-                    Fitur opsional yang diaktifkan untuk campaign ini.
-                </p>
+                <p class="card-subtitle">Fitur opsional yang diaktifkan untuk campaign ini.</p>
             </div>
         </div>
-
         <table class="data-table data-table-kv">
             <tbody>
-                <tr>
-                    <th>Jumlah Package</th>
-                    <td>
-                        @if($campaign->enable_quantity)
-                            <span class="badge badge-green">Aktif</span>
-                        @else
-                            <span class="badge badge-red">Nonaktif</span>
-                        @endif
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>Nama Donatur</th>
-                    <td>
-                        @if($campaign->enable_nama_donatur)
-                            <span class="badge badge-green">Aktif</span>
-                        @else
-                            <span class="badge badge-red">Nonaktif</span>
-                        @endif
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>Nominal Lainnya</th>
-                    <td>
-                        @if($campaign->enable_custom_nominal)
-                            <span class="badge badge-green">Aktif</span>
-                        @else
-                            <span class="badge badge-red">Nonaktif</span>
-                        @endif
-                    </td>
-                </tr>
+                <tr><th>Jumlah Package</th><td>@if($campaign->enable_quantity) <span class="badge badge-green">Aktif</span> @else <span class="badge badge-red">Nonaktif</span> @endif</td></tr>
+                <tr><th>Nama Donatur</th><td>@if($campaign->enable_nama_donatur) <span class="badge badge-green">Aktif</span> @else <span class="badge badge-red">Nonaktif</span> @endif</td></tr>
+                <tr><th>Nominal Lainnya</th><td>@if($campaign->enable_custom_nominal) <span class="badge badge-green">Aktif</span> @else <span class="badge badge-red">Nonaktif</span> @endif</td></tr>
             </tbody>
         </table>
-
     </section>
 
     {{-- Update Campaign --}}
     <section class="ob-card ob-card-lg">
-
         <div class="card-topbar">
             <div>
                 <h2>Update Campaign</h2>
-                <p class="card-subtitle">
-                    Riwayat update yang dibuat untuk campaign ini.
-                </p>
+                <p class="card-subtitle">Riwayat update yang dibuat untuk campaign ini.</p>
             </div>
         </div>
-
         <div class="table-wrapper">
             <table class="data-table">
-
                 <thead>
-                    <tr>
-                        <th>Judul</th>
-                        <th>Dibuat Oleh</th>
-                        <th>Tanggal</th>
-                    </tr>
+                    <tr><th>Judul</th><th>Dibuat Oleh</th><th>Tanggal</th></tr>
                 </thead>
-
                 <tbody>
                     @forelse($campaign->campaignUpdates as $update)
                         <tr>
-                            <td>
-                                <p class="cell-title">
-                                    {{ $update->judul_update }}
-                                </p>
-                            </td>
-
-                            <td>
-                                {{ $update->user->name ?? '-' }}
-                            </td>
-
-                            <td class="text-muted-strong">
-                                {{ $update->created_at->format('d M Y') }}
-                            </td>
+                            <td><p class="cell-title">{{ $update->judul_update }}</p></td>
+                            <td>{{ $campaign->penggalangDana->nama_penggalang ?? $update->user->name ?? '-' }}</td>
+                            <td class="text-muted-strong">{{ $update->created_at->format('d M Y') }}</td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="3" class="empty-state">
-                                Belum ada update.
-                            </td>
-                        </tr>
+                        <tr><td colspan="3" class="empty-state">Belum ada update.</td></tr>
                     @endforelse
                 </tbody>
-
             </table>
         </div>
-
     </section>
 
     {{-- Fundraiser Pendukung --}}
     <section class="ob-card ob-card-lg">
-
         <div class="card-topbar">
             <div>
                 <h2>Fundraiser Pendukung</h2>
-                <p class="card-subtitle">
-                    Daftar user yang ikut menjadi fundraiser pendukung.
-                </p>
+                <p class="card-subtitle">Daftar user yang ikut menjadi fundraiser pendukung.</p>
             </div>
         </div>
-
         <div class="table-wrapper">
             <table class="data-table">
-
-                <thead>
-                    <tr>
-                        <th>Nama User</th>
-                    </tr>
-                </thead>
-
+                <thead><tr><th>Nama User</th></tr></thead>
                 <tbody>
                     @forelse($campaign->campaignFundraisers as $fundraiser)
-                        <tr>
-                            <td>
-                                <p class="cell-title">
-                                    {{ $fundraiser->user->name ?? 'User tidak ditemukan' }}
-                                </p>
-                            </td>
-                        </tr>
+                        <tr><td><p class="cell-title">{{ $fundraiser->user->name ?? 'User tidak ditemukan' }}</p></td></tr>
                     @empty
-                        <tr>
-                            <td class="empty-state">
-                                Tidak ada fundraiser pendukung.
-                            </td>
-                        </tr>
+                        <tr><td class="empty-state">Tidak ada fundraiser pendukung.</td></tr>
                     @endforelse
                 </tbody>
-
             </table>
         </div>
-
     </section>
 
     {{-- Packages --}}
     <section class="ob-card ob-card-lg">
-
         <div class="card-topbar">
             <div>
                 <h2>Package Campaign</h2>
-                <p class="card-subtitle">
-                    Daftar package donasi yang tersedia untuk campaign ini.
-                </p>
+                <p class="card-subtitle">Daftar package donasi yang tersedia untuk campaign ini.</p>
             </div>
         </div>
-
         <div class="table-wrapper">
             <table class="data-table">
-
-                <thead>
-                    <tr>
-                        <th>Nama Package</th>
-                        <th>Nominal</th>
-                        <th>Deskripsi</th>
-                    </tr>
-                </thead>
-
+                <thead><tr><th>Nama Package</th><th>Nominal</th><th>Deskripsi</th></tr></thead>
                 <tbody>
                     @forelse($campaign->packages as $package)
                         <tr>
-                            <td>
-                                <p class="cell-title">
-                                    {{ $package->nama_package }}
-                                </p>
-                            </td>
-                            <td>
-                                <span class="text-muted-strong">
-                                    Rp {{ number_format($package->nominal, 0, ',', '.') }}
-                                </span>
-                            </td>
-                            <td>
-                                {{ $package->deskripsi ?? '-' }}
-                            </td>
+                            <td><p class="cell-title">{{ $package->judul ?? $package->nama_package ?? '-' }}</p></td>
+                            <td><span class="text-muted-strong">Rp {{ number_format($package->nominal, 0, ',', '.') }}</span></td>
+                            <td>{{ $package->deskripsi ?? '-' }}</td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="3" class="empty-state">
-                                Belum ada package.
-                            </td>
-                        </tr>
+                        <tr><td colspan="3" class="empty-state">Belum ada package.</td></tr>
                     @endforelse
                 </tbody>
-
             </table>
         </div>
-
     </section>
 
+    {{-- Reject Modal --}}
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('admin.campaign.reject', $campaign->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill text-danger"></i> Tolak Campaign</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="rejection_reason" class="form-label">Alasan Penolakan <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" placeholder="Tulis alasan mengapa campaign ini ditolak..." required></textarea>
+                            <small class="text-muted">Alasan ini akan ditampilkan kepada penggalang dana.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-reject">
+                            <i class="bi bi-x-circle-fill"></i> Tolak Campaign
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
-
-@push('styles')
-    <style>
-        /* Approval Section */
-        .ob-card {
-            border-left: 4px solid var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        /* Alert */
-        .alert {
-            padding: var(--space-3) var(--space-4);
-            border-radius: var(--radius-sm);
-            border-left: 3px solid;
-            display: flex;
-            align-items: flex-start;
-            gap: var(--space-2);
-        }
-
-        .alert-success {
-            background-color: #f0fdf4;
-            color: #166534;
-            border-left-color: #22c55e;
-        }
-
-        .alert-danger {
-            background-color: #fef2f2;
-            color: #991b1b;
-            border-left-color: #ef4444;
-        }
-
-        .alert-info {
-            background-color: #eff6ff;
-            color: #1e40af;
-            border-left-color: #3b82f6;
-        }
-
-        .alert .text-warning {
-            color: #d97706;
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-2);
-            padding: var(--space-2) var(--space-5);
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: var(--fs-xs);
-            font-weight: var(--fw-medium);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        .btn-lg {
-            padding: var(--space-3) var(--space-6);
-            font-size: var(--fs-sm);
-        }
-
-        .btn-success {
-            background-color: #22c55e;
-            color: #fff;
-        }
-
-        .btn-success:hover {
-            background-color: #16a34a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-        }
-
-        .btn-danger {
-            background-color: #ef4444;
-            color: #fff;
-        }
-
-        .btn-danger:hover {
-            background-color: #dc2626;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-warning {
-            background-color: #f59e0b;
-            color: #fff;
-        }
-
-        .btn-warning:hover {
-            background-color: #d97706;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-        }
-
-        .btn-secondary {
-            background-color: var(--bg-soft);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--border);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-soft);
-        }
-
-        /* Modal */
-        .modal-content {
-            border-radius: var(--radius);
-            border: none;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
-            border-bottom: 1px solid var(--border);
-            padding: var(--space-4) var(--space-5);
-        }
-
-        .modal-header .modal-title {
-            font-size: var(--fs-sm);
-            font-weight: var(--fw-semibold);
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            gap: var(--space-2);
-        }
-
-        .modal-body {
-            padding: var(--space-5);
-        }
-
-        .modal-footer {
-            border-top: 1px solid var(--border);
-            padding: var(--space-4) var(--space-5);
-        }
-
-        .btn-close {
-            background: none;
-            border: none;
-            font-size: var(--fs-lg);
-            color: var(--muted);
-            cursor: pointer;
-            padding: 0;
-            line-height: 1;
-            transition: color 0.2s ease;
-        }
-
-        .btn-close:hover {
-            color: var(--text);
-        }
-
-        /* Form */
-        .form-label {
-            font-size: var(--fs-xs);
-            font-weight: var(--fw-medium);
-            color: var(--text);
-            margin-bottom: var(--space-2);
-            display: block;
-        }
-
-        .form-label .text-danger {
-            color: #ef4444;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: var(--space-2) var(--space-3);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: var(--fs-xs);
-            color: var(--text);
-            background: var(--bg);
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        .form-control::placeholder {
-            color: var(--muted-light);
-        }
-
-        .text-muted {
-            font-size: var(--fs-xxs);
-            color: var(--muted);
-            margin-top: var(--space-1);
-            display: block;
-        }
-
-        /* Utility */
-        .d-flex {
-            display: flex;
-        }
-
-        .d-inline {
-            display: inline;
-        }
-
-        .d-block {
-            display: block;
-        }
-
-        .gap-2 {
-            gap: var(--space-2);
-        }
-
-        .gap-3 {
-            gap: var(--space-3);
-        }
-
-        .mt-1 {
-            margin-top: var(--space-1);
-        }
-
-        .mt-3 {
-            margin-top: var(--space-3);
-        }
-
-        .mt-4 {
-            margin-top: var(--space-4);
-        }
-
-        .mb-0 {
-            margin-bottom: 0;
-        }
-
-        .flex-wrap {
-            flex-wrap: wrap;
-        }
-
-        .fw-bold {
-            font-weight: var(--fw-bold);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .d-flex.gap-3 {
-                flex-direction: column;
-            }
-
-            .d-flex.gap-3 .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .modal-dialog {
-                margin: var(--space-3);
-            }
-
-            .btn-lg {
-                padding: var(--space-2) var(--space-4);
-                font-size: var(--fs-xs);
-            }
-        }
-    </style>
-@endpush

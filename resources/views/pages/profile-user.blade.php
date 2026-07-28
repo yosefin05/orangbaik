@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +8,11 @@
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/profile-user.css') }}">
+
 </head>
 <x-logout-modal/>
 
 <body>
-
     @include('components.header')
 
     @php
@@ -24,25 +23,22 @@
     @endphp
 
     <main class="profile-page">
-
-        {{-- HERO --}}
+        <!-- HERO -->
         <section class="profile-hero">
             <div class="profile-container">
                 <img src="{{ asset('assets/profile-banner.png') }}" class="profile-banner" alt="Profil OrangBaik.id">
             </div>
         </section>
 
-        {{-- CONTENT --}}
+        <!-- CONTENT -->
         <section class="profile-content">
             <div class="profile-container">
 
-                {{-- PROFILE SUMMARY --}}
+                <!-- PROFILE SUMMARY -->
                 <section class="profile-summary">
-
                     <div class="profile-user">
                         @if(!empty($user->foto_profil))
-                            <img src="{{ asset('storage/' . $user->foto_profil) }}" class="profile-avatar"
-                                alt="{{ $user->name }}">
+                            <img src="{{ asset('storage/' . $user->foto_profil) }}" class="profile-avatar" alt="{{ $user->name }}">
                         @else
                             <div class="profile-avatar profile-avatar-placeholder">
                                 {{ $avatarInitial }}
@@ -60,19 +56,16 @@
                             <strong>Rp{{ number_format($totalDonasi ?? 0, 0, ',', '.') }}</strong>
                             <span>Nominal Donasi</span>
                         </div>
-
                         <div class="profile-stat-item">
                             <strong>{{ $jumlahDonasi ?? 0 }}</strong>
                             <span>Jumlah Donasi</span>
                         </div>
                     </div>
-
                 </section>
 
-                {{-- INFORMASI PRIBADI --}}
+                <!-- INFORMASI PRIBADI -->
                 <section class="profile-card">
                     <h2>Informasi Pribadi</h2>
-
                     <div class="profile-menu-list">
 
                         @if($user->role === 'admin')
@@ -80,12 +73,10 @@
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'dashboard'])
                                 </span>
-
                                 <span class="menu-text">
                                     <strong>Dashboard Admin</strong>
                                     <small>Masuk ke halaman administrator</small>
                                 </span>
-
                                 <span class="menu-arrow">›</span>
                             </a>
                         @endif
@@ -94,25 +85,10 @@
                             <span class="menu-icon">
                                 @include('components.profile-icon', ['type' => 'user'])
                             </span>
-
                             <span class="menu-text">
                                 <strong>Ubah Profil</strong>
                                 <small>Atur identitas dan foto profil kamu</small>
                             </span>
-
-                            <span class="menu-arrow">›</span>
-                        </a>
-
-                        <a href="#" class="profile-menu-item">
-                            <span class="menu-icon">
-                                @include('components.profile-icon', ['type' => 'language'])
-                            </span>
-
-                            <span class="menu-text">
-                                <strong>Bahasa</strong>
-                                <small>Pilih bahasa yang ingin digunakan</small>
-                            </span>
-
                             <span class="menu-arrow">›</span>
                         </a>
 
@@ -120,47 +96,34 @@
                             <span class="menu-icon">
                                 @include('components.profile-icon', ['type' => 'donation'])
                             </span>
-
                             <span class="menu-text">
                                 <strong>Riwayat Donasi</strong>
                                 <small>Lihat seluruh riwayat donasi kamu</small>
                             </span>
-
                             <span class="menu-arrow">›</span>
                         </a>
 
-                        @php
-                            $penggalangStatus = $penggalang?->status;
-                        @endphp
-
                         @if(!$penggalang)
-
                             <a href="#" class="profile-menu-item" id="openPenggalangModal">
-
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'handshake'])
                                 </span>
-
                                 <span class="menu-text">
                                     <strong>Daftar sebagai Penggalang Dana</strong>
                                     <small>Mulai membuat campaign donasi</small>
                                 </span>
-
                                 <span class="menu-arrow">›</span>
-
                             </a>
-
                         @elseif($penggalangStatus === 'pending')
-<<<<<<< HEAD
                             <a href="{{ route('profil.penggalang', $penggalang->id) }}" class="profile-menu-item">
-=======
-                            <a href="{{ route('profil.penggalang' , $penggalang->id) }}" class="profile-menu-item">
->>>>>>> 15dbd06b99467f4eb6a85971f4babac48d9f53a5
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'handshake'])
                                 </span>
                                 <span class="menu-text">
-                                    <strong>Status Pengajuan</strong>
+                                    <strong>
+                                        Pengajuan
+                                        <span class="badge-pending">Pending</span>
+                                    </strong>
                                     <small>Pengajuan sedang diverifikasi admin</small>
                                 </span>
                                 <span class="menu-arrow">›</span>
@@ -173,7 +136,6 @@
                                         <span class="notif-dot"></span>
                                     @endif
                                 </span>
-
                                 <span class="menu-text">
                                     <strong>Pengajuan Ditolak</strong>
                                     <small>Lihat alasan penolakan</small>
@@ -195,10 +157,11 @@
                                 <span class="menu-arrow">›</span>
                             </a>
                         @endif
+
                     </div>
                 </section>
 
-                {{-- LAINNYA --}}
+                <!-- LAINNYA -->
                 <section class="profile-card">
                     <h2>Lainnya</h2>
                     <div class="profile-menu-list">
@@ -234,7 +197,7 @@
                         </a>
                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                             @csrf
-                            <button type="submit" class="profile-menu-item logout-button logout-trigger" >
+                            <button type="submit" class="profile-menu-item logout-button logout-trigger">
                                 <span class="menu-icon">
                                     @include('components.profile-icon', ['type' => 'logout'])
                                 </span>
@@ -250,30 +213,16 @@
             </div>
         </section>
 
-        {{-- MODAL --}}
+        <!-- MODAL -->
         <div class="modal-overlay" id="penggalangModal">
             <div class="penggalang-modal">
-
                 <h2>Daftar Penggalang Dana</h2>
-
-                <p>
-                    Silakan pilih jenis akun penggalang dana yang ingin didaftarkan.
-                </p>
-
+                <p>Silakan pilih jenis akun penggalang dana yang ingin didaftarkan.</p>
                 <div class="modal-buttons">
-                    <a href="{{ route('verifikasi.penggalang') }}" class="btn-individu">
-                        Individu
-                    </a>
-
-                    <a href="{{ route('penggalang_dana.organisasi.create') }}" class="btn-organisasi">
-                        Organisasi
-                    </a>
+                    <a href="{{ route('verifikasi.penggalang') }}" class="btn-individu">Individu</a>
+                    <a href="{{ route('penggalang_dana.organisasi.create') }}" class="btn-organisasi">Organisasi</a>
                 </div>
-
-                <button type="button" class="btn-close" id="closePenggalangModal">
-                    Batal
-                </button>
-
+                <button type="button" class="btn-close" id="closePenggalangModal">Batal</button>
             </div>
         </div>
 
@@ -284,5 +233,4 @@
     <script src="{{ asset('js/header.js') }}"></script>
     <script src="{{ asset('js/profile-user.js') }}"></script>
 </body>
-
 </html>

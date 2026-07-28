@@ -40,6 +40,9 @@ class CampaignController extends Controller
             'approvedBy' // tambahin approvedBy
         ]);
 
+        $campaign->updateActiveStatus();
+
+
         return view(
             'admin.campaign.show',
             compact('campaign')

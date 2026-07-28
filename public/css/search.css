@@ -1,0 +1,414 @@
+/* ============================================================
+   SEARCH.CSS – Halaman Pencarian
+   Menggunakan root variables dari global.css
+   ============================================================ */
+
+/* ---------- Container utama ---------- */
+.search-section {
+    padding: var(--space-8) 0 var(--space-16);
+}
+
+/* ---------- Form Pencarian ---------- */
+.search-form-wrapper {
+    max-width: 640px;
+    margin: 0 auto var(--space-8);
+}
+
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+    padding: 0.25rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border);
+    transition: box-shadow 0.25s, border-color 0.25s;
+}
+
+.search-form:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(51, 101, 175, 0.12);
+}
+
+.search-form input {
+    flex: 1;
+    border: none;
+    padding: 0.9rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-sm);
+    outline: none;
+    background: transparent;
+    color: var(--text);
+}
+
+.search-form input::placeholder {
+    color: var(--muted-light);
+}
+
+.search-form button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 0.9rem 2rem;
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    transition: background 0.25s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-form button:hover {
+    background: var(--primary-hover);
+    transform: scale(1.02);
+}
+
+.search-form button:active {
+    transform: scale(0.97);
+}
+
+/* ---------- Judul ---------- */
+.search-title {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-bold);
+    margin-bottom: var(--space-8);
+    color: var(--text-dark);
+    text-align: center;
+    letter-spacing: -0.02em;
+}
+
+.search-title strong {
+    color: var(--primary);
+}
+
+/* ---------- Subtitle section ---------- */
+.search-subtitle {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-5);
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search-subtitle span {
+    font-size: var(--fs-xs);
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+    padding: 0.1rem 0.7rem;
+    border-radius: var(--radius-full);
+    line-height: 1.6;
+}
+
+.empty-result {
+    text-align: center;
+    color: var(--muted);
+    padding: var(--space-8) 0;
+    font-size: var(--fs-sm);
+}
+
+.search-placeholder {
+    text-align: center;
+    color: var(--muted-light);
+    padding: var(--space-16) 0;
+    font-size: var(--fs-md);
+}
+
+/* ============================================================
+   BERITA – horizontal scroll
+   ============================================================ */
+.berita-scroll-wrapper {
+    overflow-x: auto;
+    padding: 0.5rem 0 var(--space-6);
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.berita-scroll-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.berita-scroll-wrapper::-webkit-scrollbar-track {
+    background: var(--border-soft);
+    border-radius: var(--radius-full);
+}
+
+.berita-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: var(--radius-full);
+}
+
+.berita-scroll {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+    padding: 0.25rem 0.25rem 0.5rem;
+}
+
+.berita-card {
+    flex: 0 0 280px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.25s, box-shadow 0.25s;
+    border: 1px solid var(--border-soft);
+}
+
+.berita-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.berita-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.berita-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: var(--bg-soft);
+}
+
+.berita-body {
+    padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.berita-body h4 {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.berita-body h4 strong {
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 0 0.15rem;
+    border-radius: 2px;
+}
+
+.berita-body p {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.berita-date {
+    font-size: var(--fs-xxs);
+    color: var(--muted-light);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.berita-date::before {
+    content: "📅";
+    font-size: 0.8rem;
+}
+
+/* ============================================================
+   CAMPAIGN – grid 4 kolom
+   ============================================================ */
+.campaign-grid-search {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+    margin-top: var(--space-2);
+}
+
+.campaign-card {
+    background: var(--bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.25s, box-shadow 0.25s;
+    border: 1px solid var(--border-soft);
+}
+
+.campaign-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+}
+
+.campaign-card a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.campaign-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: var(--bg-soft);
+}
+
+.campaign-body {
+    padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.campaign-body h3 {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.campaign-body h3 strong {
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 0 0.15rem;
+    border-radius: 2px;
+}
+
+.campaign-body .organizer {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.campaign-body .organizer span {
+    color: var(--border);
+}
+
+.campaign-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.campaign-price strong {
+    font-size: var(--fs-md);
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+}
+
+.campaign-price span {
+    font-size: var(--fs-xxs);
+    color: var(--muted-light);
+}
+
+.progress {
+    height: 6px;
+    background: var(--border-soft);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: 0.6rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: var(--radius-full);
+    transition: width 0.4s ease;
+}
+
+.campaign-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--fs-xxs);
+    color: var(--muted-light);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+    .campaign-grid-search {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-5);
+    }
+}
+
+@media (max-width: 768px) {
+    .campaign-grid-search {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-4);
+    }
+
+    .berita-card {
+        flex: 0 0 220px;
+    }
+
+    .search-title {
+        font-size: var(--fs-lg);
+    }
+
+    .search-form-wrapper {
+        padding: 0 var(--space-4);
+    }
+}
+
+@media (max-width: 480px) {
+    .campaign-grid-search {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+
+    .berita-card {
+        flex: 0 0 200px;
+    }
+
+    .search-form {
+        flex-direction: column;
+        border-radius: var(--radius-md);
+        padding: 0.5rem;
+        background: var(--bg);
+    }
+
+    .search-form input {
+        padding: 0.7rem 1rem;
+        font-size: var(--fs-xs);
+    }
+
+    .search-form button {
+        padding: 0.7rem 1.2rem;
+        justify-content: center;
+        font-size: var(--fs-xs);
+    }
+
+    .search-title {
+        font-size: var(--fs-md);
+    }
+}
+
+/* ---------- margin antar section ---------- */
+.search-result-section:not(:last-child) {
+    margin-bottom: var(--space-10);
+}
+
+.search-result-section + .search-result-section {
+    margin-top: var(--space-10);
+}
+
+/* ---------- highlight class ---------- */
+strong.highlight {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 0 0.2rem;
+    border-radius: 2px;
+} 

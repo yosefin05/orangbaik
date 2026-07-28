@@ -967,6 +967,87 @@ body {
     }
 }
 
+/* ============================================================
+   TOMBOL BAGIKAN & BUAT UPDATE
+   ============================================================ */
+
+/* Wrapper untuk aksi di bagian updates */
+.latest-news-section .section-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+/* Tombol Bagikan */
+.btn-share {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.5rem;
+    background: var(--bg-soft);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    transition: background 0.25s, transform 0.15s, box-shadow 0.25s;
+    text-decoration: none;
+}
+
+.btn-share:hover {
+    background: var(--border-soft);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-share i {
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+
+/* Tombol Buat Update (untuk owner) */
+.btn-add-update {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.5rem;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-xs);
+    transition: background 0.25s, color 0.25s, transform 0.15s, box-shadow 0.25s;
+    text-decoration: none;
+}
+
+.btn-add-update:hover {
+    background: var(--primary);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-add-update i {
+    font-size: 1.1rem;
+}
+
+/* Responsive: tombol full width di layar kecil */
+@media (max-width: 576px) {
+    .latest-news-section .section-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    .btn-share,
+    .btn-add-update {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 @media (max-width: 576px) {
     .lightbox-prev,
     .lightbox-next {

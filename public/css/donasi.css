@@ -1,9 +1,14 @@
+/* ============================
+   DONASI PAGE
+   ============================ */
 .donasi-page {
     overflow-x: hidden;
     background: var(--bg-soft);
 }
 
-/* SECTION */
+/* ============================
+   SECTION
+   ============================ */
 .donasi-section {
     padding: 34px 0;
 }
@@ -32,10 +37,160 @@
 }
 
 /* ============================
-   CATEGORY - SEPERTI HOME
-   Tidak hover, tidak card, tidak scroll mobile
-============================ */
+   FILTER SECTION
+   ============================ */
+.donasi-filter-form {
+    background: var(--bg);
+    padding: var(--space-6);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
+}
 
+.donasi-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-5);
+}
+
+/* === FILTER GROUP (untuk select dropdown) === */
+.donasi-filter-group {
+    flex: 1 1 180px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.donasi-filter-group label {
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+}
+
+.donasi-filter-group select {
+    height: 44px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    color: var(--text);
+    outline: none;
+    transition: .2s;
+    cursor: pointer;
+}
+
+.donasi-filter-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(51, 101, 175, .1);
+}
+
+/* === FILTER GROUP (untuk checkbox multiple) === */
+.filter-group {
+    flex: 2 1 300px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.filter-group label {
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+}
+
+.filter-group .filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.filter-group .filter-options label {
+    font-weight: var(--fw-regular);
+    font-size: var(--fs-xxs);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    transition: .2s ease;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.filter-group .filter-options label:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.filter-group .filter-options label.active-filter {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.filter-group .filter-options label input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* === FILTER ACTIONS === */
+.donasi-filter-actions {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.btn-filter,
+.btn-reset {
+    height: 44px;
+    padding: 0 var(--space-6);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+    transition: .2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    gap: var(--space-2);
+    border: none;
+}
+
+.btn-filter {
+    background: var(--primary);
+    color: #fff;
+}
+
+.btn-filter:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.btn-reset {
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+}
+
+.btn-reset:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* ============================
+   CATEGORY GRID
+   ============================ */
 .donasi-category-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -43,66 +198,71 @@
     gap: var(--space-8, 32px) var(--space-9, 36px);
 }
 
-.donasi-category-item,
-.donasi-category-item:hover,
-.donasi-category-item:focus,
-.donasi-category-item.ob-card,
-.donasi-category-item.ob-card-hover,
-.donasi-category-item.ob-card:hover,
-.donasi-category-item.ob-card-hover:hover {
+.donasi-category-item {
     min-width: 0;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-
     gap: var(--space-3, 12px);
-
     color: inherit;
     text-align: center;
     text-decoration: none;
-
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    transform: none !important;
     outline: none;
     padding: 0;
+    transition: .2s ease;
+    cursor: pointer;
 }
 
-.donasi-category-icon {
-    width: 74px;
-    height: 74px;
-
-    display: grid;
-    place-items: center;
-
-    margin-inline: auto;
+.donasi-category-item:hover {
+    transform: translateY(-3px);
 }
 
-.donasi-category-icon img {
-    width: 60px;
-    height: 60px;
-
-    display: block;
-
-    object-fit: contain;
-    object-position: center;
+.donasi-category-item.active {
+    transform: translateY(-3px);
 }
 
-.donasi-category-item p,
-.donasi-category-item:hover p,
-.donasi-category-item:focus p {
+.donasi-category-item.active .donasi-category-icon {
+    background: var(--primary-light);
+    border-radius: var(--radius-full);
+}
+
+.donasi-category-item p {
     margin: 0;
-
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
     line-height: 1.35;
 }
 
-/* CAMPAIGN CAROUSEL */
+.donasi-category-item.active p {
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+}
+
+.donasi-category-icon {
+    width: 74px;
+    height: 74px;
+    display: grid;
+    place-items: center;
+    margin-inline: auto;
+    transition: .2s ease;
+}
+
+.donasi-category-icon img {
+    width: 60px;
+    height: 60px;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* ============================
+   CAMPAIGN CAROUSEL
+   ============================ */
 .campaign-carousel {
     width: 100%;
     position: relative;
@@ -111,14 +271,11 @@
 .donasi-card-grid {
     display: flex;
     gap: 24px;
-
     overflow-x: auto;
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
-
     margin: 0;
     padding: 4px 2px 16px;
-
     scrollbar-width: none;
     cursor: grab;
 }
@@ -131,11 +288,12 @@
     display: none;
 }
 
-/* Desktop: 4 card t erlihat */
+/* ============================
+   CAMPAIGN CARD
+   ============================ */
 .donasi-card {
     flex: 0 0 calc((100% - 72px) / 4);
     scroll-snap-align: start;
-
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -144,22 +302,22 @@
     transition: .2s ease;
 }
 
-.donasi-card.ob-card {
-    padding: 0;
-}
-
 .donasi-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow);
     border-color: rgba(51, 101, 175, .25);
 }
 
+.donasi-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .donasi-card-image {
     width: 100%;
     aspect-ratio: 16 / 9;
-
     display: block;
-
     object-fit: cover;
     object-position: center;
 }
@@ -174,16 +332,13 @@
     font-weight: var(--fw-bold);
     line-height: 1.35;
     margin-bottom: 5px;
-
     display: -webkit-box;
     overflow: hidden;
-
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     line-clamp: 2;
 }
 
-/* DONASI INFO */
 .donasi-organizer {
     color: var(--muted);
     font-size: var(--fs-xxs);
@@ -196,25 +351,21 @@
     font-size: 9px;
 }
 
-.donasi-amount,
-.program-amount {
+.donasi-amount {
     display: flex;
     align-items: center;
     gap: 12px;
-
     margin-top: 12px;
 }
 
-.donasi-amount strong,
-.program-amount strong {
+.donasi-amount strong {
     color: var(--primary);
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     line-height: 1;
 }
 
-.donasi-amount span,
-.program-amount span {
+.donasi-amount span {
     color: var(--muted);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-medium);
@@ -223,19 +374,14 @@
 .donasi-progress {
     width: 100%;
     height: 7px;
-
     margin-top: 9px;
-
     overflow: hidden;
-
     background: var(--border);
     border-radius: var(--radius-full);
 }
 
 .donasi-progress-fill {
-    width: 55%;
     height: 100%;
-
     background: var(--primary);
     border-radius: inherit;
 }
@@ -244,102 +390,57 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin-top: 10px;
-
     color: var(--muted);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-medium);
 }
 
-/* NEW SECTION */
+/* ============================
+   NEW GRID (2 item)
+   ============================ */
 .donasi-new-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 34px;
 }
 
-.donasi-new-grid img {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-
+.donasi-new-item {
     display: block;
-
-    object-fit: cover;
-    object-position: center;
-
+    text-decoration: none;
+    overflow: hidden;
     border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-card);
-}
-
-/* PROGRAM LIST */
-.program-list {
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-}
-
-.program-card {
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    align-items: start;
-    gap: 24px;
-
-    padding-bottom: 22px;
-
-    border-bottom: 1px solid var(--border);
-}
-
-.program-card.ob-card {
-    padding: 0 0 22px;
-
-    background: transparent;
-    border-top: 0;
-    border-right: 0;
-    border-left: 0;
-    border-radius: 0;
-    box-shadow: none;
-}
-
-.program-card:last-child {
-    border-bottom: none;
-}
-
-.program-image {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-
-    display: block;
-
-    object-fit: cover;
-    object-position: center;
-
-    border-radius: var(--radius-sm);
-}
-
-.program-body {
-    padding-top: 4px;
-}
-
-.program-body h3 {
-    margin-bottom: 4px;
-
-    color: var(--text-dark);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    line-height: 1.25;
-
     transition: .2s ease;
 }
 
-.program-card:hover .program-body h3 {
-    color: var(--primary);
+.donasi-new-item:hover {
+    transform: scale(1.02);
 }
+
+.donasi-new-item img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    box-shadow: var(--shadow-card);
+}
+
+/* ============================
+   TEXT CENTER
+   ============================ */
+.text-center {
+    text-align: center;
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
 
 /* TABLET */
 @media (max-width: 1000px) {
     .donasi-card {
-        flex-basis: calc((100% - 24px) / 2);
+        flex: 0 0 calc((100% - 24px) / 2);
     }
 
     .donasi-category-grid {
@@ -347,8 +448,8 @@
         gap: var(--space-7, 28px) var(--space-6, 24px);
     }
 
-    .program-card {
-        grid-template-columns: 280px 1fr;
+    .filter-group {
+        flex: 1 1 100%;
     }
 }
 
@@ -363,37 +464,46 @@
         font-size: var(--fs-sm);
     }
 
-    /* CATEGORY MOBILE - GRID BIASA, TIDAK SCROLL */
-    .donasi-category-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        align-items: start;
-        gap: 22px 12px;
-
-        overflow: visible;
-        padding-bottom: 0;
+    /* FILTER MOBILE */
+    .donasi-filter-form {
+        padding: var(--space-4);
     }
 
-    .donasi-category-item,
-    .donasi-category-item:hover,
-    .donasi-category-item:focus,
-    .donasi-category-item.ob-card,
-    .donasi-category-item.ob-card-hover,
-    .donasi-category-item.ob-card:hover,
-    .donasi-category-item.ob-card-hover:hover {
-        min-width: 0;
+    .donasi-filter-row {
+        flex-direction: column;
+        gap: var(--space-4);
+    }
 
-        gap: var(--space-2, 8px);
+    .donasi-filter-group {
+        flex: 1 1 auto;
+        width: 100%;
+    }
 
-        color: inherit;
-        text-align: center;
-        text-decoration: none;
+    .filter-group {
+        flex: 1 1 auto;
+        width: 100%;
+    }
 
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        transform: none !important;
-        padding: 0;
+    .filter-group .filter-options label {
+        font-size: var(--fs-xxs);
+        padding: var(--space-1) var(--space-2);
+        white-space: nowrap;
+    }
+
+    .donasi-filter-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .btn-filter,
+    .btn-reset {
+        width: 100%;
+    }
+
+    /* CATEGORY MOBILE */
+    .donasi-category-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 22px 12px;
     }
 
     .donasi-category-icon {
@@ -406,15 +516,11 @@
         height: 52px;
     }
 
-    .donasi-category-item p,
-    .donasi-category-item:hover p,
-    .donasi-category-item:focus p {
-        color: var(--text-dark);
+    .donasi-category-item p {
         font-size: var(--fs-xxs);
-        font-weight: var(--fw-medium);
     }
 
-    /* HP: 2 card terlihat dan tetap bisa digeser */
+    /* CARD MOBILE */
     .donasi-card-grid {
         gap: 12px;
     }
@@ -440,7 +546,6 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
-
         margin-top: 8px;
     }
 
@@ -462,41 +567,9 @@
         font-size: 9px;
     }
 
+    /* NEW GRID MOBILE */
     .donasi-new-grid {
         grid-template-columns: 1fr;
         gap: 18px;
-    }
-
-    .program-card {
-        grid-template-columns: 130px 1fr;
-        gap: 12px;
-
-        padding-bottom: 18px;
-    }
-
-    .program-card.ob-card {
-        padding-bottom: 18px;
-    }
-
-    .program-image {
-        aspect-ratio: 4 / 3;
-    }
-
-    .program-body h3 {
-        font-size: var(--fs-xs);
-        line-height: 1.3;
-    }
-
-    .program-amount {
-        gap: 8px;
-        margin-top: 9px;
-    }
-
-    .program-amount strong {
-        font-size: var(--fs-xs);
-    }
-
-    .donasi-meta {
-        font-size: var(--fs-xxs);
     }
 }

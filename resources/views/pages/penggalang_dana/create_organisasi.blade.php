@@ -124,7 +124,7 @@
                             </label>
 
                             <label class="verify-field">
-                                <span>Email Organisasi <b>*</b></span>
+                                <span>Email Pendaftar<b>*</b></span>
 
                                 <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}"
                                     placeholder="Masukkan email organisasi">

@@ -148,7 +148,7 @@ class Campaign extends Model
 
     public function isOwner($userId)
     {
-        return $this->penggalang_dana_id === $userId;
+        return $this->penggalangDana && $this->penggalangDana->user_id == $userId;
     }
 
     /**
@@ -173,4 +173,21 @@ class Campaign extends Model
             ->where('status', 'active')
             ->first();
     }
-}   
+
+    /**
+     * Cek apakah campaign aktif secara waktu (belum berakhir)
+     */
+    public function isTimeActive(): bool
+    {
+        return now()->between($this->tanggal_mulai, $this->tanggal_berakhir);
+    }
+
+    /**
+     * Update status is_active berdasarkan tanggal
+     */
+    public function updateActiveStatus(): void
+    {
+        $this->is_active = $this->isTimeActive() && $this->isApproved();
+        $this->save();
+    }
+}

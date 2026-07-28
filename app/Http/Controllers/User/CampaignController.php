@@ -21,28 +21,51 @@ class CampaignController extends Controller
 
     public function index(Request $request)
     {
+        // Ambil semua filter dari database (tabel: filter)
+        $filters = Filter::all();
+
+        // Ambil kategori untuk tombol cepat
         $kategori = Kategori::all();
 
-        // Ubah query untuk menampilkan semua campaign yang aktif
+        // Query dasar: campaign aktif
         $query = Campaign::with([
             'kategori',
             'penggalangDana',
-            'donasi'
+            'donasi',
+            'filter' // relasi many-to-many ke filter
         ])->where('is_active', true);
 
-        // Tambahkan ini: Tampilkan semua campaign (termasuk yang pending)
-        // Hanya sembunyikan yang rejected
+        // Hanya tampilkan campaign yang approved atau regular
         $query->where(function ($q) {
             $q->where('campaign_type', 'regular')
                 ->orWhere('approval_status', 'approved')
                 ->orWhereNull('approval_status');
         });
 
+        // === FILTER: Jenis Penggalang ===
+        if ($request->filled('jenis_penggalang')) {
+            $jenis = $request->jenis_penggalang;
+            $query->whereHas('penggalangDana', function ($q) use ($jenis) {
+                $q->where('jenis_penggalang', $jenis);
+            });
+        }
+
+        // === FILTER: Filter (checkbox multiple dari tabel `filter`) ===
+        if ($request->filled('filter_ids')) {
+            $filterIds = (array) $request->filter_ids;
+            $query->whereHas('filter', function ($q) use ($filterIds) {
+                $q->whereIn('filter.id', $filterIds);
+            });
+        }
+
+        // === FILTER: Kategori (tombol cepat) ===
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Darurat - hanya campaign emergency yang sudah di-approve
+        // === AMBIL DATA UNTUK SECTION ===
+
+        // Darurat - emergency approved
         $darurat = (clone $query)
             ->where('campaign_type', 'emergency')
             ->where('approval_status', 'approved')
@@ -50,7 +73,7 @@ class CampaignController extends Controller
             ->take(8)
             ->get();
 
-        // Terbaru - semua campaign yang aktif (regular + emergency/sustainable yang sudah approve)
+        // Terbaru - semua campaign
         $terbaru = (clone $query)
             ->where(function ($q) {
                 $q->where('campaign_type', 'regular')
@@ -60,7 +83,7 @@ class CampaignController extends Controller
             ->take(8)
             ->get();
 
-        // Pemberdayaan - hanya campaign sustainable yang sudah di-approve
+        // Pemberdayaan - sustainable approved
         $pemberdayaan = (clone $query)
             ->where('campaign_type', 'sustainable')
             ->where('approval_status', 'approved')
@@ -68,8 +91,8 @@ class CampaignController extends Controller
             ->take(8)
             ->get();
 
-        $campaignTerbaru = Campaign::with('penggalangDana')
-            ->where('is_active', true)
+        // Campaign terbaru (2 item untuk grid kecil)
+        $campaignTerbaru = (clone $query)
             ->where(function ($q) {
                 $q->where('campaign_type', 'regular')
                     ->orWhere('approval_status', 'approved');
@@ -78,19 +101,35 @@ class CampaignController extends Controller
             ->take(2)
             ->get();
 
-        // Untuk testing: ambil semua campaign
-        $campaigns = Campaign::with(['penggalangDana', 'donasi'])
-            ->where('is_active', true)
-            ->latest()
-            ->get();
+        // Campaign dengan pencapaian < 30%
+        $belumSampai30 = (clone $query)
+            ->where(function ($q) {
+                $q->where('campaign_type', 'regular')
+                    ->orWhere('approval_status', 'approved');
+            })
+            ->get()
+            ->filter(function ($campaign) {
+                $terkumpul = $campaign->donasi->sum('nominal');
+                $target = $campaign->target_donasi;
+                if ($target == 0) return false;
+                return ($terkumpul / $target) < 0.3;
+            })
+            ->take(8);
+
+        // === DATA UNTUK FILTER ===
+        $selectedJenis = $request->jenis_penggalang ?? '';
+        $selectedFilterIds = $request->filter_ids ?? [];
 
         return view('pages.donasi', compact(
+            'filters',        // <-- data filter dari database
             'kategori',
-            'campaigns',
             'darurat',
             'terbaru',
             'pemberdayaan',
-            'campaignTerbaru'
+            'campaignTerbaru',
+            'belumSampai30',
+            'selectedJenis',
+            'selectedFilterIds'
         ));
     }
 
@@ -549,6 +588,7 @@ class CampaignController extends Controller
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
 
     public function destroy(Campaign $campaign)
     {

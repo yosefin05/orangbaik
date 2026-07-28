@@ -667,6 +667,46 @@
     color:white;
 }
 
+/* ============================
+   STATUS BADGE
+   ============================ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.status-badge.pending {
+    background-color: var(--secondary-light);
+    color: var(--secondary);
+}
+
+.status-badge.approved {
+    background-color: var(--success-light);
+    color: var(--success);
+}
+
+.status-badge.rejected {
+    background-color: var(--danger-light);
+    color: var(--danger);
+}
+
+/* ============================
+   RESPONSIVE: STATUS BADGE
+   ============================ */
+@media (max-width: 640px) {
+    .status-badge {
+        font-size: 9px;
+        padding: 0.15rem 0.5rem;
+    }
+}
 
 /* RESPONSIVE */
 @media (max-width: 800px) {

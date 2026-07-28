@@ -16,7 +16,55 @@
     @include('components.header')
 
     <main class="donasi-page page-wrapper">
+        {{-- FILTER SECTION --}}
+        <section class="donasi-section">
+            <div class="container">
+                <form action="{{ route('donasi') }}" method="GET" class="donasi-filter-form">
+                    <div class="donasi-filter-row">
 
+                        {{-- Filter Jenis Penggalang --}}
+                        <div class="donasi-filter-group">
+                            <label for="jenis">Jenis Penggalang</label>
+                            <select name="jenis" id="jenis">
+                                <option value="">Semua</option>
+                                <option value="individu" {{ request('jenis') == 'individu' ? 'selected' : '' }}>Individu
+                                </option>
+                                <option value="organisasi" {{ request('jenis') == 'organisasi' ? 'selected' : '' }}>
+                                    Organisasi</option>
+                            </select>
+                        </div>
+
+                        {{-- FILTER: Filter (checkbox multiple dari tabel `filter`) --}}
+                        <div class="filter-group">
+                            <label>Filter Campaign</label>
+                            <div class="filter-options" style="flex-wrap: wrap;">
+                                @foreach ($filters as $filter)
+                                    @php
+                                        $isChecked = in_array($filter->id, (array)$selectedFilterIds);
+                                    @endphp
+                                    <label class="{{ $isChecked ? 'active-filter' : '' }}">
+                                        <input type="checkbox"
+                                            name="filter_ids[]"
+                                            value="{{ $filter->id }}"
+                                            {{ $isChecked ? 'checked' : '' }}
+                                            onchange="document.getElementById('filterForm').submit()">
+                                        {{ $filter->nama_filter }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Tombol Filter & Reset --}}
+                        <div class="donasi-filter-actions">
+                            <button type="submit" class="btn-filter">Filter</button>
+                            <a href="{{ route('donasi') }}" class="btn-reset">Reset</a>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </section>
+        {{-- KATEGORI --}}
         <section class="donasi-section">
             <div class="container">
 
@@ -25,7 +73,7 @@
                 </h1>
 
                 <div class="donasi-category-grid">
-                    @foreach($kategori as $item)
+                    @foreach ($kategori as $item)
                         @php
                             $icon = match (strtolower($item->nama_kategori)) {
                                 'zakat' => 'assets/zakat.svg',
@@ -36,14 +84,18 @@
                                 default => 'assets/lainnya.svg',
                             };
                         @endphp
+
                         <a href="{{ route('donasi', ['kategori' => $item->id]) }}"
                             class="donasi-category-item {{ request('kategori') == $item->id ? 'active' : '' }}">
+
                             <div class="donasi-category-icon">
                                 <img src="{{ asset($icon) }}" alt="{{ $item->nama_kategori }}">
                             </div>
+
                             <p>{{ $item->nama_kategori }}</p>
                         </a>
                     @endforeach
+
                     {{-- Semua / Lainnya --}}
                     <a href="{{ route('donasi') }}"
                         class="donasi-category-item {{ request()->filled('kategori') ? '' : 'active' }}">
@@ -53,13 +105,13 @@
                         </div>
 
                         <p>Lainnya</p>
-
                     </a>
                 </div>
 
             </div>
         </section>
 
+        {{-- DARURAT --}}
         <section class="donasi-border donasi-section">
             <div class="container">
 
@@ -69,54 +121,63 @@
 
                 <div class="campaign-carousel">
                     <div class="donasi-card-grid">
-                        @foreach ($campaigns as $campaign)
+
+                        @forelse ($darurat as $campaign)
                             @php
                                 $terkumpul = $campaign->donasi->sum('nominal');
                                 $persen = $campaign->target_donasi
                                     ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                     : 0;
-                                $hari =
-                                    max(
-                                        0,
-                                        (int) now()->diffInDays($campaign->tanggal_berakhir, false)
-                                    );
+                                $hari = max(
+                                    0,
+                                    (int) now()->diffInDays($campaign->tanggal_berakhir, false)
+                                );
                             @endphp
+
                             <article class="donasi-card">
-                                <a href=" {{ route('campaign.show', $campaign->slug) }}">
+                                <a href="{{ route('campaign.show', $campaign->slug) }}">
                                     <img class="donasi-card-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                                        alt="{{ $campaign->judul }}">
+                                        alt="{{ $campaign->judul }}" loading="lazy">
+
                                     <div class="donasi-card-body">
                                         <h3>{{ $campaign->judul }}</h3>
+
                                         <p class="donasi-organizer">
                                             {{ $campaign->penggalangDana->nama_penggalang }}
                                             <span>●</span>
                                         </p>
+
                                         <div class="donasi-amount">
                                             <strong>
                                                 Rp {{ number_format($terkumpul, 0, ',', '.') }}
                                             </strong>
                                             <span>Terkumpul</span>
                                         </div>
+
                                         <div class="donasi-progress">
-                                            <div class="donasi-progress-fill" style="width:{{ $persen }}%"></div>
+                                            <div class="donasi-progress-fill" style="width: {{ $persen }}%;">
+                                            </div>
                                         </div>
+
                                         <div class="donasi-meta">
-                                            <span>
-                                                {{ $campaign->donasi->count() }} Donatur
-                                            </span>
-                                            <span>
-                                                {{ $hari }} Hari
-                                            </span>
+                                            <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                            <span>{{ $hari }} Hari</span>
                                         </div>
                                     </div>
                                 </a>
                             </article>
-                        
+
+                        @empty
+                            <p>Belum ada campaign darurat.</p>
+                        @endforelse
+
                     </div>
                 </div>
+
             </div>
         </section>
 
+        {{-- TERBARU --}}
         <section class="donasi-border donasi-section">
             <div class="container">
 
@@ -125,6 +186,7 @@
                 </h2>
 
                 <div class="donasi-new-grid">
+
                     @forelse ($campaignTerbaru as $campaign)
                         <a href="{{ route('campaign.show', ['slug' => $campaign->slug]) }}" class="donasi-new-item">
                             <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
@@ -133,54 +195,149 @@
                     @empty
                         <p>Belum ada campaign terbaru.</p>
                     @endforelse
-                </div> 
-            </div>
+
+                </div>
+
             </div>
         </section>
 
+        {{-- PEMBERDAYAAN BERKELANJUTAN --}}
         <section class="donasi-border donasi-section">
             <div class="container">
 
                 <h2 class="donasi-section-title">
                     Pemberdayaan Berkelanjutan
                 </h2>
+
                 <div class="campaign-carousel">
                     <div class="donasi-card-grid">
-                        <a href="{{ route('campaign.show', $campaign->slug) }}" class="donasi-card"> <img
-                                class="donasi-card-image" src="{{ asset($campaign['image']) }}"
-                                alt="{{ $campaign['title'] }}" loading="lazy">
 
-                            <div class="donasi-card-body">
-                                <h3>{{ $campaign['title'] }}</h3>
+                        @forelse ($pemberdayaan as $campaign)
+                            @php
+                                $terkumpul = $campaign->donasi->sum('nominal');
+                                $persen = $campaign->target_donasi
+                                    ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                    : 0;
+                                $hari = max(
+                                    0,
+                                    (int) now()->diffInDays($campaign->tanggal_berakhir, false)
+                                );
+                            @endphp
 
-                                <p class="donasi-organizer">
-                                    {{ $campaign['organizer'] }}
-                                    <span aria-hidden="true">●</span>
-                                </p>
+                            <article class="donasi-card">
+                                <a href="{{ route('campaign.show', $campaign->slug) }}">
+                                    <img class="donasi-card-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                        alt="{{ $campaign->judul }}" loading="lazy">
 
-                                <div class="donasi-amount">
-                                    <strong>{{ $campaign['amount'] }}</strong>
-                                    <span>Terkumpul</span>
-                                </div>
+                                    <div class="donasi-card-body">
+                                        <h3>{{ $campaign->judul }}</h3>
 
-                                <div class="donasi-progress">
-                                    <div class="donasi-progress-fill"></div>
-                                </div>
+                                        <p class="donasi-organizer">
+                                            {{ $campaign->penggalangDana->nama_penggalang }}
+                                            <span>●</span>
+                                        </p>
 
-                                <div class="donasi-meta">
-                                    <span>{{ $campaign['donatur'] }}</span>
-                                    <span>∞</span>
-                                </div>
-                            </div>
-                        </a>
+                                        <div class="donasi-amount">
+                                            <strong>
+                                                Rp {{ number_format($terkumpul, 0, ',', '.') }}
+                                            </strong>
+                                            <span>Terkumpul</span>
+                                        </div>
+
+                                        <div class="donasi-progress">
+                                            <div class="donasi-progress-fill" style="width: {{ $persen }}%;">
+                                            </div>
+                                        </div>
+
+                                        <div class="donasi-meta">
+                                            <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                            <span>{{ $hari }} Hari</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </article>
+
+                        @empty
+                            <p>Belum ada campaign berkelanjutan.</p>
+                        @endforelse
+
                     </div>
                 </div>
-                @endforeach
+
             </div>
         </section>
+
+        {{-- 🔥 SECTION BARU: CAMPAIGN DENGAN PENCAPAIAN < 30% (tampilkan 8) --}} <section
+            class="donasi-border donasi-section">
+            <div class="container">
+
+                <h2 class="donasi-section-title">
+                    Butuh Dukungan Lebih! (Pencapaian < 30%) </h2>
+
+                        <div class="campaign-carousel">
+                            <div class="donasi-card-grid">
+
+                                @forelse ($belumSampai30 as $campaign)
+                                    @php
+                                        $terkumpul = $campaign->donasi->sum('nominal');
+                                        $persen = $campaign->target_donasi
+                                            ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                            : 0;
+                                        $hari = max(
+                                            0,
+                                            (int) now()->diffInDays($campaign->tanggal_berakhir, false)
+                                        );
+                                    @endphp
+
+                                    <article class="donasi-card">
+                                        <a href="{{ route('campaign.show', $campaign->slug) }}">
+                                            <img class="donasi-card-image"
+                                                src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                                alt="{{ $campaign->judul }}" loading="lazy">
+
+                                            <div class="donasi-card-body">
+                                                <h3>{{ $campaign->judul }}</h3>
+
+                                                <p class="donasi-organizer">
+                                                    {{ $campaign->penggalangDana->nama_penggalang }}
+                                                    <span>●</span>
+                                                </p>
+
+                                                <div class="donasi-amount">
+                                                    <strong>
+                                                        Rp {{ number_format($terkumpul, 0, ',', '.') }}
+                                                    </strong>
+                                                    <span>Terkumpul</span>
+                                                </div>
+
+                                                <div class="donasi-progress">
+                                                    <div class="donasi-progress-fill" style="width: {{ $persen }}%;">
+                                                    </div>
+                                                </div>
+
+                                                <div class="donasi-meta">
+                                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                                    <span>{{ $hari }} Hari</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </article>
+
+                                @empty
+                                    <p class="text-center">🎉 Semua campaign sudah mencapai lebih dari 30%! Terima kasih
+                                        atas dukungannya.</p>
+                                @endforelse
+
+                            </div>
+                        </div>
+
+            </div>
+            </section>
+
     </main>
 
     @include('components.footer')
+
     <script src="{{ asset('js/header.js') }}"></script>
 
 </body>

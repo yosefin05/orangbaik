@@ -9,9 +9,6 @@
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/detail-campaign.css') }}">
-
-    {{-- QR Code library (Client-side) --}}
-    {{-- <script src="{{ asset('js/qrcode.min.js') }}"></script> --}}
 </head>
 
 <body>
@@ -31,7 +28,7 @@
             <div class="detail-layout">
 
                 {{-- ========================================================== --}}
-                {{-- LEFT CONTENT                                               --}}
+                {{-- LEFT CONTENT --}}
                 {{-- ========================================================== --}}
                 <div class="detail-main">
 
@@ -44,20 +41,36 @@
                     </section>
 
                     {{-- ========================================================== --}}
-                    {{-- KABAR TERBARU - UPDATE CAMPAIGN                            --}}
+                    {{-- KABAR TERBARU - UPDATE CAMPAIGN --}}
                     {{-- ========================================================== --}}
                     <section class="latest-news-section">
+
+                        {{-- HEADER dengan tombol Bagikan & Buat Update --}}
                         <div class="section-header">
-                            <h2>Kabar Terbaru</h2>
-                            @auth
-                                @if ($campaign->isOwner(Auth::id()))
-                                    <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn-add-update">
-                                        <i class="bi bi-plus-circle"></i> Tambah Update
-                                    </a>
-                                @endif
-                            @endauth
+                            <h2>
+                                <i class="bi bi-newspaper" style="color: var(--primary);"></i> Kabar Terbaru
+                            </h2>
+
+                            <div class="section-actions">
+                                {{-- Tombol Bagikan --}}
+                                <button class="btn-share" onclick="shareCampaign()">
+                                    <i class="bi bi-share-fill"></i> Bagikan
+                                </button>
+
+                                {{-- Tombol Buat Update (hanya untuk owner) --}}
+                                @auth
+                                    @if ($campaign->isOwner(Auth::id()))
+                                        <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn-add-update">
+                                            <i class="bi bi-megaphone-fill"></i> Buat Update
+                                        </a>
+                                    @endif
+                                @endauth
+                            </div>
                         </div>
 
+                        {{-- ========================================================== --}}
+                        {{-- DAFTAR UPDATE --}}
+                        {{-- ========================================================== --}}
                         @if ($campaign->campaignUpdates->count() > 0)
                             <div class="updates-list">
                                 @foreach ($campaign->campaignUpdates as $update)
@@ -111,7 +124,8 @@
                                                             @foreach ($update->campaign_update_gambar as $gambar)
                                                                 <div class="update-detail-gallery-item"
                                                                     onclick="openLightbox('{{ asset('storage/' . $gambar->gambar_update) }}', {{ $allImagesJson }})">
-                                                                    <img src="{{ asset('storage/' . $gambar->gambar_update) }}" alt="Gambar update">
+                                                                    <img src="{{ asset('storage/' . $gambar->gambar_update) }}"
+                                                                        alt="Gambar update">
                                                                     <div class="zoom-overlay">
                                                                         <i class="bi bi-zoom-in"></i>
                                                                     </div>
@@ -122,13 +136,25 @@
                                                 </div>
                                             </div>
 
+                                            {{-- ========================================================== --}}
+                                            {{-- FOOTER UPDATE - dengan tombol Edit & Hapus (hanya untuk owner) --}}
+                                            {{-- ========================================================== --}}
                                             @auth
                                                 @if ($campaign->isOwner(Auth::id()))
                                                     <div class="update-footer">
-                                                        <form action="{{ route('campaign.update.destroy', [$campaign->slug, $update->id]) }}" method="POST">
+                                                        {{-- Tombol Edit --}}
+                                                        <a href="{{ route('campaign.update.edit', [$campaign->slug, $update->id]) }}"
+                                                           class="btn-edit-update">
+                                                            <i class="bi bi-pencil"></i> Edit
+                                                        </a>
+
+                                                        {{-- Tombol Hapus --}}
+                                                        <form action="{{ route('campaign.update.destroy', [$campaign->slug, $update->id]) }}"
+                                                              method="POST" style="display: inline;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn-delete-update" onclick="return confirm('Yakin ingin menghapus update ini?')">
+                                                            <button type="submit" class="btn-delete-update"
+                                                                    onclick="return confirm('Yakin ingin menghapus update ini?')">
                                                                 <i class="bi bi-trash"></i> Hapus
                                                             </button>
                                                         </form>
@@ -145,7 +171,7 @@
                                 <p>Belum ada update dari campaign ini.</p>
                                 @auth
                                     @if ($campaign->isOwner(Auth::id()))
-                                        <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn btn-outline">
+                                        <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn-outline">
                                             Buat Update Pertama
                                         </a>
                                     @endif
@@ -157,7 +183,7 @@
                 </div>
 
                 {{-- ========================================================== --}}
-                {{-- RIGHT SIDEBAR                                              --}}
+                {{-- RIGHT SIDEBAR --}}
                 {{-- ========================================================== --}}
                 <aside class="detail-sidebar">
 
@@ -213,7 +239,8 @@
                     <div class="fundraiser-info-card">
                         <h3>Informasi Penggalang Dana</h3>
 
-                        <a href="{{ route('profil.penggalang', $campaign->penggalangDana->id) }}" class="fundraiser-profile">
+                        <a href="{{ route('profil.penggalang', $campaign->penggalangDana->id) }}"
+                            class="fundraiser-profile">
                             <img src="{{ asset('storage/' . ($campaign->penggalangDana->foto_profil ?? 'assets/logo-icon.png')) }}"
                                 alt="{{ $campaign->penggalangDana->nama_penggalang }}">
                             <div>
@@ -250,9 +277,7 @@
                         @endif
                     </div>
 
-                    {{-- ========================================================== --}}
-                    {{-- FUNDRAISER SECTION                                         --}}
-                    {{-- ========================================================== --}}
+                    {{-- Fundraiser Section --}}
                     @auth
                         @php
                             $isFundraiser = $campaign->isFundraiser(Auth::id());
@@ -287,7 +312,6 @@
                                 </div>
                                 <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
 
-                                {{-- QR Code inline SVG --}}
                                 <div class="referral-qr-section">
                                     @php
                                         $qrSvg = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
@@ -312,7 +336,8 @@
                                 <form action="{{ route('fundraiser.destroy', $campaign->slug) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-fundraiser-leave" onclick="return confirm('Yakin ingin berhenti menjadi fundraiser?')">
+                                    <button type="submit" class="btn-fundraiser-leave"
+                                        onclick="return confirm('Yakin ingin berhenti menjadi fundraiser?')">
                                         <i class="bi bi-x-circle"></i> Berhenti
                                     </button>
                                 </form>
@@ -335,9 +360,7 @@
 
     </main>
 
-    {{-- ========================================================== --}}
-    {{-- LIGHTBOX MODAL (GALERI UPDATE)                             --}}
-    {{-- ========================================================== --}}
+    {{-- Lightbox --}}
     <div class="lightbox-overlay" id="lightboxOverlay">
         <button class="lightbox-close" onclick="closeLightbox()"><i class="bi bi-x-lg"></i></button>
         <button class="lightbox-prev" onclick="changeImage(-1)"><i class="bi bi-chevron-left"></i></button>
@@ -353,13 +376,26 @@
 
     @include('components.footer')
 
-    {{-- ========================================================== --}}
-    {{-- SCRIPTS                                                    --}}
-    {{-- ========================================================== --}}
+    {{-- Scripts --}}
     <script>
-        /* ============================================================
-           REFERRAL LINK - COPY
-           ============================================================ */
+        // Fungsi share, toggle, lightbox, copy referral, QR download tetap sama
+        function shareCampaign() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '{{ $campaign->judul }}',
+                    text: 'Dukung campaign ini di OrangBaik.id',
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Link campaign berhasil disalin!');
+                }).catch(() => {
+                    prompt('Salin link ini:', url);
+                });
+            }
+        }
+
         function copyReferralLink() {
             const input = document.getElementById('referralLink');
             if (!input) return;
@@ -368,9 +404,6 @@
             alert('Link referral berhasil disalin!');
         }
 
-        /* ============================================================
-           TOGGLE UPDATE DETAIL (EXPAND/COLLAPSE)
-           ============================================================ */
         function toggleUpdateDetail(id) {
             const wrapper = document.getElementById('detailContent-' + id);
             const toggleText = document.getElementById('toggleText-' + id);
@@ -402,9 +435,6 @@
             }
         }
 
-        /* ============================================================
-           LIGHTBOX GALLERY
-           ============================================================ */
         let lightboxImages = [];
         let currentImageIndex = 0;
 
@@ -428,7 +458,7 @@
             lightboxImages.forEach((_, i) => {
                 const dot = document.createElement('span');
                 dot.className = 'lightbox-dot' + (i === currentImageIndex ? ' active' : '');
-                dot.onclick = function(e) {
+                dot.onclick = function (e) {
                     e.stopPropagation();
                     goToImage(i);
                 };
@@ -478,13 +508,13 @@
 
         let touchStartX = 0,
             touchEndX = 0;
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const wrapper = document.querySelector('.lightbox-image-wrapper');
             if (wrapper) {
-                wrapper.addEventListener('touchstart', function(e) {
+                wrapper.addEventListener('touchstart', function (e) {
                     touchStartX = e.changedTouches[0].screenX;
                 }, { passive: true });
-                wrapper.addEventListener('touchend', function(e) {
+                wrapper.addEventListener('touchend', function (e) {
                     touchEndX = e.changedTouches[0].screenX;
                     const diff = touchStartX - touchEndX;
                     if (Math.abs(diff) > 50) {
@@ -494,13 +524,10 @@
             }
         });
 
-        document.getElementById('lightboxOverlay').addEventListener('click', function(e) {
+        document.getElementById('lightboxOverlay').addEventListener('click', function (e) {
             if (e.target === this) closeLightbox();
         });
 
-        /* ============================================================
-           QR CODE - DOWNLOAD SVG
-           ============================================================ */
         document.addEventListener('DOMContentLoaded', function () {
             const btn = document.getElementById('btnDownloadQr');
             if (!btn) return;
@@ -509,7 +536,6 @@
             const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
             btn.href = URL.createObjectURL(blob);
         });
-
     </script>
 
 </body>

@@ -29,9 +29,9 @@
 
         <div class="header-actions">
 
-            <form action="{{ url('donasi') }}" method="GET" class="desktop-search-form">
-                <input type="text" name="q" placeholder="Cari campaign...">
-
+            {{-- ✅ PERBAIKAN: action ke route search --}}
+            <form action="{{ route('search') }}" method="GET" class="desktop-search-form">
+                <input type="text" name="q" placeholder="Cari campaign..." value="{{ request('q') }}">
                 <button type="submit" aria-label="Cari">
                     <i class="bi bi-search"></i>
                 </button>
@@ -80,9 +80,13 @@
                             $penggalang = auth()->user()->penggalangDana;
                         @endphp
                         @if($penggalang && $penggalang->status === 'approved')
-                            <a href="{{ route('profil.penggalang', $penggalang->id) }}">Profil</a>
-                                <i class="bi bi-megaphone-fill"></i>
+                            <a href="{{ route('profil.penggalang', $penggalang->id) }}">
+                                <i class="bi bi-people-fill"></i>
                                 <span>Profil Penggalang</span>
+                            </a>
+                            <a href="{{ route('campaign.create', $penggalang->id) }}">
+                                <i class="bi bi-megaphone-fill"></i>
+                                <span>Tambah Campaign</span>
                             </a>
                         @endif
 
@@ -92,7 +96,7 @@
                                 <span>Dashboard Admin</span>
                             </a>
                         @endif
-                    
+
                         <form id="logoutForm" action="{{ route('logout') }}" method="POST">
                             @csrf
 
@@ -112,12 +116,12 @@
     {{-- MOBILE HEADER --}}
     <div class="container mobile-header-inner">
 
-        <form action="{{ url('donasi') }}" method="GET" class="mobile-search-form">
+        {{-- ✅ SUDAH BENAR: action ke route search --}}
+        <form action="{{ route('search') }}" method="GET" class="mobile-search-form">
             <button type="submit" aria-label="Cari">
                 <i class="bi bi-search"></i>
             </button>
-
-            <input type="text" name="q" placeholder="Cari Program Donasi">
+            <input type="text" name="q" placeholder="Cari Program Donasi" value="{{ request('q') }}">
         </form>
 
         @guest
