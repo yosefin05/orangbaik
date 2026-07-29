@@ -23,7 +23,7 @@
                 <div class="hero-card hero-main-slider">
                     @foreach ($campaigns as $index => $campaign)
                         <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
-                            <a href="{{ route('campaign.show', $campaign->slug) }}">
+                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
                                 <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}">
                             </a>
                         </div>
@@ -123,7 +123,7 @@
                             }
                         @endphp
                         <article class="campaign-card">
-                            <a href="{{ route('campaign.show', $campaign->slug) }}">
+                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
                                 <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
                                     alt="{{ $campaign->judul }}" loading="lazy">
                             </a>
@@ -161,7 +161,7 @@
                 <h2 class="section-title">Yuk, Lihat yang Baru!</h2>
                 <div class="new-grid">
                     @forelse ($campaignTerbaru as $campaign)
-                        <a href="{{ route('campaign.show', ['slug' => $campaign->slug]) }}" class="donasi-new-item">
+                        <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="donasi-new-item">
                             <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
                                 loading="lazy">
                         </a>
@@ -199,7 +199,7 @@
                             }
                         @endphp
                         <article class="campaign-card">
-                            <a href="{{ route('campaign.show', $campaign->slug) }}">
+                            <a href="{{ route('campaign.show', $campaign->custom_slug ??$campaign->slug) }}">
                                 <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
                                     alt="{{ $campaign->judul }}" loading="lazy">
                             </a>
@@ -331,7 +331,7 @@
                         @endphp
 
                         <article class="list-card">
-                            <a href="{{ route('campaign.show', $campaign->slug) }}">
+                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
                                 <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
                                     loading="lazy">
                             </a>

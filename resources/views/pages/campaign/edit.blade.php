@@ -9,6 +9,43 @@
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/campaign-create.css') }}">
+
+    <!-- Tambahan style untuk custom slug (opsional) -->
+    <style>
+        .campaign-slug-wrap {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            padding: 0 0.75rem;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+        .campaign-slug-wrap:focus-within {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        .campaign-slug-wrap .slug-prefix {
+            font-weight: 500;
+            color: #6c757d;
+            margin-right: 0.5rem;
+            white-space: nowrap;
+        }
+        .campaign-slug-wrap .slug-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 0.75rem 0;
+            background: transparent;
+            font-size: 1rem;
+        }
+        .campaign-slug-wrap .slug-input::placeholder {
+            color: #adb5bd;
+        }
+        .campaign-slug-wrap .slug-input:focus {
+            box-shadow: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -74,6 +111,7 @@
                                     donatur.</p>
                             </div>
 
+                            <!-- Judul -->
                             <div class="campaign-field">
                                 <label for="judul">Judul Campaign <span>*</span></label>
                                 <div class="campaign-input-wrap">
@@ -87,6 +125,21 @@
                                 @enderror
                             </div>
 
+                            <!-- ====== CUSTOM SLUG ====== -->
+                            <div class="campaign-field">
+                                <label for="custom_slug">Link Campaign</label>
+                                <div class="campaign-slug-wrap">
+                                    <span class="slug-prefix">orangbaik.id/</span>
+                                    <input type="text" name="custom_slug" id="custom_slug"
+                                           class="slug-input"
+                                           placeholder="contoh: bantu-korban-banjir"
+                                           value="{{ old('custom_slug', $campaign->custom_slug) }}">
+                                </div>
+                                <small class="campaign-note">Gunakan nama singkat agar mudah dibagikan. Kosongkan untuk menggunakan slug otomatis.</small>
+                            </div>
+                            <!-- ====== END CUSTOM SLUG ====== -->
+
+                            <!-- Deskripsi -->
                             <div class="campaign-field">
                                 <label for="deskripsi_campaign">Deskripsi Campaign <span>*</span></label>
                                 <div class="campaign-input-wrap">
@@ -100,6 +153,7 @@
                                 @enderror
                             </div>
 
+                            <!-- Gambar Pendukung -->
                             <div class="campaign-field">
                                 <label>Gambar Pendukung <small>(Opsional)</small></label>
                                 <div class="campaign-support-grid">
@@ -316,8 +370,8 @@
                                             <label class="package-image-upload">
                                                 <input type="file" name="packages[{{ $index }}][image]"
                                                     accept="image/png,image/jpeg,image/jpg" hidden>
-                                                @if($package->image)
-                                                    <img src="{{ asset('storage/' . $package->image) }}" alt="Package Image">
+                                                @if($package->gambar)
+                                                    <img src="{{ asset('storage/' . $package->gambar) }}" alt="Package Image">
                                                 @else
                                                     <span><i class="bi bi-image"></i></span>
                                                     <small>Tambahkan Gambar</small>
@@ -328,7 +382,7 @@
                                                 <label>Judul Package <span>*</span></label>
                                                 <div class="campaign-input-wrap">
                                                     <input type="text" name="packages[{{ $index }}][title]"
-                                                        value="{{ old("packages.$index.title", $package->title) }}"
+                                                        value="{{ old("packages.$index.title", $package->judul) }}"
                                                         placeholder="Masukkan judul package" required>
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </div>
@@ -338,7 +392,7 @@
                                                 <label>Deskripsi Package <small>(Opsional)</small></label>
                                                 <div class="campaign-input-wrap">
                                                     <textarea name="packages[{{ $index }}][description]" rows="3"
-                                                        placeholder="Masukkan deskripsi package">{{ old("packages.$index.description", $package->description) }}</textarea>
+                                                        placeholder="Masukkan deskripsi package">{{ old("packages.$index.description", $package->deskripsi) }}</textarea>
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </div>
                                             </div>
@@ -481,7 +535,7 @@
 
     <script src="{{ asset('js/header.js') }}"></script>
     <script src="{{ asset('js/campaign-edit.js') }}"></script>
-    <script src="{{ asset('js/campaign-type.js') }}"
+    <script src="{{ asset('js/campaign-type.js') }}"></script>
 </body>
 
 </html>

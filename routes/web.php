@@ -55,33 +55,26 @@ Route::post('/kalkulator/hitung', [KalkulatorController::class, 'calculate'])->n
 Route::get('/donasi', [CampaignController::class, 'index'])->name('donasi');
 
 // ============================================================
-// CAMPAIGN (AUTHENTICATED) - spesifik dulu sebelum wildcard
+// CAMPAIGN (AUTHENTICATED) - semua route dengan prefix /campaign
 // ============================================================
 Route::middleware('auth')->group(function () {
+    // Create campaign
     Route::get('/campaign/create', [CampaignController::class, 'create'])->name('campaign.create');
     Route::post('/campaign', [CampaignController::class, 'store'])->name('campaign.store');
+
+    // Edit campaign
     Route::get('/campaign/{campaign}/edit', [CampaignController::class, 'edit'])->name('campaign.edit');
+
+    // Update & Delete campaign (hanya PUT/DELETE, tidak ada GET)
     Route::put('/campaign/{campaign}', [CampaignController::class, 'update'])->name('campaign.update');
     Route::delete('/campaign/{campaign}', [CampaignController::class, 'destroy'])->name('campaign.destroy');
-    Route::get('/campaign/{slug}/update/{update}/edit', [App\Http\Controllers\User\CampaignUpdateController::class, 'edit'])
-        ->name('campaign.update.edit');
-    Route::put('/campaign/{slug}/update/{update}', [App\Http\Controllers\User\CampaignUpdateController::class, 'update'])
-        ->name('campaign.update.update');
-    Route::delete('/campaign/{slug}/update/{update}', [App\Http\Controllers\User\CampaignUpdateController::class, 'destroy'])
-        ->name('campaign.update.destroy');
-    // Route create sudah ada: campaign.update.create
-});
 
-// Wildcard setelah semua route spesifik
-Route::get('/campaign/{slug}', [CampaignController::class, 'show'])->name('campaign.show');
-
-// ============================================================
-// CAMPAIGN UPDATE (KABAR TERBARU)
-// ============================================================
-Route::middleware('auth')->prefix('campaign')->group(function () {
-    Route::get('/{slug}/update/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
-    Route::post('/{slug}/update', [CampaignUpdateController::class, 'store'])->name('campaign.update.store');
-    Route::delete('/{slug}/update/{id}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');
+    // Campaign Update (kabar terbaru) - semua dengan prefix /campaign
+    Route::get('/campaign/{slug}/update/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
+    Route::post('/campaign/{slug}/update', [CampaignUpdateController::class, 'store'])->name('campaign.update.store');
+    Route::get('/campaign/{slug}/update/{update}/edit', [CampaignUpdateController::class, 'edit'])->name('campaign.update.edit');
+    Route::put('/campaign/{slug}/update/{update}', [CampaignUpdateController::class, 'update'])->name('campaign.update.update');
+    Route::delete('/campaign/{slug}/update/{update}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');
 });
 
 // ============================================================
@@ -170,3 +163,11 @@ Route::middleware('auth')->group(function () {
 // ADMIN ROUTES
 // ============================================================
 require __DIR__ . '/admin.php';
+
+// ============================================================
+// WILDCARD CAMPAIGN - HARUS DI PALING AKHIR!
+// Menangani semua URL satu segmen (misal /bantu-korban, /ppp)
+// ============================================================
+Route::get('/{slug}', [CampaignController::class, 'show'])
+    ->where('slug', '^[a-z0-9-]+$')
+    ->name('campaign.show');

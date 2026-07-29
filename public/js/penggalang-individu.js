@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const preview = document.getElementById('avatarPreview');
 
         document.getElementById('fotoProfilInput').addEventListener('change', function () {
-
             const file = this.files[0];
 
             if (!file) return;

@@ -29,7 +29,8 @@ class Campaign extends Model
         'approval_status',
         'approved_at',
         'approved_by',
-        'rejection_reason'
+        'rejection_reason',
+        'custom_slug',
     ];
 
     protected $casts = [

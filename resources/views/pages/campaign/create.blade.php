@@ -9,6 +9,44 @@
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/campaign-create.css') }}">
+
+    <!-- Tambahan style untuk custom slug -->
+    <style>
+        .campaign-slug-wrap {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            padding: 0 0.75rem;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+        .campaign-slug-wrap:focus-within {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        .campaign-slug-wrap .slug-prefix {
+            font-weight: 500;
+            color: #6c757d;
+            margin-right: 0.5rem;
+            white-space: nowrap;
+        }
+        .campaign-slug-wrap .slug-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 0.75rem 0;
+            background: transparent;
+            font-size: 1rem;
+        }
+        .campaign-slug-wrap .slug-input::placeholder {
+            color: #adb5bd;
+        }
+        /* Opsional: sesuaikan dengan gaya bawaan */
+        .campaign-slug-wrap .slug-input:focus {
+            box-shadow: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -64,6 +102,21 @@
                                     <i class="bi bi-pencil-fill"></i>
                                 </div>
                             </div>
+
+                            {{-- ==== MULAI: Custom Slug ===== --}}
+                            <div class="campaign-field">
+                                <label for="custom_slug">Link Campaign</label>
+                                <div class="campaign-slug-wrap">
+                                    <span class="slug-prefix">orangbaik.id/</span>
+                                    <input type="text" name="custom_slug" id="custom_slug"
+                                           class="slug-input"
+                                           placeholder="contoh: bantu-korban-banjir"
+                                           value="{{ old('custom_slug') }}">
+                                </div>
+                                <small class="campaign-note">Gunakan nama singkat agar mudah dibagikan.</small>
+                            </div>
+                            {{-- ==== SELESAI: Custom Slug ===== --}}
+
                             <div class="campaign-field">
                                 <label for="deskripsi_campaign">Deskripsi Campaign <span>*</span></label>
                                 <div class="campaign-input-wrap">
