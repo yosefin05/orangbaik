@@ -144,17 +144,18 @@
                                                     <div class="update-footer">
                                                         {{-- Tombol Edit --}}
                                                         <a href="{{ route('campaign.update.edit', [$campaign->slug, $update->id]) }}"
-                                                           class="btn-edit-update">
+                                                            class="btn-edit-update">
                                                             <i class="bi bi-pencil"></i> Edit
                                                         </a>
 
                                                         {{-- Tombol Hapus --}}
-                                                        <form action="{{ route('campaign.update.destroy', [$campaign->slug, $update->id]) }}"
-                                                              method="POST" style="display: inline;">
+                                                        <form
+                                                            action="{{ route('campaign.update.destroy', [$campaign->slug, $update->id]) }}"
+                                                            method="POST" style="display: inline;">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn-delete-update"
-                                                                    onclick="return confirm('Yakin ingin menghapus update ini?')">
+                                                                onclick="return confirm('Yakin ingin menghapus update ini?')">
                                                                 <i class="bi bi-trash"></i> Hapus
                                                             </button>
                                                         </form>
@@ -284,7 +285,8 @@
                             $isOwner = $campaign->isOwner(Auth::id());
                         @endphp
 
-                        @if (!$isFundraiser && !$isOwner)
+                        {{-- Tampilkan tombol join jika user BELUM menjadi fundraiser (termasuk owner) --}}
+                        @if (!$isFundraiser)
                             <div class="fundraiser-join-card">
                                 <h3>Jadi Fundraiser</h3>
                                 <p>Bantu sebarkan campaign ini dan dapatkan reward!</p>
@@ -297,10 +299,12 @@
                             </div>
                         @endif
 
-                        @if ($isFundraiser && !$isOwner)
+                        {{-- Tampilkan referral dan opsi berhenti jika user SUDAH menjadi fundraiser (termasuk owner) --}}
+                        @if ($isFundraiser)
                             @php
                                 $fundraiser = $campaign->getFundraiserByUser(Auth::id());
                             @endphp
+
                             <div class="fundraiser-referral-card">
                                 <h4>🔗 Link Referral Anda</h4>
                                 <p>Bagikan link ini untuk mengajak donasi:</p>
@@ -327,9 +331,7 @@
                                     </a>
                                 </div>
                             </div>
-                        @endif
 
-                        @if ($isFundraiser && !$isOwner)
                             <div class="fundraiser-join-card joined">
                                 <h3>✅ Anda Fundraiser</h3>
                                 <p>Terima kasih telah menjadi fundraiser untuk campaign ini!</p>
@@ -385,7 +387,7 @@
                     title: '{{ $campaign->judul }}',
                     text: 'Dukung campaign ini di OrangBaik.id',
                     url: window.location.href
-                }).catch(() => {});
+                }).catch(() => { });
             } else {
                 const url = window.location.href;
                 navigator.clipboard.writeText(url).then(() => {
