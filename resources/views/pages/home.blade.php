@@ -161,9 +161,29 @@
                 <h2 class="section-title">Yuk, Lihat yang Baru!</h2>
                 <div class="new-grid">
                     @forelse ($campaignTerbaru as $campaign)
-                        <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="donasi-new-item">
-                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
-                                loading="lazy">
+                        @php
+                            $terkumpul = $campaign->donasi->sum('nominal');
+                            $persen = $campaign->target_donasi
+                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                : 0;
+                        @endphp
+                        <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
+                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}" loading="lazy">
+                            <div class="new-item-overlay">
+                                <h3>{{ $campaign->judul }}</h3>
+                                <p>{{ $campaign->penggalangDana->nama_penggalang }}</p>
+                                <div class="new-item-price">
+                                    <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
+                                    <span>Terkumpul</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
+                                </div>
+                                <div class="new-item-meta">
+                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ round($persen) }}%</span>
+                                </div>
+                            </div>
                         </a>
                     @empty
                         <p>Belum ada campaign terbaru.</p>
