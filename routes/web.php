@@ -7,10 +7,12 @@ use App\Http\Controllers\User\BeritaController;
 use App\Http\Controllers\User\KomentarController;
 use App\Http\Controllers\User\KalkulatorController;
 use App\Http\Controllers\User\CampaignController;
+use App\Http\Controllers\User\DonasiController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\CampaignUpdateController;
 use App\Http\Controllers\User\FundraiserController;
 use App\Http\Controllers\User\SearchController;
+use App\Http\Controllers\User\RiwayatDonasiController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -53,6 +55,9 @@ Route::post('/kalkulator/hitung', [KalkulatorController::class, 'calculate'])->n
 // CAMPAIGN (PUBLIC - list)
 // ============================================================
 Route::get('/donasi', [CampaignController::class, 'index'])->name('donasi');
+Route::get('/campaign/{slug}/donasi', [DonasiController::class, 'create'])->name('donasi.create');
+Route::post('/campaign/{slug}/donasi', [DonasiController::class, 'store'])->name('donasi.store');
+Route::get('/donasi/status/{status}', [DonasiController::class, 'status'])->name('donasi.status');
 
 // ============================================================
 // CAMPAIGN (AUTHENTICATED) - semua route dengan prefix /campaign
@@ -145,9 +150,9 @@ Route::middleware('auth')->group(function () {
         $penggalang = auth()->user()->penggalangDana()->first();
         return view('pages.profile-user', compact('penggalang'));
     })->name('profile.user');
-    Route::get('/riwayat-donasi', function () {
-        return view('pages.riwayat-donasi');
-    })->name('riwayat.donasi');
+    Route::get('/riwayat-donasi', [RiwayatDonasiController::class, 'index'])
+        ->name('riwayat.donasi')
+        ->middleware('auth');
 });
 
 // ============================================================

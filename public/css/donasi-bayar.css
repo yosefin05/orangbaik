@@ -1,697 +1,656 @@
+/* ============================================================
+   DONASI BAYAR — Payment / Checkout Page
+   OrangBaik.id
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. PAGE / LAYOUT
+   ------------------------------------------------------------ */
+
 .payment-page {
-    min-height: 100vh;
     background: var(--bg-soft);
-    color: var(--text-dark, #111827);
+    min-height: 100vh;
+    padding: var(--space-8) var(--page-padding) var(--space-20);
 }
 
 .payment-container {
-    width: min(100% - 86px, 1250px);
-    margin-inline: auto;
-    padding: 44px 0 70px;
+    max-width: var(--container-form);
+    margin: 0 auto;
 }
 
-/* BACK */
 .back-button {
     display: inline-flex;
     align-items: center;
-    gap: 34px;
-
-    border: none;
-    background: transparent;
-    color: #050505;
-
-    font-size: var(--fs-md);
-    font-weight: var(--fw-bold);
-    line-height: 1;
-
-    margin-bottom: 74px;
+    gap: var(--space-2);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
     cursor: pointer;
+    margin-bottom: var(--space-6);
+    transition: border-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
 
 .back-button svg {
-    width: 34px;
-    height: 34px;
-    fill: none;
+    width: 16px;
+    height: 16px;
     stroke: currentColor;
-    stroke-width: 3.2;
+    stroke-width: 2.25;
+    fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
-/* LAYOUT */
+.back-button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: var(--shadow-soft);
+}
+
 .payment-layout {
     display: grid;
-    grid-template-columns: minmax(0, 650px) 520px;
-    justify-content: space-between;
-    align-items: start;
-    gap: 40px;
+    grid-template-columns: 1fr 380px;
+    gap: var(--page-gap);
+    align-items: flex-start;
 }
 
 .payment-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
     min-width: 0;
 }
 
 .payment-right {
-    min-width: 0;
+    position: sticky;
+    top: var(--space-8);
 }
 
-/* CAMPAIGN MINI */
-.campaign-mini-card {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 22px;
-    align-items: start;
+/* ------------------------------------------------------------
+   2. SHARED CARD SURFACE
+   ------------------------------------------------------------ */
 
-    padding-bottom: 32px;
-    margin-bottom: 28px;
-    border-bottom: 1px solid var(--border);
+.campaign-mini-card,
+.nominal-section,
+.donor-card,
+.message-card,
+.payment-method-card {
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.nominal-section,
+.donor-card,
+.message-card,
+.payment-method-card {
+    padding: var(--card-padding-lg);
+}
+
+.nominal-section h2,
+.message-card h2 {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
+    margin: 0 0 var(--space-5);
+}
+
+/* ------------------------------------------------------------
+   3. CAMPAIGN MINI CARD
+   ------------------------------------------------------------ */
+
+.campaign-mini-card {
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    overflow: hidden;
 }
 
 .campaign-mini-card img {
-    width: 100%;
-    aspect-ratio: 16 / 9;
+    width: 108px;
+    height: 108px;
+    border-radius: var(--radius-md);
     object-fit: cover;
-    object-position: center;
-    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+    background: var(--bg-soft);
+}
+
+.campaign-mini-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
 }
 
 .campaign-mini-body h1 {
-    color: #111111;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
+    line-height: 1.35;
+    margin: 0 0 var(--space-1);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+.campaign-mini-body > p {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
-    line-height: 1.25;
-    margin-bottom: 4px;
+    color: var(--muted);
+    margin: 0 0 var(--space-3);
 }
 
-.campaign-mini-body p {
-    color: #9ca3af;
-    font-size: 10px;
-    line-height: 1.3;
-    margin-bottom: 6px;
-}
-
-.campaign-mini-body p span {
-    color: #2e9dfb;
+.campaign-mini-body > p span {
+    color: var(--muted-light);
 }
 
 .mini-amount {
     display: flex;
-    align-items: center;
-    gap: 26px;
-    margin-bottom: 6px;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
 }
 
 .mini-amount strong {
-    color: var(--primary);
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
+    color: var(--primary);
 }
 
 .mini-amount span {
-    color: #9ca3af;
     font-size: var(--fs-xxs);
-    font-weight: var(--fw-semibold);
+    color: var(--muted);
 }
 
 .mini-progress {
     width: 100%;
-    height: 7px;
-    background: #d8d8d8;
+    height: 6px;
     border-radius: var(--radius-full);
+    background: var(--border-soft);
     overflow: hidden;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2);
 }
 
 .mini-progress div {
-    width: 38%;
     height: 100%;
     background: var(--primary);
-    border-radius: inherit;
+    border-radius: var(--radius-full);
+    transition: width .3s ease;
 }
 
 .mini-meta {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-
-    color: #9ca3af;
     font-size: var(--fs-xxs);
-    font-weight: var(--fw-semibold);
+    color: var(--muted);
 }
 
-/* NOMINAL */
-.nominal-section h2,
-.message-card h2 {
-    color: #050505;
-    font-size: var(--fs-md);
-    font-weight: var(--fw-bold);
-    line-height: 1.25;
-    margin-bottom: 26px;
-}
+/* ------------------------------------------------------------
+   4. NOMINAL SECTION
+   ------------------------------------------------------------ */
 
 .nominal-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 34px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
 }
 
 .nominal-card {
-    min-height: 108px;
-    padding: 20px 44px;
-
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 42px;
-
-    background: var(--bg-soft);
-    border: 1px solid #cfd4dc;
-    border-radius: var(--radius-sm);
-
-    box-shadow: 0 2px 3px rgba(0, 0, 0, .12);
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: .2s ease;
-}
-
-.nominal-card input {
-    display: none;
+    background: var(--bg);
+    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
 }
 
 .nominal-card:hover {
     border-color: var(--primary);
-    box-shadow: var(--shadow-card);
-    transform: translateY(-2px);
+    background: var(--primary-light);
+}
+
+.nominal-card input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 .nominal-card:has(input:checked) {
     border-color: var(--primary);
     background: var(--primary-light);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.nominal-card:has(input:focus-visible) {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .nominal-emoji {
-    font-size: 48px;
+    font-size: var(--fs-md);
     line-height: 1;
+    flex-shrink: 0;
 }
 
 .nominal-card strong {
-    color: #050505;
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-bold);
-    line-height: 1;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text);
+}
+
+.nominal-card:has(input:checked) strong {
+    color: var(--primary);
 }
 
 .custom-nominal-card {
-    padding: 38px 44px 32px;
-    margin-bottom: 36px;
-
-    background: var(--bg-soft);
-    border: 1px solid #cfd4dc;
-    border-radius: var(--radius-sm);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, .12);
+    padding: var(--space-4);
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-blue-soft);
 }
 
 .custom-nominal-card h3 {
-    color: #111111;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
-    margin-bottom: 24px;
+    color: var(--text-dark);
+    margin: 0 0 var(--space-3);
 }
 
 .custom-input-wrap {
-    height: 80px;
-
     display: flex;
     align-items: center;
-    gap: 18px;
-
-    padding: 0 28px;
-    margin-bottom: 24px;
-
-    background: #eef0f4;
-    border: 1px solid #d7dbe2;
+    gap: var(--space-2);
+    background: var(--bg);
+    border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
+    padding: 0 var(--space-4);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.custom-input-wrap:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .custom-input-wrap span {
-    color: #050505;
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--muted);
 }
 
 .custom-input-wrap input {
     flex: 1;
-    min-width: 0;
-
     border: none;
     outline: none;
     background: transparent;
-
-    color: #050505;
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-bold);
-    text-align: right;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
+    padding: var(--space-3) 0;
+    min-width: 0;
 }
 
 .custom-input-wrap input::placeholder {
-    color: #999999;
+    color: var(--muted-light);
+    font-weight: var(--fw-regular);
 }
 
-.custom-nominal-card p {
-    color: #9ca3af;
-    font-size: var(--fs-sm);
-    line-height: 1.4;
+.custom-nominal-card > p {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    margin: var(--space-2) 0 0;
 }
 
-/* DONOR DATA */
-.donor-card,
-.message-card {
-    background: var(--bg-soft);
-    border: 1px solid #d1d5db;
-    box-shadow: 0 2px 3px rgba(0, 0, 0, .08);
-}
-
-.donor-card {
-    padding: 46px 44px 34px;
-    margin-top: 36px;
-    margin-bottom: 36px;
-}
+/* ------------------------------------------------------------
+   5. DONOR CARD
+   ------------------------------------------------------------ */
 
 .donor-title {
-    text-align: center;
-    color: #111111;
-    font-size: var(--fs-sm);
-    margin-bottom: 32px;
+    font-size: var(--fs-xs);
+    color: var(--text);
+    margin: 0 0 var(--space-4);
+}
+
+.donor-title strong {
+    color: var(--text-dark);
+    font-weight: var(--fw-semibold);
 }
 
 .donor-title a {
     color: var(--primary);
     font-weight: var(--fw-semibold);
+    text-decoration: none;
+}
+
+.donor-title a:hover {
+    text-decoration: underline;
 }
 
 .donor-input-group {
     display: flex;
     flex-direction: column;
-    gap: 22px;
-    margin-bottom: 18px;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
 }
 
-.donor-input-group input {
+.donor-input-group input[type="text"] {
     width: 100%;
-    height: 62px;
-    padding: 0 30px;
-
-    border: 1px solid #cfd4dc;
+    border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
-    background: var(--bg);
-
-    color: #111111;
+    padding: var(--space-3) var(--space-4);
     font-size: var(--fs-xs);
-    font-weight: var(--fw-medium);
+    color: var(--text-dark);
+    background: var(--bg);
+    transition: border-color .15s ease, box-shadow .15s ease;
 }
 
-.donor-input-group input::placeholder {
-    color: #a0a0a0;
+.donor-input-group input[type="text"]::placeholder {
+    color: var(--muted-light);
+}
+
+.donor-input-group input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.donor-input-group input[type="text"]:read-only {
+    background: var(--bg-soft);
+    color: var(--muted);
+    cursor: not-allowed;
 }
 
 .input-note {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-
-    color: #111111;
-    font-size: 11px;
-    line-height: 1.4;
-
-    margin-bottom: 18px;
+    gap: var(--space-2);
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    background: var(--info-light);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
+    margin: 0 0 var(--space-5);
 }
 
 .input-note span {
-    color: var(--primary);
-    font-size: 15px;
+    color: var(--info);
+    font-size: var(--fs-sm);
     line-height: 1;
+    flex-shrink: 0;
 }
 
-/* SWITCH */
+/* ------------------------------------------------------------
+   6. SWITCH / TOGGLE ROW
+   ------------------------------------------------------------ */
+
 .switch-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 16px;
-
-    color: #111111;
-    font-size: 12px;
-    line-height: 1.4;
-
+    justify-content: space-between;
+    gap: var(--space-4);
     cursor: pointer;
 }
 
+.switch-row span {
+    font-size: var(--fs-xxs);
+    color: var(--text);
+}
+
 .switch-row input {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 .switch-row i {
-    width: 28px;
-    height: 14px;
-    flex-shrink: 0;
-
     position: relative;
-
-    background: #dbe3ef;
-    border: 1px solid var(--primary);
+    flex-shrink: 0;
+    width: 40px;
+    height: 22px;
     border-radius: var(--radius-full);
+    background: var(--border);
+    transition: background-color .2s ease;
 }
 
-.switch-row i::after {
+.switch-row i::before {
     content: "";
     position: absolute;
-    top: 50%;
+    top: 2px;
     left: 2px;
-
-    width: 8px;
-    height: 8px;
-
-    background: var(--primary);
-    border-radius: var(--radius-full);
-
-    transform: translateY(-50%);
-    transition: .2s ease;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: var(--shadow-soft);
+    transition: transform .2s ease;
 }
 
 .switch-row input:checked + i {
-    background: var(--primary-light);
+    background: var(--primary);
 }
 
-.switch-row input:checked + i::after {
-    left: 16px;
+.switch-row input:checked + i::before {
+    transform: translateX(18px);
 }
 
-/* MESSAGE */
-.message-card {
-    padding: 48px 44px 26px;
+.switch-row input:focus-visible + i {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
+
+/* ------------------------------------------------------------
+   7. MESSAGE CARD
+   ------------------------------------------------------------ */
 
 .textarea-wrap {
     position: relative;
-    margin-bottom: 16px;
 }
 
 .textarea-wrap textarea {
     width: 100%;
-    min-height: 205px;
+    min-height: 110px;
     resize: vertical;
-
-    padding: 24px 30px 44px;
-
-    border: 1px solid #cfd4dc;
+    border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
+    padding: var(--space-4);
+    padding-bottom: var(--space-8);
+    font-size: var(--fs-xs);
+    font-family: inherit;
+    color: var(--text-dark);
     background: var(--bg);
-
-    color: #111111;
-    font-size: var(--fs-sm);
-    line-height: 1.35;
+    line-height: 1.5;
+    transition: border-color .15s ease, box-shadow .15s ease;
 }
 
 .textarea-wrap textarea::placeholder {
-    color: #a0a0a0;
+    color: var(--muted-light);
 }
 
-.textarea-wrap span {
+.textarea-wrap textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.textarea-wrap #charCount {
     position: absolute;
-    right: 28px;
-    bottom: 22px;
-
-    color: #999999;
-    font-size: var(--fs-xs);
+    right: var(--space-4);
+    bottom: var(--space-3);
+    font-size: var(--fs-xxs);
+    color: var(--muted-light);
 }
 
-/* RIGHT CARD */
-.payment-method-card {
-    background: var(--bg-soft);
-    border: 1px solid #cfd4dc;
-    border-radius: var(--radius-sm);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, .12);
-
-    padding: 48px 36px 28px;
-
-    position: sticky;
-    top: 28px;
+.message-card .switch-row {
+    margin-top: var(--space-4);
 }
+
+/* ------------------------------------------------------------
+   8. ERROR TEXT
+   ------------------------------------------------------------ */
+
+.error-text {
+    font-size: var(--fs-xxs);
+    color: var(--danger);
+    margin-top: var(--space-1);
+}
+
+/* ------------------------------------------------------------
+   9. PAYMENT SUMMARY (RIGHT SIDEBAR)
+   ------------------------------------------------------------ */
 
 .payment-method-card h2 {
-    color: #111111;
     font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    margin-bottom: 28px;
-}
-
-.method-group {
-    margin-bottom: 30px;
-}
-
-.method-group h3 {
-    color: #111111;
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    margin-bottom: 16px;
-}
-
-.method-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-
-    min-height: 48px;
-    cursor: pointer;
-}
-
-.method-item input {
-    display: none;
-}
-
-.custom-radio {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-
-    border: 1.5px solid #aab0b8;
-    border-radius: var(--radius-full);
-    background: var(--bg);
-    position: relative;
-}
-
-.method-item input:checked + .custom-radio {
-    border-color: var(--primary);
-}
-
-.method-item input:checked + .custom-radio::after {
-    content: "";
-    position: absolute;
-    inset: 4px;
-    border-radius: inherit;
-    background: var(--primary);
-}
-
-.wallet-logo {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-
-    display: grid;
-    place-items: center;
-
-    background: #12b7d7;
-    border-radius: var(--radius-full);
-    color: var(--bg);
-}
-
-.wallet-logo svg {
-    width: 24px;
-    height: 24px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.bank-logo {
-    min-width: 128px;
-
-    display: inline-flex;
-    align-items: center;
-
-    color: #005baa;
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-extrabold);
-    line-height: 1;
-}
-
-.bank-logo::before {
-    content: "▱";
-    margin-right: 5px;
-    font-size: 24px;
-    line-height: 1;
-}
-
-.method-item strong {
-    color: #111111;
-    font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
-    line-height: 1;
+    color: var(--text-dark);
+    margin: 0 0 var(--space-5);
 }
 
 .payment-total {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    padding-top: 24px;
-    margin-top: 8px;
-    margin-bottom: 12px;
-
-    border-top: 1px solid var(--border);
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border-soft);
 }
 
 .payment-total span {
-    color: #111111;
     font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    color: var(--text);
 }
 
 .payment-total strong {
-    color: #111111;
-    font-size: var(--fs-xs);
+    font-size: var(--fs-lg);
     font-weight: var(--fw-bold);
+    color: var(--secondary);
+}
+
+.payment-method-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    background: var(--info-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.payment-method-info strong {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
+}
+
+.payment-method-info p {
+    font-size: var(--fs-xxs);
+    color: var(--info);
+    margin: 0;
+}
+
+.payment-method-info small {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
 }
 
 .pay-button {
     width: 100%;
-    height: 54px;
-
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--primary);
-    color: var(--bg);
-
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-
-    cursor: pointer;
-    transition: .2s ease;
+    gap: var(--space-2);
+    box-shadow: var(--shadow-soft);
+    transition: background-color .15s ease, box-shadow .15s ease, transform .1s ease;
 }
 
-.pay-button:hover {
+.pay-button:hover:not(:disabled) {
     background: var(--primary-hover);
-    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
 }
 
-/* RESPONSIVE */
-@media (max-width: 1100px) {
+.pay-button:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.pay-button:disabled {
+    background: var(--muted-light);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+#loading-text {
+    text-align: center;
+    margin-top: var(--space-4);
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+}
+
+/* ------------------------------------------------------------
+   10. RESPONSIVE
+   ------------------------------------------------------------ */
+
+@media (max-width: 960px) {
     .payment-layout {
         grid-template-columns: 1fr;
     }
 
-    .payment-method-card {
+    .payment-right {
         position: static;
     }
 }
 
-@media (max-width: 720px) {
-    .payment-container {
-        width: min(100% - 30px, 520px);
-        padding: 28px 0 48px;
+@media (max-width: 560px) {
+    .payment-page {
+        padding: var(--space-5) var(--space-4) var(--space-16);
     }
 
-    .back-button {
-        gap: 16px;
-        font-size: var(--fs-sm);
-        margin-bottom: 42px;
-    }
-
-    .back-button svg {
-        width: 26px;
-        height: 26px;
+    .nominal-list {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2);
     }
 
     .campaign-mini-card {
-        grid-template-columns: 132px 1fr;
-        gap: 12px;
-        padding-bottom: 22px;
+        flex-direction: column;
     }
 
-    .campaign-mini-body h1 {
-        font-size: 10px;
+    .campaign-mini-card img {
+        width: 100%;
+        height: 160px;
     }
 
-    .mini-amount {
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .nominal-section h2,
-    .message-card h2 {
-        font-size: var(--fs-sm);
-    }
-
-    .nominal-card {
-        min-height: 78px;
-        padding: 16px 22px;
-        gap: 22px;
-    }
-
-    .nominal-emoji {
-        font-size: 36px;
-    }
-
-    .nominal-card strong {
-        font-size: var(--fs-md);
-    }
-
-    .custom-nominal-card,
+    .nominal-section,
     .donor-card,
-    .message-card {
-        padding: 26px 22px;
-    }
-
-    .custom-input-wrap {
-        height: 64px;
-        padding: 0 18px;
-    }
-
-    .custom-input-wrap span,
-    .custom-input-wrap input {
-        font-size: var(--fs-md);
-    }
-
-    .custom-nominal-card p,
-    .donor-title,
-    .textarea-wrap textarea {
-        font-size: var(--fs-xs);
-    }
-
-    .donor-input-group input {
-        height: 54px;
-        padding: 0 18px;
-    }
-
+    .message-card,
     .payment-method-card {
-        padding: 30px 22px 24px;
+        padding: var(--card-padding);
     }
+}
 
-    .bank-logo {
-        min-width: 104px;
-        font-size: 11px;
-    }
-
-    .method-item {
-        gap: 10px;
-    }
-
-    .method-item strong {
-        font-size: 11px;
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
     }
 }

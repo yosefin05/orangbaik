@@ -233,7 +233,7 @@
                             </span>
                         </div>
 
-                        <a href="#" class="donate-button">Donasi Sekarang</a>
+                        <a href="{{ route('donasi.create', $campaign->slug) }}" class="donate-button">Donasi Sekarang</a>
                     </div>
 
                     {{-- Fundraiser Info --}}

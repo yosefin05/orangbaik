@@ -14,40 +14,25 @@ return new class extends Migration
         Schema::create('donasi', function (Blueprint $table) {
 
             $table->id();
-
             // Relasi ke campaign
             $table->foreignId('campaign_id')
                 ->constrained('campaign')
                 ->cascadeOnDelete();
-
             // Nullable jika donatur tidak login
             $table->foreignId('user_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
-
             // Data Donatur
             $table->string('nama_donatur');
             $table->string('email')->nullable();
             $table->string('no_hp', 20)->nullable();
-
             // Informasi Donasi
             $table->unsignedBigInteger('nominal');
-
             $table->text('pesan_doa')
                 ->nullable();
-
             $table->boolean('is_anonim')
                 ->default(false);
-
-            // Status Donasi
-            $table->enum('status', [
-                'pending',
-                'paid',
-                'failed',
-                'cancelled'
-            ])->default('pending');
-
             $table->timestamps();
         });
     }

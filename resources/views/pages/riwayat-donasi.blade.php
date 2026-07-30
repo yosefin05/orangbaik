@@ -14,90 +14,8 @@
 @include('components.header')
 
 @php
-    $donations = [
-        [
-            'type' => 'Donasi',
-            'date' => '17 Juni 2026',
-            'status' => 'Selesai',
-            'status_key' => 'selesai',
-            'title' => 'Sedekah Makan untuk Yatim dan Dhuafa',
-            'organizer' => "Dompet Al-Qur'an Indonesia",
-            'amount' => 'Rp300.000',
-            'amount_value' => 300000,
-            'method' => 'QRIS',
-            'invoice' => 'OB-20260617-001',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'type' => 'Donasi',
-            'date' => '17 Juni 2026',
-            'status' => 'Selesai',
-            'status_key' => 'selesai',
-            'title' => 'Bantu Pendidikan Anak Yatim',
-            'organizer' => 'Yayasan OrangBaik',
-            'amount' => 'Rp250.000',
-            'amount_value' => 250000,
-            'method' => 'Transfer Bank',
-            'invoice' => 'OB-20260617-002',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'type' => 'Donasi',
-            'date' => '16 Juni 2026',
-            'status' => 'Menunggu',
-            'status_key' => 'menunggu',
-            'title' => 'Sedekah Subuh untuk Dhuafa',
-            'organizer' => 'Komunitas Peduli Sesama',
-            'amount' => 'Rp150.000',
-            'amount_value' => 150000,
-            'method' => 'QRIS',
-            'invoice' => 'OB-20260616-003',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'type' => 'Donasi',
-            'date' => '15 Juni 2026',
-            'status' => 'Selesai',
-            'status_key' => 'selesai',
-            'title' => 'Bantuan Makanan untuk Lansia',
-            'organizer' => 'Rumah Peduli Indonesia',
-            'amount' => 'Rp200.000',
-            'amount_value' => 200000,
-            'method' => 'E-Wallet',
-            'invoice' => 'OB-20260615-004',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'type' => 'Donasi',
-            'date' => '14 Juni 2026',
-            'status' => 'Gagal',
-            'status_key' => 'gagal',
-            'title' => 'Bantu Renovasi Masjid Pelosok',
-            'organizer' => 'Gerakan Wakaf Baik',
-            'amount' => 'Rp100.000',
-            'amount_value' => 100000,
-            'method' => 'QRIS',
-            'invoice' => 'OB-20260614-005',
-            'image' => 'assets/slide1.png',
-        ],
-        [
-            'type' => 'Donasi',
-            'date' => '13 Juni 2026',
-            'status' => 'Selesai',
-            'status_key' => 'selesai',
-            'title' => 'Paket Sembako untuk Keluarga Prasejahtera',
-            'organizer' => 'Aksi Baik Nusantara',
-            'amount' => '300.000',
-            'amount_value' => 300000,
-            'method' => 'Transfer Bank',
-            'invoice' => 'OB-20260613-006',
-            'image' => 'assets/slide1.png',
-        ],
-    ];
-
-    $totalDonasi = count($donations);
-    $totalNominal = collect($donations)->sum('amount_value');
-    $totalSelesai = collect($donations)->where('status_key', 'selesai')->count();
+    // Data dikirim dari controller: $formattedDonations, $totalDonasi, $totalNominal, $totalSelesai
+    $donations = $formattedDonations ?? [];
     $formatRupiah = fn ($value) => 'Rp' . number_format($value, 0, ',', '.');
 @endphp
 
@@ -122,8 +40,8 @@
 
             <div class="history-hero-card">
                 <span>Total Donasi</span>
-                <strong>{{ $formatRupiah($totalNominal) }}</strong>
-                <p>Dari {{ $totalDonasi }} transaksi donasi</p>
+                <strong>{{ $formatRupiah($totalNominal ?? 0) }}</strong>
+                <p>Dari {{ $totalDonasi ?? 0 }} transaksi donasi</p>
             </div>
         </section>
 
@@ -139,7 +57,7 @@
 
                 <div>
                     <span>Total Transaksi</span>
-                    <strong>{{ $totalDonasi }}</strong>
+                    <strong>{{ $totalDonasi ?? 0 }}</strong>
                 </div>
             </article>
 
@@ -152,7 +70,7 @@
 
                 <div>
                     <span>Donasi Selesai</span>
-                    <strong>{{ $totalSelesai }}</strong>
+                    <strong>{{ $totalSelesai ?? 0 }}</strong>
                 </div>
             </article>
 
@@ -166,7 +84,7 @@
 
                 <div>
                     <span>Total Nominal</span>
-                    <strong>{{ $formatRupiah($totalNominal) }}</strong>
+                    <strong>{{ $formatRupiah($totalNominal ?? 0) }}</strong>
                 </div>
             </article>
         </section>
@@ -204,7 +122,7 @@
                             <div class="history-item-main">
                                 <div class="history-image-wrap">
                                     <img
-                                        src="{{ asset($donation['image']) }}"
+                                        src="{{ $donation['image'] }}"
                                         alt="{{ $donation['title'] }}"
                                         class="history-image"
                                     >
@@ -237,7 +155,7 @@
 
                             <div class="history-payment">
                                 <span>Nominal</span>
-                                <strong>{{ str_starts_with($donation['amount'], 'Rp') ? $donation['amount'] : 'Rp' . $donation['amount'] }}</strong>
+                                <strong>{{ $donation['amount'] }}</strong>
 
                                 <a href="#" class="receipt-button">
                                     E-Kwitansi

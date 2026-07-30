@@ -18,7 +18,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->string('judul')->nullable();
             $table->text('deskripsi')->nullable();
-            $table->unsignedBigInteger('nominal');
+            $table->unsignedBigInteger('nominal')->nullable();
             $table->string('gambar')->nullable();
             $table->timestamps();
         });
