@@ -2,10 +2,6 @@
 
 @section('page-title', 'Campaign')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('css/admin/campaign/index.css') }}">
-@endpush
-
 @section('content')
 
     <section class="ob-card ob-card-lg">
@@ -17,6 +13,24 @@
                     Kelola seluruh campaign donasi yang ada di platform OrangBaik.id.
                 </p>
             </div>
+            
+            {{-- Cek apakah admin terdaftar sebagai penggalang dana --}}
+            @php
+                $isPenggalangDana = auth()->user()->penggalangDana()->exists();
+            @endphp
+
+            @if($isPenggalangDana)
+                <a href="{{ route('campaign.create') }}" class="btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Tambah Campaign</span>
+                </a>
+            @else
+                <button type="button" class="btn-primary btn-disabled" 
+                        onclick="openPenggalangModal()">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Tambah Campaign</span>
+                </button>
+            @endif
         </div>
 
         <div class="table-wrapper">
@@ -73,9 +87,6 @@
                             </td>
 
                             <td>
-                                {{--
-                                PHP
-                                --}}
                                 @if($item->is_active)
                                     <span class="badge badge-green">
                                         <i class="bi bi-check-circle-fill"></i>
@@ -173,4 +184,60 @@
 
     </section>
 
+    <!-- MODAL DAFTAR PENGGALANG DANA -->
+    <div class="modal-overlay" id="penggalangModal">
+        <div class="penggalang-modal">
+            <h2>Daftar Penggalang Dana</h2>
+            <p>Silakan pilih jenis akun penggalang dana yang ingin didaftarkan.</p>
+            <div class="modal-buttons">
+                <a href="{{ route('verifikasi.penggalang') }}" class="btn-individu">Individu</a>
+                <a href="{{ route('penggalang_dana.organisasi.create') }}" class="btn-organisasi">Organisasi</a>
+            </div>
+            <button type="button" class="btn-close" id="closePenggalangModal">Batal</button>
+        </div>
+    </div>
+
 @endsection
+
+@push('scripts')
+<script>
+    // Function to open modal
+    function openPenggalangModal() {
+        const modal = document.getElementById('penggalangModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+
+    // Function to close modal
+    function closePenggalangModal() {
+        const modal = document.getElementById('penggalangModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('penggalangModal');
+        const closeBtn = document.getElementById('closePenggalangModal');
+
+        // Close button
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closePenggalangModal);
+        }
+
+        // Click outside modal content
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closePenggalangModal();
+            }
+        });
+
+        // Close with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closePenggalangModal();
+            }
+        });
+    });
+</script>
+@endpush

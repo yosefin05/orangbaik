@@ -68,7 +68,6 @@
                                 <strong>Rp {{ number_format($package->nominal, 0, ',', '.') }}</strong>
                             </label>
                         @empty
-                            <!-- Fallback DEFAULT jika tidak ada package -->
                             <label class="nominal-card">
                                 <input type="radio" name="nominal" value="10000" checked>
                                 <span class="nominal-emoji">💰</span>
@@ -268,7 +267,6 @@
             const isAnonim = anonymousDonor.checked || anonymousMessage.checked;
 
             if (isAnonim) {
-                // Jika anonim, ubah nama jadi "Orang Baik"
                 if (namaDonaturInput) {
                     namaDonaturInput.value = 'Orang Baik';
                 }
@@ -276,7 +274,6 @@
                     donorNameDisplay.textContent = 'Orang Baik';
                 }
             } else {
-                // Jika tidak anonim, kembalikan ke nama asli
                 if (namaDonaturInput && !namaDonaturInput.readOnly) {
                     namaDonaturInput.value = namaAsli;
                 }
@@ -286,11 +283,8 @@
             }
         }
 
-        // Event listener untuk kedua checkbox
         anonymousDonor.addEventListener('change', updateAnonim);
         anonymousMessage.addEventListener('change', updateAnonim);
-
-        // Jalankan sekali saat halaman dimuat
         updateAnonim();
 
         // ============================================================
@@ -328,13 +322,11 @@
         const loadingText = document.getElementById('loading-text');
 
         payButton.addEventListener('click', async function() {
-            // Clear semua error
             document.querySelectorAll('.error-text').forEach(el => {
                 el.style.display = 'none';
                 el.textContent = '';
             });
 
-            // Ambil nilai nominal
             let nominal = 0;
             const selectedRadio = document.querySelector('input[name="nominal"]:checked');
             if (selectedRadio) {
@@ -345,7 +337,6 @@
                 nominal = customValue;
             }
 
-            // Validasi minimal donasi
             if (!validateNominal(nominal)) {
                 return;
             }
@@ -422,4 +413,4 @@
 </script>
 
 </body>
-</html>
+</html> 

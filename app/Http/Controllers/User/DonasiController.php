@@ -26,21 +26,21 @@ class DonasiController extends Controller
     public function create($slug)
     {
         $campaign = Campaign::where('slug', $slug)
-            ->with(['packages', 'penggalangDana', 'donasi'])
-            ->firstOrFail();
+                            ->with(['packages', 'penggalangDana', 'donasi'])
+                            ->firstOrFail();
 
         $totalTerkumpul = $campaign->donasi->sum('nominal');
-        $jumlahDonatur = $campaign->donasi->count();
+        $jumlahDonatur  = $campaign->donasi->count();
 
         return view('pages.donasi-bayar', compact(
             'campaign',
             'totalTerkumpul',
-            'jumlahDonatur',
+            'jumlahDonatur'
         ));
     }
 
     /**
-     * Proses donasi dan redirect ke halaman konfirmasi
+     * Proses donasi dan kembalikan Snap Token (JSON)
      */
     public function store(DonasiRequest $request, $slug)
     {
@@ -50,9 +50,9 @@ class DonasiController extends Controller
         $minimalDonasi = $campaign->minimal_donasi ?? 5000;
 
         // Tentukan nominal
-        $nominal = $request->filled('nominal_lainnya')
-            ? $request->nominal_lainnya
-            : $request->nominal;
+        $nominal = $request->filled('nominal_lainnya') 
+                    ? $request->nominal_lainnya 
+                    : $request->nominal;
 
         if (empty($nominal) || $nominal < $minimalDonasi) {
             return response()->json([
@@ -62,42 +62,62 @@ class DonasiController extends Controller
             ], 422);
         }
 
-        // ... sisanya sama
-    }
+        // Cek anonim
+        $isAnonim = $request->has('anonymous_donor') || $request->has('anonymous_message');
 
-    /**
-     * Halaman konfirmasi pembayaran (Snap popup)
-     */
-    public function confirm(Donasi $donasi)
-    {
-        $pembayaran = $donasi->pembayaran;
-        $snapToken = session('snap_token') ?? $pembayaran->snap_token;
-
-        if (!$snapToken) {
-            abort(404, 'Token pembayaran tidak ditemukan.');
+        $namaDonatur = $request->nama_donatur ?? 'Orang Baik';
+        if ($isAnonim) {
+            $namaDonatur = 'Orang Baik';
         }
 
-        return view('pages.donasi-konfirmasi', compact('donasi', 'snapToken'));
+        $dataDonasi = [
+            'campaign_id'   => $campaign->id,
+            'user_id'       => auth()->id(),
+            'nama_donatur'  => $namaDonatur,
+            'email'         => auth()->user()->email ?? null,
+            'no_hp'         => $request->no_hp,
+            'nominal'       => $nominal,
+            'pesan_doa'     => $request->pesan,
+            'is_anonim'     => $isAnonim,
+        ];
+
+        $donasi = Donasi::create($dataDonasi);
+
+        $orderId = 'ORDER-' . strtoupper(Str::random(8)) . '-' . $donasi->id;
+
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'order_id'  => $orderId,
+            'transaction_status' => 'pending',
+        ]);
+
+        try {
+            $snapToken = $this->midtransService->createTransaction($donasi, $pembayaran);
+        } catch (\Exception $e) {
+            Log::error('Midtrans Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memproses pembayaran. Silakan coba lagi.'
+            ], 500);
+        }
+
+        $pembayaran->update(['snap_token' => $snapToken]);
+
+        return response()->json([
+            'success' => true,
+            'snap_token' => $snapToken,
+            'donasi_id' => $donasi->id,
+        ]);
     }
 
     /**
-     * Halaman status donasi
+     * Halaman status pembayaran
      */
     public function status($status)
     {
         $allowed = ['sukses', 'pending', 'gagal'];
         if (!in_array($status, $allowed)) {
             abort(404);
-        }
-
-        // Jika status pending, pastikan ada snap_token di session
-        if ($status == 'pending') {
-            $snapToken = session('snap_token');
-            $donasiId = session('donasi_id');
-
-            if (!$snapToken) {
-                return redirect()->route('home')->with('error', 'Token pembayaran tidak ditemukan.');
-            }
         }
 
         return view('pages.donasi-status', compact('status'));

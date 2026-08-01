@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -168,7 +169,8 @@
                                 : 0;
                         @endphp
                         <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
-                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}" loading="lazy">
+                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
+                                loading="lazy">
                             <div class="new-item-overlay">
                                 <h3>{{ $campaign->judul }}</h3>
                                 <p>{{ $campaign->penggalangDana->nama_penggalang }}</p>
@@ -219,7 +221,7 @@
                             }
                         @endphp
                         <article class="campaign-card">
-                            <a href="{{ route('campaign.show', $campaign->custom_slug ??$campaign->slug) }}">
+                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
                                 <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
                                     alt="{{ $campaign->judul }}" loading="lazy">
                             </a>
@@ -384,6 +386,21 @@
         </section>
 
     </main>
+
+    <!-- FLOATING WHATSAPP BUTTON -->
+    @if(env('ENABLE_WA_FLOATING', true))
+        <div class="floating-wa-container">
+            <a href="https://wa.me/{{ env('WHATSAPP_NUMBER', '6281385002300') }}?text={{ urlencode(env('WHATSAPP_MESSAGE', 'Halo tim OrangBaik.id, saya mau bertanya mengenai...')) }}"
+                target="_blank" rel="noopener noreferrer" class="floating-wa-btn"
+                aria-label="Hubungi Customer Service via WhatsApp">
+                <div class="wa-icon-wrapper">
+                    <i class="bi bi-whatsapp"></i>
+                </div>
+                <span class="wa-tooltip">Hubungi CS</span>
+                <span class="wa-badge">Online</span>
+            </a>
+        </div>
+    @endif
 
     @include('components.footer')
 
