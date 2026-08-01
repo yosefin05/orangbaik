@@ -32,7 +32,7 @@ class CampaignController extends Controller
             'kategori',
             'penggalangDana',
             'donasi',
-            'filter' // relasi many-to-many ke filter
+            'filter'
         ])->where('is_active', true);
 
         // Hanya tampilkan campaign yang approved atau regular
@@ -122,7 +122,7 @@ class CampaignController extends Controller
         $selectedFilterIds = $request->filter_ids ?? [];
 
         return view('pages.donasi', compact(
-            'filters',        // <-- data filter dari database
+            'filters',
             'kategori',
             'darurat',
             'terbaru',
@@ -178,10 +178,11 @@ class CampaignController extends Controller
             'filter' => 'required|array|min:1|max:4',
             'filter.*' => 'exists:filter,id',
             'gambar_pendukung.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'packages' => 'required|array|min:1',
+            // PACKAGE TIDAK WAJIB - HAPUS VALIDASI REQUIRED
+            'packages' => 'nullable|array',
             'packages.*.title' => 'nullable|string|max:255',
             'packages.*.description' => 'nullable|string',
-            'packages.*.nominal' => 'nullable|numeric|min:1',
+            'packages.*.nominal' => 'nullable|numeric|min:0', // DIUBAH: nullable, min:0
             'packages.*.image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'custom_slug' => 'nullable|alpha_dash|unique:campaign,custom_slug',
         ]);
@@ -190,19 +191,19 @@ class CampaignController extends Controller
 
         try {
             // Upload thumbnail
-            $thumbnail = $request->file('thumbnail')
-                ->store('campaign/thumbnail', 'public');
+            $thumbnail = $request->file('thumbnail')->store('campaign/thumbnail', 'public');
 
             // Penggalang Dana
             $penggalang = Penggalang_Dana::where('user_id', Auth::id())->firstOrFail();
 
             // Set approval only for emergency and sustainable
-            $approvalStatus = in_array($request->campaign_type, ['emergency', 'sustainable'])
-                ? 'pending'
-                : 'approved';
+            $approvalStatus = in_array($request->campaign_type, ['emergency', 'sustainable']) ? 'pending' : 'approved';
 
-            // Siapkan custom_slug – jika kosong set null, jika ada di-slugify
+            // Siapkan custom_slug
             $customSlug = $request->custom_slug ? Str::slug($request->custom_slug) : null;
+
+            // Set minimal donasi ke 5000 jika tidak diisi
+            $minimalDonasi = $request->minimal_donasi ?: 5000;
 
             // Simpan Campaign
             $campaign = Campaign::create([
@@ -213,7 +214,7 @@ class CampaignController extends Controller
                 'tanggal_mulai' => $request->tanggal_mulai,
                 'tanggal_berakhir' => $request->tanggal_akhir,
                 'target_donasi' => $request->target_donasi,
-                'minimal_donasi' => $request->minimal_donasi,
+                'minimal_donasi' => $minimalDonasi,
                 'kategori_id' => $request->kategori_id,
                 'campaign_type' => $request->campaign_type,
                 'approval_status' => $approvalStatus,
@@ -246,11 +247,7 @@ class CampaignController extends Controller
 
             if ($request->hasFile('gambar_pendukung')) {
                 foreach ($request->file('gambar_pendukung') as $gambar) {
-                    $path = $gambar->store(
-                        'campaign/gambar',
-                        'public'
-                    );
-
+                    $path = $gambar->store('campaign/gambar', 'public');
                     Campaign_Gambar::create([
                         'campaign_id' => $campaign->id,
                         'gambar' => $path,
@@ -260,30 +257,29 @@ class CampaignController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Simpan Package
+            | Simpan Package - HANYA JIKA ADA DAN NOMINAL > 0
             |--------------------------------------------------------------------------
             */
 
-            foreach ($request->packages as $package) {
-                $gambar = null;
+            if ($request->has('packages') && is_array($request->packages)) {
+                foreach ($request->packages as $package) {
+                    // CEK: hanya simpan jika nominal ada dan > 0
+                    if (isset($package['nominal']) && $package['nominal'] > 0) {
+                        $gambar = null;
 
-                if (
-                    isset($package['image']) &&
-                    $package['image'] instanceof \Illuminate\Http\UploadedFile
-                ) {
-                    $gambar = $package['image']->store(
-                        'campaign/package',
-                        'public'
-                    );
+                        if (isset($package['image']) && $package['image'] instanceof \Illuminate\Http\UploadedFile) {
+                            $gambar = $package['image']->store('campaign/package', 'public');
+                        }
+
+                        Campaign_Package::create([
+                            'campaign_id' => $campaign->id,
+                            'judul' => $package['title'] ?? 'Package',
+                            'deskripsi' => $package['description'] ?? null,
+                            'nominal' => $package['nominal'],
+                            'gambar' => $gambar,
+                        ]);
+                    }
                 }
-
-                Campaign_Package::create([
-                    'campaign_id' => $campaign->id,
-                    'judul' => $package['title'],
-                    'deskripsi' => $package['description'] ?? null,
-                    'nominal' => $package['nominal'],
-                    'gambar' => $gambar,
-                ]);
             }
 
             DB::commit();
@@ -292,7 +288,6 @@ class CampaignController extends Controller
                 ? 'Campaign berhasil dibuat dan menunggu persetujuan admin untuk tampil di section Darurat/Berkelanjutan'
                 : 'Campaign berhasil dibuat.';
 
-            // === PERUBAHAN: redirect pakai custom_slug jika ada ===
             $redirectSlug = $campaign->custom_slug ?? $campaign->slug;
             return redirect()
                 ->route('campaign.show', $redirectSlug)
@@ -300,7 +295,6 @@ class CampaignController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-
             return back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -315,7 +309,6 @@ class CampaignController extends Controller
         if (is_null($value)) {
             return null;
         }
-        // Remove dots, commas, spaces, and "Rp" prefix
         return preg_replace('/[^0-9]/', '', $value);
     }
 
@@ -333,14 +326,13 @@ class CampaignController extends Controller
             ->where('is_active', true)
             ->where(function ($query) use ($slug) {
                 $query->where('slug', $slug)
-                      ->orWhere('custom_slug', $slug);
+                    ->orWhere('custom_slug', $slug);
             })
             ->firstOrFail();
 
         $campaign->terkumpul = $campaign->donasi->sum('nominal');
         $campaign->donasi_count = $campaign->donasi->count();
 
-        // Siapkan data untuk modal
         $updatesData = $campaign->campaignUpdates->map(function ($update) {
             return [
                 'id' => $update->id,
@@ -413,10 +405,11 @@ class CampaignController extends Controller
             'filter' => 'array|max:4',
             'filter.*' => 'exists:filter,id',
             'gambar_pendukung.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'packages' => 'array|min:1',
+            // PACKAGE TIDAK WAJIB
+            'packages' => 'nullable|array',
             'packages.*.title' => 'nullable|string|max:255',
             'packages.*.description' => 'nullable|string',
-            'packages.*.nominal' => 'nullable|numeric|min:1',
+            'packages.*.nominal' => 'nullable|numeric|min:0', // DIUBAH: nullable
             'packages.*.image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'custom_slug' => 'nullable|alpha_dash|unique:campaign,custom_slug,' . $campaign->id,
         ]);
@@ -427,14 +420,14 @@ class CampaignController extends Controller
             // Reset approval if type changed to emergency/sustainable
             $approvalStatus = $campaign->approval_status;
 
-            if (
-                in_array($request->campaign_type, ['emergency', 'sustainable']) &&
-                $campaign->campaign_type != $request->campaign_type
-            ) {
+            if (in_array($request->campaign_type, ['emergency', 'sustainable']) && $campaign->campaign_type != $request->campaign_type) {
                 $approvalStatus = 'pending';
             } elseif (!in_array($request->campaign_type, ['emergency', 'sustainable'])) {
                 $approvalStatus = null;
             }
+
+            // Set minimal donasi ke 5000 jika tidak diisi
+            $minimalDonasi = $request->minimal_donasi ?: 5000;
 
             // Update data
             $data = [
@@ -443,7 +436,7 @@ class CampaignController extends Controller
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'tanggal_berakhir' => $validated['tanggal_berakhir'],
                 'target_donasi' => $validated['target_donasi'],
-                'minimal_donasi' => $validated['minimal_donasi'],
+                'minimal_donasi' => $minimalDonasi,
                 'kategori_id' => $validated['kategori_id'],
                 'campaign_type' => $request->campaign_type,
                 'approval_status' => $approvalStatus,
@@ -460,7 +453,6 @@ class CampaignController extends Controller
 
             // Handle thumbnail
             if ($request->hasFile('thumbnail')) {
-                // Delete old thumbnail
                 if ($campaign->thumbnail && file_exists(storage_path('app/public/' . $campaign->thumbnail))) {
                     unlink(storage_path('app/public/' . $campaign->thumbnail));
                 }
@@ -470,16 +462,9 @@ class CampaignController extends Controller
 
             $campaign->update($data);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Update Filter
-            |--------------------------------------------------------------------------
-            */
-
-            // Delete existing filters
+            // Update Filter
             Campaign_Filter::where('campaign_id', $campaign->id)->delete();
 
-            // Create new filters
             if ($request->has('filter')) {
                 foreach ($request->filter as $filter) {
                     Campaign_Filter::create([
@@ -489,14 +474,8 @@ class CampaignController extends Controller
                 }
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Update Gambar Pendukung
-            |--------------------------------------------------------------------------
-            */
-
+            // Update Gambar Pendukung
             if ($request->hasFile('gambar_pendukung')) {
-                // Delete existing images
                 $existingImages = Campaign_Gambar::where('campaign_id', $campaign->id)->get();
                 foreach ($existingImages as $img) {
                     if (file_exists(storage_path('app/public/' . $img->gambar))) {
@@ -505,7 +484,6 @@ class CampaignController extends Controller
                     $img->delete();
                 }
 
-                // Upload new images
                 foreach ($request->file('gambar_pendukung') as $gambar) {
                     if ($gambar) {
                         $path = $gambar->store('campaign/gambar', 'public');
@@ -517,33 +495,28 @@ class CampaignController extends Controller
                 }
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Update Package
-            |--------------------------------------------------------------------------
-            */
-
+            // Update Package
             if ($request->has('packages')) {
-                // Get existing package IDs
                 $existingPackageIds = $campaign->packages->pluck('id')->toArray();
                 $updatedPackageIds = [];
 
                 foreach ($request->packages as $packageData) {
+                    // SKIP jika nominal kosong atau 0
+                    if (!isset($packageData['nominal']) || $packageData['nominal'] <= 0) {
+                        continue;
+                    }
+
                     if (isset($packageData['id']) && in_array($packageData['id'], $existingPackageIds)) {
                         // Update existing package
                         $package = Campaign_Package::find($packageData['id']);
                         if ($package) {
                             $updateData = [
-                                'judul' => $packageData['title'],
+                                'judul' => $packageData['title'] ?? 'Package',
                                 'deskripsi' => $packageData['description'] ?? null,
                                 'nominal' => $packageData['nominal'],
                             ];
 
-                            // Handle image update
-                            if (
-                                isset($packageData['image']) &&
-                                $packageData['image'] instanceof \Illuminate\Http\UploadedFile
-                            ) {
+                            if (isset($packageData['image']) && $packageData['image'] instanceof \Illuminate\Http\UploadedFile) {
                                 if ($package->gambar && file_exists(storage_path('app/public/' . $package->gambar))) {
                                     unlink(storage_path('app/public/' . $package->gambar));
                                 }
@@ -557,16 +530,13 @@ class CampaignController extends Controller
                     } else {
                         // Create new package
                         $gambar = null;
-                        if (
-                            isset($packageData['image']) &&
-                            $packageData['image'] instanceof \Illuminate\Http\UploadedFile
-                        ) {
+                        if (isset($packageData['image']) && $packageData['image'] instanceof \Illuminate\Http\UploadedFile) {
                             $gambar = $packageData['image']->store('campaign/package', 'public');
                         }
 
                         $package = Campaign_Package::create([
                             'campaign_id' => $campaign->id,
-                            'judul' => $packageData['title'],
+                            'judul' => $packageData['title'] ?? 'Package',
                             'deskripsi' => $packageData['description'] ?? null,
                             'nominal' => $packageData['nominal'],
                             'gambar' => $gambar,
@@ -575,7 +545,7 @@ class CampaignController extends Controller
                     }
                 }
 
-                // Delete packages that are not in the updated list
+                // Delete packages not in updated list
                 $packagesToDelete = array_diff($existingPackageIds, $updatedPackageIds);
                 if (!empty($packagesToDelete)) {
                     $packages = Campaign_Package::whereIn('id', $packagesToDelete)->get();
@@ -586,6 +556,15 @@ class CampaignController extends Controller
                         $package->delete();
                     }
                 }
+            } else {
+                // Jika tidak ada packages sama sekali, hapus semua packages yang ada
+                $existingPackages = $campaign->packages;
+                foreach ($existingPackages as $package) {
+                    if ($package->gambar && file_exists(storage_path('app/public/' . $package->gambar))) {
+                        unlink(storage_path('app/public/' . $package->gambar));
+                    }
+                    $package->delete();
+                }
             }
 
             DB::commit();
@@ -594,14 +573,12 @@ class CampaignController extends Controller
                 ? 'Campaign berhasil diupdate dan menunggu persetujuan admin'
                 : 'Campaign berhasil diupdate';
 
-            // === PERUBAHAN: redirect pakai custom_slug jika ada ===
             $redirectSlug = $campaign->custom_slug ?? $campaign->slug;
             return redirect()->route('campaign.show', $redirectSlug)
                 ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
-
             return back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

@@ -340,6 +340,21 @@
 
     </main>
 
+     <!-- FLOATING WHATSAPP BUTTON -->
+    @if(env('ENABLE_WA_FLOATING', true))
+        <div class="floating-wa-container">
+            <a href="https://wa.me/{{ env('WHATSAPP_NUMBER', '6281385002300') }}?text={{ urlencode(env('WHATSAPP_MESSAGE', 'Halo tim OrangBaik.id, saya mau bertanya mengenai...')) }}"
+                target="_blank" rel="noopener noreferrer" class="floating-wa-btn"
+                aria-label="Hubungi Customer Service via WhatsApp">
+                <div class="wa-icon-wrapper">
+                    <i class="bi bi-whatsapp"></i>
+                </div>
+                <span class="wa-tooltip">Hubungi CS</span>
+                <span class="wa-badge">Online</span>
+            </a>
+        </div>
+    @endif
+
     @include('components.footer')
 
     <script>

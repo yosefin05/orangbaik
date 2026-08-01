@@ -2,9 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("=== CAMPAIGN CREATE PAGE LOADED ===");
 
     // === DOM ELEMENTS ===
-    const publishBtn =
-        document.getElementById("publishBtn") ||
-        document.getElementById("forceSubmitBtn");
+    const publishBtn = document.getElementById("publishBtn") || document.getElementById("forceSubmitBtn");
     const moneyInputs = document.querySelectorAll("[data-money]");
     const fileInputs = document.querySelectorAll('input[type="file"]');
     const filterInputs = document.querySelectorAll('input[name="filter[]"]');
@@ -17,10 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const toggleNominal = document.getElementById("toggleNominal");
     const form = document.getElementById("campaignCreateForm");
 
-    // Debug form
     console.log("Form element:", form);
     console.log("Form action:", form?.action);
-    console.log("Form method:", form?.method);
 
     // === HELPER FUNCTIONS ===
     function onlyNumber(value) {
@@ -50,13 +46,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // === SHOW VALIDATION ERRORS ===
     function showValidationErrors(errors) {
-        // Hapus error container lama
         const oldErrorContainer = document.getElementById("validationErrors");
         if (oldErrorContainer) {
             oldErrorContainer.remove();
         }
 
-        // Buat container baru
         const errorContainer = document.createElement("div");
         errorContainer.id = "validationErrors";
         errorContainer.className = "validation-error-container";
@@ -67,7 +61,6 @@ document.addEventListener("DOMContentLoaded", function () {
             border-radius: 8px;
             margin-bottom: 20px;
             border: 1px solid #f5c6cb;
-            animation: fadeIn 0.3s ease;
         `;
 
         errorContainer.innerHTML = `
@@ -77,13 +70,11 @@ document.addEventListener("DOMContentLoaded", function () {
             </ul>
         `;
 
-        // Insert di atas form
         const formElement = document.getElementById("campaignCreateForm");
         if (formElement) {
             formElement.parentNode.insertBefore(errorContainer, formElement);
         }
 
-        // Scroll ke error container
         errorContainer.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
@@ -92,7 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
         input.addEventListener("input", function () {
             formatMoneyInput(input);
         });
-        // Set initial value
         if (input.value) {
             formatMoneyInput(input);
         }
@@ -104,18 +94,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const file = input.files[0];
             if (!file) return;
 
-            const preview = document.querySelector(
-                '[data-preview="' + input.id + '"]',
-            );
+            const preview = document.querySelector('[data-preview="' + input.id + '"]');
             if (!preview) return;
 
             preview.src = URL.createObjectURL(file);
             preview.hidden = false;
 
-            // Hide placeholder
-            const placeholder = preview.parentElement.querySelector(
-                ".campaign-upload-placeholder",
-            );
+            const placeholder = preview.parentElement.querySelector(".campaign-upload-placeholder");
             if (placeholder) {
                 placeholder.style.display = "none";
             }
@@ -125,9 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // === FILTER VALIDATION ===
     filterInputs.forEach(function (input) {
         input.addEventListener("change", function () {
-            const checked = document.querySelectorAll(
-                'input[name="filter[]"]:checked',
-            );
+            const checked = document.querySelectorAll('input[name="filter[]"]:checked');
 
             if (checked.length > 4) {
                 input.checked = false;
@@ -173,13 +156,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const removeButton = item.querySelector("[data-remove-package]");
         if (removeButton) {
             removeButton.addEventListener("click", function () {
-                item.remove();
-                refreshPackageTitle();
-                renderPreview();
+                if (packageList.querySelectorAll("[data-package-item]").length > 1) {
+                    item.remove();
+                    refreshPackageTitle();
+                    renderPreview();
+                }
             });
         }
 
-        // File input preview for package
         const fileInput = item.querySelector('input[type="file"]');
         if (fileInput) {
             fileInput.addEventListener("change", function () {
@@ -191,13 +175,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 const small = label.querySelector("small");
 
                 if (placeholder) {
-                    placeholder.innerHTML =
-                        '<i class="bi bi-check-circle-fill" style="color: #28a745;"></i>';
+                    placeholder.innerHTML = '<i class="bi bi-check-circle-fill" style="color: #28a745;"></i>';
                 }
                 if (small) {
-                    small.textContent =
-                        file.name.substring(0, 20) +
-                        (file.name.length > 20 ? "..." : "");
+                    small.textContent = file.name.substring(0, 20) + (file.name.length > 20 ? "..." : "");
                 }
                 renderPreview();
             });
@@ -226,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </label>
 
             <div class="campaign-field compact">
-                <label>Judul Package</label>
+                <label>Judul Package <small>(Opsional)</small></label>
                 <div class="campaign-input-wrap">
                     <input type="text" name="packages[${packageIndex}][title]" placeholder="Masukkan judul package">
                     <i class="bi bi-pencil-fill"></i>
@@ -242,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
 
             <div class="campaign-field compact">
-                <label>Nominal Package <span>*</span></label>
+                <label>Nominal Package <small>(Opsional)</small></label>
                 <div class="campaign-money-wrap">
                     <span>Rp</span>
                     <input
@@ -250,8 +231,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         name="packages[${packageIndex}][nominal]"
                         placeholder="0"
                         inputmode="numeric"
-                        data-money
-                        required>
+                        data-money>
                 </div>
                 <div class="package-extra-feature"></div>
             </div>
@@ -269,15 +249,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const donaturChecked = toggleDonatur?.checked || false;
         const nominalChecked = toggleNominal?.checked || false;
 
-        document
-            .querySelectorAll(".package-extra-feature")
-            .forEach(function (feature) {
-                feature.innerHTML = "";
+        document.querySelectorAll(".package-extra-feature").forEach(function (feature) {
+            feature.innerHTML = "";
 
-                if (donaturChecked) {
-                    feature.insertAdjacentHTML(
-                        "beforeend",
-                        `
+            if (donaturChecked) {
+                feature.insertAdjacentHTML(
+                    "beforeend",
+                    `
                     <div class="campaign-field compact">
                         <label>Nama Pekurban</label>
                         <div class="campaign-input-wrap">
@@ -285,14 +263,14 @@ document.addEventListener("DOMContentLoaded", function () {
                             <i class="bi bi-pencil-fill"></i>
                         </div>
                     </div>
-                `,
-                    );
-                }
+                `
+                );
+            }
 
-                let html = '<div class="package-price-row">';
+            let html = '<div class="package-price-row">';
 
-                if (nominalChecked) {
-                    html += `
+            if (nominalChecked) {
+                html += `
                     <div class="campaign-field compact custom-nominal">
                         <label>Nominal Lainnya</label>
                         <div class="campaign-money-wrap">
@@ -301,10 +279,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
                 `;
-                }
+            }
 
-                if (quantityChecked) {
-                    html += `
+            if (quantityChecked) {
+                html += `
                     <div class="package-quantity">
                         <label>Jumlah</label>
                         <div class="feature-counter">
@@ -318,13 +296,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
                 `;
-                }
+            }
 
-                html += "</div>";
-                feature.insertAdjacentHTML("beforeend", html);
-            });
+            html += "</div>";
+            feature.insertAdjacentHTML("beforeend", html);
+        });
 
-        // Re-bind money inputs
         document.querySelectorAll("[data-money]").forEach(function (input) {
             input.addEventListener("input", function () {
                 formatMoneyInput(input);
@@ -333,12 +310,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // === FEATURE TOGGLES ===
-    if (toggleQuantity)
-        toggleQuantity.addEventListener("change", renderPackageFeature);
-    if (toggleDonatur)
-        toggleDonatur.addEventListener("change", renderPackageFeature);
-    if (toggleNominal)
-        toggleNominal.addEventListener("change", renderPackageFeature);
+    if (toggleQuantity) toggleQuantity.addEventListener("change", renderPackageFeature);
+    if (toggleDonatur) toggleDonatur.addEventListener("change", renderPackageFeature);
+    if (toggleNominal) toggleNominal.addEventListener("change", renderPackageFeature);
 
     // === ADD PACKAGE ===
     if (addPackageButton && packageList) {
@@ -367,24 +341,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const packages = document.querySelectorAll("[data-package-item]");
 
         if (packages.length === 0) {
-            previewContainer.innerHTML =
-                '<p class="text-muted">Belum ada package</p>';
+            previewContainer.innerHTML = `
+                <div class="preview-empty">
+                    <p class="text-muted">Belum ada package</p>
+                    <small class="text-muted">Default packages akan muncul (Rp10.000, Rp25.000, Rp50.000, Rp100.000)</small>
+                </div>
+            `;
             return;
         }
 
         packages.forEach((item) => {
-            const title =
-                item.querySelector('input[name*="[title]"]')?.value?.trim() ||
-                "Package";
-            const description =
-                item
-                    .querySelector('textarea[name*="[description]"]')
-                    ?.value?.trim() || "";
-            const nominal =
-                item.querySelector('input[name*="[nominal]"]')?.value || "0";
-            const imageInput = item.querySelector(
-                'input[type="file"][name*="[image]"]',
-            );
+            const title = item.querySelector('input[name*="[title]"]')?.value?.trim() || "Package";
+            const description = item.querySelector('textarea[name*="[description]"]')?.value?.trim() || "";
+            const nominal = item.querySelector('input[name*="[nominal]"]')?.value || "0";
+            const imageInput = item.querySelector('input[type="file"][name*="[image]"]');
 
             let imageHTML = `<div class="preview-package-placeholder"><i class="bi bi-image"></i></div>`;
             if (imageInput?.files?.length > 0) {
@@ -427,7 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                     ${counterHTML}
                 </div>
-            `,
+            `
             );
         });
 
@@ -444,7 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
                 </div>
-            `,
+            `
             );
         }
     }
@@ -479,59 +449,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("🔍 Validating form...");
 
-        // Hapus semua error styling sebelumnya
-        document
-            .querySelectorAll(".is-invalid")
-            .forEach((el) => el.classList.remove("is-invalid"));
+        document.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
 
-        // Cek semua field required
+        // Cek thumbnail
+        const thumbnail = document.getElementById("thumbnail");
+        if (thumbnail && thumbnail.files.length === 0) {
+            errorMessages.push("Thumbnail wajib diupload");
+            thumbnail.classList.add("is-invalid");
+            isValid = false;
+            console.log("❌ No thumbnail uploaded");
+        }
+
+        // Cek required fields
         const requiredFields = form.querySelectorAll("[required]");
         console.log(`📋 Found ${requiredFields.length} required fields`);
 
         requiredFields.forEach((field) => {
+            if (field.type === "hidden" || field.disabled) return;
+            if (field.type === "file") return; // Skip file, sudah dihandle terpisah
+
             let value = field.value;
             let fieldName = field.name || field.id || "unknown";
 
-            // Skip jika field hidden atau disabled
-            if (field.type === "hidden" || field.disabled) return;
-
             console.log(`  Checking: ${fieldName} = "${value}"`);
 
-            // Special handling for file inputs
-            if (field.type === "file") {
-                if (field.files.length === 0) {
-                    // Cari label terdekat
-                    let label = field
-                        .closest(".campaign-field")
-                        ?.querySelector("label")
-                        ?.textContent?.trim();
-                    if (!label) {
-                        const parentLabel = field.closest("label");
-                        if (parentLabel) {
-                            label = parentLabel.textContent?.trim() || "File";
-                        }
-                    }
-                    if (!label) label = field.id || "File";
-
-                    errorMessages.push(`${label} wajib diupload`);
-                    field.classList.add("is-invalid");
-                    isValid = false;
-                    console.log(`    ❌ File required: ${fieldName}`);
-                }
-                return;
-            }
-
-            // Handle money input
             if (field.hasAttribute("data-money")) {
                 value = cleanMoney(value);
                 console.log(`    Cleaned money: "${value}"`);
             }
 
             if (!value || value === "0" || value.trim() === "") {
-                let label = field
-                    .closest(".campaign-field")
-                    ?.querySelector("label")
-                    ?.textContent?.trim();
+                let label = field.closest(".campaign-field")?.querySelector("label")?.textContent?.trim();
                 if (!label) {
                     const parentLabel = field.closest("label");
                     if (parentLabel) {
@@ -550,57 +498,24 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Cek thumbnail secara khusus
-        const thumbnail = document.getElementById("thumbnail");
-        if (thumbnail && thumbnail.files.length === 0) {
-            errorMessages.push("Thumbnail wajib diupload");
-            thumbnail.classList.add("is-invalid");
-            isValid = false;
-            console.log("❌ No thumbnail uploaded");
-        }
-
         // Cek filter minimal 1
-        const checkedFilters = document.querySelectorAll(
-            'input[name="filter[]"]:checked',
-        );
+        const checkedFilters = document.querySelectorAll('input[name="filter[]"]:checked');
         if (checkedFilters.length === 0) {
             errorMessages.push("Minimal pilih 1 filter");
-            document
-                .querySelector(".campaign-filter-grid")
-                ?.classList.add("is-invalid");
+            document.querySelector(".campaign-filter-grid")?.classList.add("is-invalid");
             isValid = false;
             console.log("❌ No filter selected");
         }
 
-        // Cek packages
-        const packages = document.querySelectorAll("[data-package-item]");
-        if (packages.length === 0) {
-            errorMessages.push("Minimal buat 1 package");
-            isValid = false;
-            console.log("❌ No packages");
-        }
-
-        packages.forEach((pkg, index) => {
-            const nominal = pkg.querySelector('input[name*="[nominal]"]');
-            if (nominal) {
-                const cleanVal = cleanMoney(nominal.value);
-                if (!cleanVal || cleanVal === "0") {
-                    errorMessages.push(
-                        `Package ${index + 1}: Nominal wajib diisi`,
-                    );
-                    nominal.classList.add("is-invalid");
-                    isValid = false;
-                    console.log(`❌ Package ${index + 1}: nominal invalid`);
-                }
-            }
-        });
+        // CEK PACKAGE - TIDAK WAJIB LAGI!
+        // Package bersifat opsional, tidak perlu divalidasi
+        console.log("✅ Packages are optional - skipping validation");
 
         if (!isValid) {
             console.log("❌ Validation failed:", errorMessages);
             showValidationErrors(errorMessages);
         } else {
             console.log("✅ Validation passed!");
-            // Hapus error container jika ada
             const errorContainer = document.getElementById("validationErrors");
             if (errorContainer) errorContainer.remove();
         }
@@ -612,18 +527,16 @@ document.addEventListener("DOMContentLoaded", function () {
     renderPackageFeature();
     renderPreview();
 
-    // === FORM SUBMIT HANDLER - SINGLE HANDLER ===
+    // === FORM SUBMIT HANDLER ===
     if (form) {
         console.log("🔗 Attaching submit handler to form");
 
         form.addEventListener("submit", function (e) {
             console.log("🚀 Form submit triggered!");
 
-            // Hapus error container sebelumnya
             const oldErrors = document.getElementById("validationErrors");
             if (oldErrors) oldErrors.remove();
 
-            // Validasi
             if (!validateForm()) {
                 console.log("⛔ Validation failed, preventing submit");
                 e.preventDefault();
@@ -633,23 +546,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             console.log("✅ Validation passed, submitting...");
 
-            // Disable button untuk mencegah double submit
             if (publishBtn) {
                 publishBtn.disabled = true;
                 publishBtn.classList.add("btn-loading");
-                publishBtn.innerHTML =
-                    '<i class="bi bi-hourglass-split"></i><span>Menyimpan...</span>';
+                publishBtn.innerHTML = '<i class="bi bi-hourglass-split"></i><span>Menyimpan...</span>';
             }
 
-            // Form akan submit secara normal
             return true;
         });
     } else {
-        console.error("❌ Form not found! Cannot attach submit handler.");
+        console.error("❌ Form not found!");
     }
 
-    // === TAMBAHKAN CSS UNTUK VALIDASI ===
-    // Inject CSS untuk styling error
+    // === INJECT CSS ===
     const style = document.createElement("style");
     style.textContent = `
         .is-invalid {
@@ -698,15 +607,31 @@ document.addEventListener("DOMContentLoaded", function () {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+        
+        .preview-empty {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .preview-empty .text-muted {
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+        
+        .preview-empty small {
+            color: #adb5bd;
+            font-size: 12px;
+        }
     `;
     document.head.appendChild(style);
 
-    // === TAMBAHKAN KEYBOARD SHORTCUT (Opsional) ===
+    // === KEYBOARD SHORTCUT ===
     document.addEventListener("keydown", function (e) {
-        // Ctrl+Enter untuk submit cepat
         if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
             const activeElement = document.activeElement;
-            if (activeElement && form.contains(activeElement)) {
+            if (activeElement && form && form.contains(activeElement)) {
                 e.preventDefault();
                 form.dispatchEvent(new Event("submit"));
             }

@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/campaign-create.css') }}">
 
-    <!-- Tambahan style untuk custom slug -->
     <style>
         .campaign-slug-wrap {
             display: flex;
@@ -42,7 +41,6 @@
         .campaign-slug-wrap .slug-input::placeholder {
             color: #adb5bd;
         }
-        /* Opsional: sesuaikan dengan gaya bawaan */
         .campaign-slug-wrap .slug-input:focus {
             box-shadow: none;
         }
@@ -103,9 +101,9 @@
                                 </div>
                             </div>
 
-                            {{-- ==== MULAI: Custom Slug ===== --}}
+                            {{-- Custom Slug --}}
                             <div class="campaign-field">
-                                <label for="custom_slug">Link Campaign</label>
+                                <label for="custom_slug">Link Campaign <small>(Opsional)</small></label>
                                 <div class="campaign-slug-wrap">
                                     <span class="slug-prefix">orangbaik.id/</span>
                                     <input type="text" name="custom_slug" id="custom_slug"
@@ -115,15 +113,12 @@
                                 </div>
                                 <small class="campaign-note">Gunakan nama singkat agar mudah dibagikan.</small>
                             </div>
-                            {{-- ==== SELESAI: Custom Slug ===== --}}
 
                             <div class="campaign-field">
                                 <label for="deskripsi_campaign">Deskripsi Campaign <span>*</span></label>
                                 <div class="campaign-input-wrap">
                                     <textarea id="deskripsi_campaign" name="deskripsi_campaign" rows="7"
-                                        placeholder="Masukkan deskripsi campaign Anda" required>
-                                        {{ old('deskripsi_campaign') }}
-                                    </textarea>
+                                        placeholder="Masukkan deskripsi campaign Anda" required>{{ old('deskripsi_campaign') }}</textarea>
                                     <i class="bi bi-pencil-fill"></i>
                                 </div>
                             </div>
@@ -195,13 +190,14 @@
                                 </div>
                             </div>
                             <div class="campaign-field">
-                                <label for="minimal_donasi">Minimal Donasi <span>*</span></label>
+                                <label for="minimal_donasi">Minimal Donasi <small>(Opsional)</small></label>
                                 <div class="campaign-money-wrap">
                                     <span>Rp</span>
                                     <input type="text" id="minimal_donasi" name="minimal_donasi"
-                                        value="{{ old('minimal_donasi') }}" placeholder="0" inputmode="numeric"
-                                        data-money required>
+                                        value="{{ old('minimal_donasi', '5000') }}" placeholder="Minimal Rp 5.000" inputmode="numeric"
+                                        data-money>
                                 </div>
+                                <small class="campaign-note">Minimal donasi default Rp 5.000 jika tidak diisi.</small>
                             </div>
                         </section>
 
@@ -299,10 +295,11 @@
                     </div>
                     {{-- RIGHT SIDEBAR --}}
                     <aside class="campaign-create-sidebar">
+                        {{-- PACKAGE SECTION --}}
                         <section class="campaign-side-card">
                             <div class="campaign-side-head">
-                                <h2>Form Type</h2>
-                                <p>Atur bentuk donasi yang akan tampil kepada donatur.</p>
+                                <h2>Package Donasi <small>(Opsional)</small></h2>
+                                <p>Tambahkan package donasi agar donatur lebih mudah memilih. Jika tidak diisi, akan muncul pilihan nominal default.</p>
                             </div>
                             <div class="campaign-package-list" id="packageList">
                                 <div class="campaign-package-item" data-package-item>
@@ -321,7 +318,7 @@
                                         <small>Tambahkan Gambar</small>
                                     </label>
                                     <div class="campaign-field compact">
-                                        <label>Judul Package</label>
+                                        <label>Judul Package <small>(Opsional)</small></label>
                                         <div class="campaign-input-wrap">
                                             <input type="text" name="packages[0][title]"
                                                 placeholder="Masukkan judul package">
@@ -337,11 +334,11 @@
                                         </div>
                                     </div>
                                     <div class="campaign-field compact">
-                                        <label>Nominal Package <span>*</span></label>
+                                        <label>Nominal Package <small>(Opsional)</small></label>
                                         <div class="campaign-money-wrap">
                                             <span>Rp</span>
                                             <input type="text" name="packages[0][nominal]" placeholder="0"
-                                                inputmode="numeric" data-money required>
+                                                inputmode="numeric" data-money>
                                         </div>
                                         <div class="package-extra-feature"></div>
                                     </div>
@@ -351,7 +348,10 @@
                                 <i class="bi bi-plus-lg"></i>
                                 <span>Tambahkan Package Baru</span>
                             </button>
+                            <small class="campaign-note">Jika tidak menambahkan package, akan muncul pilihan nominal default (Rp 10.000, Rp 25.000, Rp 50.000, Rp 100.000).</small>
                         </section>
+
+                        {{-- FITUR LAINNYA --}}
                         <section class="campaign-side-card">
                             <div class="campaign-side-head">
                                 <h2>Tambahkan Fitur Lainnya <span>(Opsional)</span></h2>
@@ -402,6 +402,8 @@
                                 </div>
                             </div>
                         </section>
+
+                        {{-- PREVIEW --}}
                         <section class="campaign-side-card">
                             <div class="campaign-side-head">
                                 <h2>Pratinjau Tata Letak Package</h2>
@@ -411,6 +413,7 @@
                                 <div id="previewPackageList"></div>
                             </div>
                         </section>
+
                         <button type="submit" class="campaign-submit-button" id="publishBtn">
                             <i class="bi bi-send-fill"></i>
                             <span>Publikasikan Campaign</span>
