@@ -45,19 +45,16 @@
                     {{-- ========================================================== --}}
                     <section class="latest-news-section">
 
-                        {{-- HEADER dengan tombol Bagikan & Buat Update --}}
                         <div class="section-header">
                             <h2>
                                 <i class="bi bi-newspaper" style="color: var(--primary);"></i> Kabar Terbaru
                             </h2>
 
                             <div class="section-actions">
-                                {{-- Tombol Bagikan --}}
                                 <button class="btn-share" onclick="shareCampaign()">
                                     <i class="bi bi-share-fill"></i> Bagikan
                                 </button>
 
-                                {{-- Tombol Buat Update (hanya untuk owner) --}}
                                 @auth
                                     @if ($campaign->isOwner(Auth::id()))
                                         <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn-add-update">
@@ -68,9 +65,6 @@
                             </div>
                         </div>
 
-                        {{-- ========================================================== --}}
-                        {{-- DAFTAR UPDATE --}}
-                        {{-- ========================================================== --}}
                         @if ($campaign->campaignUpdates->count() > 0)
                             <div class="updates-list">
                                 @foreach ($campaign->campaignUpdates as $update)
@@ -100,13 +94,11 @@
                                                 {{ Str::limit($update->isi_update, 120) }}
                                             </div>
 
-                                            {{-- Tombol Baca Selengkapnya (expand) --}}
                                             <button class="btn-read-more" onclick="toggleUpdateDetail({{ $update->id }})">
                                                 <span id="toggleText-{{ $update->id }}">Baca Selengkapnya</span>
                                                 <i class="bi bi-chevron-down" id="toggleIcon-{{ $update->id }}"></i>
                                             </button>
 
-                                            {{-- Detail Lengkap (expand) --}}
                                             <div class="update-detail-wrapper" id="detailContent-{{ $update->id }}">
                                                 <div class="update-detail-content">
                                                     <div class="update-full-body">
@@ -136,19 +128,13 @@
                                                 </div>
                                             </div>
 
-                                            {{-- ========================================================== --}}
-                                            {{-- FOOTER UPDATE - dengan tombol Edit & Hapus (hanya untuk owner) --}}
-                                            {{-- ========================================================== --}}
                                             @auth
                                                 @if ($campaign->isOwner(Auth::id()))
                                                     <div class="update-footer">
-                                                        {{-- Tombol Edit --}}
                                                         <a href="{{ route('campaign.update.edit', [$campaign->slug, $update->id]) }}"
                                                             class="btn-edit-update">
                                                             <i class="bi bi-pencil"></i> Edit
                                                         </a>
-
-                                                        {{-- Tombol Hapus --}}
                                                         <form
                                                             action="{{ route('campaign.update.destroy', [$campaign->slug, $update->id]) }}"
                                                             method="POST" style="display: inline;">
@@ -188,7 +174,6 @@
                 {{-- ========================================================== --}}
                 <aside class="detail-sidebar">
 
-                    {{-- Donation Summary --}}
                     <div class="donation-summary-card">
                         <h2>{{ $campaign->judul }}</h2>
 
@@ -236,7 +221,6 @@
                         <a href="{{ route('donasi.create', $campaign->slug) }}" class="donate-button">Donasi Sekarang</a>
                     </div>
 
-                    {{-- Fundraiser Info --}}
                     <div class="fundraiser-info-card">
                         <h3>Informasi Penggalang Dana</h3>
 
@@ -250,7 +234,6 @@
                         </a>
                     </div>
 
-                    {{-- Donasi Terbaru --}}
                     <div class="side-list-card">
                         <h3>Donasi Terbaru</h3>
 
@@ -278,34 +261,34 @@
                         @endif
                     </div>
 
-                    {{-- Fundraiser Section --}}
+                    {{-- ========================================================== --}}
+                    {{-- FUNDRAISER SECTION --}}
+                    {{-- ========================================================== --}}
                     @auth
                         @php
                             $isFundraiser = $campaign->isFundraiser(Auth::id());
-                            $isOwner = $campaign->isOwner(Auth::id());
+                            $routeSlug = $campaign->custom_slug ?? $campaign->slug;
                         @endphp
 
-                        {{-- Tampilkan tombol join jika user BELUM menjadi fundraiser (termasuk owner) --}}
                         @if (!$isFundraiser)
                             <div class="fundraiser-join-card">
                                 <h3>Jadi Fundraiser</h3>
                                 <p>Bantu sebarkan campaign ini dan dapatkan reward!</p>
-                                <form action="{{ route('fundraiser.store', $campaign->slug) }}" method="POST">
+                                <form action="{{ route('fundraiser.store', $routeSlug) }}" method="POST" id="fundraiserForm">
                                     @csrf
-                                    <button type="submit" class="btn-fundraiser-join">
+                                    <button type="submit" class="btn-fundraiser-join" id="btnJoinFundraiser">
                                         <i class="bi bi-megaphone"></i> Gabung Jadi Fundraiser
                                     </button>
                                 </form>
                             </div>
                         @endif
 
-                        {{-- Tampilkan referral dan opsi berhenti jika user SUDAH menjadi fundraiser (termasuk owner) --}}
                         @if ($isFundraiser)
                             @php
                                 $fundraiser = $campaign->getFundraiserByUser(Auth::id());
                             @endphp
 
-                            <div class="fundraiser-referral-card">
+                            <div class="fundraiser-referral-card" id="fundraiserReferralCard">
                                 <h4>🔗 Link Referral Anda</h4>
                                 <p>Bagikan link ini untuk mengajak donasi:</p>
                                 <div class="referral-link-box">
@@ -314,6 +297,11 @@
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                 </div>
+                                
+                                <div style="display: none;">
+                                    <span id="sidebarReferralCode">{{ $fundraiser->referral_code }}</span>
+                                </div>
+                                
                                 <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
 
                                 <div class="referral-qr-section">
@@ -322,9 +310,12 @@
                                             ->size(180)->margin(1)
                                             ->generate($fundraiser->referral_url);
                                     @endphp
-                                    <div class="qr-canvas-wrapper">
+                                    <div class="qr-canvas-wrapper" onclick="openFundraiserModalFromSidebar()" style="cursor: pointer;">
                                         {!! $qrSvg !!}
                                     </div>
+                                    <span style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 8px;">
+                                        👆 Klik QR Code untuk lihat detail
+                                    </span>
                                     <a class="btn-download-qr" id="btnDownloadQr" href="#"
                                         download="qr-referral-{{ $fundraiser->referral_code }}.svg">
                                         <i class="bi bi-download"></i> Download QR Code
@@ -335,7 +326,7 @@
                             <div class="fundraiser-join-card joined">
                                 <h3>✅ Anda Fundraiser</h3>
                                 <p>Terima kasih telah menjadi fundraiser untuk campaign ini!</p>
-                                <form action="{{ route('fundraiser.destroy', $campaign->slug) }}" method="POST">
+                                <form action="{{ route('fundraiser.destroy', $routeSlug) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn-fundraiser-leave"
@@ -378,16 +369,107 @@
 
     @include('components.footer')
 
-    {{-- Scripts --}}
+    {{-- ========================================================== --}}
+    {{-- MODAL POP-UP FUNDRAISER --}}
+    {{-- ========================================================== --}}
+    <div class="modal-overlay" id="fundraiserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeFundraiserModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <div class="modal-logo">
+                    <img src="{{ asset('assets/logo-icon.png') }}" alt="OrangBaik.id">
+                    <span>OrangBaik.id</span>
+                </div>
+                <h2>🎉 Selamat!</h2>
+                <p class="subtitle">Anda berhasil menjadi Fundraiser</p>
+            </div>
+            <div class="modal-body">
+                <div class="success-badge">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Fundraiser Activated
+                </div>
+
+                <div class="fundraiser-info-modal">
+                    @auth
+                        <img src="{{ asset('storage/' . (Auth::user()->foto_profil ?? 'assets/logo-icon.png')) }}"
+                            alt="Profile" class="fundraiser-avatar-modal">
+                        <div class="fundraiser-name-modal">
+                            {{ Auth::user()->name }}
+                            <small>Fundraiser untuk campaign ini</small>
+                        </div>
+                    @endauth
+                </div>
+
+                <hr class="modal-divider">
+
+                <div class="referral-section-title">
+                    <i class="bi bi-link-45deg"></i> Link Referral Anda
+                </div>
+                <div class="referral-link-box-modal">
+                    <input type="text" id="modalReferralLink" value="" readonly>
+                    <button onclick="copyModalReferralLink()" class="btn-copy-link-modal">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                <small style="display:block; margin-bottom: 16px; color: #64748b; font-size: 12px;">
+                    <i class="bi bi-info-circle"></i> Bagikan link ini untuk mengajak donasi
+                </small>
+
+                <div class="referral-section-title">
+                    <i class="bi bi-tag"></i> Kode Referral Anda
+                </div>
+                <div class="referral-code-box">
+                    <span class="code-label">Kode</span>
+                    <span class="code-value" id="modalReferralCode">-</span>
+                    <button class="btn-copy-code" onclick="copyModalReferral()">
+                        <i class="bi bi-clipboard"></i> Salin
+                    </button>
+                </div>
+
+                <div class="referral-section-title">
+                    <i class="bi bi-qr-code"></i> QR Code Referral
+                </div>
+                <div class="modal-qr-wrapper" onclick="openFundraiserModalFromModal()" style="cursor: pointer;">
+                    <div id="modalQrContainer">
+                        <!-- QR Code akan diisi oleh JavaScript -->
+                    </div>
+                    <span class="modal-qr-label">👆 Klik QR Code untuk lihat detail</span>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-modal-secondary" onclick="closeFundraiserModal()">
+                        <i class="bi bi-x-circle"></i> Tutup
+                    </button>
+                    <button class="btn-modal-primary" onclick="shareReferralLink()">
+                        <i class="bi bi-share-fill"></i> Bagikan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Toast Notification --}}
+    <div class="toast-notification" id="toastNotification">
+        <i class="bi bi-check-circle-fill" style="color: #4ade80;"></i>
+        <span id="toastMessage">Berhasil disalin!</span>
+    </div>
+
+    {{-- ========================================================== --}}
+    {{-- SCRIPTS --}}
+    {{-- ========================================================== --}}
     <script>
-        // Fungsi share, toggle, lightbox, copy referral, QR download tetap sama
+        // ============================================================
+        // SHARE CAMPAIGN
+        // ============================================================
         function shareCampaign() {
             if (navigator.share) {
                 navigator.share({
                     title: '{{ $campaign->judul }}',
                     text: 'Dukung campaign ini di OrangBaik.id',
                     url: window.location.href
-                }).catch(() => { });
+                }).catch(() => {});
             } else {
                 const url = window.location.href;
                 navigator.clipboard.writeText(url).then(() => {
@@ -398,14 +480,20 @@
             }
         }
 
+        // ============================================================
+        // COPY REFERRAL LINK (dari sidebar)
+        // ============================================================
         function copyReferralLink() {
             const input = document.getElementById('referralLink');
             if (!input) return;
             input.select();
             document.execCommand('copy');
-            alert('Link referral berhasil disalin!');
+            showToast('Link referral berhasil disalin!');
         }
 
+        // ============================================================
+        // TOGGLE UPDATE DETAIL
+        // ============================================================
         function toggleUpdateDetail(id) {
             const wrapper = document.getElementById('detailContent-' + id);
             const toggleText = document.getElementById('toggleText-' + id);
@@ -437,6 +525,9 @@
             }
         }
 
+        // ============================================================
+        // LIGHTBOX
+        // ============================================================
         let lightboxImages = [];
         let currentImageIndex = 0;
 
@@ -460,7 +551,7 @@
             lightboxImages.forEach((_, i) => {
                 const dot = document.createElement('span');
                 dot.className = 'lightbox-dot' + (i === currentImageIndex ? ' active' : '');
-                dot.onclick = function (e) {
+                dot.onclick = function(e) {
                     e.stopPropagation();
                     goToImage(i);
                 };
@@ -510,13 +601,13 @@
 
         let touchStartX = 0,
             touchEndX = 0;
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const wrapper = document.querySelector('.lightbox-image-wrapper');
             if (wrapper) {
-                wrapper.addEventListener('touchstart', function (e) {
+                wrapper.addEventListener('touchstart', function(e) {
                     touchStartX = e.changedTouches[0].screenX;
                 }, { passive: true });
-                wrapper.addEventListener('touchend', function (e) {
+                wrapper.addEventListener('touchend', function(e) {
                     touchEndX = e.changedTouches[0].screenX;
                     const diff = touchStartX - touchEndX;
                     if (Math.abs(diff) > 50) {
@@ -526,17 +617,243 @@
             }
         });
 
-        document.getElementById('lightboxOverlay').addEventListener('click', function (e) {
+        document.getElementById('lightboxOverlay').addEventListener('click', function(e) {
             if (e.target === this) closeLightbox();
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        // ============================================================
+        // TOAST NOTIFICATION
+        // ============================================================
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============================================================
+        // MODAL FUNDRAISER - CORE FUNCTIONS
+        // ============================================================
+        let modalReferralCode = '';
+        let modalReferralUrl = '';
+        let modalQrSvg = '';
+
+        function openFundraiserModal(referralCode, referralUrl, qrSvg) {
+            modalReferralCode = referralCode || '';
+            modalReferralUrl = referralUrl || '';
+            modalQrSvg = qrSvg || '';
+
+            const referralLinkInput = document.getElementById('modalReferralLink');
+            if (referralLinkInput) {
+                referralLinkInput.value = referralUrl || '';
+            }
+
+            const referralCodeElement = document.getElementById('modalReferralCode');
+            if (referralCodeElement) {
+                referralCodeElement.textContent = referralCode || '-';
+            }
+
+            const qrContainer = document.getElementById('modalQrContainer');
+            if (qrContainer && qrSvg) {
+                qrContainer.innerHTML = qrSvg;
+            }
+
+            const modal = document.getElementById('fundraiserModal');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeFundraiserModal() {
+            const modal = document.getElementById('fundraiserModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // ============================================================
+        // OPEN MODAL FROM SIDEBAR QR
+        // ============================================================
+        function openFundraiserModalFromSidebar() {
+            const referralLinkInput = document.getElementById('referralLink');
+            if (!referralLinkInput) {
+                showToast('Data referral tidak ditemukan');
+                return;
+            }
+            
+            const referralUrl = referralLinkInput.value;
+            
+            let referralCode = '';
+            const codeElement = document.getElementById('sidebarReferralCode');
+            if (codeElement) {
+                referralCode = codeElement.textContent;
+            } else {
+                try {
+                    const urlParams = new URLSearchParams(new URL(referralUrl).search);
+                    referralCode = urlParams.get('ref') || 'REF-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+                } catch(e) {
+                    referralCode = 'REF-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+                }
+            }
+            
+            const qrWrapper = document.querySelector('.qr-canvas-wrapper');
+            if (!qrWrapper) {
+                showToast('QR Code tidak ditemukan');
+                return;
+            }
+            
+            const qrSvg = qrWrapper.innerHTML;
+            if (!qrSvg || qrSvg.trim() === '') {
+                showToast('QR Code tidak ditemukan');
+                return;
+            }
+            
+            openFundraiserModal(referralCode, referralUrl, qrSvg);
+        }
+
+        // ============================================================
+        // OPEN MODAL FROM MODAL QR
+        // ============================================================
+        function openFundraiserModalFromModal() {
+            const referralLinkInput = document.getElementById('modalReferralLink');
+            const referralCodeElement = document.getElementById('modalReferralCode');
+            const qrContainer = document.getElementById('modalQrContainer');
+            
+            if (!referralLinkInput || !referralCodeElement || !qrContainer) {
+                showToast('Data tidak ditemukan');
+                return;
+            }
+            
+            const referralUrl = referralLinkInput.value;
+            const referralCode = referralCodeElement.textContent;
+            const qrSvg = qrContainer.innerHTML;
+            
+            if (!qrSvg || qrSvg.trim() === '' || qrSvg.includes('<!--')) {
+                showToast('QR Code belum tersedia');
+                return;
+            }
+            
+            closeFundraiserModal();
+            
+            setTimeout(function() {
+                openFundraiserModal(referralCode, referralUrl, qrSvg);
+            }, 400);
+        }
+
+        // ============================================================
+        // COPY FUNCTIONS
+        // ============================================================
+        function copyModalReferralLink() {
+            const input = document.getElementById('modalReferralLink');
+            input.select();
+            document.execCommand('copy');
+            showToast('Link referral berhasil disalin!');
+        }
+
+        function copyModalReferral() {
+            const code = document.getElementById('modalReferralCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('Kode referral berhasil disalin!');
+            }).catch(() => {
+                const input = document.createElement('input');
+                input.value = code;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showToast('Kode referral berhasil disalin!');
+            });
+        }
+
+        // ============================================================
+        // SHARE REFERRAL LINK
+        // ============================================================
+        function shareReferralLink() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Donasi Campaign di OrangBaik.id',
+                    text: 'Yuk donasi! Gunakan referral code saya: ' + modalReferralCode,
+                    url: modalReferralUrl
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(modalReferralUrl).then(() => {
+                    showToast('Link referral berhasil disalin!');
+                }).catch(() => {
+                    prompt('Salin link ini:', modalReferralUrl);
+                });
+            }
+        }
+
+        // ============================================================
+        // KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const fundraiserModal = document.getElementById('fundraiserModal');
+                const lightboxOverlay = document.getElementById('lightboxOverlay');
+                
+                if (fundraiserModal && fundraiserModal.classList.contains('active')) {
+                    closeFundraiserModal();
+                } else if (lightboxOverlay && lightboxOverlay.classList.contains('active')) {
+                    closeLightbox();
+                }
+            }
+        });
+
+        // Click outside to close
+        document.addEventListener('DOMContentLoaded', function() {
+            const fundraiserModal = document.getElementById('fundraiserModal');
+            if (fundraiserModal) {
+                fundraiserModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeFundraiserModal();
+                    }
+                });
+            }
+        });
+
+        // ============================================================
+        // DOWNLOAD QR CODE (dari sidebar)
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
             const btn = document.getElementById('btnDownloadQr');
             if (!btn) return;
             const svg = btn.closest('.referral-qr-section').querySelector('svg');
             if (!svg) return;
             const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
             btn.href = URL.createObjectURL(blob);
+        });
+
+        // ============================================================
+        // TAMPILKAN MODAL DARI SERVER
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('show_fundraiser_modal') && session('referral_code'))
+                try {
+                    const qrContainer = document.getElementById('modalQrContainer');
+                    if (!qrContainer) return;
+                    
+                    const qrSvg = `{!! SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(300)->margin(1)->generate(session('referral_url')) !!}`;
+                    qrContainer.innerHTML = qrSvg;
+
+                    setTimeout(function() {
+                        openFundraiserModal(
+                            '{{ session('referral_code') }}',
+                            '{{ session('referral_url') }}',
+                            qrSvg
+                        );
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('Error showing modal:', error);
+                }
+            @endif
         });
     </script>
 

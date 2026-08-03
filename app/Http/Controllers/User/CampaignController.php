@@ -315,13 +315,17 @@ class CampaignController extends Controller
     /**
      * Menampilkan campaign – cari berdasarkan slug ATAU custom_slug
      */
+    /**
+     * Menampilkan campaign – cari berdasarkan slug ATAU custom_slug
+     */
     public function show($slug)
     {
         $campaign = Campaign::with([
             'penggalangDana',
             'donasi.user',
             'campaignUpdates.campaign_update_gambar',
-            'campaignFundraisers.user'
+            'campaignFundraisers.user',
+            'fundraisers'
         ])
             ->where('is_active', true)
             ->where(function ($query) use ($slug) {

@@ -36,6 +36,8 @@ class Campaign extends Model
     protected $casts = [
         'verified_at' => 'datetime',
         'approved_at' => 'datetime',
+        'tanggal_mulai' => 'datetime',
+        'tanggal_berakhir' => 'datetime',
     ];
 
     // ============================================================
@@ -78,6 +80,11 @@ class Campaign extends Model
     }
 
     public function campaignFundraisers()
+    {
+        return $this->hasMany(Campaign_Fundraiser::class);
+    }
+
+    public function fundraisers()
     {
         return $this->hasMany(Campaign_Fundraiser::class);
     }
@@ -129,6 +136,19 @@ class Campaign extends Model
             ->where('approval_status', 'pending');
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('campaign_type', 'regular')
+                ->orWhere('approval_status', 'approved');
+        });
+    }
+
     // ============================================================
     // HELPER METHODS
     // ============================================================
@@ -152,43 +172,128 @@ class Campaign extends Model
         return $this->penggalangDana && $this->penggalangDana->user_id == $userId;
     }
 
-    /**
-     * Cek apakah user adalah fundraiser aktif untuk campaign ini
-     * (HANYA 1 DEKLARASI!)
-     */
     public function isFundraiser($userId)
     {
-        return $this->campaignFundraisers()
+        return $this->fundraisers()
             ->where('user_id', $userId)
             ->where('status', 'active')
             ->exists();
     }
 
-    /**
-     * Ambil data fundraiser untuk user tertentu di campaign ini
-     */
     public function getFundraiserByUser($userId)
     {
-        return $this->campaignFundraisers()
+        return $this->fundraisers()
             ->where('user_id', $userId)
             ->where('status', 'active')
             ->first();
     }
 
-    /**
-     * Cek apakah campaign aktif secara waktu (belum berakhir)
-     */
+    public function getActiveFundraisers()
+    {
+        return $this->fundraisers()
+            ->where('status', 'active')
+            ->get();
+    }
+
+    public function getFundraisersCount()
+    {
+        return $this->fundraisers()
+            ->where('status', 'active')
+            ->count();
+    }
+
     public function isTimeActive(): bool
     {
         return now()->between($this->tanggal_mulai, $this->tanggal_berakhir);
     }
 
-    /**
-     * Update status is_active berdasarkan tanggal
-     */
     public function updateActiveStatus(): void
     {
         $this->is_active = $this->isTimeActive() && $this->isApproved();
         $this->save();
+    }
+
+    public function getRouteSlug(): string
+    {
+        return $this->custom_slug ?? $this->slug;
+    }
+
+    public function getTotalDonasi()
+    {
+        return $this->donasi()->sum('nominal');
+    }
+
+    public function getTotalDonasiSuccess()
+    {
+        return $this->donasi()->where('status', 'success')->sum('nominal');
+    }
+
+    public function getDonaturCount()
+    {
+        return $this->donasi()->where('status', 'success')->count();
+    }
+
+    public function getProgressPercentage(): float
+    {
+        if ($this->target_donasi <= 0) {
+            return 0;
+        }
+        $total = $this->getTotalDonasiSuccess();
+        return min(100, ($total / $this->target_donasi) * 100);
+    }
+
+    public function isDonatable(): bool
+    {
+        return $this->is_active 
+            && $this->isApproved() 
+            && $this->isTimeActive()
+            && $this->target_donasi > 0;
+    }
+
+    public function getRemainingDays(): int
+    {
+        $now = now();
+        $end = $this->tanggal_berakhir;
+        
+        if ($now->gt($end)) {
+            return 0;
+        }
+        
+        return (int) $now->diffInDays($end);
+    }
+
+    public function getStatusText(): string
+    {
+        if (!$this->is_active) {
+            return 'Tidak Aktif';
+        }
+        
+        if (!$this->isApproved()) {
+            return 'Menunggu Persetujuan';
+        }
+        
+        if ($this->tanggal_mulai->isFuture()) {
+            return 'Akan Datang';
+        }
+        
+        if ($this->tanggal_berakhir->isPast()) {
+            return 'Berakhir';
+        }
+        
+        return 'Aktif';
+    }
+
+    public function getStatusColor(): string
+    {
+        $status = $this->getStatusText();
+        
+        return match($status) {
+            'Aktif' => 'success',
+            'Menunggu Persetujuan' => 'warning',
+            'Akan Datang' => 'info',
+            'Berakhir' => 'secondary',
+            'Tidak Aktif' => 'danger',
+            default => 'secondary'
+        };
     }
 }

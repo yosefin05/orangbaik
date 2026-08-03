@@ -4,7 +4,6 @@
 
 /* ============================================================
    GLOBAL OVERFLOW PROTECTION
-   (mencegah halaman melebar akibat teks panjang tanpa spasi)
    ============================================================ */
 
 body {
@@ -58,7 +57,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
-    min-width: 0; /* wajib: biar grid item bisa menyempit, tidak dorong layout */
+    min-width: 0;
 }
 
 .campaign-hero-image {
@@ -108,24 +107,64 @@ body {
     color: var(--text-dark);
 }
 
+.section-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+}
+
+.btn-share {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--bg-soft);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.btn-share:hover {
+    background: var(--border-soft);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-share i {
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+
 .btn-add-update {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: 8px 16px;
+    padding: var(--space-2) var(--space-4);
     background: var(--primary-light);
     color: var(--primary);
+    border: 1px solid var(--primary);
     border-radius: var(--radius-full);
+    font-weight: var(--fw-semibold);
     font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
+    transition: all 0.25s ease;
     text-decoration: none;
-    transition: all 0.2s ease;
 }
 
 .btn-add-update:hover {
     background: var(--primary);
     color: #fff;
     transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-add-update i {
+    font-size: 1.1rem;
 }
 
 /* ============================================================
@@ -154,16 +193,14 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
-/* Thumbnail update: ukuran FIX, tidak ikut molor ke bawah
-   walau teks di sampingnya panjang */
 .update-thumbnail {
     width: 180px;
     height: 120px;
-    flex: 0 0 180px; /* flex-shrink 0 + flex-grow 0, ukuran terkunci */
+    flex: 0 0 180px;
     border-radius: var(--radius-sm);
     overflow: hidden;
     border: 1px solid var(--border);
-    align-self: flex-start; /* jangan ikut stretch tinggi ke content sebelah */
+    align-self: flex-start;
 }
 
 .update-thumbnail img {
@@ -175,7 +212,7 @@ body {
 
 .update-content-wrapper {
     flex: 1;
-    min-width: 0; /* wajib: biar teks panjang di kolom ini yang wrap, bukan dorong lebar */
+    min-width: 0;
 }
 
 .update-title {
@@ -250,7 +287,7 @@ body {
 }
 
 /* ============================================================
-   UPDATE DETAIL (EXPAND) — smooth height animation
+   UPDATE DETAIL (EXPAND)
    ============================================================ */
 
 .update-detail-wrapper {
@@ -323,58 +360,6 @@ body {
 }
 
 /* ============================================================
-   LIGHTBOX
-   ============================================================ */
-
-.lightbox-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    padding: var(--space-6);
-}
-
-.lightbox-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.lightbox-overlay img {
-    max-width: 90vw;
-    max-height: 90vh;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
-.lightbox-close {
-    position: absolute;
-    top: 24px;
-    right: 32px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: #fff;
-    font-size: 22px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease;
-}
-
-.lightbox-close:hover {
-    background: rgba(255, 255, 255, 0.25);
-}
-
-/* ============================================================
    UPDATE FOOTER
    ============================================================ */
 
@@ -384,21 +369,43 @@ body {
     border-top: 1px solid var(--border-soft);
     display: flex;
     justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+.btn-edit-update {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 4px 14px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-edit-update:hover {
+    background: var(--primary);
+    color: #fff;
 }
 
 .btn-delete-update {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 4px 14px;
     background: var(--danger-light);
     color: var(--danger);
     border: none;
     border-radius: var(--radius-full);
-    padding: 4px 14px;
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
     cursor: pointer;
     transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
 }
 
 .btn-delete-update:hover {
@@ -435,7 +442,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: 10px 24px;
+    padding: var(--space-2) var(--space-6);
     border: 2px solid var(--primary);
     border-radius: var(--radius-full);
     color: var(--primary);
@@ -461,7 +468,7 @@ body {
     gap: var(--space-5);
     position: sticky;
     top: 100px;
-    min-width: 0; /* wajib: biar grid item bisa menyempit, tidak dorong layout */
+    min-width: 0;
 }
 
 /* ============================================================
@@ -530,7 +537,7 @@ body {
 .donate-button {
     display: block;
     width: 100%;
-    padding: 12px;
+    padding: var(--space-3);
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     color: #fff;
     text-align: center;
@@ -643,7 +650,7 @@ body {
 }
 
 .side-list-item > div {
-    min-width: 0; /* biar nama/nominal donatur yang panjang wrap, bukan dorong lebar */
+    min-width: 0;
 }
 
 .side-list-item h4 {
@@ -707,7 +714,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: 10px 24px;
+    padding: var(--space-2) var(--space-6);
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     color: #fff;
     border: none;
@@ -727,7 +734,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: 10px 24px;
+    padding: var(--space-2) var(--space-6);
     background: var(--danger-light);
     color: var(--danger);
     border: none;
@@ -747,7 +754,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: 10px 24px;
+    padding: var(--space-2) var(--space-6);
     background: var(--bg-soft);
     color: var(--text);
     border: 1px solid var(--border);
@@ -762,12 +769,15 @@ body {
     background: var(--border);
 }
 
+/* ============================================================
+   FUNDRAISER REFERRAL CARD
+   ============================================================ */
+
 .fundraiser-referral-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
     padding: var(--space-4);
-    margin-top: var(--space-4);
 }
 
 .fundraiser-referral-card h4 {
@@ -785,20 +795,25 @@ body {
 .referral-link-box {
     display: flex;
     gap: var(--space-2);
+    margin-bottom: var(--space-2);
 }
 
 .referral-link-box input {
     flex: 1;
-    padding: 8px 12px;
+    padding: var(--space-2) var(--space-3);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     font-size: var(--fs-xs);
     background: var(--bg-soft);
     color: var(--text);
+    min-width: 0;
 }
 
 .btn-copy-link {
-    padding: 8px 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2) var(--space-3);
     background: var(--primary);
     color: #fff;
     border: none;
@@ -807,9 +822,9 @@ body {
     transition: all 0.2s ease;
 }
 
-/* ============================================================
-   REFERRAL CARD - QR CODE (tampil langsung, tanpa modal)
-   ============================================================ */
+.btn-copy-link:hover {
+    background: var(--primary-hover);
+}
 
 .referral-qr-section {
     margin-top: var(--space-4);
@@ -826,6 +841,16 @@ body {
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-soft);
     margin-bottom: var(--space-3);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.qr-canvas-wrapper:hover {
+    transform: scale(1.02);
+}
+
+.qr-canvas-wrapper:active {
+    transform: scale(0.95);
 }
 
 .btn-download-qr {
@@ -834,7 +859,7 @@ body {
     justify-content: center;
     gap: var(--space-2);
     width: 100%;
-    padding: 10px 16px;
+    padding: var(--space-2) var(--space-4);
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     color: #fff;
     border: none;
@@ -843,6 +868,7 @@ body {
     font-size: var(--fs-xs);
     cursor: pointer;
     transition: all 0.2s ease;
+    text-decoration: none;
 }
 
 .btn-download-qr:hover {
@@ -851,8 +877,27 @@ body {
 }
 
 /* ============================================================
-   LIGHTBOX - SLIDE GAMBAR (TAMBAHAN)
+   LIGHTBOX
    ============================================================ */
+
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    padding: var(--space-6);
+}
+
+.lightbox-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
 
 .lightbox-prev,
 .lightbox-next {
@@ -886,6 +931,29 @@ body {
 .lightbox-next:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: translateY(-50%) scale(1.05);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    z-index: 10;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .lightbox-image-wrapper {
@@ -945,141 +1013,551 @@ body {
     background: rgba(255, 255, 255, 0.5);
 }
 
-/* Responsive Lightbox */
-@media (max-width: 768px) {
-    .lightbox-prev,
-    .lightbox-next {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
+/* ============================================================
+   MODAL POP-UP FUNDRAISER
+   ============================================================ */
 
-    .lightbox-prev {
-        left: 10px;
-    }
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+}
 
-    .lightbox-next {
-        right: 10px;
-    }
+.modal-overlay.active {
+    display: flex;
+}
 
-    .lightbox-image-wrapper img {
-        max-height: 70vh;
+.modal-content {
+    background: white;
+    border-radius: 24px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 0;
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
-/* ============================================================
-   TOMBOL BAGIKAN & BUAT UPDATE
-   ============================================================ */
+.modal-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    padding: var(--space-6) var(--space-8) var(--space-5);
+    border-radius: 24px 24px 0 0;
+    text-align: center;
+    position: relative;
+}
 
-/* Wrapper untuk aksi di bagian updates */
-.latest-news-section .section-actions {
+.modal-logo {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
     align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.modal-logo img {
+    height: 40px;
+    width: auto;
+}
+
+.modal-logo span {
+    color: white;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    letter-spacing: -0.5px;
+}
+
+.modal-header h2 {
+    color: white;
+    font-size: var(--fs-lg);
+    margin: 0;
+    font-weight: var(--fw-semibold);
+}
+
+.modal-header .subtitle {
+    color: rgba(255,255,255,0.9);
+    font-size: var(--fs-xs);
+    margin-top: var(--space-1);
+}
+
+.modal-close {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-5);
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: rgba(255,255,255,0.3);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: var(--space-7) var(--space-8) var(--space-8);
+}
+
+.success-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--success-light);
+    color: #166534;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
     margin-bottom: var(--space-4);
 }
 
-/* Tombol Bagikan */
-.btn-share {
+.success-badge i {
+    font-size: 16px;
+}
+
+.fundraiser-info-modal {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    margin-bottom: var(--space-5);
+    border: 1px solid var(--border-soft);
+}
+
+.fundraiser-avatar-modal {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+}
+
+.fundraiser-name-modal {
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-sm);
+    color: var(--text-dark);
+}
+
+.fundraiser-name-modal small {
+    display: block;
+    font-weight: var(--fw-regular);
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+}
+
+.modal-divider {
+    border: none;
+    border-top: 1px solid var(--border-soft);
+    margin: var(--space-5) 0;
+}
+
+/* ============================================================
+   MODAL - REFERRAL LINK
+   ============================================================ */
+
+.referral-section-title {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
+    margin-bottom: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.referral-section-title i {
+    color: var(--primary);
+}
+
+.referral-link-box-modal {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--bg-soft);
+    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-soft);
+    margin-bottom: var(--space-4);
+}
+
+.referral-link-box-modal input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: var(--fs-xs);
+    color: var(--text-dark);
+    padding: var(--space-2) 0;
+    font-family: 'Courier New', monospace;
+    outline: none;
+    min-width: 0;
+}
+
+.referral-link-box-modal input:focus {
+    outline: none;
+}
+
+.btn-copy-link-modal {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.5rem;
+    justify-content: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.btn-copy-link-modal:hover {
+    background: var(--primary-hover);
+    transform: scale(1.02);
+}
+
+/* ============================================================
+   MODAL - REFERRAL CODE
+   ============================================================ */
+
+.referral-code-box {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--bg-soft);
+    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+    margin-bottom: var(--space-4);
+}
+
+.referral-code-box .code-label {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    font-weight: var(--fw-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.referral-code-box .code-value {
+    font-family: 'Courier New', monospace;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    color: var(--primary);
+    letter-spacing: 1px;
+    flex: 1;
+}
+
+.btn-copy-code {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: var(--fw-medium);
+}
+
+.btn-copy-code:hover {
+    background: var(--primary-hover);
+    transform: scale(1.02);
+}
+
+/* ============================================================
+   MODAL - QR CODE
+   ============================================================ */
+
+.modal-qr-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: var(--space-4);
+}
+
+.modal-qr-wrapper:hover {
+    transform: scale(1.02);
+    border-color: var(--primary);
+}
+
+.modal-qr-wrapper:active {
+    transform: scale(0.95);
+}
+
+.modal-qr-wrapper svg {
+    max-width: 180px;
+    height: auto;
+    background: white;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+}
+
+.modal-qr-label {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    margin-top: var(--space-2);
+}
+
+/* ============================================================
+   MODAL - ACTION BUTTONS
+   ============================================================ */
+
+.modal-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.modal-actions .btn-modal-primary {
+    flex: 1;
+    padding: var(--space-3);
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.modal-actions .btn-modal-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.modal-actions .btn-modal-secondary {
+    flex: 1;
+    padding: var(--space-3);
     background: var(--bg-soft);
     color: var(--text);
     border: 1px solid var(--border);
-    border-radius: var(--radius-full);
-    font-weight: var(--fw-medium);
-    font-size: var(--fs-xs);
+    border-radius: var(--radius);
+    font-weight: var(--fw-semibold);
     cursor: pointer;
-    transition: background 0.25s, transform 0.15s, box-shadow 0.25s;
-    text-decoration: none;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
 }
 
-.btn-share:hover {
+.modal-actions .btn-modal-secondary:hover {
+    background: var(--border-soft);
+}
+
+/* ============================================================
+   MODAL QR FULLSCREEN
+   ============================================================ */
+
+.modal-qr-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-qr-overlay.active {
+    display: flex;
+}
+
+.modal-qr-fullscreen {
+    background: white;
+    border-radius: 24px;
+    max-width: 500px;
+    width: 90%;
+    padding: var(--space-8);
+    position: relative;
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-qr-close {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-5);
+    background: var(--bg-soft);
+    border: none;
+    color: var(--text);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-qr-close:hover {
+    background: var(--border-soft);
+    transform: rotate(90deg);
+}
+
+.modal-qr-fullscreen-content {
+    text-align: center;
+}
+
+.modal-qr-fullscreen-content #qrFullscreenContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-5);
+}
+
+.modal-qr-fullscreen-content #qrFullscreenContainer svg {
+    max-width: 280px;
+    height: auto;
+    background: white;
+    padding: var(--space-4);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.modal-qr-fullscreen-content h3 {
+    font-size: var(--fs-md);
+    color: var(--text-dark);
+    margin-bottom: var(--space-2);
+}
+
+.modal-qr-fullscreen-content p {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    margin-bottom: var(--space-5);
+}
+
+.modal-qr-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+}
+
+.btn-download-qr-modal,
+.btn-share-qr-modal {
+    padding: var(--space-2) var(--space-6);
+    border: none;
+    border-radius: var(--radius);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-xs);
+}
+
+.btn-download-qr-modal {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-download-qr-modal:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-share-qr-modal {
+    background: var(--bg-soft);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.btn-share-qr-modal:hover {
     background: var(--border-soft);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-soft);
 }
 
-.btn-share i {
-    font-size: 1.1rem;
-    color: var(--primary);
-}
+/* ============================================================
+   TOAST NOTIFICATION
+   ============================================================ */
 
-/* Tombol Buat Update (untuk owner) */
-.btn-add-update {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.5rem;
-    background: var(--primary-light);
-    color: var(--primary);
-    border: 1px solid var(--primary);
-    border-radius: var(--radius-full);
-    font-weight: var(--fw-semibold);
+.toast-notification {
+    position: fixed;
+    bottom: var(--space-8);
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--text-dark);
+    color: white;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius);
     font-size: var(--fs-xs);
-    transition: background 0.25s, color 0.25s, transform 0.15s, box-shadow 0.25s;
-    text-decoration: none;
+    font-weight: var(--fw-medium);
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
 }
 
-.btn-add-update:hover {
-    background: var(--primary);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-soft);
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
-.btn-add-update i {
-    font-size: 1.1rem;
-}
-
-/* Responsive: tombol full width di layar kecil */
-@media (max-width: 576px) {
-    .latest-news-section .section-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-    .btn-share,
-    .btn-add-update {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 576px) {
-    .lightbox-prev,
-    .lightbox-next {
-        width: 34px;
-        height: 34px;
-        font-size: 16px;
-    }
-
-    .lightbox-prev {
-        left: 6px;
-    }
-
-    .lightbox-next {
-        right: 6px;
-    }
-
-    .lightbox-image-wrapper img {
-        max-height: 60vh;
-    }
-
-    .lightbox-footer {
-        bottom: 16px;
-    }
-
-    .lightbox-dot {
-        width: 8px;
-        height: 8px;
-    }
-
-    .lightbox-dot.active {
-        width: 18px;
-    }
+.toast-notification i {
+    font-size: 20px;
 }
 
 /* ============================================================
@@ -1106,7 +1584,7 @@ body {
     }
 
     .description-section h1 {
-        font-size: var(--fs-lg);
+        font-size: var(--fs-md);
     }
 
     .update-card {
@@ -1133,6 +1611,61 @@ body {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--space-2);
     }
+
+    .lightbox-prev,
+    .lightbox-next {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .lightbox-prev {
+        left: 10px;
+    }
+
+    .lightbox-next {
+        right: 10px;
+    }
+
+    .lightbox-image-wrapper img {
+        max-height: 70vh;
+    }
+
+    .modal-content {
+        max-width: 95%;
+    }
+
+    .modal-body {
+        padding: var(--space-5);
+    }
+
+    .modal-header {
+        padding: var(--space-5) var(--space-5) var(--space-4);
+    }
+
+    .modal-logo img {
+        height: 32px;
+    }
+
+    .modal-logo span {
+        font-size: var(--fs-sm);
+    }
+
+    .modal-header h2 {
+        font-size: var(--fs-md);
+    }
+
+    .modal-qr-fullscreen {
+        padding: var(--space-5);
+    }
+
+    .modal-qr-fullscreen-content #qrFullscreenContainer svg {
+        max-width: 200px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 576px) {
@@ -1141,15 +1674,27 @@ body {
     }
 
     .description-section h1 {
-        font-size: var(--fs-md);
+        font-size: var(--fs-sm);
     }
 
     .description-section p {
         font-size: var(--fs-xs);
     }
 
-    .section-header h2 {
-        font-size: var(--fs-md);
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .section-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-share,
+    .btn-add-update {
+        width: 100%;
+        justify-content: center;
     }
 
     .update-thumbnail {
@@ -1186,5 +1731,109 @@ body {
     .btn-fundraiser-login {
         width: 100%;
         justify-content: center;
+    }
+
+    .referral-link-box {
+        flex-wrap: wrap;
+    }
+
+    .referral-link-box input {
+        width: 100%;
+    }
+
+    .btn-copy-link {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .referral-link-box-modal {
+        flex-wrap: wrap;
+        padding: var(--space-2);
+    }
+
+    .referral-link-box-modal input {
+        width: 100%;
+        font-size: var(--fs-xxs);
+    }
+
+    .btn-copy-link-modal {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .referral-code-box {
+        flex-wrap: wrap;
+        gap: var(--space-1);
+        padding: var(--space-2);
+    }
+
+    .referral-code-box .code-value {
+        width: 100%;
+        text-align: center;
+        font-size: var(--fs-sm);
+    }
+
+    .btn-copy-code {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-qr-wrapper svg {
+        max-width: 140px;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+    }
+
+    .lightbox-prev {
+        left: 6px;
+    }
+
+    .lightbox-next {
+        right: 6px;
+    }
+
+    .lightbox-image-wrapper img {
+        max-height: 60vh;
+    }
+
+    .lightbox-footer {
+        bottom: 16px;
+    }
+
+    .lightbox-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .lightbox-dot.active {
+        width: 18px;
+    }
+
+    .modal-actions .btn-modal-primary,
+    .modal-actions .btn-modal-secondary {
+        padding: var(--space-2);
+        font-size: var(--fs-xs);
+    }
+
+    .modal-qr-actions {
+        flex-direction: column;
+    }
+
+    .btn-download-qr-modal,
+    .btn-share-qr-modal {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .toast-notification {
+        max-width: 90%;
+        font-size: var(--fs-xxs);
+        padding: var(--space-2) var(--space-4);
+        bottom: var(--space-4);
     }
 }

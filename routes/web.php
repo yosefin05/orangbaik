@@ -80,14 +80,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/campaign/{slug}/update/{update}/edit', [CampaignUpdateController::class, 'edit'])->name('campaign.update.edit');
     Route::put('/campaign/{slug}/update/{update}', [CampaignUpdateController::class, 'update'])->name('campaign.update.update');
     Route::delete('/campaign/{slug}/update/{update}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');
-});
-
-// ============================================================
-// FUNDRAISER
-// ============================================================
-Route::middleware('auth')->prefix('fundraiser')->group(function () {
-    Route::post('/{slug}', [FundraiserController::class, 'store'])->name('fundraiser.store');
-    Route::delete('/{slug}', [FundraiserController::class, 'destroy'])->name('fundraiser.destroy');
+    
+    // ============================================================
+    // FUNDRAISER - PERBAIKI: pindahkan ke sini dengan prefix campaign
+    // ============================================================
+    Route::post('/campaign/{slug}/fundraiser', [FundraiserController::class, 'store'])
+        ->name('fundraiser.store')
+        ->where('slug', '.*');
+    
+    Route::delete('/campaign/{slug}/fundraiser', [FundraiserController::class, 'destroy'])
+        ->name('fundraiser.destroy')
+        ->where('slug', '.*');
 });
 
 // ============================================================
@@ -174,5 +177,5 @@ require __DIR__ . '/admin.php';
 // Menangani semua URL satu segmen (misal /bantu-korban, /ppp)
 // ============================================================
 Route::get('/{slug}', [CampaignController::class, 'show'])
-    ->where('slug', '^[a-z0-9-]+$')
+    ->where('slug', '.*')  // UBAH: terima semua karakter
     ->name('campaign.show');
