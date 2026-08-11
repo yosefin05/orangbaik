@@ -10,6 +10,7 @@ use App\Http\Controllers\admin\PenggalangDanaController;
 use App\Http\Controllers\admin\CampaignController;
 use App\Http\Controllers\admin\TestimoniController;
 use App\Http\Controllers\admin\KomentarController;
+use App\Http\Controllers\admin\DonasiController;
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -77,4 +78,7 @@ Route::middleware(['auth', 'admin'])
         });
 
         Route::resource('testimoni', TestimoniController::class);
+
+        Route::resource('donasi', DonasiController::class);
+        Route::get('donasi/export', [DonasiController::class, 'export'])->name('donasi.export');
     });

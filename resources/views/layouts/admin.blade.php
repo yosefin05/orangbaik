@@ -59,48 +59,63 @@
 
             <nav class="sidebar-nav">
 
+                {{-- Dashboard --}}
                 <a href="{{ route('admin.dashboard') }}"
                     class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i>
                     <span>Dashboard</span>
                 </a>
 
+                {{-- User --}}
                 <a href="{{ route('admin.users.index') }}"
                     class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     <i class="bi bi-person"></i>
                     <span>User</span>
                 </a>
 
+                {{-- Penggalang Dana --}}
                 <a href="{{ route('admin.penggalang_dana.index') }}"
                     class="{{ request()->routeIs('admin.penggalang_dana.*') ? 'active' : '' }}">
                     <i class="bi bi-people"></i>
                     <span>Penggalang Dana</span>
                 </a>
 
-                <a href="{{ route('admin.berita.index') }}"
-                    class="{{ request()->routeIs('admin.berita.*') ? 'active' : '' }}">
-                    <i class="bi bi-newspaper"></i>
-                    <span>Berita</span>
-                </a>
-
-                <a href="{{ route('admin.filter.index') }}"
-                    class="{{ request()->routeIs('admin.filter.*') ? 'active' : '' }}">
-                    <i class="bi bi-funnel"></i>
-                    <span>Filter</span>
-                </a>
-
+                {{-- Campaign --}}
                 <a href="{{ route('admin.campaign.index') }}"
                     class="{{ request()->routeIs('admin.campaign.*') ? 'active' : '' }}">
                     <i class="bi bi-megaphone"></i>
                     <span>Campaign</span>
                 </a>
 
+                {{-- DONASI --}}
+                <a href="{{ route('admin.donasi.index') }}"
+                    class="{{ request()->routeIs('admin.donasi.*') ? 'active' : '' }}">
+                    <i class="bi bi-wallet2"></i>
+                    <span>Donasi</span>
+                </a>
+
+                {{-- Berita --}}
+                <a href="{{ route('admin.berita.index') }}"
+                    class="{{ request()->routeIs('admin.berita.*') ? 'active' : '' }}">
+                    <i class="bi bi-newspaper"></i>
+                    <span>Berita</span>
+                </a>
+
+                {{-- Filter --}}
+                <a href="{{ route('admin.filter.index') }}"
+                    class="{{ request()->routeIs('admin.filter.*') ? 'active' : '' }}">
+                    <i class="bi bi-funnel"></i>
+                    <span>Filter</span>
+                </a>
+
+                {{-- Testimoni --}}
                 <a href="{{ route('admin.testimoni.index') }}"
                     class="{{ request()->routeIs('admin.testimoni.*') ? 'active' : '' }}">
                     <i class="bi bi-chat-heart"></i>
                     <span>Testimoni</span>
                 </a>
 
+                {{-- Komentar --}}
                 <a href="{{ route('admin.komentar.index') }}"
                     class="{{ request()->routeIs('admin.komentar.*') ? 'active' : '' }}">
                     <i class="bi bi-chat-dots"></i>

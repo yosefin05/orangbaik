@@ -350,7 +350,6 @@
                     <i class="bi bi-whatsapp"></i>
                 </div>
                 <span class="wa-tooltip">Hubungi CS</span>
-                <span class="wa-badge">Online</span>
             </a>
         </div>
     @endif

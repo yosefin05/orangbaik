@@ -234,11 +234,25 @@
                         </a>
                     </div>
 
+                    {{-- ========================================================== --}}
+                    {{-- DONASI TERBARU - HANYA SETTLEMENT --}}
+                    {{-- ========================================================== --}}
                     <div class="side-list-card">
                         <h3>Donasi Terbaru</h3>
 
-                        @if ($campaign->donasi->count() > 0)
-                            @foreach ($campaign->donasi()->latest()->take(5)->get() as $donasi)
+                        @php
+                            // Ambil hanya donasi dengan status settlement
+                            $donasiSettlement = $campaign->donasi()
+                                ->whereHas('pembayaran', function($q) {
+                                    $q->where('transaction_status', 'settlement');
+                                })
+                                ->latest()
+                                ->take(5)
+                                ->get();
+                        @endphp
+
+                        @if ($donasiSettlement->count() > 0)
+                            @foreach ($donasiSettlement as $donasi)
                                 <div class="side-list-item">
                                     <div class="avatar-circle">
                                         @if (!$donasi->is_anonymous && $donasi->user && $donasi->user->foto_profil)
@@ -249,15 +263,21 @@
                                         @endif
                                     </div>
                                     <div>
-                                        <h4>{{ $donasi->is_anonymous ? 'Anonim' : ($donasi->nama_donatur ?? $donasi->user->name ?? 'Donatur') }}
-                                        </h4>
+                                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                            <h4 style="margin:0;">
+                                                {{ $donasi->is_anonymous ? 'Anonim' : ($donasi->nama_donatur ?? $donasi->user->name ?? 'Donatur') }}
+                                            </h4>
+                                            <span style="font-size:10px; background:#4ade80; color:#fff; padding:2px 8px; border-radius:12px;">
+                                                ✓ Berhasil
+                                            </span>
+                                        </div>
                                         <p>Berdonasi sebesar <b>Rp {{ number_format($donasi->nominal, 0, ',', '.') }}</b></p>
                                         <span>{{ $donasi->created_at->diffForHumans() }}</span>
                                     </div>
                                 </div>
                             @endforeach
                         @else
-                            <p class="text-muted">Belum ada donasi.</p>
+                            <p class="text-muted">Belum ada donasi yang berhasil.</p>
                         @endif
                     </div>
 

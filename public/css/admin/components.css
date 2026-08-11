@@ -513,6 +513,263 @@
 }
 
 /* ============================================================
+   BADGE
+   Dipakai di data-table untuk status (Campaign, Donasi, dll)
+   ============================================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.badge i {
+    font-size: 12px;
+    line-height: 1;
+}
+
+.badge-green {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.badge-red {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.badge-blue {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.badge-yellow {
+    background: var(--secondary-light);
+    color: var(--secondary-hover);
+}
+
+.badge-gray {
+    background: var(--border-soft);
+    color: var(--muted);
+}
+
+/* ============================================================
+   FILTER BAR
+   Form filter di atas data-table (search, select, date range)
+   ============================================================ */
+
+.filter-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1 1 180px;
+    min-width: 160px;
+}
+
+.filter-field label {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.filter-field input,
+.filter-field select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    color: var(--text-dark);
+    background: var(--bg);
+    transition: .15s ease;
+}
+
+.filter-field input::placeholder {
+    color: var(--muted-light);
+}
+
+.filter-field input:focus,
+.filter-field select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.filter-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+}
+
+@media (max-width: 576px) {
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-field {
+        min-width: 0;
+    }
+
+    .filter-actions {
+        width: 100%;
+    }
+
+    .filter-actions .btn-primary,
+    .filter-actions .action-link {
+        justify-content: center;
+    }
+}
+
+/* ============================================================
+   STAT CARDS
+   Dipakai di Dashboard, Kelola Donasi, dan halaman lain yang
+   punya ringkasan statistik di bagian atas.
+   ============================================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 122px;
+    padding: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    transition: .2s ease;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: linear-gradient(180deg, var(--primary), var(--secondary));
+    opacity: .9;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(51, 101, 175, .28);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-icon {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+}
+
+.stat-icon i {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.stat-icon.icon-blue {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.stat-icon.icon-green {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.stat-icon.icon-orange {
+    background: var(--secondary-light);
+    color: var(--secondary);
+}
+
+.stat-icon.icon-red {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.stat-icon.icon-purple {
+    background: rgba(142, 68, 173, .13);
+    color: #8e44ad;
+}
+
+.stat-icon.icon-teal {
+    background: rgba(20, 184, 166, .13);
+    color: #14b8a6;
+}
+
+.stat-icon.icon-gold {
+    background: rgba(234, 179, 8, .13);
+    color: #eab308;
+}
+
+.stat-label {
+    margin: 0 0 var(--space-1);
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.4;
+}
+
+.stat-value {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.1;
+}
+
+.text-blue { color: var(--primary); }
+.text-green { color: var(--success); }
+.text-orange { color: var(--secondary); }
+.text-red { color: var(--danger); }
+.text-purple { color: #8e44ad; }
+.text-teal { color: #14b8a6; }
+.text-gold { color: #eab308; }
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: var(--space-5);
+    }
+
+    .stat-value {
+        font-size: var(--fs-md);
+    }
+}
+/* ============================================================
    RESPONSIVE COMPONENTS
    ============================================================ */
 

@@ -26,11 +26,26 @@ class DonasiController extends Controller
     public function create($slug)
     {
         $campaign = Campaign::where('slug', $slug)
-                            ->with(['packages', 'penggalangDana', 'donasi'])
-                            ->firstOrFail();
+            ->with([
+                'packages',
+                'penggalangDana',
+                'donasi.pembayaran',
+            ])
+            ->firstOrFail();
 
-        $totalTerkumpul = $campaign->donasi->sum('nominal');
-        $jumlahDonatur  = $campaign->donasi->count();
+        $totalTerkumpul = $campaign->donasi
+            ->filter(function ($donasi) {
+                return $donasi->pembayaran
+                    && $donasi->pembayaran->transaction_status === 'settlement';
+            })
+            ->sum('nominal');
+
+        $jumlahDonatur = $campaign->donasi
+            ->filter(function ($donasi) {
+                return $donasi->pembayaran
+                    && $donasi->pembayaran->transaction_status === 'settlement';
+            })
+            ->count();
 
         return view('pages.donasi-bayar', compact(
             'campaign',
@@ -50,9 +65,9 @@ class DonasiController extends Controller
         $minimalDonasi = $campaign->minimal_donasi ?? 5000;
 
         // Tentukan nominal
-        $nominal = $request->filled('nominal_lainnya') 
-                    ? $request->nominal_lainnya 
-                    : $request->nominal;
+        $nominal = $request->filled('nominal_lainnya')
+            ? $request->nominal_lainnya
+            : $request->nominal;
 
         if (empty($nominal) || $nominal < $minimalDonasi) {
             return response()->json([
@@ -71,14 +86,14 @@ class DonasiController extends Controller
         }
 
         $dataDonasi = [
-            'campaign_id'   => $campaign->id,
-            'user_id'       => auth()->id(),
-            'nama_donatur'  => $namaDonatur,
-            'email'         => auth()->user()->email ?? null,
-            'no_hp'         => $request->no_hp,
-            'nominal'       => $nominal,
-            'pesan_doa'     => $request->pesan,
-            'is_anonim'     => $isAnonim,
+            'campaign_id' => $campaign->id,
+            'user_id' => auth()->id(),
+            'nama_donatur' => $namaDonatur,
+            'email' => auth()->user()->email ?? null,
+            'no_hp' => $request->no_hp,
+            'nominal' => $nominal,
+            'pesan_doa' => $request->pesan,
+            'is_anonim' => $isAnonim,
         ];
 
         $donasi = Donasi::create($dataDonasi);
@@ -87,7 +102,7 @@ class DonasiController extends Controller
 
         $pembayaran = Pembayaran::create([
             'donasi_id' => $donasi->id,
-            'order_id'  => $orderId,
+            'order_id' => $orderId,
             'transaction_status' => 'pending',
         ]);
 

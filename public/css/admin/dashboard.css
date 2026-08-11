@@ -171,6 +171,11 @@
     color: #14b8a6;
 }
 
+.stat-icon.icon-gold {
+    background: rgba(234, 179, 8, .13);
+    color: #eab308;
+}
+
 .stat-label {
     margin: 0 0 var(--space-1);
     color: var(--muted);

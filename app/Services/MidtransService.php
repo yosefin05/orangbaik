@@ -56,33 +56,130 @@ class MidtransService
     /**
      * Menangani webhook dari Midtrans
      */
-    public function handleWebhook($payload)
-    {
-        $notification = new Notification($payload);
+    /**
+ * Menangani webhook dari Midtrans
+ */
+public function handleWebhook($payload)
+{
+    $orderId = $payload['order_id'] ?? null;
+    $statusCode = $payload['status_code'] ?? null;
+    $grossAmount = $payload['gross_amount'] ?? null;
+    $signatureKey = $payload['signature_key'] ?? null;
 
-        $orderId            = $notification->order_id;
-        $transactionStatus  = $notification->transaction_status;
-        $paymentType        = $notification->payment_type;
-        $transactionId      = $notification->transaction_id;
+    // Pastikan data penting tersedia
+    if (!$orderId || !$statusCode || !$grossAmount || !$signatureKey) {
+        Log::warning('Midtrans webhook: data tidak lengkap', [
+            'payload' => $payload,
+        ]);
 
-        $pembayaran = Pembayaran::where('order_id', $orderId)->first();
+        return false;
+    }
 
-        if (!$pembayaran) {
-            Log::warning('Webhook: Pembayaran tidak ditemukan untuk order_id ' . $orderId);
-            return false;
-        }
+    /*
+     * =====================================================
+     * 1. VERIFIKASI SIGNATURE MIDTRANS
+     * =====================================================
+     */
 
-        $pembayaran->payment_type       = $paymentType;
-        $pembayaran->transaction_id     = $transactionId;
-        $pembayaran->transaction_status = $transactionStatus;
+    $serverKey = config('midtrans.serverKey');
 
-        if ($transactionStatus == 'settlement') {
-            $pembayaran->paid_at = now();
-        }
+    $expectedSignature = hash(
+        'sha512',
+        $orderId . $statusCode . $grossAmount . $serverKey
+    );
 
-        $pembayaran->save();
+    if (!hash_equals($expectedSignature, $signatureKey)) {
+        Log::warning('Midtrans webhook: signature tidak valid', [
+            'order_id' => $orderId,
+        ]);
 
-        Log::info('Webhook processed for order_id ' . $orderId . ' status: ' . $transactionStatus);
+        return false;
+    }
+
+    /*
+     * =====================================================
+     * 2. CARI DATA PEMBAYARAN
+     * =====================================================
+     */
+
+    $pembayaran = Pembayaran::where('order_id', $orderId)->first();
+
+    if (!$pembayaran) {
+        Log::warning(
+            'Midtrans webhook: pembayaran tidak ditemukan',
+            [
+                'order_id' => $orderId,
+            ]
+        );
+
+        return false;
+    }
+
+    /*
+     * =====================================================
+     * 3. AMBIL DATA TRANSAKSI
+     * =====================================================
+     */
+
+    $transactionStatus = $payload['transaction_status'] ?? null;
+    $paymentType = $payload['payment_type'] ?? null;
+    $transactionId = $payload['transaction_id'] ?? null;
+
+    /*
+     * =====================================================
+     * 4. JANGAN BIARKAN STATUS SETTLEMENT MUNDUR
+     * =====================================================
+     */
+
+    if ($pembayaran->transaction_status === 'settlement') {
+        Log::info(
+            'Midtrans webhook: transaksi sudah settlement',
+            [
+                'order_id' => $orderId,
+            ]
+        );
+
         return true;
     }
+
+    /*
+     * =====================================================
+     * 5. UPDATE PEMBAYARAN
+     * =====================================================
+     */
+
+    $pembayaran->payment_type = $paymentType;
+    $pembayaran->transaction_id = $transactionId;
+    $pembayaran->transaction_status = $transactionStatus;
+
+    /*
+     * =====================================================
+     * 6. CATAT WAKTU PEMBAYARAN BERHASIL
+     * =====================================================
+     */
+
+    if ($transactionStatus === 'settlement') {
+        $pembayaran->paid_at = now();
+    }
+
+    $pembayaran->save();
+
+    /*
+     * =====================================================
+     * 7. LOG
+     * =====================================================
+     */
+
+    Log::info(
+        'Midtrans webhook berhasil diproses',
+        [
+            'order_id' => $orderId,
+            'transaction_status' => $transactionStatus,
+            'payment_type' => $paymentType,
+            'transaction_id' => $transactionId,
+        ]
+    );
+
+    return true;
+}
 }

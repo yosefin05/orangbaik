@@ -105,7 +105,12 @@
                 <div class="campaign-grid">
                     @forelse ($campaignDarurat as $campaign)
                         @php
-                            $terkumpul = $campaign->donasi->sum('nominal');
+                            // HANYA donasi dengan status SETTLEMENT
+                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                            });
+                            $terkumpul = $donasiSettlement->sum('nominal');
+                            $totalDonatur = $donasiSettlement->count();
                             $persen = $campaign->target_donasi
                                 ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                 : 0;
@@ -144,7 +149,7 @@
                                     <div class="progress-fill" style="width: {{ $persen }}%;"></div>
                                 </div>
                                 <div class="campaign-meta">
-                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ $totalDonatur }} Donatur</span>
                                     <span>{{ $labelHari }}</span>
                                 </div>
                             </div>
@@ -163,7 +168,12 @@
                 <div class="new-grid">
                     @forelse ($campaignTerbaru as $campaign)
                         @php
-                            $terkumpul = $campaign->donasi->sum('nominal');
+                            // HANYA donasi dengan status SETTLEMENT
+                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                            });
+                            $terkumpul = $donasiSettlement->sum('nominal');
+                            $totalDonatur = $donasiSettlement->count();
                             $persen = $campaign->target_donasi
                                 ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                 : 0;
@@ -182,7 +192,7 @@
                                     <div class="progress-fill" style="width: {{ $persen }}%;"></div>
                                 </div>
                                 <div class="new-item-meta">
-                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ $totalDonatur }} Donatur</span>
                                     <span>{{ round($persen) }}%</span>
                                 </div>
                             </div>
@@ -202,7 +212,12 @@
                 <div class="campaign-grid">
                     @forelse ($campaignBerkelanjutan as $campaign)
                         @php
-                            $terkumpul = $campaign->donasi->sum('nominal');
+                            // HANYA donasi dengan status SETTLEMENT
+                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                            });
+                            $terkumpul = $donasiSettlement->sum('nominal');
+                            $totalDonatur = $donasiSettlement->count();
                             $persen = $campaign->target_donasi
                                 ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                 : 0;
@@ -241,7 +256,7 @@
                                     <div class="progress-fill" style="width: {{ $persen }}%;"></div>
                                 </div>
                                 <div class="campaign-meta">
-                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ $totalDonatur }} Donatur</span>
                                     <span>{{ $labelHari }}</span>
                                 </div>
                             </div>
@@ -333,7 +348,12 @@
                 <div class="list-campaign">
                     @forelse ($campaigns as $campaign)
                         @php
-                            $terkumpul = $campaign->donasi->sum('nominal');
+                            // HANYA donasi dengan status SETTLEMENT
+                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                            });
+                            $terkumpul = $donasiSettlement->sum('nominal');
+                            $totalDonatur = $donasiSettlement->count();
                             $persen = $campaign->target_donasi
                                 ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                 : 0;
@@ -373,7 +393,7 @@
                                 </div>
 
                                 <div class="campaign-meta">
-                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ $totalDonatur }} Donatur</span>
                                     <span>{{ $labelHari }}</span>
                                 </div>
                             </div>
@@ -397,7 +417,6 @@
                     <i class="bi bi-whatsapp"></i>
                 </div>
                 <span class="wa-tooltip">Hubungi CS</span>
-                <span class="wa-badge">Online</span>
             </a>
         </div>
     @endif

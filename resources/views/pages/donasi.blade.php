@@ -119,7 +119,12 @@
 
                         @forelse ($darurat as $campaign)
                             @php
-                                $terkumpul = $campaign->donasi->sum('nominal');
+                                // HANYA donasi dengan status SETTLEMENT
+                                $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                    return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                                });
+                                $terkumpul = $donasiSettlement->sum('nominal');
+                                $totalDonatur = $donasiSettlement->count();
                                 $persen = $campaign->target_donasi
                                     ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                     : 0;
@@ -155,7 +160,7 @@
                                         </div>
 
                                         <div class="donasi-meta">
-                                            <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                            <span>{{ $totalDonatur }} Donatur</span>
                                             <span>{{ $hari }} Hari</span>
                                         </div>
                                     </div>
@@ -184,7 +189,12 @@
 
                     @forelse ($campaignTerbaru as $campaign)
                         @php
-                            $terkumpul = $campaign->donasi->sum('nominal');
+                            // HANYA donasi dengan status SETTLEMENT
+                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                            });
+                            $terkumpul = $donasiSettlement->sum('nominal');
+                            $totalDonatur = $donasiSettlement->count();
                             $persen = $campaign->target_donasi
                                 ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                 : 0;
@@ -202,7 +212,7 @@
                                     <div class="donasi-progress-fill" style="width: {{ $persen }}%;"></div>
                                 </div>
                                 <div class="donasi-new-meta">
-                                    <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                    <span>{{ $totalDonatur }} Donatur</span>
                                     <span>{{ round($persen) }}%</span>
                                 </div>
                             </div>
@@ -229,7 +239,12 @@
 
                         @forelse ($pemberdayaan as $campaign)
                             @php
-                                $terkumpul = $campaign->donasi->sum('nominal');
+                                // HANYA donasi dengan status SETTLEMENT
+                                $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                    return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                                });
+                                $terkumpul = $donasiSettlement->sum('nominal');
+                                $totalDonatur = $donasiSettlement->count();
                                 $persen = $campaign->target_donasi
                                     ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                     : 0;
@@ -265,7 +280,7 @@
                                         </div>
 
                                         <div class="donasi-meta">
-                                            <span>{{ $campaign->donasi->count() }} Donatur</span>
+                                            <span>{{ $totalDonatur }} Donatur</span>
                                             <span>{{ $hari }} Hari</span>
                                         </div>
                                     </div>
@@ -293,7 +308,6 @@
                     <i class="bi bi-whatsapp"></i>
                 </div>
                 <span class="wa-tooltip">Hubungi CS</span>
-                <span class="wa-badge">Online</span>
             </a>
         </div>
     @endif
@@ -304,4 +318,4 @@
 
 </body>
 
-</html>
+</html> 

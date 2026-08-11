@@ -32,7 +32,6 @@ class Donasi extends Model
         'nominal',
         'pesan_doa',
         'is_anonim',
-        'status',
     ];
 
     protected $casts = [

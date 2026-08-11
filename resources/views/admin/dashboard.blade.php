@@ -81,6 +81,17 @@
         </div>
 
         <div class="stat-card">
+            <div class="stat-icon icon-gold">
+                <i class="bi bi-wallet2"></i>
+            </div>
+
+            <div>
+                <p class="stat-label">Total Donasi</p>
+                <h3 class="stat-value text-gold">{{ $totalDonasi ?? 0 }}</h3>
+            </div>
+        </div>
+
+        <div class="stat-card">
             <div class="stat-icon icon-orange">
                 <i class="bi bi-newspaper"></i>
             </div>
@@ -132,6 +143,11 @@
                 <span>Campaign</span>
             </a>
 
+            <a href="{{ route('admin.donasi.index') }}" class="menu-item">
+                <i class="bi bi-wallet2 menu-icon"></i>
+                <span>Donasi</span>
+            </a>
+
             <a href="{{ route('admin.testimoni.index') }}" class="menu-item">
                 <i class="bi bi-chat-heart menu-icon"></i>
                 <span>Testimoni</span>
@@ -145,5 +161,4 @@
         </div>
 
     </section>
-
 @endsection

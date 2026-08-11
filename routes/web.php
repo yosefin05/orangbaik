@@ -13,6 +13,7 @@ use App\Http\Controllers\User\CampaignUpdateController;
 use App\Http\Controllers\User\FundraiserController;
 use App\Http\Controllers\User\SearchController;
 use App\Http\Controllers\User\RiwayatDonasiController;
+use App\Http\Controllers\MidtransController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -36,6 +37,8 @@ Route::post('/set-intended-url', function (Request $request) {
 
 // search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+Route::post('/midtrans/notification', [MidtransController::class, 'notification']);
 
 // ============================================================
 // BERITA

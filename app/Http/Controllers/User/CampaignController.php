@@ -101,22 +101,6 @@ class CampaignController extends Controller
             ->take(2)
             ->get();
 
-        // Campaign dengan pencapaian < 30%
-        $belumSampai30 = (clone $query)
-            ->where(function ($q) {
-                $q->where('campaign_type', 'regular')
-                    ->orWhere('approval_status', 'approved');
-            })
-            ->get()
-            ->filter(function ($campaign) {
-                $terkumpul = $campaign->donasi->sum('nominal');
-                $target = $campaign->target_donasi;
-                if ($target == 0)
-                    return false;
-                return ($terkumpul / $target) < 0.3;
-            })
-            ->take(8);
-
         // === DATA UNTUK FILTER ===
         $selectedJenis = $request->jenis_penggalang ?? '';
         $selectedFilterIds = $request->filter_ids ?? [];
@@ -128,7 +112,6 @@ class CampaignController extends Controller
             'terbaru',
             'pemberdayaan',
             'campaignTerbaru',
-            'belumSampai30',
             'selectedJenis',
             'selectedFilterIds'
         ));
@@ -322,7 +305,14 @@ class CampaignController extends Controller
     {
         $campaign = Campaign::with([
             'penggalangDana',
+            'donasi' => function ($query) {
+                // HANYA donasi dengan pembayaran SETTLEMENT
+                $query->whereHas('pembayaran', function ($q) {
+                    $q->where('transaction_status', 'settlement');
+                });
+            },
             'donasi.user',
+            'donasi.pembayaran',
             'campaignUpdates.campaign_update_gambar',
             'campaignFundraisers.user',
             'fundraisers'
@@ -334,8 +324,13 @@ class CampaignController extends Controller
             })
             ->firstOrFail();
 
-        $campaign->terkumpul = $campaign->donasi->sum('nominal');
-        $campaign->donasi_count = $campaign->donasi->count();
+        // Hitung total terkumpul dari donasi yang sudah settlement
+        $totalTerkumpul = $campaign->donasi->sum('nominal');
+        $totalDonatur = $campaign->donasi->count();
+
+        // Tambahkan ke object campaign
+        $campaign->terkumpul = $totalTerkumpul;
+        $campaign->donasi_count = $totalDonatur;
 
         $updatesData = $campaign->campaignUpdates->map(function ($update) {
             return [
