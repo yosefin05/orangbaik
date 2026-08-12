@@ -50,7 +50,7 @@ class DonasiController extends Controller
 
         $donasi = $query->latest()->paginate(20);
         $campaigns = Campaign::where('is_active', true)->get();
-        $statuses = ['pending', 'settlement', 'expire', 'cancel', 'deny', 'failure'];
+        $statuses = ['pending', 'settlement', 'expire'];
 
         return view('admin.donasi.index', compact('donasi', 'campaigns', 'statuses'));
     }
@@ -79,7 +79,7 @@ class DonasiController extends Controller
             'nominal' => 'required|numeric|min:1',
             'pesan_doa' => 'nullable|string',
             'is_anonim' => 'boolean',
-            'transaction_status' => 'required|in:pending,settlement,expire,cancel,deny,failure',
+            'transaction_status' => 'required|in:pending,settlement,expire',
             'payment_type' => 'nullable|string',
             'paid_at' => 'nullable|date',
         ]);
@@ -136,7 +136,7 @@ class DonasiController extends Controller
         $donasi = Donasi::with('pembayaran')->findOrFail($id);
         $campaigns = Campaign::where('is_active', true)->get();
         $users = User::where('role', 'user')->get();
-        $statuses = ['pending', 'settlement', 'expire', 'cancel', 'deny', 'failure'];
+        $statuses = ['pending', 'settlement', 'expire'];
 
         return view('admin.donasi.edit', compact('donasi', 'campaigns', 'users', 'statuses'));
     }
@@ -157,7 +157,7 @@ class DonasiController extends Controller
             'nominal' => 'required|numeric|min:1',
             'pesan_doa' => 'nullable|string',
             'is_anonim' => 'boolean',
-            'transaction_status' => 'required|in:pending,settlement,expire,cancel,deny,failure',
+            'transaction_status' => 'required|in:pending,settlement,expire',
             'payment_type' => 'nullable|string',
             'paid_at' => 'nullable|date',
         ]);

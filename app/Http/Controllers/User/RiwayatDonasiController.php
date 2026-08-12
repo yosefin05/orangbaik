@@ -37,6 +37,7 @@ class RiwayatDonasiController extends Controller
             }
 
             return [
+                'id' => $donasi->id,
                 'type' => 'Donasi',
                 'date' => $donasi->created_at->format('d F Y'),
                 'status' => $status,
@@ -56,5 +57,17 @@ class RiwayatDonasiController extends Controller
         $totalSelesai = $formattedDonations->where('status_key', 'selesai')->count();
 
         return view('pages.riwayat-donasi', compact('formattedDonations', 'totalDonasi', 'totalNominal', 'totalSelesai'));
+    }
+
+    public function kwitansi(Donasi $donasi)
+    {
+        // Pastikan hanya pemilik donasi yang bisa akses
+        if ($donasi->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $donasi->load(['campaign.penggalangDana', 'pembayaran', 'user']);
+
+        return view('pages.kwitansi', compact('donasi'));
     }
 }

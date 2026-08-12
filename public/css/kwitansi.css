@@ -1,0 +1,493 @@
+/* ============================
+   E-KWITANSI CSS — Clean / Elegant / Minimalist
+   Mengacu ke global.css :root
+   ============================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--bg-soft);
+    color: var(--text);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* ============================
+   PAGE
+   ============================ */
+
+.kwitansi-page {
+    min-height: 100vh;
+    padding: var(--space-8) var(--space-5);
+}
+
+/* ============================
+   TOOLBAR (tidak ikut print)
+   ============================ */
+
+.kwitansi-toolbar {
+    max-width: 720px;
+    margin: 0 auto var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 40px;
+    padding: 0 var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg);
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-back:hover {
+    border-color: var(--text);
+    color: var(--text);
+}
+
+.btn-print {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 40px;
+    padding: 0 var(--space-5);
+    border: 1px solid var(--text-dark);
+    border-radius: var(--radius-full);
+    background: var(--text-dark);
+    color: #fff;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.btn-print:hover {
+    opacity: .85;
+}
+
+/* ============================
+   KWITANSI WRAPPER
+   ============================ */
+
+.kwitansi-wrapper {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.kwitansi-doc {
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+/* ============================
+   HEADER — flat, no gradient
+   ============================ */
+
+.kwitansi-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-8) var(--space-8) var(--space-6);
+    flex-wrap: wrap;
+}
+
+.kwitansi-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.kwitansi-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    object-fit: contain;
+}
+
+.kwitansi-brand h1 {
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    letter-spacing: -.01em;
+}
+
+.kwitansi-brand p {
+    color: var(--muted-light);
+    font-size: var(--fs-xxs);
+    margin-top: 2px;
+}
+
+.kwitansi-title-block {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-1);
+}
+
+.kwitansi-title {
+    color: var(--muted-light);
+    font-size: 10px;
+    font-weight: var(--fw-semibold);
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+}
+
+.kwitansi-invoice {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    letter-spacing: .3px;
+    margin-bottom: 2px;
+}
+
+/* STATUS BADGE — subtle outline style */
+.kwitansi-status {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 11px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: var(--fw-semibold);
+    letter-spacing: .3px;
+    text-transform: uppercase;
+}
+
+.status-selesai {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.status-menunggu {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.status-gagal {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+/* ============================
+   DIVIDER
+   ============================ */
+
+.kwitansi-divider {
+    height: 1px;
+    background: var(--border-soft);
+    margin: 0 var(--space-8);
+}
+
+/* ============================
+   NOMINAL SECTION — flat, centered, quiet
+   ============================ */
+
+.kwitansi-nominal-section {
+    padding: var(--space-8);
+    text-align: center;
+}
+
+.kwitansi-nominal-label {
+    font-size: 11px;
+    color: var(--muted-light);
+    margin-bottom: var(--space-2);
+    font-weight: var(--fw-medium);
+    letter-spacing: .4px;
+    text-transform: uppercase;
+}
+
+.kwitansi-nominal {
+    font-size: var(--fs-xxl);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+    letter-spacing: -.03em;
+    line-height: 1.1;
+}
+
+.kwitansi-nominal-terbilang {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    font-style: italic;
+    margin-top: var(--space-2);
+}
+
+/* ============================
+   INFO GRID
+   ============================ */
+
+.kwitansi-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: var(--space-6) var(--space-8);
+}
+
+.kwitansi-info-grid .kwitansi-section:first-child {
+    padding: 0 var(--space-6) 0 0;
+    border-right: 1px solid var(--border-soft);
+}
+
+.kwitansi-info-grid .kwitansi-section:last-child {
+    padding: 0 0 0 var(--space-6);
+}
+
+@media (max-width: 600px) {
+    .kwitansi-info-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-5);
+    }
+
+    .kwitansi-info-grid .kwitansi-section:first-child {
+        padding: 0 0 var(--space-5);
+        border-right: none;
+        border-bottom: 1px solid var(--border-soft);
+    }
+
+    .kwitansi-info-grid .kwitansi-section:last-child {
+        padding: 0;
+    }
+}
+
+/* ============================
+   SECTION
+   ============================ */
+
+.kwitansi-section {
+    padding: var(--space-6) var(--space-8);
+}
+
+.kwitansi-section h3 {
+    font-size: 10px;
+    font-weight: var(--fw-semibold);
+    color: var(--muted-light);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin-bottom: var(--space-4);
+}
+
+/* ============================
+   TABLE INFO
+   ============================ */
+
+.kwitansi-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.kwitansi-table tr td {
+    padding: var(--space-2) 0;
+    font-size: var(--fs-xs);
+    color: var(--text);
+    vertical-align: top;
+    line-height: 1.5;
+}
+
+.kwitansi-table tr td:first-child {
+    color: var(--muted-light);
+    width: 120px;
+    font-weight: var(--fw-regular);
+    white-space: nowrap;
+}
+
+.kwitansi-table tr td:nth-child(2) {
+    color: var(--muted-light);
+    padding: var(--space-2) var(--space-2);
+    width: 10px;
+}
+
+.kwitansi-table tr td:last-child {
+    color: var(--text-dark);
+    font-weight: var(--fw-medium);
+}
+
+/* ============================
+   CAMPAIGN INFO — flat, borderless
+   ============================ */
+
+.kwitansi-campaign {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.kwitansi-campaign-img {
+    width: 72px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+.kwitansi-campaign-info h4 {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    line-height: 1.4;
+    margin-bottom: 2px;
+}
+
+.kwitansi-campaign-info p {
+    color: var(--muted-light);
+    font-size: var(--fs-xxs);
+}
+
+/* ============================
+   SUMMARY TABLE — minimal lines, no fill except total
+   ============================ */
+
+.kwitansi-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.kwitansi-summary-table tr td {
+    padding: 10px 0;
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.kwitansi-summary-table tr td:last-child {
+    text-align: right;
+    color: var(--text);
+    font-weight: var(--fw-medium);
+}
+
+.kwitansi-summary-table tr:last-child td {
+    border-bottom: none;
+}
+
+.kwitansi-summary-total td {
+    padding-top: var(--space-3);
+    color: var(--text-dark) !important;
+    font-weight: var(--fw-bold) !important;
+    font-size: var(--fs-sm) !important;
+}
+
+/* ============================
+   FOOTER
+   ============================ */
+
+.kwitansi-footer {
+    padding: var(--space-6) var(--space-8) var(--space-8);
+    text-align: center;
+}
+
+.kwitansi-footer p {
+    font-size: var(--fs-xxs);
+    color: var(--muted-light);
+    line-height: 1.6;
+}
+
+.kwitansi-footer-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-soft);
+}
+
+.kwitansi-footer-meta span {
+    font-size: 10px;
+    color: var(--muted-light);
+    letter-spacing: .2px;
+}
+
+/* ============================
+   PRINT STYLES
+   ============================ */
+
+@media print {
+    @page {
+        size: A4;
+        margin: 1.5cm;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .kwitansi-page {
+        padding: 0;
+    }
+
+    .kwitansi-wrapper {
+        max-width: 100%;
+    }
+
+    .kwitansi-doc {
+        border: none;
+        border-radius: 0;
+    }
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+
+@media (max-width: 600px) {
+    .kwitansi-page {
+        padding: var(--space-5) var(--space-3);
+    }
+
+    .kwitansi-header {
+        padding: var(--space-6) var(--space-6) var(--space-5);
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .kwitansi-title-block {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .kwitansi-nominal {
+        font-size: var(--fs-xl);
+    }
+
+    .kwitansi-nominal-section,
+    .kwitansi-section {
+        padding: var(--space-6);
+    }
+
+    .kwitansi-divider {
+        margin: 0 var(--space-6);
+    }
+
+    .kwitansi-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-back,
+    .btn-print {
+        width: 100%;
+        justify-content: center;
+    }
+}

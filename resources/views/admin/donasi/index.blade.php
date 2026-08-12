@@ -138,6 +138,7 @@
                         <th>No.</th>
                         <th>Campaign</th>
                         <th>Donatur</th>
+                        <th>Nomor HP</th>
                         <th>Nominal</th>
                         <th>Status</th>
                         <th>Metode</th>
@@ -156,14 +157,14 @@
                             $badgeClass = match ($status) {
                                 'settlement' => 'badge-green',
                                 'pending' => 'badge-yellow',
-                                'cancel', 'deny', 'failure' => 'badge-red',
+                                'cancel'=> 'badge-red',
                                 default => 'badge-gray',
                             };
 
                             $icon = match ($status) {
                                 'settlement' => 'bi-check-circle-fill',
                                 'pending' => 'bi-hourglass-split',
-                                'cancel', 'deny', 'failure' => 'bi-x-circle-fill',
+                                'cancel'=> 'bi-x-circle-fill',
                                 default => 'bi-clock-history',
                             };
                         @endphp
@@ -180,6 +181,10 @@
                             <td>
                                 <p class="cell-title">{{ $item->is_anonim ? 'Anonim' : $item->nama_donatur }}</p>
                                 <span class="text-muted-strong">{{ $item->email ?? '-' }}</span>
+                            </td>
+
+                            <td>
+                                <span class="text-muted-strong">{{ $item->nomor ?? '-' }}</span>
                             </td>
 
                             <td>

@@ -159,6 +159,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/riwayat-donasi', [RiwayatDonasiController::class, 'index'])
         ->name('riwayat.donasi')
         ->middleware('auth');
+    Route::get('/riwayat-donasi/{donasi}/kwitansi', [RiwayatDonasiController::class, 'kwitansi'])
+    ->middleware('auth')
+    ->name('riwayat-donasi.kwitansi');
 });
 
 // ============================================================
