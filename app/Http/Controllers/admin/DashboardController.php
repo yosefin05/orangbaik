@@ -17,8 +17,6 @@ class DashboardController extends Controller
     public function index()
     {
         return view('admin.dashboard', [
-            // 'nominal_donasi' => Campaign::sum('nominal_donasi'),
-            // 'totalDonasi' => Campaign::count(),
             'totalCampaign' => Campaign::count(),
             'totalPenggalangDana' => Penggalang_Dana::count(),
             'totalUser' => User::where('role', 'user')->count(),

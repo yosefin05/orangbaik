@@ -128,15 +128,13 @@ class PenggalangDanaController extends Controller
 
     public function storeIndividu(Request $request)
     {
-        // ===== VALIDASI YANG BENAR =====
         $request->validate([
             'foto_profil' => 'required|image|max:2048',
             'nama_penggalang' => 'required|max:255',
             'alamat' => 'required',
-            'deskripsi' => 'nullable', // boleh opsional
+            'deskripsi' => 'nullable', 
             'email' => 'required|email',
             'no_telepon' => 'required',
-            // WAJIBKAN dokumen pertama (sama seperti organisasi)
             'nama_dokumen.0' => 'required|string',
             'file_dokumen.0' => 'required|url',
             'visi' => 'nullable',
@@ -171,10 +169,8 @@ class PenggalangDanaController extends Controller
                 'youtube' => $request->youtube,
                 'tiktok' => $request->tiktok,
                 'status' => 'pending',
-                // HAPUS baris ini: 'nama_dokumen.0' => 'required', dan 'file_dokumen.0' => 'required|url'
             ]);
 
-            // Simpan dokumen (minimal satu karena sudah divalidasi)
             foreach ($request->nama_dokumen as $i => $nama) {
                 if (empty($nama) || empty($request->file_dokumen[$i])) {
                     continue;
@@ -193,7 +189,6 @@ class PenggalangDanaController extends Controller
                 ->with('success', 'Pengajuan berhasil dikirim.');
         } catch (\Exception $e) {
             DB::rollBack();
-            // Jangan redirect back dengan error, tapi log error dan tampilkan pesan umum
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
@@ -333,25 +328,18 @@ class PenggalangDanaController extends Controller
             $validated['catatan_verifikasi'] = null;
             $validated['verified_by'] = null;
             $validated['verified_at'] = null;
-            // Increment revision_count jika sebelumnya rejected atau approved
             if (in_array($penggalang->status, ['rejected', 'approved'])) {
                 $validated['revision_count'] = $penggalang->revision_count + 1;
             }
         } else {
-            // Jika tidak ada perubahan dokumen, status tetap seperti semula
-            // Kecuali jika status sebelumnya 'pending' kita biarkan saja
-            // Jika status 'rejected' dan tidak ada perubahan, kita biarkan agar user sadar belum ada perbaikan
+        
         }
 
-        // Update data utama
         $penggalang->update($validated);
 
-        // === UPDATE DOKUMEN ===
         if ($request->filled('nama_dokumen')) {
-            // Hapus semua dokumen lama
             $penggalang->penggalangDanaDokumen()->delete();
 
-            // Simpan dokumen baru
             foreach ($request->nama_dokumen as $i => $nama) {
                 if (empty($nama) || empty($request->file_dokumen[$i])) {
                     continue;
@@ -375,10 +363,6 @@ class PenggalangDanaController extends Controller
             ->with('success', $message);
     }
 
-    /**
-     * RESUBMIT – khusus untuk pengajuan yang ditolak
-     * Status langsung menjadi pending tanpa melihat perubahan dokumen
-     */
     public function resubmit($id)
     {
         $penggalang = Penggalang_Dana::findOrFail($id);
@@ -396,8 +380,6 @@ class PenggalangDanaController extends Controller
         $penggalang->verified_at = null;
         $penggalang->revision_count = $penggalang->revision_count + 1;
         $penggalang->save();
-
-        // Opsional: kirim notifikasi ke admin bahwa ada pengajuan ulang
 
         return redirect()
             ->route('profile.user')

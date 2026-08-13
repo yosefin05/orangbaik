@@ -18,19 +18,14 @@ class KalkulatorController extends Controller
     public function calculate(Request $request)
     {
         switch ($request->jenis) {
-
             case 'penghasilan':
                 return $this->penghasilan($request);
-
             case 'emas':
                 return $this->emas($request);
-
             case 'tabungan':
                 return $this->tabungan($request);
-
             case 'perdagangan':
                 return $this->perdagangan($request);
-
         }
     }
 
@@ -39,15 +34,11 @@ class KalkulatorController extends Controller
     {
         $gaji = (int) str_replace('.', '', $request->gaji ?? 0);
         $bonus = (int) str_replace('.', '', $request->bonus ?? 0);
-
         $totalHarta = $gaji + $bonus;
         $hutang = 0;
         $hartaBersih = $totalHarta - $hutang;
-
         $nishab = (self::NISHAB_GRAM * self::HARGA_EMAS) / 12;
-
         $wajib = $hartaBersih >= $nishab;
-
         $zakat = $wajib ? $hartaBersih * self::TARIF : 0;
 
         return back()->with([
@@ -69,17 +60,11 @@ class KalkulatorController extends Controller
     private function emas($request)
     {
         $gram = (float) $request->gram;
-
         $totalHarta = $gram * self::HARGA_EMAS;
-
         $hutang = (int) str_replace('.', '', $request->pengurang ?? 0);
-
         $hartaBersih = max(0, $totalHarta - $hutang);
-
         $nishab = self::NISHAB_GRAM * self::HARGA_EMAS;
-
         $wajib = $hartaBersih >= $nishab;
-
         $zakat = $wajib ? $hartaBersih * self::TARIF : 0;
 
         return back()->with([
@@ -101,19 +86,12 @@ class KalkulatorController extends Controller
     private function tabungan($request)
     {
         $saldo = (int) str_replace('.', '', $request->saldo);
-
         $bunga = (int) str_replace('.', '', $request->bunga ?? 0);
-
         $totalHarta = $saldo;
-
         $hutang = $bunga;
-
         $hartaBersih = max(0, $saldo - $bunga);
-
         $nishab = self::NISHAB_GRAM * self::HARGA_EMAS;
-
         $wajib = $hartaBersih >= $nishab;
-
         $zakat = $wajib ? $hartaBersih * self::TARIF : 0;
 
         return back()->with([
@@ -137,20 +115,13 @@ class KalkulatorController extends Controller
         $modal = (int) str_replace('.', '', $request->modal);
         $untung = (int) str_replace('.', '', $request->untung);
         $piutang = (int) str_replace('.', '', $request->piutang ?? 0);
-
         $rugi = (int) str_replace('.', '', $request->rugi ?? 0);
         $hutang = (int) str_replace('.', '', $request->hutang ?? 0);
-
         $totalHarta = $modal + $untung + $piutang;
-
         $totalHutang = $rugi + $hutang;
-
         $hartaBersih = max(0, $totalHarta - $totalHutang);
-
         $nishab = self::NISHAB_GRAM * self::HARGA_EMAS;
-
         $wajib = $hartaBersih >= $nishab;
-
         $zakat = $wajib ? $hartaBersih * self::TARIF : 0;
 
         return back()->with([

@@ -21,19 +21,16 @@ class CampaignController extends Controller
 
     public function index(Request $request)
     {
-        // Ambil semua filter dari database (tabel: filter)
+        $now = Carbon::now();
         $filters = Filter::all();
-
-        // Ambil kategori untuk tombol cepat
         $kategori = Kategori::all();
+        $penggalangDana = Penggalang_Dana::where('status', 'verified')->get();
 
-        // Query dasar: campaign aktif
-        $query = Campaign::with([
-            'kategori',
-            'penggalangDana',
-            'donasi',
-            'filter'
-        ])->where('is_active', true);
+        // tampilkan campaign aktif
+        $query = Campaign::with(['penggalangDana', 'donasi.pembayaran', 'kategori', 'filter'])
+            ->where('is_active', true)
+            ->where('tanggal_mulai', '<=', $now)
+            ->where('tanggal_berakhir', '>=', $now);
 
         // Hanya tampilkan campaign yang approved atau regular
         $query->where(function ($q) {
@@ -42,7 +39,7 @@ class CampaignController extends Controller
                 ->orWhereNull('approval_status');
         });
 
-        // === FILTER: Jenis Penggalang ===
+        // FILTER: Jenis Penggalang
         if ($request->filled('jenis_penggalang')) {
             $jenis = $request->jenis_penggalang;
             $query->whereHas('penggalangDana', function ($q) use ($jenis) {
@@ -50,7 +47,7 @@ class CampaignController extends Controller
             });
         }
 
-        // === FILTER: Filter (checkbox multiple dari tabel `filter`) ===
+        // FILTER: Filter (checkbox multiple) 
         if ($request->filled('filter_ids')) {
             $filterIds = (array) $request->filter_ids;
             $query->whereHas('filter', function ($q) use ($filterIds) {
@@ -58,14 +55,12 @@ class CampaignController extends Controller
             });
         }
 
-        // === FILTER: Kategori (tombol cepat) ===
+        // FILTER: Kategori 
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
 
-        // === AMBIL DATA UNTUK SECTION ===
-
-        // Darurat - emergency approved
+        // DARURAT (emergency + approved + aktif)
         $darurat = (clone $query)
             ->where('campaign_type', 'emergency')
             ->where('approval_status', 'approved')
@@ -73,17 +68,7 @@ class CampaignController extends Controller
             ->take(8)
             ->get();
 
-        // Terbaru - semua campaign
-        $terbaru = (clone $query)
-            ->where(function ($q) {
-                $q->where('campaign_type', 'regular')
-                    ->orWhere('approval_status', 'approved');
-            })
-            ->latest()
-            ->take(8)
-            ->get();
-
-        // Pemberdayaan - sustainable approved
+        // PEMBERDAYAAN (sustainable + approved + aktif)
         $pemberdayaan = (clone $query)
             ->where('campaign_type', 'sustainable')
             ->where('approval_status', 'approved')
@@ -91,17 +76,19 @@ class CampaignController extends Controller
             ->take(8)
             ->get();
 
-        // Campaign terbaru (2 item untuk grid kecil)
+        // CAMPAIGN TERBARU (2 item untuk grid kecil)
         $campaignTerbaru = (clone $query)
-            ->where(function ($q) {
-                $q->where('campaign_type', 'regular')
-                    ->orWhere('approval_status', 'approved');
-            })
             ->latest()
             ->take(2)
             ->get();
 
-        // === DATA UNTUK FILTER ===
+        $campaigns = (clone $query)
+            ->where('campaign_type', 'regular')
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        // DATA UNTUK FILTER 
         $selectedJenis = $request->jenis_penggalang ?? '';
         $selectedFilterIds = $request->filter_ids ?? [];
 
@@ -109,11 +96,12 @@ class CampaignController extends Controller
             'filters',
             'kategori',
             'darurat',
-            'terbaru',
             'pemberdayaan',
             'campaignTerbaru',
+            'campaigns',
             'selectedJenis',
-            'selectedFilterIds'
+            'selectedFilterIds',
+            'penggalangDana'
         ));
     }
 

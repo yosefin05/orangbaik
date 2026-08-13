@@ -55,9 +55,6 @@ class TestimoniController extends Controller
             );
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Testimoni $testimoni)
     {
         return view(

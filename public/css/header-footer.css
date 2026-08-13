@@ -728,7 +728,6 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-
     color: var(--primary);
     background: var(--primary-light);
     border-radius: var(--radius-md);

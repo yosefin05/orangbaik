@@ -139,7 +139,6 @@ class BeritaController extends Controller
         $totalBaru = count($request->file('gambar', []));
 
         if ($totalLama + $totalBaru > 3) {
-
             return back()
                 ->withErrors([
                     'gambar' => 'Total gambar maksimal 3.'
@@ -154,9 +153,7 @@ class BeritaController extends Controller
         ];
 
         if ($request->hasFile('thumbnail')) {
-
             if ($beritum->thumbnail) {
-
                 Storage::disk('public')
                     ->delete($beritum->thumbnail);
             }
@@ -170,11 +167,9 @@ class BeritaController extends Controller
         }
 
         $beritum->update($data);
-
+        
         if ($request->hasFile('gambar')) {
-
             foreach ($request->file('gambar') as $gambar) {
-
                 $path = $gambar->store(
                     'berita/gallery',
                     'public'

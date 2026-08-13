@@ -1,24 +1,17 @@
 /* ============================
    ZAKAT CALCULATOR PAGE
-   Sesuai global.css
    ============================ */
-
 .zakat-page {
     min-height: 100vh;
     overflow-x: hidden;
-
     background: var(--bg-soft);
     color: var(--text-dark);
 }
 
 /* HERO */
 .zakat-hero {
-    padding-top: var(--space-12, 48px);
-    padding-bottom: var(--space-12, 48px);
-
-    background:
-        radial-gradient(circle at 10% 0%, rgba(51, 101, 175, .12), transparent 30%),
-        linear-gradient(180deg, var(--bg), var(--bg-soft));
+    padding: var(--space-12, 48px) 0;
+    background: radial-gradient(circle at 10% 0%, rgba(51, 101, 175, .12), transparent 30%), linear-gradient(180deg, var(--bg), var(--bg-soft));
 }
 
 .zakat-hero-layout {
@@ -37,21 +30,17 @@
 .zakat-form-label,
 .zakat-result-label {
     display: inline-flex;
-
     margin-bottom: var(--space-3, 12px);
     padding: var(--space-1, 4px) var(--space-3, 12px);
-
     border-radius: var(--radius-full);
     background: var(--primary-light);
     color: var(--primary);
-
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
 }
 
 .zakat-hero h1 {
     margin: 0 0 var(--space-4, 16px);
-
     color: var(--text-dark);
     font-size: var(--fs-xxl);
     font-weight: var(--fw-extrabold);
@@ -62,7 +51,6 @@
 .zakat-hero p {
     margin: 0;
     max-width: 660px;
-
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.85;
@@ -72,25 +60,19 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3, 12px);
-
     margin-top: var(--space-7, 28px);
 }
 
 .zakat-primary-link,
 .zakat-secondary-link {
     min-height: 46px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     padding: 0 var(--space-6, 24px);
-
     border-radius: var(--radius-full);
-
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-
     transition: .2s ease;
 }
 
@@ -98,7 +80,6 @@
     background: var(--primary);
     color: var(--bg);
 }
-
 .zakat-primary-link:hover {
     background: var(--primary-hover);
     color: var(--bg);
@@ -110,7 +91,6 @@
     color: var(--primary);
     border: 1px solid var(--border);
 }
-
 .zakat-secondary-link:hover {
     border-color: var(--primary);
     background: var(--primary-light);
@@ -118,31 +98,22 @@
 
 .zakat-hero-image {
     min-height: 320px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     overflow: hidden;
-
     border-radius: var(--radius);
-    background:
-        radial-gradient(circle at 50% 30%, rgba(51, 101, 175, .18), transparent 42%),
-        var(--primary-light);
 }
-
 .zakat-hero-image img {
     width: 78%;
     max-height: 280px;
-
     display: block;
     object-fit: contain;
 }
 
 /* INFO */
 .zakat-info-section {
-    padding-top: var(--space-6, 24px);
-    padding-bottom: var(--space-4, 16px);
+    padding: var(--space-6, 24px) 0 var(--space-4, 16px);
 }
 
 .zakat-info-banner {
@@ -150,9 +121,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-5, 20px);
-
     padding: var(--space-5, 20px);
-
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -168,32 +137,25 @@
 .zakat-info-icon {
     width: 44px;
     height: 44px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-
     border-radius: var(--radius-md);
     background: var(--primary-light);
     color: var(--primary);
-
     font-size: var(--fs-sm);
 }
 
 .zakat-info-main strong {
     display: block;
-
     margin-bottom: var(--space-1, 4px);
-
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
 }
-
 .zakat-info-main p {
     margin: 0;
-
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.65;
@@ -204,7 +166,6 @@
     align-items: center;
     gap: var(--space-2, 8px);
     flex-shrink: 0;
-
     color: var(--primary);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
@@ -212,8 +173,7 @@
 
 /* MAIN LAYOUT */
 .zakat-calculator-section {
-    padding-top: var(--space-8, 32px);
-    padding-bottom: var(--space-16, 64px);
+    padding: var(--space-8, 32px) 0 var(--space-16, 64px);
 }
 
 .zakat-calculator-layout {
@@ -240,39 +200,32 @@
     display: flex;
     align-items: flex-start;
     gap: var(--space-4, 16px);
-
     margin-bottom: var(--space-6, 24px);
 }
 
 .zakat-step {
     width: 42px;
     height: 42px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-
     border-radius: var(--radius-full);
     background: var(--primary);
     color: var(--bg);
-
     font-size: var(--fs-xs);
     font-weight: var(--fw-extrabold);
 }
 
 .zakat-panel-header h2 {
     margin: 0 0 var(--space-2, 8px);
-
     color: var(--text-dark);
     font-size: var(--fs-md);
     font-weight: var(--fw-extrabold);
     line-height: 1.3;
 }
-
 .zakat-panel-header p {
     margin: 0;
-
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.7;
@@ -283,7 +236,6 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-4, 16px);
-
     margin-bottom: var(--space-7, 28px);
 }
 
@@ -291,28 +243,22 @@
     display: flex;
     align-items: flex-start;
     gap: var(--space-3, 12px);
-
     min-height: 112px;
     padding: var(--space-4, 16px);
-
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-soft);
     color: var(--text-dark);
-
     font-family: inherit;
     text-align: left;
     cursor: pointer;
-
     transition: .2s ease;
 }
-
 .zakat-tab:hover {
     border-color: var(--primary);
     background: var(--primary-light);
     transform: translateY(-2px);
 }
-
 .zakat-tab.active {
     border-color: var(--primary);
     background: var(--primary);
@@ -323,19 +269,15 @@
 .zakat-tab-icon {
     width: 40px;
     height: 40px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-
     border-radius: var(--radius-md);
     background: var(--bg);
     color: var(--primary);
-
     font-size: var(--fs-sm);
 }
-
 .zakat-tab.active .zakat-tab-icon {
     background: rgba(255, 255, 255, .16);
     color: var(--bg);
@@ -343,22 +285,17 @@
 
 .zakat-tab-content strong {
     display: block;
-
     margin-bottom: var(--space-1, 4px);
-
     font-size: var(--fs-xs);
     font-weight: var(--fw-extrabold);
     line-height: 1.35;
 }
-
 .zakat-tab-content small {
     display: block;
-
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.55;
 }
-
 .zakat-tab.active small {
     color: rgba(255, 255, 255, .82);
 }
@@ -374,17 +311,14 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: var(--space-5, 20px);
-
     margin-bottom: var(--space-6, 24px);
 }
 
 .zakat-form-label {
     margin-bottom: var(--space-2, 8px);
 }
-
 .zakat-form-head h3 {
     margin: 0;
-
     color: var(--text-dark);
     font-size: var(--fs-sm);
     font-weight: var(--fw-extrabold);
@@ -393,27 +327,20 @@
 
 .zakat-nisab-box {
     min-width: 180px;
-
     padding: var(--space-4, 16px);
-
     background: var(--secondary-light);
     border: 1px solid rgba(245, 158, 11, .18);
     border-radius: var(--radius-md);
 }
-
 .zakat-nisab-box strong {
     display: block;
-
     margin-bottom: var(--space-1, 4px);
-
     color: var(--secondary);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
 }
-
 .zakat-nisab-box span {
     display: block;
-
     color: var(--text-dark);
     font-size: var(--fs-xxs);
     line-height: 1.55;
@@ -430,11 +357,9 @@
     flex-direction: column;
     gap: var(--space-2, 8px);
 }
-
 .zakat-field-full {
     grid-column: 1 / -1;
 }
-
 .zakat-field label,
 .zakat-field-title {
     color: var(--text-dark);
@@ -445,13 +370,11 @@
 .zakat-input-wrap {
     position: relative;
 }
-
 .zakat-input-prefix {
     position: absolute;
     left: var(--space-4, 16px);
     top: 50%;
     transform: translateY(-50%);
-
     color: var(--muted);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
@@ -460,32 +383,25 @@
 .zakat-input-wrap input {
     width: 100%;
     height: 48px;
-
     padding: 0 var(--space-4, 16px);
-
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-soft);
     color: var(--text-dark);
-
     font-family: inherit;
     font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
-
     outline: none;
     transition: .2s ease;
 }
-
 .zakat-input-wrap.has-prefix input {
     padding-left: 48px;
 }
-
 .zakat-input-wrap input:focus {
     background: var(--bg);
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(51, 101, 175, .10);
 }
-
 .zakat-field small {
     color: var(--muted);
     font-size: var(--fs-xxs);
@@ -496,34 +412,26 @@
     display: flex;
     justify-content: space-between;
     gap: var(--space-5, 20px);
-
     margin-top: var(--space-6, 24px);
     padding: var(--space-5, 20px);
-
     border-radius: var(--radius-md);
     background: var(--primary-light);
 }
-
 .zakat-live-preview span {
     display: block;
-
     margin-bottom: var(--space-1, 4px);
-
     color: var(--primary);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
 }
-
 .zakat-live-preview strong {
     color: var(--primary);
     font-size: var(--fs-md);
     font-weight: var(--fw-extrabold);
 }
-
 .zakat-live-preview p {
     max-width: 320px;
     margin: 0;
-
     color: var(--text);
     font-size: var(--fs-xxs);
     line-height: 1.65;
@@ -532,27 +440,21 @@
 .zakat-submit-button {
     width: 100%;
     min-height: 50px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-2, 8px);
-
     margin-top: var(--space-6, 24px);
-
     border: none;
     border-radius: var(--radius-full);
     background: var(--primary);
     color: var(--bg);
-
     font-family: inherit;
     font-size: var(--fs-xs);
     font-weight: var(--fw-extrabold);
-
     cursor: pointer;
     transition: .2s ease;
 }
-
 .zakat-submit-button:hover {
     background: var(--primary-hover);
     transform: translateY(-2px);
@@ -562,7 +464,6 @@
 .zakat-result-area {
     position: sticky;
     top: 104px;
-
     display: flex;
     flex-direction: column;
     gap: var(--space-5, 20px);
@@ -570,24 +471,35 @@
 
 .zakat-result-card {
     padding: var(--space-6, 24px);
+    position: relative;
+    overflow: hidden;
+}
+.zakat-result-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 7px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+.zakat-result-card.is-empty::before {
+    background: var(--border);
 }
 
 .zakat-result-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-4, 16px);
-
     margin-bottom: var(--space-6, 24px);
 }
 
 .zakat-result-label {
     margin-bottom: var(--space-2, 8px);
 }
-
 .zakat-result-header h2 {
     margin: 0;
-
     color: var(--text-dark);
     font-size: var(--fs-sm);
     font-weight: var(--fw-extrabold);
@@ -597,39 +509,31 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    min-width: 52px;
-    height: 34px;
-
+    min-width: 58px;
+    height: 36px;
     border-radius: var(--radius-full);
-    background: var(--secondary-light);
-    color: var(--secondary);
-
+    background: var(--primary-light);
+    color: var(--primary);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-extrabold);
 }
 
 .zakat-result-title {
     margin: 0 0 var(--space-2, 8px);
-
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.6;
 }
-
 .zakat-result-amount {
     margin: 0 0 var(--space-2, 8px);
-
     color: var(--primary);
-    font-size: var(--fs-xl);
+    font-size: clamp(28px, 4vw, 42px);
     font-weight: var(--fw-extrabold);
     line-height: 1.15;
     letter-spacing: -.04em;
 }
-
 .zakat-result-subtitle {
     margin: 0 0 var(--space-6, 24px);
-
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.6;
@@ -637,9 +541,9 @@
 
 .zakat-result-detail {
     overflow: hidden;
-
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
+    margin-top: var(--space-6, 24px);
 }
 
 .zakat-result-row {
@@ -647,37 +551,30 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4, 16px);
-
     padding: var(--space-4, 16px);
-
     border-bottom: 1px solid var(--border-soft);
 }
-
 .zakat-result-row:last-child {
     border-bottom: none;
 }
-
 .zakat-result-row span {
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.5;
 }
-
 .zakat-result-row strong {
     color: var(--text-dark);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
     text-align: right;
 }
-
 .zakat-result-row.total {
-    background: var(--primary-light);
+    background: linear-gradient(90deg, var(--primary-light), var(--bg));
 }
 
 .text-danger {
     color: var(--danger) !important;
 }
-
 .text-success {
     color: var(--success) !important;
 }
@@ -685,83 +582,65 @@
 .zakat-law-card {
     display: flex;
     gap: var(--space-4, 16px);
-
     margin-top: var(--space-5, 20px);
     padding: var(--space-4, 16px);
-
     background: var(--bg-soft);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
 }
-
 .zakat-law-card > span {
     width: 40px;
     height: 40px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-
     border-radius: var(--radius-md);
     background: var(--primary-light);
     color: var(--primary);
-
     font-size: var(--fs-sm);
 }
-
 .zakat-law-card h4 {
     margin: 0 0 var(--space-1, 4px);
-
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-extrabold);
 }
-
 .zakat-law-card p {
     margin: 0;
-
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.65;
 }
 
 .zakat-empty-state {
-    min-height: 280px;
-
+    min-height: 320px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: var(--space-4, 16px);
-
     text-align: center;
 }
-
 .zakat-empty-state span {
     width: 76px;
     height: 76px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     border-radius: var(--radius-full);
     background: var(--primary-light);
     color: var(--primary);
-
     font-size: var(--fs-xl);
+    box-shadow: 0 14px 35px rgba(51, 101, 175, .16);
 }
-
 .zakat-empty-state p {
     max-width: 260px;
     margin: 0;
-
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.7;
 }
-
 .zakat-empty-state strong {
     color: var(--primary);
 }
@@ -769,18 +648,14 @@
 .zakat-action-card {
     padding: var(--space-6, 24px);
 }
-
 .zakat-action-card h3 {
     margin: 0 0 var(--space-2, 8px);
-
     color: var(--text-dark);
     font-size: var(--fs-sm);
     font-weight: var(--fw-extrabold);
 }
-
 .zakat-action-card p {
     margin: 0 0 var(--space-5, 20px);
-
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.65;
@@ -790,40 +665,31 @@
 .zakat-print-button {
     width: 100%;
     min-height: 46px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-2, 8px);
-
     border-radius: var(--radius-full);
-
     font-family: inherit;
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-
     cursor: pointer;
     transition: .2s ease;
 }
-
 .zakat-pay-button {
     margin-bottom: var(--space-3, 12px);
-
     background: var(--primary);
     color: var(--bg);
 }
-
 .zakat-pay-button:hover {
     background: var(--primary-hover);
     color: var(--bg);
 }
-
 .zakat-print-button {
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--primary);
 }
-
 .zakat-print-button:hover {
     border-color: var(--primary);
     background: var(--primary-light);
@@ -831,9 +697,7 @@
 
 /* TERMS */
 .zakat-terms-section {
-    padding-top: var(--space-14, 56px);
-    padding-bottom: var(--space-16, 64px);
-
+    padding: var(--space-14, 56px) 0 var(--space-16, 64px);
     background: var(--bg);
     border-top: 1px solid var(--border-soft);
 }
@@ -842,20 +706,16 @@
     max-width: 760px;
     margin-bottom: var(--space-10, 40px);
 }
-
 .zakat-section-heading h2 {
     margin: 0 0 var(--space-3, 12px);
-
     color: var(--text-dark);
     font-size: var(--fs-lg);
     font-weight: var(--fw-extrabold);
     line-height: 1.2;
     letter-spacing: -.03em;
 }
-
 .zakat-section-heading p {
     margin: 0;
-
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.8;
@@ -869,50 +729,55 @@
 
 .zakat-term-card {
     padding: var(--space-6, 24px);
-
     background: var(--bg-soft);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     transition: .2s ease;
 }
-
 .zakat-term-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-card);
 }
-
 .zakat-term-card > span {
     width: 52px;
     height: 52px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     margin-bottom: var(--space-4, 16px);
-
     border-radius: var(--radius-md);
     background: var(--primary-light);
     color: var(--primary);
-
     font-size: var(--fs-md);
 }
-
 .zakat-term-card h3 {
     margin: 0 0 var(--space-2, 8px);
-
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-extrabold);
     line-height: 1.4;
 }
-
 .zakat-term-card p {
     margin: 0;
-
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.7;
+}
+
+/* ANIMATIONS */
+@keyframes zakatFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.zakat-action-card,
+.zakat-result-content {
+    animation: zakatFadeUp .25s ease;
 }
 
 /* RESPONSIVE */
@@ -921,11 +786,9 @@
     .zakat-calculator-layout {
         grid-template-columns: 1fr;
     }
-
     .zakat-result-area {
         position: static;
     }
-
     .zakat-terms-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -933,221 +796,79 @@
 
 @media (max-width: 768px) {
     .zakat-hero {
-        padding-top: var(--space-8, 32px);
-        padding-bottom: var(--space-9, 36px);
+        padding: var(--space-8, 32px) 0 var(--space-9, 36px);
     }
-
     .zakat-hero h1 {
         font-size: var(--fs-lg);
         line-height: 1.18;
     }
-
     .zakat-hero p {
         font-size: var(--fs-xxs);
         line-height: 1.75;
     }
-
     .zakat-hero-image {
         min-height: 220px;
         border-radius: var(--radius-md);
     }
-
     .zakat-info-banner {
         align-items: flex-start;
         flex-direction: column;
     }
-
     .zakat-calculator-section {
-        padding-top: var(--space-6, 24px);
-        padding-bottom: var(--space-12, 48px);
+        padding: var(--space-6, 24px) 0 var(--space-12, 48px);
     }
-
     .zakat-panel,
     .zakat-result-card,
     .zakat-action-card {
         border-radius: var(--radius-md);
     }
-
     .zakat-panel {
         padding: var(--space-5, 20px);
     }
-
     .zakat-tabs {
         grid-template-columns: 1fr;
         gap: var(--space-3, 12px);
     }
-
     .zakat-tab {
         min-height: auto;
     }
-
     .zakat-form-head {
         flex-direction: column;
     }
-
     .zakat-nisab-box {
         width: 100%;
         min-width: 0;
     }
-
     .zakat-fields {
         grid-template-columns: 1fr;
     }
-
     .zakat-live-preview {
         flex-direction: column;
     }
-
     .zakat-result-amount {
         font-size: var(--fs-lg);
     }
-
     .zakat-terms-section {
-        padding-top: var(--space-10, 40px);
-        padding-bottom: calc(var(--space-12, 48px) + 86px);
+        padding: var(--space-10, 40px) 0 calc(var(--space-12, 48px) + 86px);
     }
-
     .zakat-section-heading {
         margin-bottom: var(--space-7, 28px);
     }
-
     .zakat-section-heading h2 {
         font-size: var(--fs-md);
     }
-
     .zakat-section-heading p {
         font-size: var(--fs-xxs);
     }
-
     .zakat-terms-grid {
         grid-template-columns: 1fr;
     }
-}
-
-/* ============================
-   KALKULATOR ZAKAT - UI IMPROVEMENT
-   ============================ */
-
-.zakat-result-card {
-    position: relative;
-    overflow: hidden;
-}
-
-.zakat-result-card::before {
-    content: "";
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-
-    height: 7px;
-
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-}
-
-.zakat-result-card.is-empty::before {
-    background: var(--border);
-}
-
-.zakat-result-header {
-    align-items: center;
-}
-
-.zakat-result-badge {
-    min-width: 58px;
-    height: 36px;
-
-    border-radius: var(--radius-full);
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-.zakat-result-amount {
-    font-size: clamp(28px, 4vw, 42px);
-}
-
-.zakat-result-detail {
-    margin-top: var(--space-6, 24px);
-}
-
-.zakat-result-row.total {
-    background: linear-gradient(90deg, var(--primary-light), var(--bg));
-}
-
-.zakat-empty-state {
-    min-height: 320px;
-}
-
-.zakat-empty-state span {
-    box-shadow: 0 14px 35px rgba(51, 101, 175, .16);
-}
-
-.zakat-live-preview {
-    border: 1px solid rgba(51, 101, 175, .14);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .55);
-}
-
-.zakat-input-wrap input {
-    letter-spacing: .01em;
-}
-
-.zakat-input-wrap input::placeholder {
-    color: var(--muted);
-}
-
-.zakat-tab {
-    position: relative;
-    overflow: hidden;
-}
-
-.zakat-tab::after {
-    content: "";
-
-    position: absolute;
-    inset: auto 16px 12px 16px;
-
-    height: 3px;
-
-    border-radius: var(--radius-full);
-    background: transparent;
-
-    transition: .2s ease;
-}
-
-.zakat-tab.active::after {
-    background: rgba(255, 255, 255, .7);
-}
-
-.zakat-action-card {
-    animation: zakatFadeUp .25s ease;
-}
-
-.zakat-result-content {
-    animation: zakatFadeUp .25s ease;
-}
-
-@keyframes zakatFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media (max-width: 768px) {
     .zakat-result-card::before {
         height: 6px;
     }
-
     .zakat-empty-state {
         min-height: 240px;
     }
-
     .zakat-result-amount {
         font-size: var(--fs-lg);
     }

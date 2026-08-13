@@ -20,59 +20,71 @@ class HomeController extends Controller
 
         $now = Carbon::now();
 
-        // ================================================
-        // SEMUA CAMPAIGN AKTIF (belum berakhir)
-        // ================================================
-        $campaigns = Campaign::with(['penggalangDana', 'donasi'])
+        // tampilkan campaign aktif
+        $query = Campaign::with(['penggalangDana', 'donasi.pembayaran', 'kategori', 'filter'])
             ->where('is_active', true)
             ->where('tanggal_mulai', '<=', $now)
-            ->where('tanggal_berakhir', '>=', $now)
+            ->where('tanggal_berakhir', '>=', $now);
+
+        // Hanya tampilkan campaign yang approved atau regular
+        $query->where(function ($q) {
+            $q->where('campaign_type', 'regular')
+                ->orWhere('approval_status', 'approved')
+                ->orWhereNull('approval_status');
+        });
+
+        $heroCampaigns = Campaign::with(['penggalangDana', 'donasi.pembayaran'])
+        ->where('is_active', true)
+        ->where('campaign_type', 'emergency')
+        ->where('approval_status', 'approved')
+        ->where('tanggal_mulai', '<=', $now)
+        ->where('tanggal_berakhir', '>=', $now)
+        ->latest()
+        ->take(5)
+        ->get();
+
+        // DARURAT (emergency + approved + aktif)
+        $darurat = (clone $query)
+            ->where('campaign_type', 'emergency')
+            ->where('approval_status', 'approved')
             ->latest()
+            ->take(8)
             ->get();
+
+        // PEMBERDAYAAN (sustainable + approved + aktif)
+        $pemberdayaan = (clone $query)
+            ->where('campaign_type', 'sustainable')
+            ->where('approval_status', 'approved')
+            ->latest()
+            ->take(8)
+            ->get();
+
+        // CAMPAIGN TERBARU (2 item untuk grid kecil)
+        $campaignTerbaru = (clone $query)
+            ->latest()
+            ->take(2)
+            ->get();
+
+        $campaigns = (clone $query)
+            ->where('campaign_type', 'regular')
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
 
         if ($request->filled('kategori')) {
             $campaigns = $campaigns->where('kategori_id', $request->kategori);
         }
-
-        // ================================================
-        // DARURAT (emergency + approved + aktif)
-        // ================================================
-        $campaignDarurat = Campaign::with(['penggalangDana', 'donasi'])
-            ->emergency()
-            ->where('tanggal_mulai', '<=', $now)
-            ->where('tanggal_berakhir', '>=', $now)
-            ->latest()
-            ->get();
-
-        // ================================================
-        // BERKELANJUTAN (sustainable + approved + aktif)
-        // ================================================
-        $campaignBerkelanjutan = Campaign::with(['penggalangDana', 'donasi'])
-            ->sustainable()
-            ->where('tanggal_mulai', '<=', $now)
-            ->where('tanggal_berakhir', '>=', $now)
-            ->latest()
-            ->get();
-
-        // ================================================
-        // TERBARU (hanya 2, aktif)
-        // ================================================
-        $campaignTerbaru = Campaign::with(['penggalangDana'])
-            ->where('is_active', true)
-            ->where('tanggal_mulai', '<=', $now)
-            ->where('tanggal_berakhir', '>=', $now)
-            ->latest()
-            ->take(2)
-            ->get();
 
         return view('pages.home', compact(
             'testimoni',
             'kategori',
             'berita',
             'campaigns',
-            'campaignDarurat',
-            'campaignBerkelanjutan',
-            'campaignTerbaru'
+            'heroCampaigns',
+            'darurat',
+            'pemberdayaan',
+            'campaignTerbaru',
+            'campaigns'
         ));
     }
 }

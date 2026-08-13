@@ -61,7 +61,6 @@ class RiwayatDonasiController extends Controller
 
     public function kwitansi(Donasi $donasi)
     {
-        // Pastikan hanya pemilik donasi yang bisa akses
         if ($donasi->user_id !== auth()->id()) {
             abort(403);
         }

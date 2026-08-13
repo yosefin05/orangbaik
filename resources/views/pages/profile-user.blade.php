@@ -20,6 +20,17 @@
         $penggalang = $user->penggalangDana;
         $penggalangStatus = $penggalang?->status;
         $avatarInitial = strtoupper(substr($user->name ?? 'U', 0, 1));
+
+        // 🔥🔥🔥 AMBIL DATA DONASI LANGSUNG DI SINI 🔥🔥🔥
+        use App\Models\Donasi;
+        $donasiSettlement = Donasi::where('user_id', $user->id)
+            ->whereHas('pembayaran', function ($q) {
+                $q->where('transaction_status', 'settlement');
+            })
+            ->get();
+
+        $totalDonasi = $donasiSettlement->sum('nominal');
+        $jumlahDonasi = $donasiSettlement->count();
     @endphp
 
     <main class="profile-page">

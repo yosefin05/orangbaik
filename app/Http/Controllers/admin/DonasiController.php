@@ -11,9 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class DonasiController extends Controller
 {
-    /**
-     * Display a listing of the donations.
-     */
+    
     public function index(Request $request)
     {
         $query = Donasi::with(['campaign', 'user', 'pembayaran']);
@@ -38,7 +36,7 @@ class DonasiController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        // Search by nama donatur or email
+        // Search by nama donatur, email, atau nomor hp
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -55,9 +53,7 @@ class DonasiController extends Controller
         return view('admin.donasi.index', compact('donasi', 'campaigns', 'statuses'));
     }
 
-    /**
-     * Show the form for creating a new donation (manual input by admin).
-     */
+    
     public function create()
     {
         $campaigns = Campaign::where('is_active', true)->get();
@@ -65,9 +61,6 @@ class DonasiController extends Controller
         return view('admin.donasi.create', compact('campaigns', 'users'));
     }
 
-    /**
-     * Store a newly created donation.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -87,7 +80,6 @@ class DonasiController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create donation
             $donasi = Donasi::create([
                 'campaign_id' => $request->campaign_id,
                 'user_id' => $request->user_id,
@@ -99,7 +91,6 @@ class DonasiController extends Controller
                 'is_anonim' => $request->boolean('is_anonim'),
             ]);
 
-            // Create payment
             $donasi->pembayaran()->create([
                 'order_id' => 'ADMIN-' . time() . '-' . $donasi->id,
                 'transaction_status' => $request->transaction_status,
@@ -119,18 +110,12 @@ class DonasiController extends Controller
         }
     }
 
-    /**
-     * Display the specified donation.
-     */
     public function show($id)
     {
         $donasi = Donasi::with(['campaign', 'user', 'pembayaran'])->findOrFail($id);
         return view('admin.donasi.show', compact('donasi'));
     }
 
-    /**
-     * Show the form for editing the specified donation.
-     */
     public function edit($id)
     {
         $donasi = Donasi::with('pembayaran')->findOrFail($id);
@@ -141,9 +126,6 @@ class DonasiController extends Controller
         return view('admin.donasi.edit', compact('donasi', 'campaigns', 'users', 'statuses'));
     }
 
-    /**
-     * Update the specified donation.
-     */
     public function update(Request $request, $id)
     {
         $donasi = Donasi::with('pembayaran')->findOrFail($id);
@@ -165,7 +147,6 @@ class DonasiController extends Controller
         DB::beginTransaction();
 
         try {
-            // Update donation
             $donasi->update([
                 'campaign_id' => $request->campaign_id,
                 'user_id' => $request->user_id,
@@ -177,7 +158,6 @@ class DonasiController extends Controller
                 'is_anonim' => $request->boolean('is_anonim'),
             ]);
 
-            // Update payment
             $donasi->pembayaran->update([
                 'transaction_status' => $request->transaction_status,
                 'payment_type' => $request->payment_type ?? $donasi->pembayaran->payment_type,
@@ -195,9 +175,6 @@ class DonasiController extends Controller
         }
     }
 
-    /**
-     * Remove the specified donation.
-     */
     public function destroy($id)
     {
         $donasi = Donasi::findOrFail($id);
@@ -207,9 +184,6 @@ class DonasiController extends Controller
             ->with('success', 'Donasi berhasil dihapus!');
     }
 
-    /**
-     * Export donations to CSV
-     */
     public function export(Request $request)
     {
         $query = Donasi::with(['campaign', 'user', 'pembayaran']);

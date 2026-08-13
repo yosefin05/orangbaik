@@ -22,7 +22,7 @@
             <div class="container hero-layout">
 
                 <div class="hero-card hero-main-slider">
-                    @foreach ($campaigns as $index => $campaign)
+                    @foreach ($heroCampaigns as $index => $campaign)
                         <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
                             <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
                                 <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}">
@@ -103,7 +103,7 @@
                 </h2>
 
                 <div class="campaign-grid">
-                    @forelse ($campaignDarurat as $campaign)
+                    @forelse ($darurat as $campaign)
                         @php
                             // HANYA donasi dengan status SETTLEMENT
                             $donasiSettlement = $campaign->donasi->filter(function($donasi) {
@@ -210,7 +210,7 @@
                 <h2 class="section-title">Pemberdayaan Berkelanjutan</h2>
 
                 <div class="campaign-grid">
-                    @forelse ($campaignBerkelanjutan as $campaign)
+                    @forelse ($pemberdayaan as $campaign)
                         @php
                             // HANYA donasi dengan status SETTLEMENT
                             $donasiSettlement = $campaign->donasi->filter(function($donasi) {
@@ -263,6 +263,68 @@
                         </article>
                     @empty
                         <p>Belum ada campaign berkelanjutan.</p>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+        <section class="section section-border">
+            <div class="container">
+                <h2 class="section-title">Campaign Lainnya</h2>
+
+                <div class="campaign-grid">
+                    @forelse ($campaigns as $campaign)
+                        @php
+                            // HANYA donasi dengan status SETTLEMENT
+                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                            });
+                            $terkumpul = $donasiSettlement->sum('nominal');
+                            $totalDonatur = $donasiSettlement->count();
+                            $persen = $campaign->target_donasi
+                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                : 0;
+
+                            // ♻️ SAMA PERSIS DENGAN DARURAT
+                            $now = \Carbon\Carbon::now();
+                            $end = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
+                            $diff = (int) $now->diffInDays($end, false);
+
+                            if ($diff < 0) {
+                                $labelHari = 'Selesai';
+                            } elseif ($diff == 0) {
+                                $labelHari = 'Hari terakhir';
+                            } else {
+                                $labelHari = $diff . ' Hari';
+                            }
+                        @endphp
+                        <article class="campaign-card">
+                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
+                                <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                    alt="{{ $campaign->judul }}" loading="lazy">
+                            </a>
+                            <div class="campaign-body">
+                                <h3>{{ $campaign->judul }}</h3>
+                                <p>
+                                    {{ $campaign->penggalangDana->nama_penggalang }}
+                                    <span>●</span>
+                                </p>
+                                <div class="campaign-price">
+                                    <strong>
+                                        Rp {{ number_format($terkumpul, 0, ',', '.') }}
+                                    </strong>
+                                    <span>Terkumpul</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
+                                </div>
+                                <div class="campaign-meta">
+                                    <span>{{ $totalDonatur }} Donatur</span>
+                                    <span>{{ $labelHari }}</span>
+                                </div>
+                            </div>
+                        </article>
+                    @empty
+                        <p>Belum ada campaign lainnya.</p>
                     @endforelse
                 </div>
             </div>

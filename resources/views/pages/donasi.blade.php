@@ -23,7 +23,12 @@
                     <div class="filter-top">
                         <div class="filter-left">
                             <span class="filter-icon">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="4" y1="6" x2="20" y2="6" />
+                                    <line x1="8" y1="12" x2="16" y2="12" />
+                                    <line x1="11" y1="18" x2="13" y2="18" />
+                                </svg>
                             </span>
                             <span class="filter-label">Filter</span>
                         </div>
@@ -31,14 +36,34 @@
                             <div class="filter-select-wrap">
                                 <select name="jenis" id="jenis" onchange="this.form.submit()">
                                     <option value="">Semua Penggalang</option>
-                                    <option value="individu" {{ request('jenis') == 'individu' ? 'selected' : '' }}>Individu</option>
-                                    <option value="organisasi" {{ request('jenis') == 'organisasi' ? 'selected' : '' }}>Organisasi</option>
+                                    <option value="individu" {{ request('jenis') == 'individu' ? 'selected' : '' }}>
+                                        Individu</option>
+                                    <option value="organisasi" {{ request('jenis') == 'organisasi' ? 'selected' : '' }}>
+                                        Organisasi</option>
                                 </select>
-                                <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                                <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </div>
+                            {{-- Filter Nama Penggalang Dana --}}
+                            <div class="filter-select-wrap">
+                                <select name="penggalang_id" id="penggalang_id" onchange="this.form.submit()">
+                                    <option value="">Semua Penggalang Dana</option>
+                                    @foreach ($penggalangDana as $penggalang)
+                                        <option value="{{ $penggalang->id }}" {{ request('penggalang_id') == $penggalang->id ? 'selected' : '' }}>
+                                            {{ $penggalang->nama_penggalang }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
                             </div>
                             <div class="filter-chips">
                                 @foreach ($filters as $filter)
-                                    @php $isChecked = in_array($filter->id, (array)$selectedFilterIds); @endphp
+                                    @php $isChecked = in_array($filter->id, (array) $selectedFilterIds); @endphp
                                     <label class="filter-chip {{ $isChecked ? 'active' : '' }}">
                                         <input type="checkbox" name="filter_ids[]" value="{{ $filter->id }}" {{ $isChecked ? 'checked' : '' }} onchange="this.form.submit()">
                                         {{ $filter->nama_filter }}
@@ -49,7 +74,11 @@
                     </div>
                     @if(request()->hasAny(['jenis', 'filter_ids', 'kategori']))
                         <a href="{{ route('donasi') }}" class="filter-reset">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
                             Reset
                         </a>
                     @endif
@@ -120,7 +149,7 @@
                         @forelse ($darurat as $campaign)
                             @php
                                 // HANYA donasi dengan status SETTLEMENT
-                                $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
                                     return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
                                 });
                                 $terkumpul = $donasiSettlement->sum('nominal');
@@ -190,7 +219,7 @@
                     @forelse ($campaignTerbaru as $campaign)
                         @php
                             // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
                                 return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
                             });
                             $terkumpul = $donasiSettlement->sum('nominal');
@@ -200,7 +229,8 @@
                                 : 0;
                         @endphp
                         <a href="{{ route('campaign.show', ['slug' => $campaign->slug]) }}" class="donasi-new-item">
-                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}" loading="lazy">
+                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
+                                loading="lazy">
                             <div class="donasi-new-overlay">
                                 <h3>{{ $campaign->judul }}</h3>
                                 <p>{{ $campaign->penggalangDana->nama_penggalang }}</p>
@@ -240,7 +270,7 @@
                         @forelse ($pemberdayaan as $campaign)
                             @php
                                 // HANYA donasi dengan status SETTLEMENT
-                                $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                                $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
                                     return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
                                 });
                                 $terkumpul = $donasiSettlement->sum('nominal');
@@ -288,7 +318,75 @@
                             </article>
 
                         @empty
-                            <p>Belum ada campaign berkelanjutan.</p>
+                            <p>Belum ada campaign lainnya.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="donasi-border donasi-section">
+            <div class="container">
+
+                <h2 class="donasi-section-title">
+                    Campaign Lainnya
+                </h2>
+
+                <div class="campaign-carousel">
+                    <div class="donasi-card-grid">
+
+                        @forelse ($campaigns as $campaign)
+                            @php
+                                // HANYA donasi dengan status SETTLEMENT
+                                $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
+                                    return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                                });
+                                $terkumpul = $donasiSettlement->sum('nominal');
+                                $totalDonatur = $donasiSettlement->count();
+                                $persen = $campaign->target_donasi
+                                    ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                    : 0;
+                                $hari = max(
+                                    0,
+                                    (int) now()->diffInDays($campaign->tanggal_berakhir, false)
+                                );
+                            @endphp
+
+                            <article class="donasi-card">
+                                <a href="{{ route('campaign.show', $campaign->slug) }}">
+                                    <img class="donasi-card-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                        alt="{{ $campaign->judul }}" loading="lazy">
+
+                                    <div class="donasi-card-body">
+                                        <h3>{{ $campaign->judul }}</h3>
+
+                                        <p class="donasi-organizer">
+                                            {{ $campaign->penggalangDana->nama_penggalang }}
+                                            <span>●</span>
+                                        </p>
+
+                                        <div class="donasi-amount">
+                                            <strong>
+                                                Rp {{ number_format($terkumpul, 0, ',', '.') }}
+                                            </strong>
+                                            <span>Terkumpul</span>
+                                        </div>
+
+                                        <div class="donasi-progress">
+                                            <div class="donasi-progress-fill" style="width: {{ $persen }}%;">
+                                            </div>
+                                        </div>
+
+                                        <div class="donasi-meta">
+                                            <span>{{ $totalDonatur }} Donatur</span>
+                                            <span>{{ $hari }} Hari</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </article>
+
+                        @empty
+                            <p>Belum ada campaign darurat.</p>
                         @endforelse
 
                     </div>
@@ -298,7 +396,7 @@
         </section>
     </main>
 
-     <!-- FLOATING WHATSAPP BUTTON -->
+    <!-- FLOATING WHATSAPP BUTTON -->
     @if(env('ENABLE_WA_FLOATING', true))
         <div class="floating-wa-container">
             <a href="https://wa.me/{{ env('WHATSAPP_NUMBER', '6281385002300') }}?text={{ urlencode(env('WHATSAPP_MESSAGE', 'Halo tim OrangBaik.id, saya mau bertanya mengenai...')) }}"
@@ -318,4 +416,4 @@
 
 </body>
 
-</html> 
+</html>

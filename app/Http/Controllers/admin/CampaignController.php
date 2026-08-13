@@ -35,13 +35,12 @@ class CampaignController extends Controller
             'campaignFilter.filter',
             'campaignUpdates.user',
             'campaignFundraisers.user',
-            'packages', // tambahin packages
+            'packages', 
             'verifier',
-            'approvedBy' // tambahin approvedBy
+            'approvedBy' 
         ]);
 
         $campaign->updateActiveStatus();
-
 
         return view(
             'admin.campaign.show',
@@ -61,9 +60,7 @@ class CampaignController extends Controller
         return view('admin.campaign.emergency-approval', compact('pendingCampaigns'));
     }
 
-    /**
-     * Menyetujui campaign emergency/sustainable
-     */
+    // untuk approve campaign emergency/sustainable
     public function approve(Campaign $campaign)
     {
         // Check if campaign needs approval
@@ -71,7 +68,6 @@ class CampaignController extends Controller
             return back()->with('error', 'Campaign ini tidak membutuhkan approval.');
         }
 
-        // Check if already approved
         if ($campaign->approval_status === 'approved') {
             return back()->with('error', 'Campaign ini sudah disetujui.');
         }
@@ -85,9 +81,7 @@ class CampaignController extends Controller
         return back()->with('success', 'Campaign berhasil disetujui.');
     }
 
-    /**
-     * Menolak campaign emergency/sustainable
-     */
+    // reject campaign emergency/sustainable
     public function reject(Request $request, Campaign $campaign)
     {
         $request->validate([
@@ -106,9 +100,7 @@ class CampaignController extends Controller
         return back()->with('success', 'Campaign berhasil ditolak.');
     }
 
-    /**
-     * Membatalkan approval campaign
-     */
+    // unapprove campaign emergency/sustainable
     public function unapprove(Campaign $campaign)
     {
         if (!in_array($campaign->campaign_type, ['emergency', 'sustainable'])) {
