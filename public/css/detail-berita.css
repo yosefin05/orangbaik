@@ -9,8 +9,8 @@
 
 .detail-news-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 260px;
-    gap: 74px;
+    grid-template-columns: minmax(0, 1fr) 350px;
+    gap: 60px;
     align-items: start;
 }
 
@@ -201,7 +201,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    background: var(--bg-soft);
+    background: var(--bg);
 }
 
 .comment-title {
@@ -217,7 +217,7 @@
 
 .comment-body {
     position: relative;
-    background: var(--bg-soft);
+    background: var(--bg);
 }
 
 .comment-body textarea {
@@ -360,7 +360,13 @@
 .news-sidebar {
     display: flex;
     flex-direction: column;
-    gap: 26px;
+    gap: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    padding: 20px; 
 }
 
 .sidebar-news-card {

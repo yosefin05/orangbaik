@@ -94,6 +94,13 @@
                     <span>Donasi</span>
                 </a>
 
+                {{-- PAYMENT --}}
+                <a href="{{ route('admin.payment.gateway.index') }}"
+                    class="{{ request()->routeIs('admin.payment.*') ? 'active' : '' }}">
+                    <i class="bi bi-credit-card"></i>
+                    <span>Payment</span>
+                </a>
+
                 {{-- Berita --}}
                 <a href="{{ route('admin.berita.index') }}"
                     class="{{ request()->routeIs('admin.berita.*') ? 'active' : '' }}">

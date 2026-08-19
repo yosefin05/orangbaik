@@ -123,6 +123,9 @@
                             <div class="sidebar-news-content">
                                 <h4>{{ Str::limit($news->judul, 55) }}</h4>
                                 <span>
+                                    {{ $news->user->nama ?? 'Admin' }}
+                                </span>
+                                <span>
                                     {{ $news->created_at->translatedFormat('d F Y') }}
                                 </span>
                             </div>

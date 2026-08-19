@@ -16,7 +16,7 @@
         {{-- HERO --}}
         <section class="fundraiser-hero">
             <div class="fundraiser-container">
-                <button class="fundraiser-back" type="button" onclick="window.location='{{ route('profile.user') }}'">
+                <button class="fundraiser-back" type="button" onclick="window.history.back()"">
                     <svg viewBox="0 0 24 24">
                         <path d="M15 18L9 12L15 6" />
                     </svg>
@@ -114,7 +114,7 @@
                             <b>⌄</b>
                         </summary>
                         <div class="paragraph-content">
-                            {!! nl2br(e($penggalang->deskripsi)) !!}
+                            <p>{!! nl2br(e($penggalang->deskripsi)) !!}</p>
                         </div>
                     </details>
 

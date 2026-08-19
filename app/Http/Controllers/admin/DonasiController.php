@@ -112,8 +112,51 @@ class DonasiController extends Controller
 
     public function show($id)
     {
-        $donasi = Donasi::with(['campaign', 'user', 'pembayaran'])->findOrFail($id);
+        $donasi = Donasi::with(['campaign', 'user', 'pembayaran.paymentChannel.gateway'])->findOrFail($id);
         return view('admin.donasi.show', compact('donasi'));
+    }
+
+    /**
+     * Verifikasi (approve) pembayaran transfer manual
+     */
+    public function approveManual($id)
+    {
+        $donasi = Donasi::with('pembayaran')->findOrFail($id);
+
+        if (!$donasi->pembayaran) {
+            return back()->with('error', 'Data pembayaran tidak ditemukan.');
+        }
+
+        $donasi->pembayaran->update([
+            'transaction_status' => 'settlement',
+            'paid_at'            => now(),
+            'rejection_reason'   => null,
+        ]);
+
+        return back()->with('success', 'Pembayaran manual donasi #' . $donasi->id . ' berhasil diverifikasi (Settlement).');
+    }
+
+    /**
+     * Tolak (reject) pembayaran transfer manual
+     */
+    public function rejectManual(Request $request, $id)
+    {
+        $request->validate([
+            'rejection_reason' => 'nullable|string|max:255',
+        ]);
+
+        $donasi = Donasi::with('pembayaran')->findOrFail($id);
+
+        if (!$donasi->pembayaran) {
+            return back()->with('error', 'Data pembayaran tidak ditemukan.');
+        }
+
+        $donasi->pembayaran->update([
+            'transaction_status' => 'failed',
+            'rejection_reason'   => $request->rejection_reason ?? 'Bukti transfer tidak valid atau dana belum masuk.',
+        ]);
+
+        return back()->with('warning', 'Pembayaran manual donasi #' . $donasi->id . ' telah ditolak.');
     }
 
     public function edit($id)

@@ -25,14 +25,11 @@
 
 .profile-banner {
     width: 100%;
-    max-height: 310px;
-
+    max-height: 300px;
     display: block;
     object-fit: contain;
     object-position: center;
-
     margin-inline: auto;
-    padding-bottom: var(--space-8, 32px);
 }
 
 /* ============================

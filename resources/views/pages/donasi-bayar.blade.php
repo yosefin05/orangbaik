@@ -7,6 +7,84 @@
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/donasi-bayar.css') }}">
+    <style>
+        .payment-channels-section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .payment-channels-section h2 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 1rem;
+        }
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 0.75rem;
+        }
+        .channel-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+        .channel-item:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+        .channel-item.selected,
+        .channel-item input[type="radio"]:checked ~ .channel-item-content {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .channel-item input[type="radio"] {
+            margin-right: 0.75rem;
+            accent-color: #2563eb;
+            width: 18px;
+            height: 18px;
+        }
+        .channel-item-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .channel-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .channel-name {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .channel-type {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .channel-provider-tag {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .channel-item input[type="radio"]:checked + .channel-item-content .channel-provider-tag {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+    </style>
 </head>
 <body>
 
@@ -111,6 +189,31 @@
                     </div>
                 </section>
 
+                {{-- METODE PEMBAYARAN --}}
+                <section class="payment-channels-section">
+                    <h2>Pilih Metode Pembayaran</h2>
+                    <div id="error-payment_channel_id" class="error-text" style="display:none; margin-bottom: 0.75rem;"></div>
+
+                    <div class="channel-grid">
+                        @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
+                            @foreach ($paymentChannels as $idx => $channel)
+                                <label class="channel-item">
+                                    <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" {{ $idx === 0 ? 'checked' : '' }}>
+                                    <div class="channel-item-content">
+                                        <div class="channel-info">
+                                            <strong class="channel-name">{{ $channel->name }}</strong>
+                                            <span class="channel-type">{{ $channel->payment_type_label }}</span>
+                                        </div>
+                                        <span class="channel-provider-tag">{{ $channel->gateway?->name }}</span>
+                                    </div>
+                                </label>
+                            @endforeach
+                        @else
+                            <p style="color:#64748b; font-size:0.875rem;">Metode pembayaran belum tersedia.</p>
+                        @endif
+                    </div>
+                </section>
+
                 <section class="donor-card">
                     <p class="donor-title">
                         @if(auth()->check())
@@ -191,13 +294,12 @@
                     </div>
 
                     <div class="payment-method-info">
-                        <strong>💳 Metode Pembayaran</strong>
-                        <p>Pilih metode pembayaran setelah klik "Bayar Sekarang".</p>
-                        <small>Tersedia: Kartu Kredit, Virtual Account, E-Wallet, QRIS, dan lainnya.</small>
+                        <strong>💳 Pembayaran Aman</strong>
+                        <p>Transaksi Anda dilindungi dengan enkripsi keamanan standar perbankan.</p>
                     </div>
 
                     <button class="pay-button" type="button" id="payButton">
-                        🛡 Bayar Sekarang
+                        🛡 Lanjutkan Pembayaran
                     </button>
                     <div id="loading-text" style="display:none;">
                         ⏳ Memproses...
@@ -376,6 +478,11 @@
                     return;
                 }
 
+                if (result.redirect_url) {
+                    window.location.href = result.redirect_url;
+                    return;
+                }
+
                 if (result.snap_token) {
                     snap.pay(result.snap_token, {
                         onSuccess: function(res) {
@@ -393,7 +500,7 @@
                         }
                     });
                 } else {
-                    alert('Gagal mendapatkan token pembayaran.');
+                    alert('Gagal mendapatkan informasi pembayaran.');
                     resetButton();
                 }
 

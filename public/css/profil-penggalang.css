@@ -1,114 +1,20 @@
-.banner-wrapper{
-    width:100%;
-    height:250px;
-    overflow:hidden;
-    border-radius:0;
-}
-
-.penggalang-banner{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-}
-
-.penggalang-summary{
-
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    margin-top:-42px;
-    position:relative;
-    z-index:100;
-    padding:0 4px 22px;
-    border-bottom:1px solid #e5e5e5;
-}
-
-.penggalang-left{
-    display:flex;
-    align-items:flex-end;
-    gap:18px;
-}
-
-.logo-wrapper{
-    width:88px;
-    height:88px;
-    border-radius:50%;
-    background:white;
-    padding:4px;
-    border:1px solid #ddd;
-    flex-shrink:0;
-}
-
-.penggalang-logo{
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    object-fit:cover;
-}
-
-.penggalang-title{
-    margin-bottom:10px;
-}
-
-.penggalang-title h1{
-    margin:0;
-    font-size:20px;
-    font-weight:700;
-    color:#2b5fb8;
-}
-
-.verified-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-top:6px;
-}
-
-.jenis-badge{
-    background:#1f8bff;
-    color:white;
-    font-size:11px;
-    padding:3px 10px;
-    border-radius:20px;
-    font-weight:600;
-}
-
-.penggalang-actions{
-    display:flex;
-    align-items:center;
-    gap:18px;
-    margin-bottom:8px;
-}
-
-.dashboard-link{
-    color:#2b5fb8;
-    text-decoration:none;
-    padding-right:18px;
-    border-right:1px solid #cfcfcf;
-}
-
-.edit-button{
-    background:#356bc6;
-    color:white;
-    text-decoration:none;
-    padding:8px 26px;
-    border-radius:20px;
-    font-weight:600;
-}
-
+/* ============================
+   FUNDRAISER PROFILE PAGE
+   ============================ */
 .fundraiser-profile-page {
     min-height: 100vh;
     background: var(--bg-soft);
-    color: var(--text-dark);
+    color: var(--text);
 }
 
 .fundraiser-container {
-    width: min(100% - 72px, 1120px);
+    width: min(100% - 72px, var(--container));
     margin-inline: auto;
 }
 
-/* HERO */
+/* ============================
+   HERO
+   ============================ */
 .fundraiser-hero {
     background: linear-gradient(180deg, #f4f9ff 0%, #edf6ff 100%);
 }
@@ -117,17 +23,18 @@
     display: inline-flex;
     align-items: center;
     gap: 24px;
-
     border: none;
     background: transparent;
-    color: #050505;
-
+    color: var(--text-dark);
     font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-
+    font-weight: var(--fw-semibold);
     padding-top: 30px;
     margin-bottom: 36px;
     cursor: pointer;
+    transition: color .2s;
+}
+.fundraiser-back:hover {
+    color: var(--primary);
 }
 
 .fundraiser-back svg {
@@ -135,7 +42,7 @@
     height: 28px;
     fill: none;
     stroke: currentColor;
-    stroke-width: 3.2;
+    stroke-width: 2.5;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
@@ -150,22 +57,29 @@
     padding-bottom: 34px;
 }
 
-/* CONTENT */
+/* ============================
+   CONTENT
+   ============================ */
 .fundraiser-content {
     padding: 38px 0 70px;
 }
 
+/* ============================
+   SUMMARY - PAKAI CLASS ASLI
+   ============================ */
 .fundraiser-summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 28px;
-
     padding: 0 34px 34px;
     margin-bottom: 28px;
     border-bottom: 1px solid var(--border);
 }
 
+/* ============================
+   INFO - PAKAI CLASS ASLI
+   ============================ */
 .fundraiser-info {
     display: flex;
     align-items: center;
@@ -176,77 +90,182 @@
     width: 82px;
     height: 82px;
     border-radius: var(--radius-full);
-    object-fit: contain;
+    object-fit: cover;
     background: var(--bg);
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
 }
 
 .fundraiser-info h1 {
     color: var(--primary);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-md);
     font-weight: var(--fw-bold);
-    line-height: 1.2;
-    margin-bottom: 7px;
+    line-height: 1.3;
+    margin-bottom: 8px;
 }
 
 .verified-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #a3a3a3;
+    color: var(--muted-light);
     font-size: var(--fs-xxs);
-    font-style: italic;
+    font-weight: var(--fw-regular);
 }
 
+/* ============================
+   BADGE ORGANISASI
+   ============================ */
 .org-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     height: 22px;
-    padding: 0 8px;
-
+    padding: 0 10px;
     background: #e8f3ff;
-    color: #1684e8;
+    color: var(--primary);
     border-radius: var(--radius-full);
-
-    font-size: 10px;
-    font-weight: var(--fw-bold);
-    font-style: normal;
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
 }
 
+/* ============================
+   ACTIONS - PAKAI CLASS ASLI
+   ============================ */
 .fundraiser-actions {
     display: flex;
     align-items: center;
     gap: 22px;
-
     padding-left: 44px;
-    border-left: 1px solid var(--primary);
+    border-left: 1px solid var(--border);
 }
 
+/* ============================
+   CLASS YANG DIPAKAI DI BLADE
+   ============================ */
+.penggalang-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 8px;
+}
+
+.penggalang-left {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+}
+
+.logo-wrapper {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: white;
+    padding: 4px;
+    border: 1px solid #ddd;
+    flex-shrink: 0;
+}
+
+.penggalang-logo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.penggalang-title {
+    margin-bottom: 25px;
+}
+
+.penggalang-title h1 {
+    margin: 0;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    color: var(--primary);
+}
+
+.jenis-badge {
+    background: var(--primary);
+    color: white;
+    font-size: var(--fs-xxs);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-semibold);
+}
+
+/* ============================
+   DASHBOARD LINK
+   ============================ */
 .dashboard-link {
     color: var(--primary);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    text-decoration: none;
+    padding-right: 18px;
+    border-right: 1px solid var(--border);
+    transition: color .2s;
+}
+.dashboard-link:hover {
+    color: var(--primary-hover);
+}
+.dashboard-link:last-child {
+    border-right: none;
+    padding-right: 0;
 }
 
+/* ============================
+   EDIT BUTTON
+   ============================ */
 .edit-button {
     min-width: 96px;
-    height: 34px;
-
+    height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     border-radius: var(--radius-full);
     background: var(--primary);
     color: var(--bg);
-
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    text-decoration: none;
+    transition: background .2s;
+}
+.edit-button:hover {
+    background: var(--primary-hover);
 }
 
-/* ACCORDION */
+/* ============================
+   STATUS BADGE
+   ============================ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    line-height: 1.6;
+}
+
+.status-badge.pending {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.status-badge.approved {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.status-badge.rejected {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+/* ============================
+   ACCORDION
+   ============================ */
 .accordion-list {
     display: flex;
     flex-direction: column;
@@ -254,22 +273,23 @@
 }
 
 .info-card {
-    background: var(--bg-soft);
-    border: 1px solid #cfd4dc;
-    border-radius: var(--radius-sm);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: 0 28px 22px;
+    transition: box-shadow .2s;
+}
+.info-card:hover {
+    box-shadow: var(--shadow-soft);
 }
 
 .info-card summary {
     min-height: 58px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 18px;
-
-    border-bottom: 1px solid #cfd4dc;
-
+    border-bottom: 1px solid var(--border);
     list-style: none;
     cursor: pointer;
 }
@@ -279,58 +299,58 @@
 }
 
 .info-card summary span {
-    color: #050505;
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
 }
 
 .info-card summary b {
-    color: #050505;
-    font-size: var(--fs-md);
-    font-weight: var(--fw-medium);
-    transition: .2s ease;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-regular);
+    transition: transform .25s ease;
 }
 
 .info-card:not([open]) {
     padding-bottom: 0;
 }
-
 .info-card:not([open]) summary {
     border-bottom: none;
 }
-
 .info-card[open] summary b {
     transform: rotate(180deg);
 }
 
-/* INFO CONTENT */
+/* ============================
+   INFO TABLE
+   ============================ */
 .info-table {
     padding-top: 18px;
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 14px;
 }
 
 .info-table div {
     display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 18px;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
     align-items: start;
 }
 
 .info-table strong {
-    color: #050505;
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
-    font-style: italic;
-    line-height: 1.35;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    line-height: 1.6;
 }
 
 .info-table p {
-    color: #111111;
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-medium);
-    line-height: 1.35;
+    color: var(--text);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-regular);
+    line-height: 1.7;
+    margin: 0;
 }
 
 .paragraph-content {
@@ -338,39 +358,44 @@
 }
 
 .paragraph-content h3 {
-    color: #050505;
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
-    margin: 10px 0 8px;
-}
-
-.paragraph-content p,
-.paragraph-content li {
-    color: #111111;
-    font-size: var(--fs-xxs);
-    line-height: 1.35;
-    font-weight: var(--fw-medium);
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    margin: 12px 0 8px;
 }
 
 .paragraph-content p {
+    color: var(--text);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-regular);
+    line-height: 1.8;
     margin-bottom: 14px;
 }
 
 .paragraph-content ul {
-    padding-left: 18px;
+    padding-left: 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
-/* CAMPAIGN */
+.paragraph-content li {
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+    line-height: 1.7;
+}
+
+/* ============================
+   CAMPAIGN LIST
+   ============================ */
 .fundraiser-campaign-section {
     margin-top: 42px;
 }
 
 .fundraiser-campaign-section h2 {
-    color: #050505;
-    font-size: var(--fs-xs);
+    color: var(--text-dark);
+    font-size: var(--fs-md);
     font-weight: var(--fw-bold);
     margin-bottom: 24px;
 }
@@ -395,9 +420,8 @@
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: var(--radius);
-    transition: .3s;
+    transition: transform .3s ease;
 }
-
 .campaign-row-image:hover {
     transform: scale(1.02);
 }
@@ -429,12 +453,11 @@
 .campaign-title h3 {
     margin: 0;
     font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
+    font-weight: var(--fw-semibold);
     color: var(--text-dark);
     line-height: 1.4;
     transition: color .2s;
 }
-
 .campaign-title:hover h3 {
     color: var(--primary);
 }
@@ -443,8 +466,8 @@
     margin: 0;
     color: var(--muted);
     font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
 }
-
 .campaign-row-body p span {
     margin-left: 6px;
     color: var(--primary);
@@ -454,21 +477,24 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .campaign-row-amount strong {
     font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
     color: var(--primary);
 }
 
 .campaign-row-amount span {
     color: var(--muted);
     font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
 }
 
 .campaign-progress {
-    height: 8px;
-    margin-top: 4px;
+    height: 6px;
+    margin-top: 6px;
     overflow: hidden;
     background: var(--border-soft);
     border-radius: var(--radius-full);
@@ -478,16 +504,17 @@
     height: 100%;
     background: var(--primary);
     border-radius: inherit;
-    transition: width .35s;
+    transition: width .4s ease;
 }
 
 .campaign-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: auto;
+    margin-top: 4px;
     color: var(--muted);
     font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
 }
 
 .campaign-actions {
@@ -504,21 +531,16 @@
 .campaign-action {
     width: 36px;
     height: 36px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     border: none;
     border-radius: var(--radius-full);
-
     background: transparent;
     color: var(--muted);
-
     cursor: pointer;
     text-decoration: none;
-
-    transition: .25s ease;
+    transition: background .2s, color .2s;
 }
 
 .campaign-action i {
@@ -535,27 +557,10 @@
     background: var(--danger-light);
 }
 
-.verified-text{
-    color:#d5d5d5;
-    font-weight:600;
-}
-
-.pending-text{
-    color:#f39c12;
-    font-weight:600;
-}
-
-.rejected-text{
-    color:#e74c3c;
-    font-weight:600;
-}
-
-/* ==========================
-   BANNER ORGANISASI
-========================== */
-
+/* ============================
+   BANNER UPLOAD
+   ============================ */
 .verify-cover-upload {
-    position: relative;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -567,26 +572,22 @@
     object-fit: cover;
     border-radius: var(--radius);
     border: 1px solid var(--border);
-    background: #f5f7fb;
+    background: var(--bg-soft);
     display: block;
 }
 
 .verify-cover-placeholder {
     width: 100%;
     height: 260px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
-
     border: 2px dashed var(--border);
     border-radius: var(--radius);
-
     background: var(--bg-soft);
     color: var(--muted);
-
     text-align: center;
 }
 
@@ -598,117 +599,115 @@
 .verify-cover-placeholder strong {
     color: var(--text-dark);
     font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
 }
 
 .verify-cover-placeholder span {
     font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
 }
 
 .verify-cover-button {
     width: fit-content;
-
     display: inline-flex;
     align-items: center;
     gap: 10px;
-
-    padding: 12px 20px;
-
+    padding: 12px 24px;
     background: var(--primary);
-    color: white;
-
+    color: var(--bg);
     border-radius: var(--radius-full);
-
     cursor: pointer;
-
-    font-weight: 600;
-
-    transition: .2s;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    transition: background .2s;
 }
-
 .verify-cover-button:hover {
     background: var(--primary-hover);
 }
-
 .verify-cover-button input {
     display: none;
 }
 
-.verify-cover-info{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
-    margin-top:10px;
-    flex-wrap:wrap;
-}
-
-.verify-cover-info small{
-    color:var(--muted);
-    font-size:var(--fs-xs);
-}
-
-.verify-cover-remove{
-    padding:10px 18px;
-
-    border:none;
-    border-radius:var(--radius-full);
-
-    background:#fee2e2;
-    color:#dc2626;
-
-    font-weight:600;
-
-    cursor:pointer;
-    transition:.2s;
-}
-
-.verify-cover-remove:hover{
-    background:#dc2626;
-    color:white;
-}
-
-/* ============================
-   STATUS BADGE
-   ============================ */
-.status-badge {
-    display: inline-flex;
+.verify-cover-info {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0.25rem 0.75rem;
+    gap: 20px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.verify-cover-info small {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+}
+
+.verify-cover-remove {
+    padding: 10px 20px;
+    border: none;
     border-radius: var(--radius-full);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1.5;
-    white-space: nowrap;
-}
-
-.status-badge.pending {
-    background-color: var(--secondary-light);
-    color: var(--secondary);
-}
-
-.status-badge.approved {
-    background-color: var(--success-light);
-    color: var(--success);
-}
-
-.status-badge.rejected {
-    background-color: var(--danger-light);
+    background: var(--danger-light);
     color: var(--danger);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+.verify-cover-remove:hover {
+    background: var(--danger);
+    color: var(--bg);
 }
 
 /* ============================
-   RESPONSIVE: STATUS BADGE
+   VERIFICATION STATUS TEXT
    ============================ */
-@media (max-width: 640px) {
-    .status-badge {
-        font-size: 9px;
-        padding: 0.15rem 0.5rem;
-    }
+.verified-text {
+    color: var(--success);
+    font-weight: var(--fw-semibold);
 }
 
-/* RESPONSIVE */
+.pending-text {
+    color: var(--warning);
+    font-weight: var(--fw-semibold);
+}
+
+.rejected-text {
+    color: var(--danger);
+    font-weight: var(--fw-semibold);
+}
+
+/* ============================
+   BANNER WRAPPER (PAKAI CLASS ASLI)
+   ============================ */
+.banner-wrapper {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+.penggalang-banner {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.penggalang-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: -42px;
+    position: relative;
+    z-index: 100;
+    padding: 0 4px 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
 @media (max-width: 800px) {
     .fundraiser-summary {
         align-items: flex-start;
@@ -723,13 +722,26 @@
         border-left: none;
     }
 
+    .penggalang-summary {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: -30px;
+    }
+
+    .penggalang-actions {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 12px;
+    }
+
     .info-table div {
         grid-template-columns: 1fr;
-        gap: 4px;
+        gap: 2px;
     }
 
     .campaign-row {
-        grid-template-columns: 190px 1fr;
+        grid-template-columns: 180px 1fr;
+        gap: 18px;
     }
 }
 
@@ -740,14 +752,14 @@
 
     .fundraiser-back {
         gap: 14px;
-        font-size: var(--fs-xs);
+        font-size: var(--fs-xxs);
         padding-top: 24px;
         margin-bottom: 28px;
     }
-
     .fundraiser-back svg {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
+        stroke-width: 2.5;
     }
 
     .fundraiser-banner {
@@ -756,6 +768,7 @@
 
     .fundraiser-content {
         padding-top: 28px;
+        padding-bottom: 48px;
     }
 
     .fundraiser-info {
@@ -763,12 +776,30 @@
     }
 
     .fundraiser-logo {
+        width: 60px;
+        height: 60px;
+    }
+
+    .fundraiser-info h1 {
+        font-size: var(--fs-sm);
+    }
+
+    .penggalang-logo {
         width: 64px;
         height: 64px;
     }
 
-    .fundraiser-info h1 {
-        font-size: var(--fs-xs);
+    .penggalang-title h1 {
+        font-size: var(--fs-sm);
+    }
+
+    .banner-wrapper {
+        height: 160px;
+    }
+
+    .penggalang-summary {
+        margin-top: -24px;
+        padding-bottom: 16px;
     }
 
     .info-card {
@@ -776,28 +807,51 @@
     }
 
     .campaign-row {
-        grid-template-columns: 130px 1fr;
-        gap: 12px;
+        grid-template-columns: 120px 1fr;
+        gap: 14px;
     }
 
     .campaign-row-image {
         aspect-ratio: 4 / 3;
     }
 
-    .campaign-row-body h3 {
-        font-size: 11px;
-    }
-
-    .campaign-row-amount {
-        gap: 8px;
-        flex-wrap: wrap;
+    .campaign-title h3 {
+        font-size: var(--fs-xs);
     }
 
     .campaign-row-amount strong {
-        font-size: 12px;
+        font-size: var(--fs-xs);
     }
 
     .campaign-meta {
-        font-size: 9px;
+        font-size: var(--fs-xxs);
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .status-badge {
+        font-size: 10px;
+        padding: 2px 10px;
+    }
+
+    .fundraiser-actions {
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .edit-button {
+        min-width: 80px;
+        height: 32px;
+        font-size: var(--fs-xxs);
+    }
+
+    .dashboard-link {
+        font-size: var(--fs-xxs);
+        padding-right: 12px;
+    }
+
+    .penggalang-actions {
+        flex-wrap: wrap;
+        gap: 12px;
     }
 }

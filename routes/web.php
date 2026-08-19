@@ -14,6 +14,9 @@ use App\Http\Controllers\User\FundraiserController;
 use App\Http\Controllers\User\SearchController;
 use App\Http\Controllers\User\RiwayatDonasiController;
 use App\Http\Controllers\MidtransController;
+use App\Http\Controllers\FlipController;
+use App\Http\Controllers\TripayController;
+use App\Http\Controllers\IpaymuController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -38,7 +41,14 @@ Route::post('/set-intended-url', function (Request $request) {
 // search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-Route::post('/midtrans/notification', [MidtransController::class, 'notification']);
+// ============================================================
+// PAYMENT GATEWAYS WEBHOOKS
+// ============================================================
+Route::post('/payment/midtrans/webhook', [MidtransController::class, 'notification'])->name('payment.midtrans.webhook');
+Route::post('/midtrans/notification', [MidtransController::class, 'notification']); // backward compatibility
+Route::post('/payment/flip/webhook', [FlipController::class, 'notification'])->name('payment.flip.webhook');
+Route::post('/payment/tripay/webhook', [TripayController::class, 'notification'])->name('payment.tripay.webhook');
+Route::post('/payment/ipaymu/webhook', [IpaymuController::class, 'notification'])->name('payment.ipaymu.webhook');
 
 // ============================================================
 // BERITA
@@ -55,11 +65,13 @@ Route::get('/kalkulator', [KalkulatorController::class, 'index']);
 Route::post('/kalkulator/hitung', [KalkulatorController::class, 'calculate'])->name('kalkulator.hitung');
 
 // ============================================================
-// CAMPAIGN (PUBLIC - list)
+// CAMPAIGN & DONASI (PUBLIC)
 // ============================================================
 Route::get('/donasi', [CampaignController::class, 'index'])->name('donasi');
 Route::get('/campaign/{slug}/donasi', [DonasiController::class, 'create'])->name('donasi.create');
 Route::post('/campaign/{slug}/donasi', [DonasiController::class, 'store'])->name('donasi.store');
+Route::get('/donasi/instruksi/{pembayaran}', [DonasiController::class, 'instruksi'])->name('donasi.bayar.instruksi');
+Route::post('/donasi/instruksi/{pembayaran}/upload-bukti', [DonasiController::class, 'uploadBukti'])->name('donasi.bayar.upload_bukti');
 Route::get('/donasi/status/{status}', [DonasiController::class, 'status'])->name('donasi.status');
 
 // ============================================================

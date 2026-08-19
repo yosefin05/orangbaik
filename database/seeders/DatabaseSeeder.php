@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             KategoriSeeder::class,
             FilterSeeder::class,
+            PaymentGatewaySeeder::class,
+            PaymentChannelSeeder::class,
         ]);
        
     }

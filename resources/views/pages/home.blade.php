@@ -20,7 +20,6 @@
         {{-- HERO --}}
         <section class="hero-section">
             <div class="container hero-layout">
-
                 <div class="hero-card hero-main-slider">
                     @foreach ($heroCampaigns as $index => $campaign)
                         <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">

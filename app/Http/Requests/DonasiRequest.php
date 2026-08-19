@@ -20,11 +20,12 @@ class DonasiRequest extends FormRequest
     public function rules()
     {
         return [
-            'nominal' => 'nullable|numeric|min:5000',
-            'nominal_lainnya' => 'nullable|numeric|min:5000',
-            'nama_donatur' => 'nullable|string|max:100',
-            'no_hp' => 'nullable|string|max:20',
-            'pesan' => 'nullable|string|max:255',
+            'payment_channel_id' => 'nullable|exists:payment_channels,id',
+            'nominal'            => 'nullable|numeric|min:5000',
+            'nominal_lainnya'    => 'nullable|numeric|min:5000',
+            'nama_donatur'       => 'nullable|string|max:100',
+            'no_hp'              => 'nullable|string|max:20',
+            'pesan'              => 'nullable|string|max:255',
         ];
     }
 

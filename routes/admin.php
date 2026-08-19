@@ -11,6 +11,8 @@ use App\Http\Controllers\admin\CampaignController;
 use App\Http\Controllers\admin\TestimoniController;
 use App\Http\Controllers\admin\KomentarController;
 use App\Http\Controllers\admin\DonasiController;
+use App\Http\Controllers\admin\PaymentGatewayController;
+use App\Http\Controllers\admin\PaymentChannelController;
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -81,4 +83,25 @@ Route::middleware(['auth', 'admin'])
 
         Route::resource('donasi', DonasiController::class);
         Route::get('donasi/export', [DonasiController::class, 'export'])->name('donasi.export');
+        Route::patch('donasi/{donasi}/approve-manual', [DonasiController::class, 'approveManual'])->name('donasi.approve-manual');
+        Route::patch('donasi/{donasi}/reject-manual', [DonasiController::class, 'rejectManual'])->name('donasi.reject-manual');
+
+        // ==================== PAYMENT MANAGEMENT ====================
+        Route::prefix('payment')->name('payment.')->group(function () {
+
+            // Payment Gateway (hanya lihat + toggle status)
+            Route::get('/gateway', [PaymentGatewayController::class, 'index'])
+                ->name('gateway.index');
+            Route::patch('/gateway/{gateway}/toggle', [PaymentGatewayController::class, 'toggleActive'])
+                ->name('gateway.toggle');
+
+            // Payment Channel (CRUD + sort + toggle + batch)
+            Route::post('/channel/batch', [PaymentChannelController::class, 'batchUpdate'])
+                ->name('channel.batch');
+            Route::resource('channel', PaymentChannelController::class)->except(['show']);
+            Route::patch('/channel/sort', [PaymentChannelController::class, 'updateSort'])
+                ->name('channel.sort');
+            Route::patch('/channel/{channel}/toggle', [PaymentChannelController::class, 'toggleActive'])
+                ->name('channel.toggle');
+        });
     });
