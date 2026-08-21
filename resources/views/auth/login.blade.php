@@ -73,10 +73,11 @@
                     </button>
 
                 </form>
-
-                <p class="register-text">
-                    Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
-                </p>
+                <div class="register-links">
+                    <a href="{{ route('password.request') }}">Reset Password</a>
+                    <span class="divider">|</span>
+                    <a href="{{ route('register') }}">Daftar Sekarang</a>
+                </div>
 
             </div>
 

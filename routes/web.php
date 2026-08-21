@@ -2,60 +2,68 @@
 
 use App\Models\Testimoni;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\User\PenggalangDanaController;
-use App\Http\Controllers\User\BeritaController;
-use App\Http\Controllers\User\KomentarController;
-use App\Http\Controllers\User\KalkulatorController;
-use App\Http\Controllers\User\CampaignController;
-use App\Http\Controllers\User\DonasiController;
-use App\Http\Controllers\User\HomeController;
-use App\Http\Controllers\User\CampaignUpdateController;
-use App\Http\Controllers\User\FundraiserController;
-use App\Http\Controllers\User\SearchController;
-use App\Http\Controllers\User\RiwayatDonasiController;
-use App\Http\Controllers\MidtransController;
-use App\Http\Controllers\FlipController;
-use App\Http\Controllers\TripayController;
-use App\Http\Controllers\IpaymuController;
+use App\Http\Controllers\User\{
+    PenggalangDanaController,
+    BeritaController,
+    KomentarController,
+    KalkulatorController,
+    CampaignController,
+    DonasiController,
+    HomeController,
+    CampaignUpdateController,
+    FundraiserController,
+    SearchController,
+    RiwayatDonasiController
+};
+use App\Http\Controllers\{
+    MidtransController,
+    FlipController,
+    TripayController,
+    IpaymuController
+};
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+| Semua route yang butuh verifikasi email ada di group 'verified'
+| Route tanpa verifikasi (public) di luar group
+*/
+
 // ============================================================
-// HOMEPAGE
+// PUBLIC ROUTES (TIDAK PERLU LOGIN)
 // ============================================================
+
+// Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// ============================================================
-// LOGIN / REGISTER (disediakan oleh Laravel Breeze)
-// ============================================================
+// Authentication (Breeze)
 require __DIR__ . '/auth.php';
 
-// ============================================================
-// SET INTENDED URL
-// ============================================================
-Route::post('/set-intended-url', function (Request $request) {
-    session(['url.intended' => $request->url]);
-    return response()->json(['success' => true]);
-})->name('set.intended.url');
-
-// search
+// Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 // ============================================================
-// PAYMENT GATEWAYS WEBHOOKS
+// PAYMENT WEBHOOKS (PUBLIC)
 // ============================================================
-Route::post('/payment/midtrans/webhook', [MidtransController::class, 'notification'])->name('payment.midtrans.webhook');
-Route::post('/midtrans/notification', [MidtransController::class, 'notification']); // backward compatibility
-Route::post('/payment/flip/webhook', [FlipController::class, 'notification'])->name('payment.flip.webhook');
-Route::post('/payment/tripay/webhook', [TripayController::class, 'notification'])->name('payment.tripay.webhook');
-Route::post('/payment/ipaymu/webhook', [IpaymuController::class, 'notification'])->name('payment.ipaymu.webhook');
+Route::prefix('payment')->group(function () {
+    Route::post('/midtrans/webhook', [MidtransController::class, 'notification'])->name('payment.midtrans.webhook');
+    Route::post('/flip/webhook', [FlipController::class, 'notification'])->name('payment.flip.webhook');
+    Route::post('/tripay/webhook', [TripayController::class, 'notification'])->name('payment.tripay.webhook');
+    Route::post('/ipaymu/webhook', [IpaymuController::class, 'notification'])->name('payment.ipaymu.webhook');
+});
+// Backward compatibility
+Route::post('/midtrans/notification', [MidtransController::class, 'notification']);
 
 // ============================================================
-// BERITA
+// BERITA (PUBLIC + KOMENTAR BUTUH LOGIN)
 // ============================================================
 Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
 Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.show');
-Route::middleware('auth')->post('/berita/{berita}/komentar', [KomentarController::class, 'store'])
+Route::post('/berita/{berita}/komentar', [KomentarController::class, 'store'])
+    ->middleware('auth')
     ->name('berita.komentar.store');
 
 // ============================================================
@@ -74,73 +82,30 @@ Route::get('/donasi/instruksi/{pembayaran}', [DonasiController::class, 'instruks
 Route::post('/donasi/instruksi/{pembayaran}/upload-bukti', [DonasiController::class, 'uploadBukti'])->name('donasi.bayar.upload_bukti');
 Route::get('/donasi/status/{status}', [DonasiController::class, 'status'])->name('donasi.status');
 
-// ============================================================
-// CAMPAIGN (AUTHENTICATED) - semua route dengan prefix /campaign
-// ============================================================
-Route::middleware('auth')->group(function () {
-    // Create campaign
-    Route::get('/campaign/create', [CampaignController::class, 'create'])->name('campaign.create');
-    Route::post('/campaign', [CampaignController::class, 'store'])->name('campaign.store');
+// Static pages
+Route::view('/donasi/bayar', 'pages.donasi-bayar')->name('donasi.bayar');
+Route::view('/tentang', 'pages.tentang')->name('tentang');
+Route::view('/syarat-ketentuan', 'pages.syarat-ketentuan')->name('syarat.ketentuan');
+Route::view('/pusat-bantuan', 'pages.pusat-bantuan')->name('pusat.bantuan');
 
-    // Edit campaign
-    Route::get('/campaign/{campaign}/edit', [CampaignController::class, 'edit'])->name('campaign.edit');
-
-    // Update & Delete campaign (hanya PUT/DELETE, tidak ada GET)
-    Route::put('/campaign/{campaign}', [CampaignController::class, 'update'])->name('campaign.update');
-    Route::delete('/campaign/{campaign}', [CampaignController::class, 'destroy'])->name('campaign.destroy');
-
-    // Campaign Update (kabar terbaru) - semua dengan prefix /campaign
-    Route::get('/campaign/{slug}/update/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
-    Route::post('/campaign/{slug}/update', [CampaignUpdateController::class, 'store'])->name('campaign.update.store');
-    Route::get('/campaign/{slug}/update/{update}/edit', [CampaignUpdateController::class, 'edit'])->name('campaign.update.edit');
-    Route::put('/campaign/{slug}/update/{update}', [CampaignUpdateController::class, 'update'])->name('campaign.update.update');
-    Route::delete('/campaign/{slug}/update/{update}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');
-    
-    // ============================================================
-    // FUNDRAISER - PERBAIKI: pindahkan ke sini dengan prefix campaign
-    // ============================================================
-    Route::post('/campaign/{slug}/fundraiser', [FundraiserController::class, 'store'])
-        ->name('fundraiser.store')
-        ->where('slug', '.*');
-    
-    Route::delete('/campaign/{slug}/fundraiser', [FundraiserController::class, 'destroy'])
-        ->name('fundraiser.destroy')
-        ->where('slug', '.*');
-});
-
-// ============================================================
-// DONASI (PAGE STATIS)
-// ============================================================
-Route::get('/donasi/bayar', function () {
-    return view('pages.donasi-bayar');
-})->name('donasi.bayar');
-
-Route::get('/donasi/bayar-login', function () {
-    return view('pages.donasi-bayar-login');
-})->middleware('auth')->name('donasi.bayar.login');
-
-// ============================================================
-// PUSAT INFORMASI (STATIS)
-// ============================================================
-Route::get('/tentang', function () {
-    return view('pages.tentang');
-})->name('tentang');
-Route::get('/syarat-ketentuan', function () {
-    return view('pages.syarat-ketentuan');
-})->name('syarat.ketentuan');
-Route::get('/pusat-bantuan', function () {
-    return view('pages.pusat-bantuan');
-})->name('pusat.bantuan');
-
-// ============================================================
-// PENGGALANG DANA (PUBLIC)
-// ============================================================
+// Penggalang Dana (Public)
 Route::get('/profil-penggalang/{id}', [PenggalangDanaController::class, 'profile'])->name('profil.penggalang');
 
 // ============================================================
-// PENGGALANG DANA (AUTHENTICATED)
+// AUTHENTICATED ROUTES (BUTUH LOGIN, TAPI BELUM TENTU VERIFIED)
 // ============================================================
 Route::middleware('auth')->group(function () {
+    
+    // Set intended URL
+    Route::post('/set-intended-url', function (Request $request) {
+        session(['url.intended' => $request->url]);
+        return response()->json(['success' => true]);
+    })->name('set.intended.url');
+
+    // Donasi Bayar (butuh login)
+    Route::view('/donasi/bayar-login', 'pages.donasi-bayar-login')->name('donasi.bayar.login');
+
+    // Penggalang Dana (CRUD)
     Route::get('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'createOrganisasi'])
         ->name('penggalang_dana.organisasi.create');
     Route::post('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'storeOrganisasi'])
@@ -158,31 +123,52 @@ Route::middleware('auth')->group(function () {
         ->name('penggalang_dana.rejected');
     Route::patch('/penggalang-dana/{id}/resubmit', [PenggalangDanaController::class, 'resubmit'])
         ->name('penggalang_dana.resubmit');
-});
 
-// ============================================================
-// PROFIL USER (AUTHENTICATED)
-// ============================================================
-Route::middleware('auth')->group(function () {
+    // Profile User
     Route::get('/profile-user', function () {
         $penggalang = auth()->user()->penggalangDana()->first();
         return view('pages.profile-user', compact('penggalang'));
     })->name('profile.user');
-    Route::get('/riwayat-donasi', [RiwayatDonasiController::class, 'index'])
-        ->name('riwayat.donasi')
-        ->middleware('auth');
-    Route::get('/riwayat-donasi/{donasi}/kwitansi', [RiwayatDonasiController::class, 'kwitansi'])
-    ->middleware('auth')
-    ->name('riwayat-donasi.kwitansi');
-});
 
-// ============================================================
-// PROFIL (EDIT, UPDATE, DELETE) - LARAVEL BREEZE
-// ============================================================
-Route::middleware('auth')->group(function () {
+    // Riwayat Donasi
+    Route::get('/riwayat-donasi', [RiwayatDonasiController::class, 'index'])->name('riwayat.donasi');
+    Route::get('/riwayat-donasi/{donasi}/kwitansi', [RiwayatDonasiController::class, 'kwitansi'])
+        ->name('riwayat-donasi.kwitansi');
+
+    // Profile (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// ============================================================
+// AUTHENTICATED + VERIFIED EMAIL ROUTES (WAJIB VERIFIKASI)
+// ============================================================
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // Campaign Management
+    Route::get('/campaign/create', [CampaignController::class, 'create'])->name('campaign.create');
+    Route::post('/campaign', [CampaignController::class, 'store'])->name('campaign.store');
+    Route::get('/campaign/{campaign}/edit', [CampaignController::class, 'edit'])->name('campaign.edit');
+    Route::put('/campaign/{campaign}', [CampaignController::class, 'update'])->name('campaign.update');
+    Route::delete('/campaign/{campaign}', [CampaignController::class, 'destroy'])->name('campaign.destroy');
+
+    // Campaign Updates (Kabar Terbaru)
+    Route::prefix('campaign/{slug}/update')->group(function () {
+        Route::get('/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
+        Route::post('/', [CampaignUpdateController::class, 'store'])->name('campaign.update.store');
+        Route::get('/{update}/edit', [CampaignUpdateController::class, 'edit'])->name('campaign.update.edit');
+        Route::put('/{update}', [CampaignUpdateController::class, 'update'])->name('campaign.update.update');
+        Route::delete('/{update}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');
+    });
+
+    // Fundraiser
+    Route::post('/campaign/{slug}/fundraiser', [FundraiserController::class, 'store'])
+        ->name('fundraiser.store')
+        ->where('slug', '.*');
+    Route::delete('/campaign/{slug}/fundraiser', [FundraiserController::class, 'destroy'])
+        ->name('fundraiser.destroy')
+        ->where('slug', '.*');
 });
 
 // ============================================================
@@ -192,8 +178,7 @@ require __DIR__ . '/admin.php';
 
 // ============================================================
 // WILDCARD CAMPAIGN - HARUS DI PALING AKHIR!
-// Menangani semua URL satu segmen (misal /bantu-korban, /ppp)
 // ============================================================
 Route::get('/{slug}', [CampaignController::class, 'show'])
-    ->where('slug', '.*')  // UBAH: terima semua karakter
+    ->where('slug', '.*')
     ->name('campaign.show');

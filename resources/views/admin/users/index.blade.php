@@ -26,6 +26,7 @@
                         <th>Nomor</th>
                         <th>Jenis Kelamin</th>
                         <th>Role</th>
+                        <th>Status Verifikasi</th>  <!-- TAMBAHAN -->
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -76,6 +77,25 @@
                                 </span>
                             </td>
 
+                            <!-- STATUS VERIFIKASI -->
+                            <td>
+                                @if($user->email_verified_at)
+                                    <span class="badge badge-green">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Terverifikasi
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">
+                                        {{ $user->email_verified_at->format('d/m/Y H:i') }}
+                                    </small>
+                                @else
+                                    <span class="badge badge-warning">
+                                        <i class="bi bi-clock-fill"></i>
+                                        Pending
+                                    </span>
+                                @endif
+                            </td>
+
                             <td class="text-center">
                                 <div class="action-group action-group-center">
                                     <a href="{{ route('admin.users.edit', $user) }}" class="action-link link-blue">
@@ -93,7 +113,6 @@
                                             Hapus
                                         </button>
                                     </form>
-
                                 </div>
                             </td>
                         </tr>
@@ -101,7 +120,7 @@
                     @empty
 
                         <tr>
-                            <td colspan="7" class="empty-state">
+                            <td colspan="8" class="empty-state">  <!-- Ubah colspan dari 7 ke 8 -->
                                 Belum ada data user.
                             </td>
                         </tr>
