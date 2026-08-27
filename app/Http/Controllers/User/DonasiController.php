@@ -9,8 +9,6 @@ use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
 use App\Services\MidtransService;
 use App\Services\FlipService;
-use App\Services\TripayService;
-use App\Services\IpaymuService;
 use App\Services\ManualTransferService;
 use App\Http\Requests\DonasiRequest;
 use Illuminate\Http\Request;
@@ -22,8 +20,6 @@ class DonasiController extends Controller
     public function __construct(
         protected MidtransService       $midtransService,
         protected FlipService           $flipService,
-        protected TripayService         $tripayService,
-        protected IpaymuService         $ipaymuService,
         protected ManualTransferService $manualTransferService,
     ) {}
 
@@ -62,60 +58,52 @@ class DonasiController extends Controller
     }
 
     /**
-     * Proses donasi — routing ke gateway yang sesuai berdasarkan payment channel
+     * Menyimpan data donasi & membuat transaksi pembayaran di gateway yang sesuai
+     *
+     * Flow:
+     * 1. Validasi input via DonasiRequest
+     * 2. Ambil PaymentChannel & cek gateway-nya (Midtrans / Flip / Manual)
+     * 3. Buat record Donasi (DB transaction)
+     * 4. Buat record Pembayaran & dispatch ke service gateway yang sesuai
+     * 5. Return response (snap_token / data VA / redirect URL)
      */
     public function store(DonasiRequest $request, $slug)
     {
         $campaign = Campaign::where('slug', $slug)->firstOrFail();
 
         // ============================================================
-        // 1. VALIDASI NOMINAL
+        // 1. CEK STATUS CAMPAIGN
         // ============================================================
-        $minimalDonasi = $campaign->minimal_donasi ?? config('payment.minimum_amount', 5000);
-
-        $nominal = $request->filled('nominal_lainnya')
-            ? $request->nominal_lainnya
-            : $request->nominal;
-
-        if (empty($nominal) || $nominal < $minimalDonasi) {
+        if (!$campaign->is_active) {
             return response()->json([
                 'success' => false,
-                'message' => 'Minimal donasi Rp ' . number_format($minimalDonasi, 0, ',', '.'),
-                'errors'  => ['nominal' => ['Minimal donasi Rp ' . number_format($minimalDonasi, 0, ',', '.')]],
+                'message' => 'Campaign ini sudah tidak aktif dan tidak menerima donasi.',
             ], 422);
         }
 
         // ============================================================
-        // 2. VALIDASI PAYMENT CHANNEL
+        // 2. AMBIL PAYMENT CHANNEL
         // ============================================================
         $channelId = $request->payment_channel_id;
-        if (!$channelId) {
+        $channel   = PaymentChannel::with('gateway')->findOrFail($channelId);
+
+        if (!$channel->is_active || !$channel->gateway?->is_active) {
             return response()->json([
                 'success' => false,
-                'message' => 'Pilih metode pembayaran terlebih dahulu.',
-                'errors'  => ['payment_channel_id' => ['Metode pembayaran wajib dipilih.']],
+                'message' => 'Metode pembayaran yang dipilih sedang tidak tersedia.',
             ], 422);
         }
 
-        $channel = PaymentChannel::with('gateway')
-            ->where('id', $channelId)
-            ->where('is_active', true)
-            ->first();
-
-        if (!$channel) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Metode pembayaran tidak tersedia.',
-            ], 422);
-        }
+        // Tentukan nama donatur
+        $isAnonim    = $request->boolean('is_anonim', false);
+        $namaDonatur = $isAnonim ? 'Hamba Allah' : ($request->nama_donatur ?: (auth()->user()?->name ?? 'Hamba Allah'));
+        $nominal     = (int) $request->nominal;
 
         // ============================================================
-        // 3. BUAT DONASI
+        // 3. BUAT DATA DONASI
         // ============================================================
-        $isAnonim    = $request->has('anonymous_donor') || $request->has('anonymous_message');
-        $namaDonatur = $isAnonim ? 'Orang Baik' : ($request->nama_donatur ?? 'Orang Baik');
-
         DB::beginTransaction();
+
         try {
             $donasi = Donasi::create([
                 'campaign_id'  => $campaign->id,
@@ -129,15 +117,13 @@ class DonasiController extends Controller
             ]);
 
             // ============================================================
-            // 4. ROUTING KE GATEWAY YANG SESUAI
+            // 4. ROUTING KE GATEWAY YANG SESUAI (Midtrans / Flip / Manual)
             // ============================================================
             $gatewayCode = $channel->gateway?->code;
 
             $result = match ($gatewayCode) {
                 'midtrans' => $this->processMidtrans($donasi, $channel),
                 'flip'     => $this->processFlip($donasi, $channel),
-                'tripay'   => $this->processTripay($donasi, $channel),
-                'ipaymu'   => $this->processIpaymu($donasi, $channel),
                 'manual'   => $this->processManual($donasi, $channel),
                 default    => throw new \Exception("Gateway '{$gatewayCode}' tidak dikenali."),
             };
@@ -216,64 +202,6 @@ class DonasiController extends Controller
             'amount'         => $donasi->nominal,
             'expired_at'     => $vaData['expired_date'] ?? null,
             'redirect_url'   => route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
-        ];
-    }
-
-    /**
-     * Proses donasi via Tripay (ShopeePay, dll.)
-     */
-    protected function processTripay(Donasi $donasi, PaymentChannel $channel): array
-    {
-        if (!$this->tripayService->isConfigured()) {
-            throw new \Exception('Layanan pembayaran Tripay belum tersedia. Silakan pilih metode pembayaran lain.');
-        }
-
-        $orderId = $this->generateOrderId($donasi);
-
-        $pembayaran = Pembayaran::create([
-            'donasi_id'          => $donasi->id,
-            'payment_channel_id' => $channel->id,
-            'order_id'           => $orderId,
-            'payment_type'       => $channel->payment_type,
-            'transaction_status' => 'pending',
-        ]);
-
-        $tripayData = $this->tripayService->createTransaction($donasi, $pembayaran, $channel);
-
-        return [
-            'type'         => 'tripay',
-            'order_id'     => $orderId,
-            'donasi_id'    => $donasi->id,
-            'redirect_url' => $tripayData['checkout_url'] ?? route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
-        ];
-    }
-
-    /**
-     * Proses donasi via iPaymu (LinkAja, BCA VA, dll.)
-     */
-    protected function processIpaymu(Donasi $donasi, PaymentChannel $channel): array
-    {
-        if (!$this->ipaymuService->isConfigured()) {
-            throw new \Exception('Layanan pembayaran iPaymu belum tersedia. Silakan pilih metode pembayaran lain.');
-        }
-
-        $orderId = $this->generateOrderId($donasi);
-
-        $pembayaran = Pembayaran::create([
-            'donasi_id'          => $donasi->id,
-            'payment_channel_id' => $channel->id,
-            'order_id'           => $orderId,
-            'payment_type'       => $channel->payment_type,
-            'transaction_status' => 'pending',
-        ]);
-
-        $ipaymuData = $this->ipaymuService->createTransaction($donasi, $pembayaran, $channel);
-
-        return [
-            'type'         => 'ipaymu',
-            'order_id'     => $orderId,
-            'donasi_id'    => $donasi->id,
-            'redirect_url' => $ipaymuData['Url'] ?? route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
         ];
     }
 

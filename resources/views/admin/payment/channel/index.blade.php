@@ -86,7 +86,7 @@
                             <select name="channels[{{ $index }}][payment_gateway_id]" class="form-input custom-select">
                                 @foreach ($gateways as $gateway)
                                     <option value="{{ $gateway->id }}" {{ $channel->payment_gateway_id == $gateway->id ? 'selected' : '' }}>
-                                        {{ $gateway->code === 'manual' ? ($channel->account_name ?: 'Dompet Al Quds') : $gateway->name }}
+                                        {{ $gateway->code === 'manual' ? ($channel->account_name ?: "Dompet Al Qur'an") : $gateway->name }}
                                     </option>
                                 @endforeach
                             </select>

@@ -21,8 +21,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'midtrans/notification',
             'payment/midtrans/webhook',
             'payment/flip/webhook',
-            'payment/tripay/webhook',
-            'payment/ipaymu/webhook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -28,7 +28,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Midtrans Configuration
+    | Midtrans Configuration (Gateway 1)
     |--------------------------------------------------------------------------
     */
     'midtrans' => [
@@ -41,7 +41,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Flip Configuration
+    | Flip Configuration (Gateway 2)
     |--------------------------------------------------------------------------
     */
     'flip' => [
@@ -50,33 +50,6 @@ return [
         'base_url_sandbox'    => 'https://bigflip.id/big_sandbox_api',
         'base_url_production' => 'https://bigflip.id/api',
         'webhook_token'       => env('FLIP_WEBHOOK_TOKEN'),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Tripay Configuration
-    |--------------------------------------------------------------------------
-    */
-    'tripay' => [
-        'api_key'             => env('TRIPAY_API_KEY'),
-        'private_key'         => env('TRIPAY_PRIVATE_KEY'),
-        'merchant_code'       => env('TRIPAY_MERCHANT_CODE'),
-        'is_production'       => env('TRIPAY_IS_PRODUCTION', false),
-        'base_url_sandbox'    => 'https://tripay.co.id/api-sandbox',
-        'base_url_production' => 'https://tripay.co.id/api',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | iPaymu Configuration
-    |--------------------------------------------------------------------------
-    */
-    'ipaymu' => [
-        'api_key'             => env('IPAYMU_API_KEY'),
-        'va'                  => env('IPAYMU_VA'),
-        'is_production'       => env('IPAYMU_IS_PRODUCTION', false),
-        'base_url_sandbox'    => 'https://sandbox.ipaymu.com/api/v2',
-        'base_url_production' => 'https://my.ipaymu.com/api/v2',
     ],
 
 ];

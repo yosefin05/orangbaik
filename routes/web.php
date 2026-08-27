@@ -17,9 +17,7 @@ use App\Http\Controllers\User\{
 };
 use App\Http\Controllers\{
     MidtransController,
-    FlipController,
-    TripayController,
-    IpaymuController
+    FlipController
 };
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -46,13 +44,11 @@ require __DIR__ . '/auth.php';
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 // ============================================================
-// PAYMENT WEBHOOKS (PUBLIC)
+// PAYMENT WEBHOOKS (PUBLIC - Midtrans & Flip)
 // ============================================================
 Route::prefix('payment')->group(function () {
     Route::post('/midtrans/webhook', [MidtransController::class, 'notification'])->name('payment.midtrans.webhook');
     Route::post('/flip/webhook', [FlipController::class, 'notification'])->name('payment.flip.webhook');
-    Route::post('/tripay/webhook', [TripayController::class, 'notification'])->name('payment.tripay.webhook');
-    Route::post('/ipaymu/webhook', [IpaymuController::class, 'notification'])->name('payment.ipaymu.webhook');
 });
 // Backward compatibility
 Route::post('/midtrans/notification', [MidtransController::class, 'notification']);

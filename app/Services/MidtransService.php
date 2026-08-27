@@ -126,12 +126,23 @@ class MidtransService
 
         /*
          * =====================================================
-         * 4. AMBIL DATA TRANSAKSI DARI PAYLOAD
+         * 4. AMBIL DATA TRANSAKSI DARI PAYLOAD & MAP KE STATUS INTERNAL
          * =====================================================
          */
-        $transactionStatus = $payload['transaction_status'] ?? null;
-        $paymentType       = $payload['payment_type'] ?? null;
-        $transactionId     = $payload['transaction_id'] ?? null;
+        $rawStatus   = $payload['transaction_status'] ?? null;
+        $fraudStatus = $payload['fraud_status'] ?? null;
+        $paymentType = $payload['payment_type'] ?? null;
+        $transactionId = $payload['transaction_id'] ?? null;
+
+        // Map status Midtrans ke 4 status internal: pending, settlement, failed, expired
+        $internalStatus = match ($rawStatus) {
+            'capture' => ($fraudStatus === 'accept' ? 'settlement' : 'pending'),
+            'settlement' => 'settlement',
+            'pending'    => 'pending',
+            'deny', 'cancel' => 'failed',
+            'expire'     => 'expired',
+            default      => $rawStatus ?? 'pending',
+        };
 
         /*
          * =====================================================
@@ -141,11 +152,11 @@ class MidtransService
         $updateData = [
             'payment_type'       => $paymentType,
             'transaction_id'     => $transactionId,
-            'transaction_status' => $transactionStatus,
+            'transaction_status' => $internalStatus,
             'gateway_response'   => $payload, // simpan raw response untuk audit
         ];
 
-        if ($transactionStatus === 'settlement') {
+        if ($internalStatus === 'settlement') {
             $updateData['paid_at'] = now();
         }
 
@@ -158,7 +169,8 @@ class MidtransService
          */
         Log::info('Midtrans webhook berhasil diproses', [
             'order_id'           => $orderId,
-            'transaction_status' => $transactionStatus,
+            'raw_status'         => $rawStatus,
+            'internal_status'    => $internalStatus,
             'payment_type'       => $paymentType,
             'transaction_id'     => $transactionId,
         ]);

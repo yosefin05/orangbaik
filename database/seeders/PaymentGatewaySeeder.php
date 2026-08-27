@@ -16,16 +16,6 @@ class PaymentGatewaySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name'      => 'Tripay',
-                'code'      => 'tripay',
-                'is_active' => true,
-            ],
-            [
-                'name'      => 'iPaymu',
-                'code'      => 'ipaymu',
-                'is_active' => true,
-            ],
-            [
                 'name'      => 'Flip',
                 'code'      => 'flip',
                 'is_active' => true,
@@ -38,12 +28,15 @@ class PaymentGatewaySeeder extends Seeder
         ];
 
         foreach ($gateways as $gateway) {
-            PaymentGateway::firstOrCreate(
+            PaymentGateway::updateOrCreate(
                 ['code' => $gateway['code']],
                 $gateway
             );
         }
 
-        $this->command->info('PaymentGateway seeded: Midtrans, Tripay, iPaymu, Flip, Transfer Manual');
+        // Hapus gateway yang tidak digunakan
+        PaymentGateway::whereNotIn('code', ['midtrans', 'flip', 'manual'])->delete();
+
+        $this->command->info('PaymentGateway seeded: Midtrans, Flip, dan Transfer Manual (Hanya 2 Gateway API + 1 Manual)');
     }
 }
