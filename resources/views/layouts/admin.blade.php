@@ -87,6 +87,20 @@
                     <span>Campaign</span>
                 </a>
 
+                {{-- Berita --}}
+                <a href="{{ route('admin.berita.index') }}"
+                    class="{{ request()->routeIs('admin.berita.*') ? 'active' : '' }}">
+                    <i class="bi bi-newspaper"></i>
+                    <span>Berita</span>
+                </a>
+
+                {{-- Komentar --}}
+                <a href="{{ route('admin.komentar.index') }}"
+                    class="{{ request()->routeIs('admin.komentar.*') ? 'active' : '' }}">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>Komentar</span>
+                </a>
+
                 {{-- DONASI --}}
                 <a href="{{ route('admin.donasi.index') }}"
                     class="{{ request()->routeIs('admin.donasi.*') ? 'active' : '' }}">
@@ -99,13 +113,6 @@
                     class="{{ request()->routeIs('admin.payment.*') ? 'active' : '' }}">
                     <i class="bi bi-credit-card"></i>
                     <span>Payment</span>
-                </a>
-
-                {{-- Berita --}}
-                <a href="{{ route('admin.berita.index') }}"
-                    class="{{ request()->routeIs('admin.berita.*') ? 'active' : '' }}">
-                    <i class="bi bi-newspaper"></i>
-                    <span>Berita</span>
                 </a>
 
                 {{-- Filter --}}
@@ -122,12 +129,6 @@
                     <span>Testimoni</span>
                 </a>
 
-                {{-- Komentar --}}
-                <a href="{{ route('admin.komentar.index') }}"
-                    class="{{ request()->routeIs('admin.komentar.*') ? 'active' : '' }}">
-                    <i class="bi bi-chat-dots"></i>
-                    <span>Komentar</span>
-                </a>
 
             </nav>
 

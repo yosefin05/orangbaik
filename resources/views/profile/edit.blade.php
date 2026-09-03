@@ -112,7 +112,7 @@
 
                             </label>
 
-                            <label class="input-card select-card">
+                            <label class="input-card">
 
                                 <span>Jenis Kelamin</span>
 
@@ -122,14 +122,12 @@
                                         Pilih Gender Anda
                                     </option>
 
-                                    <option value="L"
-                                        @selected(old('jenis_kelamin', $user->jenis_kelamin) == 'L')>
+                                    <option value="L" @selected(old('jenis_kelamin', $user->jenis_kelamin) == 'L')>
 
                                         Laki-laki
                                     </option>
 
-                                    <option value="P"
-                                        @selected(old('jenis_kelamin', $user->jenis_kelamin) == 'P')>
+                                    <option value="P" @selected(old('jenis_kelamin', $user->jenis_kelamin) == 'P')>
 
                                         Perempuan
 
@@ -173,15 +171,12 @@
                                 <input type="text" name="nomor" value="{{ old('nomor', $user->nomor) }}"
                                     placeholder="Masukkan Nomor Telepon">
 
-                                <span class="verified-badge">
-
-                                    <b>
-                                        <i class="bi bi-patch-check-fill"></i>
-                                    </b>
-
-                                    Sudah diverifikasi
-
-                                </span>
+                                @if($user->nomor)
+                                    <span class="verified-badge">
+                                        <b><i class="bi bi-check-circle-fill"></i></b>
+                                        Nomor terisi
+                                    </span>
+                                @endif
 
                             </div>
 
@@ -211,15 +206,13 @@
                                 <input type="email" name="email" value="{{ old('email', $user->email) }}"
                                     placeholder="Masukkan Email">
 
-                                <span class="verified-badge">
-
-                                    <b>
-                                        <i class="bi bi-patch-check-fill"></i>
-                                    </b>
-
-                                    Sudah diverifikasi
-
-                                </span>
+                                @if($user->email)
+                                    <span class="verified-badge {{ $user->hasVerifiedEmail() ? '' : 'unverified-badge' }}">
+                                        <b><i
+                                                class="bi {{ $user->hasVerifiedEmail() ? 'bi-patch-check-fill' : 'bi-exclamation-circle-fill' }}"></i></b>
+                                        {{ $user->hasVerifiedEmail() ? 'Sudah diverifikasi' : 'Belum diverifikasi' }}
+                                    </span>
+                                @endif
 
                             </div>
 
@@ -291,56 +284,48 @@
                 {{-- ========================= --}}
 
                 <div class="form-action">
-                <button type="submit"
-                    class="save-button">
-                    Simpan Perubahan
-                </button>
+                    <button type="submit" class="save-button">
+                        Simpan Perubahan
+                    </button>
 
-            </div>>
+                </div>
 
-                </form>
+            </form>
 
-            </div>
-        </main>
-        @if(session('success'))
-
-        <div class="success-alert">
-            {{ session('success') }}
         </div>
+    </main>
+    @include('components.footer')
 
-        @endif
+    <script>
 
-@include('components.footer')
+        const avatarInput = document.getElementById('avatarInput');
+        const avatarPreview = document.getElementById('avatarPreview');
 
-<script>
+        avatarInput.addEventListener('change', function () {
 
-    const avatarInput = document.getElementById('avatarInput');
-    const avatarPreview = document.getElementById('avatarPreview');
+            const file = this.files[0];
 
-    avatarInput.addEventListener('change', function () {
+            if (!file) return;
 
-        const file = this.files[0];
+            const reader = new FileReader();
 
-        if (!file) return;
+            reader.onload = function (e) {
 
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-
-            avatarPreview.innerHTML = `
+                avatarPreview.innerHTML = `
                 <img
                     id="previewImage"
                     src="${e.target.result}"
                     alt="Preview Foto Profil">
             `;
 
-        }
+            }
 
-        reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
 
-    });
+        });
 
-</script>
+    </script>
 
 </body>
+
 </html>

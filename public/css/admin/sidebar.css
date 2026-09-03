@@ -5,6 +5,13 @@
 .sidebar {
     width: 280px;
     min-height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    max-height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* IE/Edge lama */
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
@@ -13,6 +20,10 @@
         radial-gradient(circle at top left, rgba(255, 255, 255, .22), transparent 34%),
         linear-gradient(180deg, var(--primary), var(--primary-hover));
     box-shadow: 12px 0 32px rgba(31, 41, 55, .12);
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;   /* Chrome, Safari, Edge modern */
 }
 
 /* ============================================================

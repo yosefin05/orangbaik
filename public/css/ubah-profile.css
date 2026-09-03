@@ -7,14 +7,14 @@
 .edit-profile-container {
     width: min(100% - 90px, 1120px);
     margin-inline: auto;
-    padding: 38px 0 92px;
+    padding: var(--space-10) 0 var(--space-20);
 }
 
 /* BACK */
 .edit-back {
     display: inline-flex;
     align-items: center;
-    gap: 34px;
+    gap: var(--space-8);
 
     border: none;
     background: transparent;
@@ -23,7 +23,7 @@
     font-size: var(--fs-md);
     font-weight: var(--fw-bold);
 
-    margin-bottom: 72px;
+    margin-bottom: var(--space-16);
     cursor: pointer;
 }
 
@@ -34,7 +34,7 @@
 
 /* HEADING */
 .profile-heading {
-    margin-bottom: 28px;
+    margin-bottom: var(--space-6);
 }
 
 .profile-heading h1 {
@@ -42,12 +42,12 @@
     font-size: var(--fs-md);
     font-weight: var(--fw-bold);
     line-height: 1.2;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .profile-heading p {
     color: #050505;
-    font-size: var(--fs-md);
+    font-size: var(--fs-sm);
     font-weight: var(--fw-regular);
     line-height: 1.2;
     max-width: 1060px;
@@ -62,22 +62,22 @@
 .edit-profile-form {
     display: flex;
     flex-direction: column;
-    gap: 34px;
+    gap: var(--space-8);
 }
 
 .form-section h2 {
     color: #050505;
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     line-height: 1.2;
-    margin-bottom: 18px;
+    margin-bottom: var(--space-4);
 }
 
 /* PROFILE INFO */
 .profile-info-grid {
     display: grid;
     grid-template-columns: 190px 1fr;
-    gap: 30px;
+    gap: var(--space-8);
     align-items: center;
 }
 
@@ -144,20 +144,17 @@
 .profile-fields {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: var(--space-4);
 }
 
 /* INPUT CARD */
 .input-card {
     min-height: 74px;
     position: relative;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
-
-    padding: 12px 62px 12px 22px;
-
+    padding: var(--space-3) 62px var(--space-3) var(--space-5);
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -168,17 +165,15 @@
     font-size: var(--fs-xxs);
     font-weight: var(--fw-medium);
     line-height: 1.2;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .input-card input,
 .input-card select {
     width: 100%;
-
     border: none;
     outline: none;
     background: transparent;
-
     color: var(--primary);
     font-family: inherit;
     font-size: var(--fs-sm);
@@ -186,29 +181,52 @@
     line-height: 1.35;
 }
 
-.input-card input::placeholder {
-    color: #b0b0b0;
-}
-
 .input-card select {
     appearance: none;
-    color: #b0b0b0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     cursor: pointer;
+}
+
+.input-card input:focus,
+.input-card select:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.input-card input:-webkit-autofill,
+.input-card input:-webkit-autofill:hover,
+.input-card input:-webkit-autofill:focus,
+.input-card input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg) inset !important;
+    -webkit-text-fill-color: var(--primary) !important;
+    caret-color: var(--primary);
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.input-card select:-webkit-autofill,
+.input-card select:-webkit-autofill:hover,
+.input-card select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg) inset !important;
+    -webkit-text-fill-color: var(--primary) !important;
+}
+
+.security-fields .input-card input:-webkit-autofill,
+.security-fields .input-card input:-webkit-autofill:hover,
+.security-fields .input-card input:-webkit-autofill:focus,
+.security-fields .input-card input:-webkit-autofill:active {
+    -webkit-text-fill-color: #050505 !important;
 }
 
 .field-icon {
     position: absolute;
-    right: 24px;
+    right: var(--space-6);
     top: 50%;
     transform: translateY(-50%);
-
     width: 28px;
     height: 28px;
-
     display: grid;
     place-items: center;
-
-    color: var(--primary);
 }
 
 .field-icon i {
@@ -218,27 +236,24 @@
 
 /* CONTACT */
 .contact-block {
-    margin-bottom: 26px;
+    margin-bottom: var(--space-3);
 }
 
 .contact-block h3 {
     color: #050505;
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
-    margin-bottom: 14px;
+    margin-bottom: var(--space-2);
 }
 
 .verified-card {
     min-height: 142px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 22px;
-
-    padding: 26px 44px 24px 28px;
-    margin-bottom: 18px;
-
+    gap: var(--space-5);
+    padding: var(--space-6) var(--space-10) var(--space-6) var(--space-6);
+    margin-bottom: var(--space-4);
     background: #dff2ff;
     border-radius: var(--radius-sm);
 }
@@ -248,17 +263,19 @@
     min-width: 0;
 }
 
+/* FIX: margin dipindah ke badge (adjacent sibling), bukan selalu
+   nempel di input — supaya kalau badge tidak render, tidak ada
+   ruang kosong nganggur di bawah nomor/email. */
 .verified-main input {
     width: 100%;
     border: none;
     outline: none;
     background: transparent;
-
     color: var(--primary);
     font-family: inherit;
     font-size: var(--fs-sm);
     font-weight: var(--fw-semibold);
-    margin-bottom: 18px;
+    margin-bottom: 0;
 }
 
 .verified-main input::placeholder {
@@ -266,15 +283,35 @@
     font-weight: var(--fw-regular);
 }
 
+.verified-main input + .verified-badge {
+    margin-top: var(--space-4);
+}
+
+.verified-main input:focus {
+    outline: none;
+    box-shadow: none;
+    border: none;
+}
+
+.verified-main input:-webkit-autofill,
+.verified-main input:-webkit-autofill:hover,
+.verified-main input:-webkit-autofill:focus,
+.verified-main input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #dff2ff inset !important;
+    -webkit-text-fill-color: var(--primary) !important;
+    caret-color: var(--primary);
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 .verified-badge {
     width: fit-content;
     min-width: 250px;
     height: 44px;
-    padding: 0 24px;
+    padding: 0 var(--space-6);
 
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-2);
 
     background: var(--bg);
     border-radius: var(--radius-full);
@@ -303,6 +340,16 @@
     line-height: 1;
 }
 
+/* BARU: badge untuk email yang belum diverifikasi */
+.unverified-badge {
+    background: var(--warning-light);
+    color: #b45309;
+}
+
+.unverified-badge b {
+    background: var(--danger);
+}
+
 .verified-card button {
     border: none;
     background: transparent;
@@ -316,17 +363,27 @@
 
 .helper-text {
     color: #9a9a9a;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-regular);
     line-height: 1.35;
+}
+
+/* BARU: teks error validasi form (@error di Blade) */
+.error-text {
+    display: block;
+    margin-top: var(--space-1);
+    color: var(--danger);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+    line-height: 1.4;
 }
 
 /* SECURITY */
 .security-fields {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    margin-bottom: 18px;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
 }
 
 .security-fields .input-card input {
@@ -341,82 +398,80 @@
    ACTION BUTTON
 =========================== */
 
-.form-action{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:16px;
-    margin-top:48px;
+.form-action {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-12);
 }
 
-.cancel-button{
-    min-width:150px;
-    height:52px;
+.cancel-button {
+    min-width: 150px;
+    height: 52px;
 
-    border:1px solid #D9D9D9;
-    border-radius:999px;
+    border: 1px solid #D9D9D9;
+    border-radius: var(--radius-full);
 
-    background:#fff;
-    color:#666;
+    background: #fff;
+    color: #666;
 
-    font-size:15px;
-    font-weight:600;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
 
-    cursor:pointer;
-    transition:.25s;
+    cursor: pointer;
+    transition: .25s;
 }
 
-.cancel-button:hover{
-    background:#f5f5f5;
+.cancel-button:hover {
+    background: #f5f5f5;
 }
 
-.save-button{
-    min-width:220px;
-    height:52px;
+.save-button {
+    min-width: 220px;
+    height: 52px;
 
-    border:none;
-    border-radius:999px;
+    border: none;
+    border-radius: var(--radius-full);
 
-    background:#3365AF;
-    color:#fff;
+    background: var(--primary);
+    color: #fff;
 
-    font-size:15px;
-    font-weight:600;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
 
-    cursor:pointer;
-    transition:.25s;
+    cursor: pointer;
+    transition: .25s;
 }
 
-.save-button:hover{
-    background:#295594;
-    transform:translateY(-1px);
+.save-button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
-.save-button:active{
-    transform:scale(.98);
+.save-button:active {
+    transform: scale(.98);
 }
 
-.success-alert{
-    background:#e8f7ea;
-    color:#1f7a37;
-    border:1px solid #bde5c8;
-    padding:15px 20px;
-    border-radius:10px;
-    margin-bottom:25px;
+.success-alert {
+    background: var(--success-light);
+    color: #1f7a37;
+    border: 1px solid rgba(34, 197, 94, .28);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-6);
 }
 
-@media(max-width:768px){
-
-    .form-action{
-        flex-direction:column-reverse;
-        align-items:stretch;
+@media (max-width: 768px) {
+    .form-action {
+        flex-direction: column-reverse;
+        align-items: stretch;
     }
 
     .cancel-button,
-    .save-button{
-        width:100%;
+    .save-button {
+        width: 100%;
     }
-
 }
 
 /* RESPONSIVE */
@@ -437,13 +492,13 @@
 @media (max-width: 560px) {
     .edit-profile-container {
         width: min(100% - 28px, 520px);
-        padding-top: 28px;
+        padding-top: var(--space-8);
     }
 
     .edit-back {
-        gap: 14px;
+        gap: var(--space-4);
         font-size: var(--fs-xs);
-        margin-bottom: 42px;
+        margin-bottom: var(--space-10);
     }
 
     .edit-back i {
@@ -481,7 +536,7 @@
 
     .input-card {
         min-height: 66px;
-        padding-right: 48px;
+        padding-right: var(--space-12);
     }
 
     .input-card input,
@@ -490,7 +545,7 @@
     }
 
     .field-icon {
-        right: 18px;
+        right: var(--space-4);
     }
 
     .field-icon i {
@@ -499,7 +554,7 @@
 
     .verified-card {
         min-height: auto;
-        padding: 22px;
+        padding: var(--space-5);
         flex-direction: column;
         align-items: flex-start;
     }

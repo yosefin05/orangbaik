@@ -60,8 +60,8 @@
 .news-content img {
     display: block;
     width: auto;
-    max-width: 72%;
-    max-height: 420px;
+    max-width: min(72%, 620px);
+    max-height: 360px;
     height: auto;
     object-fit: contain;
     margin: 1rem auto;

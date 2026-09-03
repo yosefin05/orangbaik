@@ -8,10 +8,36 @@
     function insertImage(editor, file) {
         if (!file || !file.type.startsWith("image/")) return;
         const reader = new FileReader();
-        reader.onload = function () {
-            editor.focus();
-            document.execCommand("insertImage", false, reader.result);
-            sync(editor);
+        reader.onload = function (event) {
+            const image = new Image();
+            image.onload = function () {
+                const maxDimension = 900;
+                const scale = Math.min(
+                    1,
+                    maxDimension / image.naturalWidth,
+                    maxDimension / image.naturalHeight,
+                );
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(
+                    1,
+                    Math.round(image.naturalWidth * scale),
+                );
+                canvas.height = Math.max(
+                    1,
+                    Math.round(image.naturalHeight * scale),
+                );
+                canvas
+                    .getContext("2d")
+                    .drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                const outputType =
+                    file.type === "image/png" ? "image/png" : "image/jpeg";
+                const resizedImage = canvas.toDataURL(outputType, 0.82);
+                editor.focus();
+                document.execCommand("insertImage", false, resizedImage);
+                sync(editor);
+            };
+            image.src = event.target.result;
         };
         reader.readAsDataURL(file);
     }

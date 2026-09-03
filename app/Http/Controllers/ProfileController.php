@@ -32,32 +32,48 @@ class ProfileController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'nomor' => 'nullable|string|max:20',
             'jenis_kelamin' => 'nullable|string',
-            'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'password' => 'nullable|confirmed|min:8',
         ]);
 
-        // upload foto
+        $emailChanged = $validated['email'] !== $user->email;
+        if ($emailChanged) {
+            $user->forceFill(['email_verified_at' => null])->save();
+        }
+
+        $data = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'nomor' => $validated['nomor'] ?? null,
+            'jenis_kelamin' => $validated['jenis_kelamin'] ?? null,
+        ];
+
+        // Simpan foto baru dan hapus foto lama setelah path baru berhasil dibuat.
         if ($request->hasFile('foto_profil')) {
+            $oldPhoto = $user->foto_profil;
+            $data['foto_profil'] = $request->file('foto_profil')->store('foto-profil', 'public');
 
-            if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
-                Storage::disk('public')->delete($user->foto_profil);
+            if ($oldPhoto && Storage::disk('public')->exists($oldPhoto)) {
+                Storage::disk('public')->delete($oldPhoto);
             }
-
-            $validated['foto_profil'] = $request
-                ->file('foto_profil')
-                ->store('foto-profil', 'public');
         }
 
-        // password
         if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
+            $data['password'] = Hash::make($validated['password']);
         }
 
-        $user->update($validated);
+        $user->update($data);
 
-        return back()->with('success', 'Profil berhasil diperbarui.');
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+        }
+
+        return back()->with(
+            'success',
+            $emailChanged
+            ? 'Profil diperbarui. Silakan verifikasi email baru Anda.'
+            : 'Profil berhasil diperbarui.'
+        );
     }
 
     public function destroy(Request $request): RedirectResponse

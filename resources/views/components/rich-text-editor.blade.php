@@ -64,8 +64,8 @@
 
         .rich-text-content img {
             width: auto;
-            max-width: 72%;
-            max-height: 420px;
+            max-width: min(72%, 620px);
+            max-height: 360px;
             height: auto;
             display: block;
             object-fit: contain;
