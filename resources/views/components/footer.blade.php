@@ -48,6 +48,7 @@
             <h4>Pusat Informasi</h4>
             <a href="{{ url('/tentang') }}">Tentang Kami</a>
             <a href="{{ url('/syarat-ketentuan') }}">Syarat & Ketentuan</a>
+            <a href="{{ url('/pusat-bantuan') }}">Pusat Bantuan</a>
             <a href="{{ url('/laporan-keuangan') }}">Laporan Keuangan</a>
         </div>
 

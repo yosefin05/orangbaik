@@ -519,6 +519,288 @@
 }
 
 /* ================================
+   MAPS STYLING - ORANGBAIK.ID
+   Terpisah dari pusat-bantuan.css
+================================ */
+
+/* ================================
+   CONTACT + MAP SECTION
+================================ */
+
+.help-contact-section {
+    padding-top: var(--space-7, 28px);
+    padding-bottom: var(--space-8);
+    background: var(--bg-soft);
+}
+
+.help-contact-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr);
+    gap: var(--space-6);
+    padding-top: var(--space-7, 28px);
+    border-top: 1px solid var(--border);
+}
+
+/* ================================
+   CONTACT CARDS
+================================ */
+
+.help-contact-list {
+    display: grid;
+    gap: var(--space-5);
+}
+
+.contact-card {
+    min-height: 130px;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) 32px;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: transparent;
+    color: inherit;
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+.contact-card:hover {
+    transform: translateY(-3px);
+    background: var(--bg);
+    box-shadow: var(--shadow-card);
+}
+
+.contact-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    color: var(--primary);
+}
+
+.contact-icon i {
+    font-size: 29px;
+    line-height: 1;
+}
+
+.contact-text {
+    min-width: 0;
+}
+
+.contact-text strong {
+    display: block;
+    margin-bottom: var(--space-1);
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.3;
+}
+
+.contact-text small {
+    display: block;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.45;
+}
+
+.contact-arrow {
+    display: grid;
+    place-items: center;
+    color: var(--text-dark);
+    font-size: 34px;
+    line-height: 1;
+    transition: .2s ease;
+}
+
+.contact-arrow i {
+    line-height: 1;
+}
+
+.contact-card:hover .contact-arrow {
+    transform: translateX(3px);
+    color: var(--primary);
+}
+
+/* ================================
+   MAP CARD - GOOGLE MAPS
+================================ */
+
+.map-card {
+    background: #ffffff;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.3s ease;
+}
+
+.map-card:hover {
+    box-shadow: var(--shadow-card);
+}
+
+.map-card iframe {
+    display: block;
+    width: 100%;
+    height: 260px;
+    border: none;
+}
+
+/* ================================
+   MAP ADDRESS FOOTER
+================================ */
+
+.map-address {
+    padding: 14px 18px;
+    background: #f8fafc;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.map-address .map-icon {
+    color: #e74c3c;
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.map-address .map-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.map-address .map-text .map-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 2px;
+}
+
+.map-address .map-text .map-subtitle {
+    display: block;
+    font-size: 13px;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.map-address .map-text .map-location {
+    display: block;
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+}
+
+.map-address .map-open-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.map-address .map-open-btn:hover {
+    background: #357abd;
+}
+
+.map-address .map-open-btn i {
+    font-size: 14px;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 900px) {
+    .help-contact-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .map-card iframe {
+        height: 220px;
+    }
+}
+
+@media (max-width: 640px) {
+    .help-contact-layout {
+        gap: var(--space-4);
+        padding-top: var(--space-5);
+    }
+    
+    .help-contact-list {
+        gap: var(--space-4);
+    }
+    
+    .contact-card {
+        min-height: auto;
+        grid-template-columns: 42px minmax(0, 1fr);
+        padding: var(--space-4);
+    }
+    
+    .contact-icon {
+        width: 42px;
+        height: 42px;
+    }
+    
+    .contact-icon i {
+        font-size: 25px;
+    }
+    
+    .contact-arrow {
+        display: none;
+    }
+    
+    .contact-text strong {
+        font-size: var(--fs-xs);
+    }
+    
+    .contact-text small {
+        font-size: var(--fs-xxs);
+    }
+    
+    .map-card iframe {
+        height: 180px;
+    }
+    
+    .map-address {
+        padding: 12px 14px;
+        flex-wrap: wrap;
+    }
+    
+    .map-address .map-open-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 14px;
+    }
+    
+    .map-address .map-text .map-title {
+        font-size: 13px;
+    }
+    
+    .map-address .map-text .map-subtitle {
+        font-size: 12px;
+    }
+    
+    .map-address .map-text .map-location {
+        font-size: 11px;
+    }
+}
+
+/* ================================
    RESPONSIVE
 ================================ */
 
