@@ -28,37 +28,6 @@
             'icon' => 'bi bi-envelope-fill',
         ],
     ];
-
-    $faqs = [
-        [
-            'question' => 'Apakah OrangBaik.id memiliki izin legalitas dan diawasi oleh Pemerintah?',
-            'answer' => 'OrangBaik.id berkomitmen menjaga transparansi, legalitas, serta pengelolaan dana yang amanah dalam setiap program yang ditampilkan.',
-        ],
-        [
-            'question' => 'Bagaimana OrangBaik.id memastikan keaslian galang dana?',
-            'answer' => 'Setiap penggalang dana perlu melalui proses verifikasi data dan pemeriksaan informasi sebelum campaign ditampilkan kepada publik.',
-        ],
-        [
-            'question' => 'Apakah ada potongan untuk biaya operasional OrangBaik.id?',
-            'answer' => 'Biaya operasional digunakan untuk mendukung layanan platform, verifikasi, sistem pembayaran, dan pelaporan program.',
-        ],
-        [
-            'question' => 'Bagaimana cara mendapatkan laporan perkembangan program yang saya dukung?',
-            'answer' => 'Laporan perkembangan program dapat dilihat melalui update campaign atau informasi yang dibagikan oleh penggalang dana.',
-        ],
-        [
-            'question' => 'Bagaimana Cara Mendaftar menjadi Penggalang Dana?',
-            'answer' => 'Kamu dapat mendaftar melalui menu penggalang dana, lalu melengkapi data dan dokumen verifikasi yang dibutuhkan.',
-        ],
-        [
-            'question' => 'Apakah donasi saya aman?',
-            'answer' => 'Donasi diproses melalui sistem yang dirancang untuk menjaga keamanan transaksi dan transparansi penyaluran bantuan.',
-        ],
-        [
-            'question' => 'Apakah saya bisa mendapatkan e-kwitansi?',
-            'answer' => 'Ya, e-kwitansi dapat diakses melalui halaman riwayat donasi setelah transaksi berhasil diproses.',
-        ],
-    ];
 @endphp
 
 <main class="help-page">
@@ -180,16 +149,18 @@
             </div>
 
             <div class="about-faq-list">
-                @foreach ($faqs as $faq)
+                @forelse ($faqs as $faq)
                     <details class="about-faq-item">
                         <summary>
-                            <span>{{ $faq['question'] }}</span>
+                            <span>{{ $faq->pertanyaan }}</span>
                             <i class="bi bi-plus-lg" aria-hidden="true"></i>
                         </summary>
 
-                        <p>{{ $faq['answer'] }}</p>
+                        <p>{{ $faq->jawaban }}</p>
                     </details>
-                @endforeach
+                @empty
+                    <p>Belum ada pertanyaan yang ditampilkan.</p>
+                @endforelse
             </div>
 
         </div>

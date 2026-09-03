@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             FilterSeeder::class,
             PaymentGatewaySeeder::class,
             PaymentChannelSeeder::class,
+            SyaratKetentuanSeeder::class,
+            FaqSeeder::class,
         ]);
        
     }

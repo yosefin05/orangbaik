@@ -25,29 +25,6 @@
     ];
 
     $years = ['2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016'];
-
-    $faqs = [
-        [
-            'question' => 'Apakah OrangBaik.id memiliki izin legalitas dan diawasi oleh pemerintah?',
-            'answer' => 'OrangBaik.id dikelola secara profesional dengan komitmen terhadap transparansi, legalitas, dan pengelolaan dana yang amanah.',
-        ],
-        [
-            'question' => 'Bagaimana OrangBaik.id memastikan keaslian galang dana?',
-            'answer' => 'Setiap penggalang dana perlu melalui proses verifikasi dan pemeriksaan data sebelum campaign ditampilkan kepada publik.',
-        ],
-        [
-            'question' => 'Apakah ada potongan untuk biaya operasional OrangBaik.id?',
-            'answer' => 'Biaya operasional digunakan untuk mendukung layanan platform, pengembangan sistem, verifikasi, serta proses pelaporan program.',
-        ],
-        [
-            'question' => 'Bagaimana cara mendapatkan laporan perkembangan program yang saya dukung?',
-            'answer' => 'Laporan perkembangan program dapat dilihat melalui update campaign atau informasi yang disediakan oleh penggalang dana.',
-        ],
-        [
-            'question' => 'Bagaimana cara mendaftar menjadi penggalang dana?',
-            'answer' => 'Kamu dapat mendaftar melalui halaman profil, lalu memilih menu daftar sebagai penggalang dana dan melengkapi data verifikasi.',
-        ],
-    ];
 @endphp
 
 <main class="about-page">
@@ -218,16 +195,18 @@
             </div>
 
             <div class="about-faq-list">
-                @foreach ($faqs as $faq)
+                @forelse ($faqs as $faq)
                     <details class="about-faq-item">
                         <summary>
-                            <span>{{ $faq['question'] }}</span>
+                            <span>{{ $faq->pertanyaan }}</span>
                             <i class="bi bi-plus-lg"></i>
                         </summary>
 
-                        <p>{{ $faq['answer'] }}</p>
+                        <p>{{ $faq->jawaban }}</p>
                     </details>
-                @endforeach
+                @empty
+                    <p>Belum ada pertanyaan yang ditampilkan.</p>
+                @endforelse
             </div>
 
         </div>

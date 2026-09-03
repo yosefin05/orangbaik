@@ -13,111 +13,6 @@
 
 @include('components.header')
 
-@php
-    $terms = [
-        [
-            'title' => 'Syarat dan Ketentuan',
-            'body' => [
-                'Situs OrangBaik.id merupakan platform berbagi dan galang dana yang dikelola oleh Yayasan Dompet Al-Qur’an Indonesia. Dengan menggunakan layanan ini, pengguna dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan yang berlaku.',
-                'Syarat dan ketentuan ini mengatur penggunaan layanan, kewajiban pengguna, ketentuan donasi, penggalangan dana, serta kebijakan lain yang berkaitan dengan aktivitas di platform OrangBaik.id.',
-            ],
-        ],
-        [
-            'title' => 'Ketentuan Umum',
-            'body' => [
-                'Pengguna wajib memberikan informasi yang benar, lengkap, dan dapat dipertanggungjawabkan saat menggunakan layanan OrangBaik.id.',
-                'OrangBaik.id berhak melakukan verifikasi, peninjauan, pembatasan, atau penghapusan campaign apabila ditemukan informasi yang tidak sesuai, menyesatkan, atau melanggar ketentuan yang berlaku.',
-                'Setiap aktivitas donasi dan penggalangan dana harus dilakukan dengan itikad baik, transparan, serta tidak bertentangan dengan hukum yang berlaku di Indonesia.',
-            ],
-        ],
-        [
-            'title' => 'Prinsip Program Penggalangan Dana dan Donasi',
-            'body' => [
-                'Penggalangan dana dilakukan untuk tujuan sosial, kemanusiaan, pendidikan, dakwah, kesehatan, atau kegiatan lain yang sejalan dengan nilai kebaikan.',
-                'Donatur memahami bahwa dana yang diberikan merupakan bentuk dukungan sukarela terhadap campaign yang dipilih.',
-                'Penggalang dana bertanggung jawab atas kebenaran informasi, penggunaan dana, serta laporan perkembangan program kepada donatur.',
-            ],
-        ],
-        [
-            'title' => 'Platform OrangBaik.id',
-            'body' => [
-                'OrangBaik.id menyediakan layanan teknologi untuk mempertemukan penggalang dana dan donatur secara online.',
-                'OrangBaik.id dapat melakukan kurasi, moderasi, dan verifikasi terhadap campaign untuk menjaga keamanan dan kepercayaan pengguna.',
-                'Platform dapat mengalami perubahan fitur, tampilan, maupun kebijakan sesuai kebutuhan pengembangan layanan.',
-            ],
-        ],
-        [
-            'title' => 'Ketentuan Donasi',
-            'body' => [
-                'Donatur dapat memilih nominal donasi dan metode pembayaran yang tersedia pada platform.',
-                'Setelah transaksi berhasil, donasi akan tercatat dalam sistem dan diproses sesuai campaign yang dipilih.',
-                'Donasi yang telah berhasil diproses tidak dapat dibatalkan, kecuali terdapat kondisi khusus sesuai kebijakan platform dan ketentuan hukum yang berlaku.',
-            ],
-        ],
-        [
-            'title' => 'Ketentuan Penggalangan Dana',
-            'body' => [
-                'Penggalang dana wajib memberikan informasi campaign yang jelas, benar, dan tidak menyesatkan.',
-                'Campaign yang dibuat harus mencantumkan tujuan, target dana, penerima manfaat, dan rencana penggunaan dana secara transparan.',
-                'OrangBaik.id berhak menolak atau menonaktifkan campaign yang tidak sesuai dengan ketentuan.',
-            ],
-        ],
-        [
-            'title' => 'Kewajiban Pengguna',
-            'body' => [
-                'Pengguna wajib menjaga kerahasiaan akun dan bertanggung jawab atas seluruh aktivitas yang dilakukan menggunakan akun tersebut.',
-                'Pengguna dilarang menggunakan platform untuk kegiatan penipuan, pencucian uang, penyebaran informasi palsu, ujaran kebencian, atau aktivitas yang melanggar hukum.',
-                'Pengguna wajib mematuhi seluruh aturan, kebijakan, dan arahan yang diberikan oleh OrangBaik.id.',
-            ],
-        ],
-        [
-            'title' => 'Larangan',
-            'body' => [
-                'Pengguna dilarang membuat campaign palsu, menggunakan identitas orang lain, atau menyalahgunakan dana donasi.',
-                'Pengguna dilarang mengunggah konten yang mengandung unsur SARA, pornografi, kekerasan, perjudian, atau hal lain yang bertentangan dengan norma dan hukum.',
-                'Pengguna dilarang melakukan tindakan yang dapat merusak sistem, mengganggu layanan, atau mencuri data pengguna lain.',
-            ],
-        ],
-        [
-            'title' => 'Biaya Operasional dan Administrasi',
-            'body' => [
-                'OrangBaik.id dapat mengenakan biaya operasional atau administrasi untuk mendukung keberlangsungan layanan.',
-                'Besaran biaya dapat diinformasikan pada halaman campaign atau halaman pembayaran sesuai kebijakan yang berlaku.',
-            ],
-        ],
-        [
-            'title' => 'Perubahan Ketentuan',
-            'body' => [
-                'OrangBaik.id berhak memperbarui syarat dan ketentuan ini sewaktu-waktu.',
-                'Perubahan akan berlaku setelah dipublikasikan pada platform. Pengguna disarankan untuk membaca halaman ini secara berkala.',
-            ],
-        ],
-    ];
-
-    $faqs = [
-        [
-            'question' => 'Apakah OrangBaik.id memiliki izin legalitas?',
-            'answer' => 'OrangBaik.id dikelola oleh lembaga yang bertanggung jawab dan berkomitmen menjaga keamanan serta transparansi layanan.',
-        ],
-        [
-            'question' => 'Bagaimana OrangBaik.id memastikan keaslian galang dana?',
-            'answer' => 'Campaign dapat melalui proses peninjauan, verifikasi data, serta pemantauan informasi agar tetap sesuai dengan ketentuan platform.',
-        ],
-        [
-            'question' => 'Apakah ada biaya operasional?',
-            'answer' => 'Biaya operasional dapat diterapkan sesuai kebijakan platform dan akan diinformasikan pada halaman terkait apabila berlaku.',
-        ],
-        [
-            'question' => 'Bagaimana cara mendapatkan laporan perkembangan program?',
-            'answer' => 'Donatur dapat melihat update campaign atau informasi perkembangan yang dibagikan oleh penggalang dana melalui platform.',
-        ],
-        [
-            'question' => 'Bagaimana cara mendaftar menjadi penggalang dana?',
-            'answer' => 'Pengguna dapat mendaftar sebagai penggalang dana melalui fitur pendaftaran yang tersedia, kemudian mengikuti proses verifikasi.',
-        ],
-    ];
-@endphp
-
 <main class="terms-page">
 
     {{-- HERO --}}
@@ -152,24 +47,30 @@
                 <h3>Daftar Isi</h3>
 
                 <nav>
-                    @foreach ($terms as $index => $term)
+                    @forelse ($terms as $index => $term)
                         <a href="#term-{{ $index + 1 }}">
-                            {{ $term['title'] }}
+                            {{ $term->judul }}
                         </a>
-                    @endforeach
+                    @empty
+                        <p>Konten syarat dan ketentuan sedang diperbarui.</p>
+                    @endforelse
                 </nav>
             </aside>
 
             <article class="terms-document">
-                @foreach ($terms as $index => $term)
+                @forelse ($terms as $index => $term)
                     <section class="terms-block" id="term-{{ $index + 1 }}">
-                        <h2>{{ $term['title'] }}</h2>
+                        <h2>{{ $term->judul }}</h2>
 
-                        @foreach ($term['body'] as $paragraph)
+                        @foreach ($term->paragraphs() as $paragraph)
                             <p>{{ $paragraph }}</p>
                         @endforeach
                     </section>
-                @endforeach
+                @empty
+                    <section class="terms-block">
+                        <p>Konten syarat dan ketentuan sedang diperbarui.</p>
+                    </section>
+                @endforelse
             </article>
 
         </div>
@@ -188,18 +89,20 @@
             </div>
 
             <div class="faq-list">
-                @foreach ($faqs as $faq)
+                @forelse ($faqs as $faq)
                     <details class="faq-item">
                         <summary>
-                            <span>{{ $faq['question'] }}</span>
+                            <span>{{ $faq->pertanyaan }}</span>
                             <i class="bi bi-plus-lg"></i>
                         </summary>
 
                         <p>
-                            {{ $faq['answer'] }}
+                            {{ $faq->jawaban }}
                         </p>
                     </details>
-                @endforeach
+                @empty
+                    <p>Belum ada pertanyaan yang ditampilkan.</p>
+                @endforelse
             </div>
 
         </div>

@@ -13,7 +13,8 @@ use App\Http\Controllers\User\{
     CampaignUpdateController,
     FundraiserController,
     SearchController,
-    RiwayatDonasiController
+    RiwayatDonasiController,
+    PageController
 };
 use App\Http\Controllers\{
     MidtransController,
@@ -84,9 +85,9 @@ Route::get('/donasi/status/{status}', [DonasiController::class, 'status'])->name
 
 // Static pages
 Route::view('/donasi/bayar', 'pages.donasi-bayar')->name('donasi.bayar');
-Route::view('/tentang', 'pages.tentang')->name('tentang');
-Route::view('/syarat-ketentuan', 'pages.syarat-ketentuan')->name('syarat.ketentuan');
-Route::view('/pusat-bantuan', 'pages.pusat-bantuan')->name('pusat.bantuan');
+Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
+Route::get('/syarat-ketentuan', [PageController::class, 'syaratKetentuan'])->name('syarat.ketentuan');
+Route::get('/pusat-bantuan', [PageController::class, 'pusatBantuan'])->name('pusat.bantuan');
 
 // Penggalang Dana (Public)
 Route::get('/profil-penggalang/{id}', [PenggalangDanaController::class, 'profile'])->name('profil.penggalang');

@@ -129,6 +129,19 @@
                     <span>Testimoni</span>
                 </a>
 
+                {{-- Syarat & Ketentuan --}}
+                <a href="{{ route('admin.syarat-ketentuan.index') }}"
+                    class="{{ request()->routeIs('admin.syarat-ketentuan.*') ? 'active' : '' }}">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Syarat & Ketentuan</span>
+                </a>
+
+                {{-- FAQ --}}
+                <a href="{{ route('admin.faq.index') }}"
+                    class="{{ request()->routeIs('admin.faq.*') ? 'active' : '' }}">
+                    <i class="bi bi-question-circle"></i>
+                    <span>FAQ</span>
+                </a>
 
             </nav>
 

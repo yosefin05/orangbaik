@@ -13,6 +13,8 @@ use App\Http\Controllers\admin\KomentarController;
 use App\Http\Controllers\admin\DonasiController;
 use App\Http\Controllers\admin\PaymentGatewayController;
 use App\Http\Controllers\admin\PaymentChannelController;
+use App\Http\Controllers\admin\SyaratKetentuanController;
+use App\Http\Controllers\admin\FaqController;
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -75,6 +77,11 @@ Route::middleware(['auth', 'admin'])
         });
 
         Route::resource('testimoni', TestimoniController::class);
+
+        Route::resource('syarat-ketentuan', SyaratKetentuanController::class)
+            ->except(['show']);
+        Route::resource('faq', FaqController::class)
+            ->except(['show']);
 
         Route::get('donasi/export', [DonasiController::class, 'export'])->name('donasi.export');
         Route::patch('donasi/{donasi}/approve-manual', [DonasiController::class, 'approveManual'])->name('donasi.approve-manual');
