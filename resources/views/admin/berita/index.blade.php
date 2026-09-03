@@ -32,20 +32,23 @@
                     @forelse($berita as $item)
                         <tr>
                             <td>
-                                @if($item->thumbnail)
-                                    <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->judul }}"
-                                        class="table-thumbnail">
-                                @else
-                                    <span class="text-muted">Tidak ada</span>
-                                @endif
+                                <div class="table-thumbnail-wrapper">
+                                    @if($item->thumbnail)
+                                        <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->judul }}"
+                                            class="table-thumbnail"
+                                            onerror="this.parentElement.innerHTML='<i class=\'bi bi-image text-muted\'></i>'">
+                                    @else
+                                        <i class="bi bi-image text-muted"></i>
+                                    @endif
+                                </div>
                             </td>
                             <td>
-                                <p class="cell-title">
+                                <p class="cell-title" title="{{ $item->judul }}">
                                     {{ $item->judul }}
                                 </p>
                             </td>
                             <td>
-                                <span class="badge badge-blue">
+                                <span class="badge badge-blue badge-truncate" title="{{ $item->slug }}">
                                     {{ $item->slug }}
                                 </span>
                             </td>
@@ -84,7 +87,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="empty-state text-center py-4">
+                            <td colspan="7" class="empty-state text-center py-4">
                                 <div class="empty-state-content">
                                     <i class="bi bi-newspaper text-muted" style="font-size: 2rem;"></i>
                                     <p class="mt-2 text-muted fw-semibold">Belum ada data berita yang ditemukan.</p>

@@ -66,14 +66,11 @@
                         </div>
 
                         @if ($campaign->campaignUpdates->count() > 0)
-                            <div class="updates-list">
-                                @foreach ($campaign->campaignUpdates as $update)
-                                    @php
-                                        $firstImage = $update->campaign_update_gambar->first();
-                                        $thumbnailImage = $firstImage
-                                            ? asset('storage/' . $firstImage->gambar_update)
-                                            : asset('storage/' . $campaign->thumbnail);
-                                    @endphp
+                        <div class="updates-list">
+                            @foreach ($campaign->campaignUpdates as $update)
+                            @php
+                                $thumbnailImage = asset('storage/' . $campaign->thumbnail);
+                            @endphp
 
                                     <div class="update-card" id="update-{{ $update->id }}">
                                         <div class="update-thumbnail">
@@ -91,7 +88,7 @@
                                             </div>
 
                                             <div class="update-preview-text">
-                                                {{ Str::limit($update->isi_update, 120) }}
+                                                {{ Str::limit(strip_tags($update->isi_update), 120) }}
                                             </div>
 
                                             <button class="btn-read-more" onclick="toggleUpdateDetail({{ $update->id }})">
@@ -102,29 +99,8 @@
                                             <div class="update-detail-wrapper" id="detailContent-{{ $update->id }}">
                                                 <div class="update-detail-content">
                                                     <div class="update-full-body">
-                                                        {!! nl2br(e($update->isi_update)) !!}
+                                                        {!! $update->isi_update !!}
                                                     </div>
-
-                                                    @if ($update->campaign_update_gambar->count() > 0)
-                                                        @php
-                                                            $allImages = $update->campaign_update_gambar->map(function ($g) {
-                                                                return asset('storage/' . $g->gambar_update);
-                                                            })->toArray();
-                                                            $allImagesJson = json_encode($allImages);
-                                                        @endphp
-                                                        <div class="update-detail-gallery">
-                                                            @foreach ($update->campaign_update_gambar as $gambar)
-                                                                <div class="update-detail-gallery-item"
-                                                                    onclick="openLightbox('{{ asset('storage/' . $gambar->gambar_update) }}', {{ $allImagesJson }})">
-                                                                    <img src="{{ asset('storage/' . $gambar->gambar_update) }}"
-                                                                        alt="Gambar update">
-                                                                    <div class="zoom-overlay">
-                                                                        <i class="bi bi-zoom-in"></i>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    @endif
                                                 </div>
                                             </div>
 
@@ -150,20 +126,20 @@
                                             @endauth
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="empty-updates">
-                                <i class="bi bi-megaphone"></i>
-                                <p>Belum ada update dari campaign ini.</p>
-                                @auth
-                                    @if ($campaign->isOwner(Auth::id()))
-                                        <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn-outline">
-                                            Buat Update Pertama
-                                        </a>
-                                    @endif
-                                @endauth
-                            </div>
+                                    @endforeach
+                                </div>
+                            @else
+                        <div class="empty-updates">
+                            <i class="bi bi-megaphone"></i>
+                            <p>Belum ada update dari campaign ini.</p>
+                            @auth
+                                @if ($campaign->isOwner(Auth::id()))
+                                    <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn-outline">
+                                        Buat Update Pertama
+                                    </a>
+                                @endif
+                            @endauth
+                        </div>
                         @endif
                     </section>
 
@@ -199,12 +175,10 @@
                             <span>👤 {{ $campaign->donasi_count ?? 0 }} donatur</span>
                             <span>
                                 @php
-                                    use Carbon\Carbon;
-
-                                    $hariIni = Carbon::today();
-                                    $mulai = Carbon::parse($campaign->tanggal_mulai)->startOfDay();
+                                    $hariIni = \Carbon\Carbon::today();
+                                    $mulai = \Carbon\Carbon::parse($campaign->tanggal_mulai)->startOfDay();
                                     $akhir = $campaign->tanggal_berakhir
-                                        ? Carbon::parse($campaign->tanggal_berakhir)->endOfDay()
+                                        ? \Carbon\Carbon::parse($campaign->tanggal_berakhir)->endOfDay()
                                         : null;
 
                                     if ($hariIni->lt($mulai)) {
@@ -329,6 +303,10 @@
                                 </div>
 
                                 <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
+                                <div class="fundraiser-total-donasi">
+                                    Terkumpul melalui Anda:
+                                    <strong>Rp {{ number_format($fundraiser->total_donasi_settlement, 0, ',', '.') }}</strong>
+                                </div>
 
                                 <div class="referral-qr-section">
                                     @php

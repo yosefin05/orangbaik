@@ -1,3 +1,17 @@
+.rich-text-output {
+    text-align: justify;
+}
+
+.rich-text-output img {
+    display: block;
+    width: auto;
+    max-width: 72%;
+    max-height: 420px;
+    height: auto;
+    object-fit: contain;
+    margin: 1rem auto;
+}
+
 /* ============================================================
    CAMPAIGN SHOW - ORANGBAIK.ID
    ============================================================ */
@@ -790,6 +804,23 @@ body {
     color: var(--muted);
     font-size: var(--fs-xs);
     margin-bottom: var(--space-2);
+}
+
+.fundraiser-total-donasi {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin: var(--space-3) 0;
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+    color: var(--muted);
+    font-size: var(--fs-xs);
+}
+
+.fundraiser-total-donasi strong {
+    color: var(--primary);
+    white-space: nowrap;
 }
 
 .referral-link-box {

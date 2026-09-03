@@ -33,6 +33,7 @@ class CampaignController extends Controller
             'campaignFilter.filter',
             'campaignUpdates.user',
             'campaignFundraisers.user',
+            'campaignFundraisers.donasis.pembayaran',
             'packages',
             'verifier',
             'approvedBy'

@@ -288,8 +288,8 @@ class CampaignController extends Controller
             },
             'donasi.user',
             'donasi.pembayaran',
-            'campaignUpdates.campaign_update_gambar',
             'campaignFundraisers.user',
+            'campaignFundraisers.donasis.pembayaran',
             'fundraisers'
         ])
             ->where('is_active', true)
@@ -307,19 +307,18 @@ class CampaignController extends Controller
         $campaign->terkumpul = $totalTerkumpul;
         $campaign->donasi_count = $totalDonatur;
 
-        $updatesData = $campaign->campaignUpdates->map(function ($update) {
-            return [
-                'id' => $update->id,
-                'judul' => $update->judul_update,
-                'isi' => $update->isi_update,
-                'tanggal' => $update->created_at->translatedFormat('d F Y'),
-                'gambar' => $update->campaign_update_gambar->map(function ($gambar) {
-                    return asset('storage/' . $gambar->gambar_update);
-                })->values(),
-            ];
-        });
+        if (request()->filled('ref')) {
+            $fundraiser = $campaign->fundraisers()
+                ->where('referral_code', request('ref'))
+                ->where('status', 'active')
+                ->first();
 
-        return view('pages.campaign.show', compact('campaign', 'updatesData'));
+            if ($fundraiser) {
+                session()->put('campaign_referral.' . $campaign->id, $fundraiser->referral_code);
+            }
+        }
+
+        return view('pages.campaign.show', compact('campaign'));
     }
 
     public function edit(Campaign $campaign)

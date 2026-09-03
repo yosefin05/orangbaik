@@ -29,9 +29,6 @@
                     <div class="news-content">
                         {!! $berita->isi !!}
                     </div>
-                    <div class="news-content">
-                        {!! $berita->isi !!}
-                    </div>
                     {{-- COMMENT --}}
                     <section class="comment-section">
                         <div class="comment-header">
@@ -41,7 +38,8 @@
                         @guest
                             <div class="comment-login-box">
                                 <p>
-                                    Anda harus <a href="{{ route('login', ['redirect' => url()->full()]) }}">login</a>
+                                    Anda harus <a
+                                        href="{{ route('login', ['redirect' => request()->fullUrl()]) }}">login</a>
                                     terlebih dahulu untuk memberikan komentar.
                                 </p>
                             </div>
@@ -105,7 +103,7 @@
                     <h3>Berita Lainnya</h3>
 
                     @forelse($relatedNews as $news)
-                        <a href="{{ route('berita.show', $news->slug) }}" class="sidebar-news-card">
+                        <a href="{{ route('berita.show', $news->custom_slug ?? $news->slug) }}" class="sidebar-news-card">
                             <img src="{{ asset('storage/' . $news->thumbnail) }}" alt="{{ $news->judul }}">
                             <div class="sidebar-news-content">
                                 <h4>{{ Str::limit($news->judul, 55) }}</h4>

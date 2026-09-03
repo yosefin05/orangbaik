@@ -21,7 +21,10 @@ class BeritaController extends Controller
         $berita = Berita::with([
             'user',
             'komentar.user'
-        ])->where('slug', $slug)
+        ])->where(function ($query) use ($slug) {
+            $query->where('slug', $slug)
+                ->orWhere('custom_slug', $slug);
+        })
             ->firstOrFail();
 
         $relatedNews = Berita::where('id', '!=', $berita->id)

@@ -56,6 +56,13 @@
             editor.addEventListener("input", function () {
                 sync(editor);
             });
+            editor.addEventListener("keydown", function (event) {
+                if (event.ctrlKey && event.key.toLowerCase() === "j") {
+                    event.preventDefault();
+                    document.execCommand("justifyFull", false, null);
+                    sync(editor);
+                }
+            });
             editor.addEventListener("paste", function (event) {
                 Array.from(event.clipboardData.files).forEach(function (file) {
                     if (file.type.startsWith("image/")) {

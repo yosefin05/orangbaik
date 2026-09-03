@@ -6,6 +6,7 @@
         <button type="button" data-command="bold" title="Tebal"><strong>B</strong></button>
         <button type="button" data-command="italic" title="Miring"><em>I</em></button>
         <button type="button" data-command="underline" title="Garis bawah"><u>U</u></button>
+        <button type="button" data-command="justifyFull" title="Rata penuh">Justify</button>
         <button type="button" data-command="insertUnorderedList" title="Daftar">&bull;</button>
         <button type="button" data-command="insertOrderedList" title="Daftar bernomor">1.</button>
         <button type="button" data-command="createLink" title="Tautan">Link</button>
@@ -13,7 +14,8 @@
         <input type="file" accept="image/*" data-image-input hidden>
     </div>
     <div id="{{ $editorId }}" class="rich-text-content" contenteditable="true" role="textbox" aria-multiline="true">
-        {!! $value !!}</div>
+        {!! $value !!}
+    </div>
     <textarea name="{{ $name }}" data-rich-text-input hidden>{{ $value }}</textarea>
 </div>
 
@@ -53,6 +55,7 @@
             padding: 12px;
             outline: none;
             line-height: 1.65;
+            text-align: justify;
         }
 
         .rich-text-content:focus {
@@ -60,10 +63,13 @@
         }
 
         .rich-text-content img {
-            max-width: 100%;
+            width: auto;
+            max-width: 72%;
+            max-height: 420px;
             height: auto;
             display: block;
-            margin: 12px 0;
+            object-fit: contain;
+            margin: 12px auto;
         }
 
         .rich-text-content a {

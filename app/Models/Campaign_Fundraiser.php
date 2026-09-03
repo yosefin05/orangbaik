@@ -57,7 +57,14 @@ class Campaign_Fundraiser extends Model
 
     public function donasis()
     {
-        return $this->hasMany(Donasi::class);
+        return $this->hasMany(Donasi::class, 'fundraiser_id');
+    }
+
+    public function getTotalDonasiSettlementAttribute(): int
+    {
+        return $this->donasis
+            ->filter(fn($donasi) => $donasi->pembayaran?->transaction_status === 'settlement')
+            ->sum('nominal');
     }
 
     public function getReferralUrlAttribute()

@@ -25,8 +25,4 @@ class Campaign_Update extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function campaign_update_gambar()
-    {
-        return $this->hasMany(Campaign_Update_Gambar::class, 'campaign_update_id');
-    }
 }

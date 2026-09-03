@@ -359,10 +359,13 @@
         </div>
         <div class="table-wrapper">
             <table class="data-table">
-                <thead><tr><th>Nama User</th></tr></thead>
+                <thead><tr><th>Nama User</th><th>Total Donasi</th></tr></thead>
                 <tbody>
                     @forelse($campaign->campaignFundraisers as $fundraiser)
-                        <tr><td><p class="cell-title">{{ $fundraiser->user->name ?? 'User tidak ditemukan' }}</p></td></tr>
+                        <tr>
+                            <td><p class="cell-title">{{ $fundraiser->user->name ?? 'User tidak ditemukan' }}</p></td>
+                            <td>Rp {{ number_format($fundraiser->total_donasi_settlement, 0, ',', '.') }}</td>
+                        </tr>
                     @empty
                         <tr><td class="empty-state">Tidak ada fundraiser pendukung.</td></tr>
                     @endforelse

@@ -34,7 +34,7 @@
 
                 <div class="hero-side-slider">
                     @foreach ($berita as $index => $news)
-                        <a href="{{ route('berita.show', $news->slug) }}"
+                        <a href="{{ route('berita.show', $news->custom_slug ?? $news->slug) }}"
                             class="hero-side-card {{ $index === 0 ? 'active' : '' }}">
                             <img src="{{ asset('storage/' . $news->thumbnail) }}" alt="{{ $news->judul }}">
 

@@ -5,10 +5,9 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\Campaign_Update;
-use App\Models\Campaign_Update_Gambar;
+use App\Support\RichText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class CampaignUpdateController extends Controller
 {
@@ -30,8 +29,6 @@ class CampaignUpdateController extends Controller
         $request->validate([
             'judul_update' => 'required|string|max:255',
             'isi_update' => 'required|string',
-            'gambar.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'gambar' => 'nullable|array|max:5',
         ]);
 
         // Simpan update
@@ -39,20 +36,8 @@ class CampaignUpdateController extends Controller
             'campaign_id' => $campaign->id,
             'user_id' => Auth::id(),
             'judul_update' => $request->judul_update,
-            'isi_update' => $request->isi_update,
+            'isi_update' => RichText::clean($request->isi_update),
         ]);
-
-        // Simpan gambar-gambar
-        if ($request->hasFile('gambar')) {
-            foreach ($request->file('gambar') as $gambar) {
-                $path = $gambar->store('campaign/updates', 'public');
-
-                Campaign_Update_Gambar::create([
-                    'campaign_update_id' => $update->id,
-                    'gambar_update' => $path,
-                ]);
-            }
-        }
 
         return redirect()
             ->route('campaign.show', $campaign->slug)
@@ -89,43 +74,13 @@ class CampaignUpdateController extends Controller
         $request->validate([
             'judul_update' => 'required|string|max:255',
             'isi_update' => 'required|string',
-            'gambar.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'gambar' => 'nullable|array|max:5',
-            'hapus_gambar' => 'nullable|array',
-            'hapus_gambar.*' => 'exists:campaign_update_gambar,id',
         ]);
 
         // Update data
         $update->update([
             'judul_update' => $request->judul_update,
-            'isi_update' => $request->isi_update,
+            'isi_update' => RichText::clean($request->isi_update),
         ]);
-
-        // Hapus gambar yang dipilih
-        if ($request->has('hapus_gambar')) {
-            foreach ($request->hapus_gambar as $gambarId) {
-                $gambar = Campaign_Update_Gambar::where('id', $gambarId)
-                    ->where('campaign_update_id', $update->id)
-                    ->first();
-                if ($gambar) {
-                    if (Storage::disk('public')->exists($gambar->gambar_update)) {
-                        Storage::disk('public')->delete($gambar->gambar_update);
-                    }
-                    $gambar->delete();
-                }
-            }
-        }
-
-        // Tambah gambar baru
-        if ($request->hasFile('gambar')) {
-            foreach ($request->file('gambar') as $gambar) {
-                $path = $gambar->store('campaign/updates', 'public');
-                Campaign_Update_Gambar::create([
-                    'campaign_update_id' => $update->id,
-                    'gambar_update' => $path,
-                ]);
-            }
-        }
 
         return redirect()
             ->route('campaign.show', $campaign->slug)
@@ -140,14 +95,6 @@ class CampaignUpdateController extends Controller
             ->where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
-
-        // Hapus gambar-gambar
-        foreach ($update->campaign_update_gambar as $gambar) {
-            if (Storage::disk('public')->exists($gambar->gambar_update)) {
-                Storage::disk('public')->delete($gambar->gambar_update);
-            }
-            $gambar->delete();
-        }
 
         $update->delete();
 

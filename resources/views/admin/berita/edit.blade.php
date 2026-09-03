@@ -54,6 +54,17 @@
                     @enderror
                 </div>
 
+                <div class="form-group">
+                    <label for="custom_slug">Link Berita <small>(Opsional)</small></label>
+                    <input type="text" id="custom_slug" name="custom_slug"
+                        value="{{ old('custom_slug', $berita->custom_slug) }}" placeholder="contoh: berita-banjir-jakarta"
+                        class="form-control" />
+                    <small class="text-muted">Kosongkan untuk menggunakan slug otomatis dari judul.</small>
+                    @error('custom_slug')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
                 {{-- ====================================================== --}}
                 {{-- THUMBNAIL SAAT INI --}}
                 {{-- ====================================================== --}}

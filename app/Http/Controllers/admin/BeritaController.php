@@ -27,23 +27,18 @@ class BeritaController extends Controller
         );
     }
 
-    public function show(Berita $beritum)
-    {
-        $beritum->load([
-            'user'
-        ]);
-
-        return view(
-            'admin.berita.show',
-            [
-                'berita' => $beritum
-            ]
-        );
-    }
-
     public function create()
     {
         return view('admin.berita.create');
+    }
+
+    public function show(Berita $beritum)
+    {
+        $beritum->load('user');
+
+        return view('admin.berita.show', [
+            'berita' => $beritum,
+        ]);
     }
 
     public function store(Request $request)
@@ -53,7 +48,7 @@ class BeritaController extends Controller
                 'thumbnail' => 'required|image|max:2048',
                 'judul' => 'required|max:255',
                 'isi' => 'required',
-
+                'custom_slug' => 'nullable|alpha_dash|unique:berita,custom_slug',
             ]
         );
 
@@ -68,6 +63,7 @@ class BeritaController extends Controller
                 'judul' => $request->judul,
                 'isi' => RichText::clean($request->isi),
                 'slug' => Str::slug($request->judul),
+                'custom_slug' => $request->custom_slug ? Str::slug($request->custom_slug) : null,
                 'user_id' => Auth::id(),
             ]);
 
@@ -100,7 +96,7 @@ class BeritaController extends Controller
                 'thumbnail' => 'nullable|image|max:2048',
                 'judul' => 'required|max:255',
                 'isi' => 'required',
-
+                'custom_slug' => 'nullable|alpha_dash|unique:berita,custom_slug,' . $beritum->id,
             ]
         );
 
@@ -108,6 +104,7 @@ class BeritaController extends Controller
             'judul' => $request->judul,
             'isi' => RichText::clean($request->isi),
             'slug' => Str::slug($request->judul),
+            'custom_slug' => $request->custom_slug ? Str::slug($request->custom_slug) : null,
         ];
 
         if ($request->hasFile('thumbnail')) {
@@ -127,10 +124,7 @@ class BeritaController extends Controller
         $beritum->update($data);
 
         return redirect()
-            ->route(
-                'admin.berita.show',
-                $beritum
-            )
+            ->route('admin.berita.show', $beritum)
             ->with(
                 'success',
                 'Berita berhasil diperbarui'

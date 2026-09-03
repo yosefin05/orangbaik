@@ -37,7 +37,7 @@
                                 <div class="berita-scroll">
                                     @foreach ($berita as $news)
                                         <article class="berita-card">
-                                            <a href="{{ route('berita.show', $news->slug) }}">
+                                            <a href="{{ route('berita.show', $news->custom_slug ?? $news->slug) }}">
                                                 <img src="{{ asset('storage/' . $news->thumbnail) }}" alt="{{ $news->judul }}"
                                                     loading="lazy">
                                                 <div class="berita-body">

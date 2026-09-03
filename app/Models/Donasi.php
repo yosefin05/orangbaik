@@ -16,15 +16,21 @@ class Donasi extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function fundraiser()
+    {
+        return $this->belongsTo(Campaign_Fundraiser::class, 'fundraiser_id');
+    }
+
     public function pembayaran()
     {
         return $this->hasOne(Pembayaran::class);
     }
-    
+
     protected $table = 'donasi';
 
     protected $fillable = [
         'campaign_id',
+        'fundraiser_id',
         'user_id',
         'nama_donatur',
         'email',

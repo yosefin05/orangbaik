@@ -64,10 +64,8 @@
                                 <div class="action-group">
 
                                     @if($item->berita)
-                                        <a
-                                            href="{{ route('berita.show', $item->berita->slug) }}#komentar-{{ $item->id }}"
-                                            class="action-link link-blue"
-                                            target="_blank">
+                                        <a href="{{ route('berita.show', $item->berita->custom_slug ?? $item->berita->slug) }}#komentar-{{ $item->id }}"
+                                            class="action-link link-blue" target="_blank">
                                             <i class="bi bi-eye"></i>
                                             Lihat
                                         </a>
@@ -77,11 +75,8 @@
                                         </span>
                                     @endif
 
-                                    <form
-                                        action="{{ route('admin.komentar.destroy', $item) }}"
-                                        method="POST"
-                                        class="inline-form"
-                                        onsubmit="return confirm('Yakin ingin menghapus komentar ini?')">
+                                    <form action="{{ route('admin.komentar.destroy', $item) }}" method="POST"
+                                        class="inline-form" onsubmit="return confirm('Yakin ingin menghapus komentar ini?')">
 
                                         @csrf
                                         @method('DELETE')
@@ -116,7 +111,8 @@
 
         <div class="pagination-wrapper">
             <div class="pagination-info">
-                Menampilkan <strong>{{ $komentar->firstItem() ?? 0 }}</strong> - <strong>{{ $komentar->lastItem() ?? 0 }}</strong> dari <strong>{{ $komentar->total() }}</strong> komentar
+                Menampilkan <strong>{{ $komentar->firstItem() ?? 0 }}</strong> -
+                <strong>{{ $komentar->lastItem() ?? 0 }}</strong> dari <strong>{{ $komentar->total() }}</strong> komentar
             </div>
             <div class="pagination-links">
                 {{ $komentar->links() }}
