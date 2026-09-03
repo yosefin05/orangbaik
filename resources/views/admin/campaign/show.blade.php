@@ -281,29 +281,8 @@
             </div>
         </div>
         <div class="detail-content">
-            {!! nl2br(e($campaign->deskripsi)) !!}
+            {!! $campaign->deskripsi !!}
         </div>
-    </section>
-
-    {{-- Galeri --}}
-    <section class="ob-card ob-card-lg">
-        <div class="card-topbar">
-            <div>
-                <h2>Galeri Campaign</h2>
-                <p class="card-subtitle">Kumpulan gambar pendukung campaign.</p>
-            </div>
-        </div>
-        @if($campaign->campaignGambar->count())
-            <div class="gallery-grid">
-                @foreach($campaign->campaignGambar as $gambar)
-                    <div class="gallery-item">
-                        <img src="{{ asset('storage/' . ($gambar->gambar ?? $gambar->foto)) }}" alt="{{ $campaign->judul }}">
-                    </div>
-                @endforeach
-            </div>
-        @else
-            <p class="text-muted">Tidak ada galeri.</p>
-        @endif
     </section>
 
     {{-- Filter --}}

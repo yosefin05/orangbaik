@@ -13,7 +13,7 @@
                     Kelola seluruh campaign donasi yang ada di platform OrangBaik.id.
                 </p>
             </div>
-            
+
             {{-- Cek apakah admin terdaftar sebagai penggalang dana --}}
             @php
                 $isPenggalangDana = auth()->user()->penggalangDana()->exists();
@@ -25,8 +25,7 @@
                     <span>Tambah Campaign</span>
                 </a>
             @else
-                <button type="button" class="btn-primary btn-disabled" 
-                        onclick="openPenggalangModal()">
+                <button type="button" class="btn-primary btn-disabled" onclick="openPenggalangModal()">
                     <i class="bi bi-plus-lg"></i>
                     <span>Tambah Campaign</span>
                 </button>
@@ -128,12 +127,6 @@
                             </td>
 
                             <td>
-                                <span class="badge badge-blue">
-                                    {{ $item->campaignGambar->count() }} gambar
-                                </span>
-                            </td>
-
-                            <td>
                                 <span class="badge badge-green">
                                     {{ $item->campaignUpdates->count() }} update
                                 </span>
@@ -141,7 +134,8 @@
 
                             <td class="text-center">
                                 <div class="action-group">
-                                    <a href="{{ route('admin.campaign.show', $item) }}" class="action-link link-blue" title="Lihat detail & review campaign">
+                                    <a href="{{ route('admin.campaign.show', $item) }}" class="action-link link-blue"
+                                        title="Lihat detail & review campaign">
                                         <i class="bi bi-eye"></i>
                                         Detail
                                     </a>
@@ -170,7 +164,8 @@
 
         <div class="pagination-wrapper">
             <div class="pagination-info">
-                Menampilkan <strong>{{ $campaign->firstItem() ?? 0 }}</strong> - <strong>{{ $campaign->lastItem() ?? 0 }}</strong> dari <strong>{{ $campaign->total() }}</strong> campaign
+                Menampilkan <strong>{{ $campaign->firstItem() ?? 0 }}</strong> -
+                <strong>{{ $campaign->lastItem() ?? 0 }}</strong> dari <strong>{{ $campaign->total() }}</strong> campaign
             </div>
             <div class="pagination-links">
                 {{ $campaign->links() }}
@@ -195,44 +190,44 @@
 @endsection
 
 @push('scripts')
-<script>
-    // Function to open modal
-    function openPenggalangModal() {
-        const modal = document.getElementById('penggalangModal');
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // Prevent scrolling
-    }
-
-    // Function to close modal
-    function closePenggalangModal() {
-        const modal = document.getElementById('penggalangModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Restore scrolling
-    }
-
-    // Close modal when clicking outside
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('penggalangModal');
-        const closeBtn = document.getElementById('closePenggalangModal');
-
-        // Close button
-        if (closeBtn) {
-            closeBtn.addEventListener('click', closePenggalangModal);
+    <script>
+        // Function to open modal
+        function openPenggalangModal() {
+            const modal = document.getElementById('penggalangModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
         }
 
-        // Click outside modal content
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closePenggalangModal();
-            }
-        });
+        // Function to close modal
+        function closePenggalangModal() {
+            const modal = document.getElementById('penggalangModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
 
-        // Close with ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modal.style.display === 'flex') {
-                closePenggalangModal();
+        // Close modal when clicking outside
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('penggalangModal');
+            const closeBtn = document.getElementById('closePenggalangModal');
+
+            // Close button
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closePenggalangModal);
             }
+
+            // Click outside modal content
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                    closePenggalangModal();
+                }
+            });
+
+            // Close with ESC key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.style.display === 'flex') {
+                    closePenggalangModal();
+                }
+            });
         });
-    });
-</script>
+    </script>
 @endpush

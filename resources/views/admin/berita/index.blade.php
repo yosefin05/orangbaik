@@ -23,7 +23,6 @@
                         <th>Judul</th>
                         <th>Slug</th>
                         <th>Isi</th>
-                        <th>Galeri</th>
                         <th>Penulis</th>
                         <th>Tanggal</th>
                         <th>Aksi</th>
@@ -54,11 +53,6 @@
                                 <p class="cell-excerpt">
                                     {{ \Illuminate\Support\Str::limit(strip_tags($item->isi), 60) }}
                                 </p>
-                            </td>
-                            <td>
-                                <span class="badge badge-green">
-                                    {{ $item->gambar->count() }} gambar
-                                </span>
                             </td>
                             <td>
                                 {{ $item->user->name ?? 'User tidak ditemukan' }}
@@ -103,7 +97,8 @@
         </div>
         <div class="pagination-wrapper">
             <div class="pagination-info">
-                Menampilkan <strong>{{ $berita->firstItem() ?? 0 }}</strong> - <strong>{{ $berita->lastItem() ?? 0 }}</strong> dari <strong>{{ $berita->total() }}</strong> berita
+                Menampilkan <strong>{{ $berita->firstItem() ?? 0 }}</strong> -
+                <strong>{{ $berita->lastItem() ?? 0 }}</strong> dari <strong>{{ $berita->total() }}</strong> berita
             </div>
             <div class="pagination-links">
                 {{ $berita->links() }}

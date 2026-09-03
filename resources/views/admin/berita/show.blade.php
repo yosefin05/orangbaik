@@ -25,11 +25,7 @@
         </div>
 
         @if ($berita->thumbnail)
-            <img
-                src="{{ asset('storage/' . $berita->thumbnail) }}"
-                alt="{{ $berita->judul }}"
-                class="detail-thumbnail"
-            />
+            <img src="{{ asset('storage/' . $berita->thumbnail) }}" alt="{{ $berita->judul }}" class="detail-thumbnail" />
         @else
             <div class="detail-thumbnail detail-thumbnail-placeholder">
                 <i class="bi bi-image"></i>
@@ -77,27 +73,6 @@
             </div>
         </div>
 
-        <div class="detail-section">
-            <h3>Galeri Berita</h3>
-
-            @if ($berita->gambar->count() > 0)
-                <div class="gallery-grid">
-                    @foreach ($berita->gambar as $gambar)
-                        <div class="gallery-item">
-                            <img
-                                src="{{ asset('storage/' . $gambar->gambar) }}"
-                                alt="Galeri {{ $loop->iteration }}"
-                            />
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <p class="text-muted">
-                    Tidak ada galeri.
-                </p>
-            @endif
-        </div>
-
         <div class="form-actions">
 
             <a href="{{ route('admin.berita.edit', $berita) }}" class="btn-primary">
@@ -105,12 +80,8 @@
                 <span>Edit Berita</span>
             </a>
 
-            <form
-                action="{{ route('admin.berita.destroy', $berita) }}"
-                method="POST"
-                class="inline-form"
-                onsubmit="return confirm('Yakin ingin menghapus berita ini?')"
-            >
+            <form action="{{ route('admin.berita.destroy', $berita) }}" method="POST" class="inline-form"
+                onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
                 @csrf
                 @method('DELETE')
 

@@ -148,51 +148,13 @@
                             <div class="campaign-field">
                                 <label for="deskripsi_campaign">Deskripsi Campaign <span>*</span></label>
                                 <div class="campaign-input-wrap">
-                                    <textarea id="deskripsi_campaign" name="deskripsi" rows="7"
-                                        placeholder="Masukkan deskripsi campaign Anda"
-                                        required>{{ old('deskripsi', $campaign->deskripsi) }}</textarea>
+                                    <x-rich-text-editor name="deskripsi" id="deskripsi_campaign"
+                                        :value="old('deskripsi', $campaign->deskripsi)" />
                                     <i class="bi bi-pencil-fill"></i>
                                 </div>
                                 @error('deskripsi')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
-                            </div>
-
-                            <!-- Gambar Pendukung -->
-                            <div class="campaign-field">
-                                <label>Gambar Pendukung <small>(Opsional)</small></label>
-                                <div class="campaign-support-grid">
-                                    @php
-                                        $gambarPendukung = $campaign->campaignGambar ?? collect();
-                                    @endphp
-
-                                    @for ($i = 0; $i < 2; $i++)
-                                        <label class="campaign-upload-small" for="gambar_pendukung_{{ $i + 1 }}">
-                                            <input type="file" id="gambar_pendukung_{{ $i + 1 }}" name="gambar_pendukung[]"
-                                                accept="image/png,image/jpeg,image/jpg" hidden>
-                                            <img src="{{ isset($gambarPendukung[$i]) ? asset('storage/' . $gambarPendukung[$i]->foto) : '' }}"
-                                                alt="Gambar Pendukung {{ $i + 1 }}" class="campaign-upload-preview"
-                                                data-preview="gambar_pendukung_{{ $i + 1 }}" {{ isset($gambarPendukung[$i]) ? '' : 'hidden' }}>
-                                            <span class="campaign-upload-placeholder" {{ isset($gambarPendukung[$i]) ? 'hidden' : '' }}>
-                                                <i class="bi bi-image"></i>
-                                            </span>
-                                            <span class="campaign-upload-button small">
-                                                <i class="bi bi-camera-fill"></i>
-                                            </span>
-                                        </label>
-                                    @endfor
-                                </div>
-                                <small class="campaign-note">Catatan: Ukuran gambar pendukung disarankan 354 × 190 px.
-                                    Kosongkan jika tidak ingin mengubah.</small>
-                            </div>
-                        </section>
-
-                        {{-- DETAIL CAMPAIGN --}}
-                        <section class="campaign-create-card">
-                            <div class="campaign-create-card-head">
-                                <h2>Detail Campaign</h2>
-                                <p>Perbarui periode campaign dan target donasi sebagai acuan selama proses penggalangan
-                                    dana berlangsung.</p>
                             </div>
 
                             <div class="campaign-two-grid">

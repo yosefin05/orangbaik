@@ -37,7 +37,7 @@
 
                     <section class="description-section">
                         <h1>{{ $campaign->judul }}</h1>
-                        <p>{{ $campaign->deskripsi }}</p>
+                        <div class="rich-text-output">{!! $campaign->deskripsi !!}</div>
                     </section>
 
                     {{-- ========================================================== --}}

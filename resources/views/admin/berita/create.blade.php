@@ -54,7 +54,7 @@
                     <label for="thumbnail">Thumbnail <span class="text-danger">*</span></label>
 
                     <div class="upload-dropzone" id="thumbnailDropzone">
-                        
+
                         {{-- Placeholder --}}
                         <div class="upload-placeholder" id="thumbnailPlaceholder">
                             <i class="bi bi-image"></i>
@@ -67,7 +67,8 @@
                             <div class="thumbnail-wrapper">
                                 <img id="thumbnailPreviewImg" src="#" alt="Thumbnail Preview" />
                             </div>
-                            <button type="button" class="btn-remove-thumbnail" id="thumbnailRemoveBtn" title="Hapus thumbnail">
+                            <button type="button" class="btn-remove-thumbnail" id="thumbnailRemoveBtn"
+                                title="Hapus thumbnail">
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
@@ -81,63 +82,11 @@
                             <span class="upload-hint">atau seret gambar ke sini</span>
                         </div>
 
-                        <input
-                            type="file"
-                            id="thumbnail"
-                            name="thumbnail"
-                            class="upload-input-hidden"
-                            accept="image/*"
-                            required
-                        />
+                        <input type="file" id="thumbnail" name="thumbnail" class="upload-input-hidden" accept="image/*"
+                            required />
                     </div>
 
                     @error('thumbnail')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                {{-- GALERI GAMBAR --}}
-                <div class="form-group">
-                    <label for="gambar">Galeri Gambar</label>
-
-                    <div class="upload-dropzone" id="galleryDropzone">
-                        {{-- Placeholder --}}
-                        <div class="upload-placeholder" id="galleryPlaceholder">
-                            <i class="bi bi-images"></i>
-                            <p>Klik atau seret gambar untuk galeri</p>
-                            <span class="text-muted">Maksimal 3 gambar • Masing-masing maks 2MB</span>
-                        </div>
-
-                        {{-- Gallery Grid --}}
-                        <div class="gallery-preview-grid" id="galleryPreviewGrid">
-                            {{-- Gallery previews akan di-render di sini --}}
-                        </div>
-
-                        {{-- Tombol Upload --}}
-                        <div class="upload-btn-wrapper" id="galleryUploadWrapper">
-                            <button type="button" class="upload-btn" onclick="document.getElementById('gambar').click()">
-                                <i class="bi bi-cloud-upload"></i>
-                                <span>Tambah Gambar</span>
-                            </button>
-                            <span class="upload-hint">atau seret gambar ke sini</span>
-                        </div>
-
-                        <input
-                            type="file"
-                            id="gambar"
-                            name="gambar[]"
-                            class="upload-input-hidden"
-                            accept="image/*"
-                            multiple
-                        />
-                    </div>
-
-                    <small class="text-muted">
-                        <i class="bi bi-info-circle"></i>
-                        Maksimal 3 gambar dan ukuran tiap gambar maksimal 2 MB.
-                    </small>
-
-                    @error('gambar.*')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
@@ -147,8 +96,7 @@
                 {{-- ====================================================== --}}
                 <div class="form-group">
                     <label for="isi">Isi Berita <span class="text-danger">*</span></label>
-                    <textarea id="isi" name="isi" rows="10" class="form-control" placeholder="Tulis isi berita di sini..."
-                        required>{{ old('isi') }}</textarea>
+                    <x-rich-text-editor name="isi" id="isi" :value="old('isi')" />
                     @error('isi')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror

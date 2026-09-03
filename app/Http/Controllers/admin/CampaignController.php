@@ -13,7 +13,6 @@ class CampaignController extends Controller
         $campaign = Campaign::with([
             'kategori',
             'penggalangDana',
-            'campaignGambar',
             'campaignFilter',
             'campaignUpdates'
         ])
@@ -31,13 +30,12 @@ class CampaignController extends Controller
         $campaign->load([
             'kategori',
             'penggalangDana',
-            'campaignGambar',
             'campaignFilter.filter',
             'campaignUpdates.user',
             'campaignFundraisers.user',
-            'packages', 
+            'packages',
             'verifier',
-            'approvedBy' 
+            'approvedBy'
         ]);
 
         $campaign->updateActiveStatus();

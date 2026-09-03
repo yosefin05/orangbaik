@@ -27,24 +27,11 @@
                         <span>{{ $berita->created_at->translatedFormat('d F Y') }}</span>
                     </div>
                     <div class="news-content">
-                        {!! nl2br(e($berita->isi)) !!}
+                        {!! $berita->isi !!}
                     </div>
                     <div class="news-content">
-                        {!! nl2br(e($berita->isi)) !!}
+                        {!! $berita->isi !!}
                     </div>
-                    @if($berita->gambar->count())
-                        <section class="news-gallery">
-                            <h3>Galeri Dokumentasi</h3>
-                            <div class="news-gallery-grid">
-                                @foreach($berita->gambar as $gambar)
-                                    <div class="news-gallery-item" data-image="{{ asset('storage/' . $gambar->gambar) }}">
-                                        <img src="{{ asset('storage/' . $gambar->gambar) }}" alt="{{ $berita->judul }}">
-                                    </div>
-                                @endforeach
-                            </div>
-                        </section>
-                    @endif
-
                     {{-- COMMENT --}}
                     <section class="comment-section">
                         <div class="comment-header">

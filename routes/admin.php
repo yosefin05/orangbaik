@@ -31,11 +31,6 @@ Route::middleware(['auth', 'admin'])
             ->except(['show']);
 
         Route::resource('berita', BeritaController::class);
-        Route::delete(
-            '/berita-gambar/{gambar}',
-            [BeritaController::class, 'destroyImage']
-        )->name('berita-gambar.destroy');
-
         Route::resource('komentar', KomentarController::class)
             ->only(['index', 'show', 'destroy']);
 

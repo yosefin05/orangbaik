@@ -120,42 +120,10 @@
                             <div class="campaign-field">
                                 <label for="deskripsi_campaign">Deskripsi Campaign <span>*</span></label>
                                 <div class="campaign-input-wrap">
-                                    <textarea id="deskripsi_campaign" name="deskripsi_campaign" rows="7"
-                                        placeholder="Masukkan deskripsi campaign Anda"
-                                        required>{{ old('deskripsi_campaign') }}</textarea>
+                                    <x-rich-text-editor name="deskripsi_campaign" id="deskripsi_campaign"
+                                        :value="old('deskripsi_campaign')" />
                                     <i class="bi bi-pencil-fill"></i>
                                 </div>
-                            </div>
-                            <div class="campaign-field">
-                                <label>Gambar Pendukung <small>(Opsional)</small></label>
-                                <div class="campaign-support-grid">
-                                    <label class="campaign-upload-small" for="gambar_pendukung_1">
-                                        <input type="file" id="gambar_pendukung_1" name="gambar_pendukung[]"
-                                            accept="image/png,image/jpeg,image/jpg" hidden>
-                                        <img src="" alt="" class="campaign-upload-preview"
-                                            data-preview="gambar_pendukung_1" hidden>
-                                        <span class="campaign-upload-placeholder">
-                                            <i class="bi bi-image"></i>
-                                        </span>
-                                        <span class="campaign-upload-button small">
-                                            <i class="bi bi-camera-fill"></i>
-                                        </span>
-                                    </label>
-                                    <label class="campaign-upload-small" for="gambar_pendukung_2">
-                                        <input type="file" id="gambar_pendukung_2" name="gambar_pendukung[]"
-                                            accept="image/png,image/jpeg,image/jpg" hidden>
-                                        <img src="" alt="" class="campaign-upload-preview"
-                                            data-preview="gambar_pendukung_2" hidden>
-                                        <span class="campaign-upload-placeholder">
-                                            <i class="bi bi-image"></i>
-                                        </span>
-                                        <span class="campaign-upload-button small">
-                                            <i class="bi bi-camera-fill"></i>
-                                        </span>
-                                    </label>
-                                </div>
-                                <small class="campaign-note">Catatan: Ukuran gambar pendukung disarankan 354 × 190
-                                    px.</small>
                             </div>
                         </section>
 

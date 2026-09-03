@@ -5,11 +5,11 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\Campaign_Filter;
-use App\Models\Campaign_Gambar;
 use App\Models\Campaign_Package;
 use App\Models\Filter;
 use App\Models\Kategori;
 use App\Models\Penggalang_Dana;
+use App\Support\RichText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -151,7 +151,6 @@ class CampaignController extends Controller
             'campaign_type' => 'required|in:regular,emergency,sustainable',
             'filter' => 'required|array|min:1|max:4',
             'filter.*' => 'exists:filter,id',
-            'gambar_pendukung.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             // PACKAGE TIDAK WAJIB - HAPUS VALIDASI REQUIRED
             'packages' => 'nullable|array',
             'packages.*.title' => 'nullable|string|max:255',
@@ -185,7 +184,7 @@ class CampaignController extends Controller
                 'thumbnail' => $thumbnail,
                 'judul' => $request->judul_campaign,
                 'slug' => Str::slug($request->judul_campaign) . '-' . time(),
-                'deskripsi' => $request->deskripsi_campaign,
+                'deskripsi' => RichText::clean($request->deskripsi_campaign),
                 'tanggal_mulai' => $request->tanggal_mulai,
                 'tanggal_berakhir' => $request->tanggal_akhir,
                 'target_donasi' => $request->target_donasi,
@@ -212,22 +211,6 @@ class CampaignController extends Controller
                     'campaign_id' => $campaign->id,
                     'filter_id' => $filter,
                 ]);
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Simpan Gambar Pendukung
-            |--------------------------------------------------------------------------
-            */
-
-            if ($request->hasFile('gambar_pendukung')) {
-                foreach ($request->file('gambar_pendukung') as $gambar) {
-                    $path = $gambar->store('campaign/gambar', 'public');
-                    Campaign_Gambar::create([
-                        'campaign_id' => $campaign->id,
-                        'gambar' => $path,
-                    ]);
-                }
             }
 
             /*
@@ -349,7 +332,6 @@ class CampaignController extends Controller
         $filter = Filter::all();
 
         $campaign->load([
-            'campaignGambar',
             'packages',
             'filter',
             'kategori'
@@ -395,7 +377,6 @@ class CampaignController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'filter' => 'array|max:4',
             'filter.*' => 'exists:filter,id',
-            'gambar_pendukung.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             // PACKAGE TIDAK WAJIB
             'packages' => 'nullable|array',
             'packages.*.title' => 'nullable|string|max:255',
@@ -425,7 +406,7 @@ class CampaignController extends Controller
             // Update data
             $data = [
                 'judul' => $validated['judul'],
-                'deskripsi' => $validated['deskripsi'],
+                'deskripsi' => RichText::clean($validated['deskripsi']),
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'tanggal_berakhir' => $validated['tanggal_berakhir'],
                 'target_donasi' => $validated['target_donasi'],
@@ -464,27 +445,6 @@ class CampaignController extends Controller
                         'campaign_id' => $campaign->id,
                         'filter_id' => $filter,
                     ]);
-                }
-            }
-
-            // Update Gambar Pendukung
-            if ($request->hasFile('gambar_pendukung')) {
-                $existingImages = Campaign_Gambar::where('campaign_id', $campaign->id)->get();
-                foreach ($existingImages as $img) {
-                    if (file_exists(storage_path('app/public/' . $img->gambar))) {
-                        unlink(storage_path('app/public/' . $img->gambar));
-                    }
-                    $img->delete();
-                }
-
-                foreach ($request->file('gambar_pendukung') as $gambar) {
-                    if ($gambar) {
-                        $path = $gambar->store('campaign/gambar', 'public');
-                        Campaign_Gambar::create([
-                            'campaign_id' => $campaign->id,
-                            'gambar' => $path,
-                        ]);
-                    }
                 }
             }
 

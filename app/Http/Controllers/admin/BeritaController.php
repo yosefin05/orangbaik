@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Berita;
-use App\Models\Berita_Gambar;
+use App\Support\RichText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,8 +16,7 @@ class BeritaController extends Controller
     public function index()
     {
         $berita = Berita::with([
-            'user',
-            'gambar'
+            'user'
         ])
             ->latest()
             ->paginate(10);
@@ -31,8 +30,7 @@ class BeritaController extends Controller
     public function show(Berita $beritum)
     {
         $beritum->load([
-            'user',
-            'gambar'
+            'user'
         ]);
 
         return view(
@@ -56,12 +54,6 @@ class BeritaController extends Controller
                 'judul' => 'required|max:255',
                 'isi' => 'required',
 
-                'gambar' => 'nullable|array|max:3',
-                'gambar.*' => 'image|max:2048',
-            ],
-            [
-                'gambar.max' => 'Maksimal hanya 3 gambar galeri.',
-                'gambar.*.max' => 'Ukuran setiap gambar maksimal 2 MB.',
             ]
         );
 
@@ -74,26 +66,11 @@ class BeritaController extends Controller
             $berita = Berita::create([
                 'thumbnail' => $thumbnail,
                 'judul' => $request->judul,
-                'isi' => $request->isi,
+                'isi' => RichText::clean($request->isi),
                 'slug' => Str::slug($request->judul),
                 'user_id' => Auth::id(),
             ]);
 
-            if ($request->hasFile('gambar')) {
-
-                foreach ($request->file('gambar') as $gambar) {
-
-                    $path = $gambar->store(
-                        'berita/gallery',
-                        'public'
-                    );
-
-                    Berita_Gambar::create([
-                        'berita_id' => $berita->id,
-                        'gambar' => $path,
-                    ]);
-                }
-            }
         });
 
         return redirect()
@@ -124,31 +101,12 @@ class BeritaController extends Controller
                 'judul' => 'required|max:255',
                 'isi' => 'required',
 
-                'gambar' => 'nullable|array|max:3',
-                'gambar.*' => 'image|max:2048',
-            ],
-            [
-                'thumbnail.max' => 'Ukuran thumbnail maksimal 2 MB.',
-
-                'gambar.max' => 'Maksimal hanya 3 gambar galeri.',
-                'gambar.*.max' => 'Ukuran setiap gambar maksimal 2 MB.',
             ]
         );
 
-        $totalLama = $beritum->gambar()->count();
-        $totalBaru = count($request->file('gambar', []));
-
-        if ($totalLama + $totalBaru > 3) {
-            return back()
-                ->withErrors([
-                    'gambar' => 'Total gambar maksimal 3.'
-                ])
-                ->withInput();
-        }
-
         $data = [
             'judul' => $request->judul,
-            'isi' => $request->isi,
+            'isi' => RichText::clean($request->isi),
             'slug' => Str::slug($request->judul),
         ];
 
@@ -167,20 +125,6 @@ class BeritaController extends Controller
         }
 
         $beritum->update($data);
-        
-        if ($request->hasFile('gambar')) {
-            foreach ($request->file('gambar') as $gambar) {
-                $path = $gambar->store(
-                    'berita/gallery',
-                    'public'
-                );
-
-                Berita_Gambar::create([
-                    'berita_id' => $beritum->id,
-                    'gambar' => $path,
-                ]);
-            }
-        }
 
         return redirect()
             ->route(
@@ -193,30 +137,10 @@ class BeritaController extends Controller
             );
     }
 
-    public function destroyImage(Berita_Gambar $gambar)
-    {
-        Storage::disk('public')
-            ->delete($gambar->gambar);
-
-        $gambar->delete();
-
-        return back()->with(
-            'success',
-            'Gambar berhasil dihapus'
-        );
-    }
     public function destroy(Berita $beritum)
     {
         Storage::disk('public')
             ->delete($beritum->thumbnail);
-
-        foreach ($beritum->gambar as $gambar) {
-
-            Storage::disk('public')
-                ->delete($gambar->gambar);
-
-            $gambar->delete();
-        }
 
         $beritum->delete();
 

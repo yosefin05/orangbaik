@@ -64,10 +64,6 @@ class Campaign extends Model
         return $this->belongsTo(Penggalang_Dana::class, 'penggalang_dana_id');
     }
 
-    public function campaignGambar()
-    {
-        return $this->hasMany(Campaign_Gambar::class);
-    }
 
     public function campaignFilter()
     {

@@ -10,10 +10,6 @@ class Berita extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function gambar()
-    {
-        return $this->hasMany(Berita_Gambar::class);
-    }
     public function komentar()
     {
         return $this->hasMany(Komentar::class);

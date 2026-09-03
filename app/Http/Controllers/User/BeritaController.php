@@ -10,7 +10,7 @@ class BeritaController extends Controller
 {
     public function index()
     {
-        $beritas = Berita::with(['user', 'gambar'])
+        $beritas = Berita::with(['user'])
             ->latest()
             ->paginate(12);
 
@@ -20,10 +20,9 @@ class BeritaController extends Controller
     {
         $berita = Berita::with([
             'user',
-            'gambar',
             'komentar.user'
         ])->where('slug', $slug)
-          ->firstOrFail();
+            ->firstOrFail();
 
         $relatedNews = Berita::where('id', '!=', $berita->id)
             ->latest()
