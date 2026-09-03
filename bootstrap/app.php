@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'midtrans/notification',
+            'payment/*/webhook',
             'payment/midtrans/webhook',
             'payment/flip/webhook',
         ]);

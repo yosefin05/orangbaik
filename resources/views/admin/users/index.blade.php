@@ -120,8 +120,11 @@
                     @empty
 
                         <tr>
-                            <td colspan="8" class="empty-state">  <!-- Ubah colspan dari 7 ke 8 -->
-                                Belum ada data user.
+                            <td colspan="8" class="empty-state text-center py-4">
+                                <div class="empty-state-content">
+                                    <i class="bi bi-people text-muted" style="font-size: 2rem;"></i>
+                                    <p class="mt-2 text-muted fw-semibold">Belum ada data user yang ditemukan.</p>
+                                </div>
                             </td>
                         </tr>
 
@@ -133,7 +136,12 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $users->links() }}
+            <div class="pagination-info">
+                Menampilkan <strong>{{ $users->firstItem() ?? 0 }}</strong> - <strong>{{ $users->lastItem() ?? 0 }}</strong> dari <strong>{{ $users->total() }}</strong> user
+            </div>
+            <div class="pagination-links">
+                {{ $users->links() }}
+            </div>
         </div>
 
     </section>

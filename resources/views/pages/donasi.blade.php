@@ -157,10 +157,9 @@
                                 $persen = $campaign->target_donasi
                                     ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                     : 0;
-                                $hari = max(
-                                    0,
-                                    (int) now()->diffInDays($campaign->tanggal_berakhir, false)
-                                );
+                                $hari = $campaign->tanggal_berakhir === null
+                                    ? null
+                                    : max(0, (int) now()->diffInDays($campaign->tanggal_berakhir, false));
                             @endphp
 
                             <article class="donasi-card">

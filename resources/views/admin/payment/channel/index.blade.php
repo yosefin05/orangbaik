@@ -9,7 +9,7 @@
         <div class="channel-page-header">
             <div>
                 <h1 class="channel-title">Bank Account</h1>
-                <p class="channel-subtitle">Konfigurasi metode pembayaran, kode channel, payment gateway/provider, dan tipe pembayaran.</p>
+                <p class="channel-subtitle">Konfigurasi metode pembayaran, kode channel/no. rekening, payment gateway/provider, dan tipe pembayaran.</p>
             </div>
             <div class="header-actions">
                 <a href="{{ route('admin.payment.gateway.index') }}" class="btn-top-gateway">
@@ -36,6 +36,35 @@
             </div>
         @endif
 
+        {{-- Datalist untuk autocomplete saran nama bank / e-wallet --}}
+        <datalist id="commonBankList">
+            <option value="Bank BCA">
+            <option value="Bank Syariah (BSI)">
+            <option value="Bank BNI">
+            <option value="Bank Mandiri">
+            <option value="Bank BRI">
+            <option value="Bank Mega Syariah">
+            <option value="Bank Jatim Syariah">
+            <option value="Permata Bank">
+            <option value="Bank Muamalat">
+            <option value="Bank CIMB Niaga">
+            <option value="Bank Danamon">
+            <option value="Bank Artha Graha">
+            <option value="Bank BJB">
+            <option value="Bank BJB Syariah">
+            <option value="Bank Nagari">
+            <option value="Bank Sumsel Babel">
+            <option value="Bank Jago">
+            <option value="SeaBank">
+            <option value="QRIS">
+            <option value="GoPay">
+            <option value="ShopeePay">
+            <option value="DANA">
+            <option value="OVO">
+            <option value="LinkAja">
+            <option value="Flip Transfer">
+        </datalist>
+
         <form action="{{ route('admin.payment.channel.batch') }}" method="POST" id="channelBatchForm">
             @csrf
 
@@ -47,26 +76,17 @@
                     <div class="channel-row-item" data-id="{{ $channel->id }}">
                         <input type="hidden" name="channels[{{ $index }}][id]" value="{{ $channel->id }}" class="channel-id-input">
 
-                        {{-- 1. Nama Payment Method / Bank --}}
+                        {{-- 1. Nama Payment Method / Bank (Input Text + Datalist Autocomplete) --}}
                         <div class="field-wrap field-name">
-                            <select name="channels[{{ $index }}][name]" class="form-input custom-select">
-                                @php
-                                    $commonNames = [
-                                        'Gopay', 'ShopeePay', 'LinkAja', 'QRIS', 'DANA', 'OVO',
-                                        'Bank BCA', 'Bank Syariah (BSI)', 'Bank BNI', 'Bank Mandiri', 'Bank BRI',
-                                        'Bank Mega Syariah', 'Bank Jatim Syariah', 'Permata Bank', 'Bank Muamalat',
-                                        'Bank CIMB Niaga', 'Bank Artha Graha', 'Bank Danamon', 'Flip Transfer'
-                                    ];
-                                @endphp
-                                @foreach ($commonNames as $cName)
-                                    <option value="{{ $cName }}" {{ strcasecmp($channel->name, $cName) === 0 ? 'selected' : '' }}>
-                                        {{ $cName }}
-                                    </option>
-                                @endforeach
-                                @if (!in_array($channel->name, $commonNames))
-                                    <option value="{{ $channel->name }}" selected>{{ $channel->name }}</option>
-                                @endif
-                            </select>
+                            <input
+                                type="text"
+                                list="commonBankList"
+                                name="channels[{{ $index }}][name]"
+                                value="{{ $channel->name }}"
+                                class="form-input"
+                                placeholder="Nama Bank / E-Wallet (misal: Bank BCA)"
+                                required
+                            >
                         </div>
 
                         {{-- 2. Code / No Rekening --}}
@@ -389,18 +409,6 @@ document.addEventListener('DOMContentLoaded', function () {
         @endforeach
     `;
 
-    const commonNames = [
-        'Gopay', 'ShopeePay', 'LinkAja', 'QRIS', 'DANA', 'OVO',
-        'Bank BCA', 'Bank Syariah (BSI)', 'Bank BNI', 'Bank Mandiri', 'Bank BRI',
-        'Bank Mega Syariah', 'Bank Jatim Syariah', 'Permata Bank', 'Bank Muamalat',
-        'Bank CIMB Niaga', 'Bank Artha Graha', 'Bank Danamon', 'Flip Transfer'
-    ];
-
-    let namesOptions = '';
-    commonNames.forEach(n => {
-        namesOptions += `<option value="${n}">${n}</option>`;
-    });
-
     // 1. Tambah Row Baru (+ Add Bank)
     btnAddBank.addEventListener('click', function () {
         const nextIndex = channelList.querySelectorAll('.channel-row-item').length;
@@ -411,13 +419,26 @@ document.addEventListener('DOMContentLoaded', function () {
             <input type="hidden" name="channels[${nextIndex}][id]" value="" class="channel-id-input">
 
             <div class="field-wrap field-name">
-                <select name="channels[${nextIndex}][name]" class="form-input custom-select">
-                    ${namesOptions}
-                </select>
+                <input
+                    type="text"
+                    list="commonBankList"
+                    name="channels[${nextIndex}][name]"
+                    value=""
+                    class="form-input"
+                    placeholder="Nama Bank / E-Wallet (misal: Bank BCA)"
+                    required
+                >
             </div>
 
             <div class="field-wrap field-code">
-                <input type="text" name="channels[${nextIndex}][channel_code]" value="" class="form-input" placeholder="Code / No Rekening" required>
+                <input
+                    type="text"
+                    name="channels[${nextIndex}][channel_code]"
+                    value=""
+                    class="form-input"
+                    placeholder="Code / No Rekening"
+                    required
+                >
             </div>
 
             <div class="field-wrap field-provider">
@@ -450,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function () {
         channelList.appendChild(row);
         initRowEvents(row);
         reindexRows();
-        row.querySelector('.field-code input').focus();
+        row.querySelector('.field-name input').focus();
     });
 
     // 2. Event Handler untuk setiap baris (Delete & Drag)

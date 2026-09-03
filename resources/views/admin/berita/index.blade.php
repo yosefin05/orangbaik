@@ -90,8 +90,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="empty-state">
-                                Belum ada data berita.
+                            <td colspan="8" class="empty-state text-center py-4">
+                                <div class="empty-state-content">
+                                    <i class="bi bi-newspaper text-muted" style="font-size: 2rem;"></i>
+                                    <p class="mt-2 text-muted fw-semibold">Belum ada data berita yang ditemukan.</p>
+                                </div>
                             </td>
                         </tr>
                     @endforelse
@@ -99,7 +102,12 @@
             </table>
         </div>
         <div class="pagination-wrapper">
-            {{ $berita->links() }}
+            <div class="pagination-info">
+                Menampilkan <strong>{{ $berita->firstItem() ?? 0 }}</strong> - <strong>{{ $berita->lastItem() ?? 0 }}</strong> dari <strong>{{ $berita->total() }}</strong> berita
+            </div>
+            <div class="pagination-links">
+                {{ $berita->links() }}
+            </div>
         </div>
     </section>
 @endsection

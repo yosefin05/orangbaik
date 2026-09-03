@@ -33,6 +33,13 @@
     margin-bottom: var(--space-6);
 }
 
+.page-header > .header-actions {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-left: auto;  
+}
+
 .card-topbar > div,
 .card-header > div,
 .page-topbar > div,
@@ -324,12 +331,111 @@
 
 .pagination-wrapper {
     margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-soft);
     display: flex;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.pagination-info {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    font-weight: var(--fw-medium);
 }
 
 .pagination-wrapper nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.pagination-wrapper nav svg {
+    width: 16px;
+    height: 16px;
+}
+
+.pagination-wrapper .pagination {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 4px;
+}
+
+.pagination-wrapper .page-item .page-link,
+.pagination-wrapper nav a,
+.pagination-wrapper nav span[aria-disabled],
+.pagination-wrapper nav span[aria-current] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
     font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text);
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.pagination-wrapper nav a:hover,
+.pagination-wrapper .page-item:not(.active):not(.disabled) .page-link:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.pagination-wrapper nav span[aria-current],
+.pagination-wrapper .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff !important;
+}
+
+.pagination-wrapper nav span[aria-disabled],
+.pagination-wrapper .page-item.disabled .page-link {
+    color: var(--muted);
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f8fafc;
+}
+
+/* Tailwind pagination container fallback overrides */
+.pagination-wrapper nav > div:first-child {
+    display: none; /* Hide redundant mobile nav on desktop */
+}
+
+.pagination-wrapper nav > div:last-child {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.pagination-wrapper nav > div:last-child > div:first-child p {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    margin: 0;
+}
+
+.pagination-wrapper nav > div:last-child > div:last-child > span {
+    display: inline-flex;
+    box-shadow: none;
+    border-radius: var(--radius-sm);
+    gap: 4px;
+}
+
+.pagination-wrapper nav > div:last-child > div:last-child > span > span,
+.pagination-wrapper nav > div:last-child > div:last-child > span > a {
+    margin: 0 !important;
+    border-radius: var(--radius-sm) !important;
 }
 
 /* ============================================================
@@ -755,6 +861,121 @@
 .text-purple { color: #8e44ad; }
 .text-teal { color: #14b8a6; }
 .text-gold { color: #eab308; }
+
+/* ============================
+   DONASI STATS GRID
+   Komponen khusus halaman Kelola Donasi.
+   Layout vertikal, 5 kartu satu baris.
+   ============================ */
+
+.donasi-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.donasi-stat-card {
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-4) var(--space-5);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.donasi-stat-card::after {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: .07;
+    pointer-events: none;
+}
+
+.donasi-stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(51, 101, 175, .25);
+    box-shadow: var(--shadow-hover);
+}
+
+.donasi-stat-card:has(.icon-blue)   { color: var(--primary); }
+.donasi-stat-card:has(.icon-green)  { color: var(--success); }
+.donasi-stat-card:has(.icon-orange) { color: var(--secondary); }
+.donasi-stat-card:has(.icon-red)    { color: var(--danger); }
+.donasi-stat-card:has(.icon-purple) { color: #8e44ad; }
+.donasi-stat-card:has(.icon-teal)   { color: #14b8a6; }
+.donasi-stat-card:has(.icon-gold)   { color: #eab308; }
+
+.donasi-stat-icon {
+    position: relative;
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
+}
+
+.donasi-stat-icon i {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.donasi-stat-icon.icon-blue   { background: var(--primary-light);   color: var(--primary); }
+.donasi-stat-icon.icon-green  { background: var(--success-light);   color: var(--success); }
+.donasi-stat-icon.icon-orange { background: var(--secondary-light); color: var(--secondary); }
+.donasi-stat-icon.icon-red    { background: var(--danger-light);    color: var(--danger); }
+.donasi-stat-icon.icon-purple { background: rgba(142, 68, 173, .13); color: #8e44ad; }
+.donasi-stat-icon.icon-teal   { background: rgba(20, 184, 166, .13); color: #14b8a6; }
+.donasi-stat-icon.icon-gold   { background: rgba(234, 179, 8, .13);  color: #eab308; }
+
+.donasi-stat-label {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 var(--space-1);
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    line-height: 1.35;
+}
+
+.donasi-stat-value {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.15;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+@media (max-width: 900px) {
+    .donasi-stats-grid {
+        grid-template-columns: repeat(5, minmax(150px, 1fr));
+        overflow-x: auto;
+        padding-bottom: var(--space-2);
+    }
+}
+
 
 @media (max-width: 576px) {
     .stats-grid {

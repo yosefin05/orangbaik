@@ -20,16 +20,19 @@
             background: #fff;
             transition: border-color 0.2s;
         }
+
         .campaign-slug-wrap:focus-within {
             border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
+
         .campaign-slug-wrap .slug-prefix {
             font-weight: 500;
             color: #6c757d;
             margin-right: 0.5rem;
             white-space: nowrap;
         }
+
         .campaign-slug-wrap .slug-input {
             border: none;
             outline: none;
@@ -38,9 +41,11 @@
             background: transparent;
             font-size: 1rem;
         }
+
         .campaign-slug-wrap .slug-input::placeholder {
             color: #adb5bd;
         }
+
         .campaign-slug-wrap .slug-input:focus {
             box-shadow: none;
         }
@@ -106,10 +111,8 @@
                                 <label for="custom_slug">Link Campaign <small>(Opsional)</small></label>
                                 <div class="campaign-slug-wrap">
                                     <span class="slug-prefix">orangbaik.id/</span>
-                                    <input type="text" name="custom_slug" id="custom_slug"
-                                           class="slug-input"
-                                           placeholder="contoh: bantu-korban-banjir"
-                                           value="{{ old('custom_slug') }}">
+                                    <input type="text" name="custom_slug" id="custom_slug" class="slug-input"
+                                        placeholder="contoh: bantu-korban-banjir" value="{{ old('custom_slug') }}">
                                 </div>
                                 <small class="campaign-note">Gunakan nama singkat agar mudah dibagikan.</small>
                             </div>
@@ -118,7 +121,8 @@
                                 <label for="deskripsi_campaign">Deskripsi Campaign <span>*</span></label>
                                 <div class="campaign-input-wrap">
                                     <textarea id="deskripsi_campaign" name="deskripsi_campaign" rows="7"
-                                        placeholder="Masukkan deskripsi campaign Anda" required>{{ old('deskripsi_campaign') }}</textarea>
+                                        placeholder="Masukkan deskripsi campaign Anda"
+                                        required>{{ old('deskripsi_campaign') }}</textarea>
                                     <i class="bi bi-pencil-fill"></i>
                                 </div>
                             </div>
@@ -172,10 +176,11 @@
                                     </div>
                                 </div>
                                 <div class="campaign-field">
-                                    <label for="tanggal_akhir">Tanggal Akhir <span>*</span></label>
+                                    <label for="tanggal_akhir">Tanggal Akhir <small>(Opsional, tanpa batas jika
+                                            kosong)</small></label>
                                     <div class="campaign-input-wrap">
                                         <input type="date" id="tanggal_akhir" name="tanggal_akhir"
-                                            value="{{ old('tanggal_akhir') }}" required>
+                                            value="{{ old('tanggal_akhir') }}">
                                         <i class="bi bi-calendar-event-fill"></i>
                                     </div>
                                 </div>
@@ -194,8 +199,8 @@
                                 <div class="campaign-money-wrap">
                                     <span>Rp</span>
                                     <input type="text" id="minimal_donasi" name="minimal_donasi"
-                                        value="{{ old('minimal_donasi', '5000') }}" placeholder="Minimal Rp 5.000" inputmode="numeric"
-                                        data-money>
+                                        value="{{ old('minimal_donasi', '5000') }}" placeholder="Minimal Rp 5.000"
+                                        inputmode="numeric" data-money>
                                 </div>
                                 <small class="campaign-note">Minimal donasi default Rp 5.000 jika tidak diisi.</small>
                             </div>
@@ -299,7 +304,8 @@
                         <section class="campaign-side-card">
                             <div class="campaign-side-head">
                                 <h2>Package Donasi <small>(Opsional)</small></h2>
-                                <p>Tambahkan package donasi agar donatur lebih mudah memilih. Jika tidak diisi, akan muncul pilihan nominal default.</p>
+                                <p>Tambahkan package donasi agar donatur lebih mudah memilih. Jika tidak diisi, akan
+                                    muncul pilihan nominal default.</p>
                             </div>
                             <div class="campaign-package-list" id="packageList">
                                 <div class="campaign-package-item" data-package-item>
@@ -348,7 +354,8 @@
                                 <i class="bi bi-plus-lg"></i>
                                 <span>Tambahkan Package Baru</span>
                             </button>
-                            <small class="campaign-note">Jika tidak menambahkan package, akan muncul pilihan nominal default (Rp 10.000, Rp 25.000, Rp 50.000, Rp 100.000).</small>
+                            <small class="campaign-note">Jika tidak menambahkan package, akan muncul pilihan nominal
+                                default (Rp 10.000, Rp 25.000, Rp 50.000, Rp 100.000).</small>
                         </section>
 
                         {{-- FITUR LAINNYA --}}

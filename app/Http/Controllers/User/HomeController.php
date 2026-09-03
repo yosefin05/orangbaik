@@ -24,7 +24,10 @@ class HomeController extends Controller
         $query = Campaign::with(['penggalangDana', 'donasi.pembayaran', 'kategori', 'filter'])
             ->where('is_active', true)
             ->where('tanggal_mulai', '<=', $now)
-            ->where('tanggal_berakhir', '>=', $now);
+            ->where(function ($query) use ($now) {
+                $query->whereNull('tanggal_berakhir')
+                    ->orWhere('tanggal_berakhir', '>=', $now);
+            });
 
         // Hanya tampilkan campaign yang approved atau regular
         $query->where(function ($q) {
@@ -34,14 +37,17 @@ class HomeController extends Controller
         });
 
         $heroCampaigns = Campaign::with(['penggalangDana', 'donasi.pembayaran'])
-        ->where('is_active', true)
-        ->where('campaign_type', 'emergency')
-        ->where('approval_status', 'approved')
-        ->where('tanggal_mulai', '<=', $now)
-        ->where('tanggal_berakhir', '>=', $now)
-        ->latest()
-        ->take(5)
-        ->get();
+            ->where('is_active', true)
+            ->where('campaign_type', 'emergency')
+            ->where('approval_status', 'approved')
+            ->where('tanggal_mulai', '<=', $now)
+            ->where(function ($query) use ($now) {
+                $query->whereNull('tanggal_berakhir')
+                    ->orWhere('tanggal_berakhir', '>=', $now);
+            })
+            ->latest()
+            ->take(5)
+            ->get();
 
         // DARURAT (emergency + approved + aktif)
         $darurat = (clone $query)

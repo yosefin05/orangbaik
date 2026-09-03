@@ -1,0 +1,30 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('payment_gateways', function (Blueprint $table) {
+            $table->string('driver')->nullable()->after('code');
+            $table->text('description')->nullable()->after('driver');
+            $table->json('config')->nullable()->after('is_active');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('payment_gateways', function (Blueprint $table) {
+            $table->dropColumn(['driver', 'description', 'config']);
+        });
+    }
+};

@@ -99,8 +99,11 @@
                     @empty
 
                         <tr>
-                            <td colspan="6" class="empty-state">
-                                Belum ada komentar.
+                            <td colspan="6" class="empty-state text-center py-4">
+                                <div class="empty-state-content">
+                                    <i class="bi bi-chat-dots text-muted" style="font-size: 2rem;"></i>
+                                    <p class="mt-2 text-muted fw-semibold">Belum ada data komentar yang ditemukan.</p>
+                                </div>
                             </td>
                         </tr>
 
@@ -112,7 +115,12 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $komentar->links() }}
+            <div class="pagination-info">
+                Menampilkan <strong>{{ $komentar->firstItem() ?? 0 }}</strong> - <strong>{{ $komentar->lastItem() ?? 0 }}</strong> dari <strong>{{ $komentar->total() }}</strong> komentar
+            </div>
+            <div class="pagination-links">
+                {{ $komentar->links() }}
+            </div>
         </div>
 
     </section>

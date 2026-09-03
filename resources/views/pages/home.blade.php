@@ -105,7 +105,7 @@
                     @forelse ($darurat as $campaign)
                         @php
                             // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
                                 return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
                             });
                             $terkumpul = $donasiSettlement->sum('nominal');
@@ -116,10 +116,12 @@
 
                             // ♻️ PERHITUNGAN HARI – PASTI INTEGER
                             $now = \Carbon\Carbon::now();
-                            $end = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
-                            $diff = (int) $now->diffInDays($end, false);
+                            $end = $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir) : null;
+                            $diff = $end ? (int) $now->diffInDays($end, false) : null;
 
-                            if ($diff < 0) {
+                            if ($diff === null) {
+                                $labelHari = 'Tanpa batas';
+                            } elseif ($diff < 0) {
                                 $labelHari = 'Selesai';
                             } elseif ($diff == 0) {
                                 $labelHari = 'Hari terakhir';
@@ -168,7 +170,7 @@
                     @forelse ($campaignTerbaru as $campaign)
                         @php
                             // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
                                 return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
                             });
                             $terkumpul = $donasiSettlement->sum('nominal');
@@ -212,7 +214,7 @@
                     @forelse ($pemberdayaan as $campaign)
                         @php
                             // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
                                 return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
                             });
                             $terkumpul = $donasiSettlement->sum('nominal');
@@ -223,10 +225,12 @@
 
                             // ♻️ SAMA PERSIS DENGAN DARURAT
                             $now = \Carbon\Carbon::now();
-                            $end = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
-                            $diff = (int) $now->diffInDays($end, false);
+                            $end = $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir) : null;
+                            $diff = $end ? (int) $now->diffInDays($end, false) : null;
 
-                            if ($diff < 0) {
+                            if ($diff === null) {
+                                $labelHari = 'Tanpa batas';
+                            } elseif ($diff < 0) {
                                 $labelHari = 'Selesai';
                             } elseif ($diff == 0) {
                                 $labelHari = 'Hari terakhir';
@@ -274,7 +278,7 @@
                     @forelse ($campaigns as $campaign)
                         @php
                             // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
                                 return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
                             });
                             $terkumpul = $donasiSettlement->sum('nominal');
@@ -285,10 +289,12 @@
 
                             // ♻️ SAMA PERSIS DENGAN DARURAT
                             $now = \Carbon\Carbon::now();
-                            $end = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
-                            $diff = (int) $now->diffInDays($end, false);
+                            $end = $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir) : null;
+                            $diff = $end ? (int) $now->diffInDays($end, false) : null;
 
-                            if ($diff < 0) {
+                            if ($diff === null) {
+                                $labelHari = 'Tanpa batas';
+                            } elseif ($diff < 0) {
                                 $labelHari = 'Selesai';
                             } elseif ($diff == 0) {
                                 $labelHari = 'Hari terakhir';
@@ -410,7 +416,7 @@
                     @forelse ($campaigns as $campaign)
                         @php
                             // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function($donasi) {
+                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
                                 return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
                             });
                             $terkumpul = $donasiSettlement->sum('nominal');
@@ -421,10 +427,12 @@
 
                             // ♻️ SAMA LAGI
                             $now = \Carbon\Carbon::now();
-                            $end = \Carbon\Carbon::parse($campaign->tanggal_berakhir);
-                            $diff = (int) $now->diffInDays($end, false);
+                            $end = $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir) : null;
+                            $diff = $end ? (int) $now->diffInDays($end, false) : null;
 
-                            if ($diff < 0) {
+                            if ($diff === null) {
+                                $labelHari = 'Tanpa batas';
+                            } elseif ($diff < 0) {
                                 $labelHari = 'Selesai';
                             } elseif ($diff == 0) {
                                 $labelHari = 'Hari terakhir';

@@ -11,6 +11,7 @@ use App\Models\Berita;
 use App\Models\Campaign_Fundraiser;
 use App\Models\Komentar;
 use App\Models\Filter;
+use App\Models\Donasi;
 
 class DashboardController extends Controller
 {
@@ -25,6 +26,7 @@ class DashboardController extends Controller
             'totalBerita' => Berita::count(),
             'totalKomentar' => Komentar::count(),
             'totalFilter' => Filter::count(),
+            'totalDonasi' => Donasi::count(),
         ]);
     }
 }

@@ -204,7 +204,8 @@ class Campaign extends Model
 
     public function isTimeActive(): bool
     {
-        return now()->between($this->tanggal_mulai, $this->tanggal_berakhir);
+        return now()->greaterThanOrEqualTo($this->tanggal_mulai)
+            && ($this->tanggal_berakhir === null || now()->lessThanOrEqualTo($this->tanggal_berakhir));
     }
 
     public function updateActiveStatus(): void
@@ -244,8 +245,8 @@ class Campaign extends Model
 
     public function isDonatable(): bool
     {
-        return $this->is_active 
-            && $this->isApproved() 
+        return $this->is_active
+            && $this->isApproved()
             && $this->isTimeActive()
             && $this->target_donasi > 0;
     }
@@ -254,11 +255,15 @@ class Campaign extends Model
     {
         $now = now();
         $end = $this->tanggal_berakhir;
-        
+
+        if ($end === null) {
+            return PHP_INT_MAX;
+        }
+
         if ($now->gt($end)) {
             return 0;
         }
-        
+
         return (int) $now->diffInDays($end);
     }
 
@@ -267,27 +272,27 @@ class Campaign extends Model
         if (!$this->is_active) {
             return 'Tidak Aktif';
         }
-        
+
         if (!$this->isApproved()) {
             return 'Menunggu Persetujuan';
         }
-        
+
         if ($this->tanggal_mulai->isFuture()) {
             return 'Akan Datang';
         }
-        
-        if ($this->tanggal_berakhir->isPast()) {
+
+        if ($this->tanggal_berakhir && $this->tanggal_berakhir->isPast()) {
             return 'Berakhir';
         }
-        
+
         return 'Aktif';
     }
 
     public function getStatusColor(): string
     {
         $status = $this->getStatusText();
-        
-        return match($status) {
+
+        return match ($status) {
             'Aktif' => 'success',
             'Menunggu Persetujuan' => 'warning',
             'Akan Datang' => 'info',

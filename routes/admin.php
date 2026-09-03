@@ -81,17 +81,23 @@ Route::middleware(['auth', 'admin'])
 
         Route::resource('testimoni', TestimoniController::class);
 
-        Route::resource('donasi', DonasiController::class);
         Route::get('donasi/export', [DonasiController::class, 'export'])->name('donasi.export');
         Route::patch('donasi/{donasi}/approve-manual', [DonasiController::class, 'approveManual'])->name('donasi.approve-manual');
         Route::patch('donasi/{donasi}/reject-manual', [DonasiController::class, 'rejectManual'])->name('donasi.reject-manual');
+        Route::resource('donasi', DonasiController::class);
 
         // ==================== PAYMENT MANAGEMENT ====================
         Route::prefix('payment')->name('payment.')->group(function () {
 
-            // Payment Gateway (hanya lihat + toggle status)
+            // Payment Gateway (CRUD + toggle status + config)
             Route::get('/gateway', [PaymentGatewayController::class, 'index'])
                 ->name('gateway.index');
+            Route::post('/gateway', [PaymentGatewayController::class, 'store'])
+                ->name('gateway.store');
+            Route::put('/gateway/{gateway}', [PaymentGatewayController::class, 'update'])
+                ->name('gateway.update');
+            Route::delete('/gateway/{gateway}', [PaymentGatewayController::class, 'destroy'])
+                ->name('gateway.destroy');
             Route::patch('/gateway/{gateway}/toggle', [PaymentGatewayController::class, 'toggleActive'])
                 ->name('gateway.toggle');
 

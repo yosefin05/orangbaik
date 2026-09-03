@@ -141,23 +141,10 @@
 
                             <td class="text-center">
                                 <div class="action-group">
-
-                                    <a href="{{ route('admin.campaign.show', $item) }}" class="action-link link-blue">
+                                    <a href="{{ route('admin.campaign.show', $item) }}" class="action-link link-blue" title="Lihat detail & review campaign">
                                         <i class="bi bi-eye"></i>
                                         Detail
                                     </a>
-                                    <form action="{{ route('admin.berita.destroy', $item) }}" method="POST" class="inline-form"
-                                        onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
-
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="submit" class="action-link link-red">
-                                            <i class="bi bi-trash"></i>
-                                            <span>Hapus</span>
-                                        </button>
-                                    </form>
-
                                 </div>
                             </td>
                         </tr>
@@ -165,8 +152,11 @@
                     @empty
 
                         <tr>
-                            <td colspan="9" class="empty-state">
-                                Belum ada campaign.
+                            <td colspan="10" class="empty-state text-center py-4">
+                                <div class="empty-state-content">
+                                    <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+                                    <p class="mt-2 text-muted fw-semibold">Belum ada campaign yang ditemukan.</p>
+                                </div>
                             </td>
                         </tr>
 
@@ -179,7 +169,12 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $campaign->links() }}
+            <div class="pagination-info">
+                Menampilkan <strong>{{ $campaign->firstItem() ?? 0 }}</strong> - <strong>{{ $campaign->lastItem() ?? 0 }}</strong> dari <strong>{{ $campaign->total() }}</strong> campaign
+            </div>
+            <div class="pagination-links">
+                {{ $campaign->links() }}
+            </div>
         </div>
 
     </section>

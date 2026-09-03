@@ -114,8 +114,11 @@
                     @empty
 
                         <tr>
-                            <td colspan="6" class="empty-state">
-                                Belum ada data testimoni.
+                            <td colspan="6" class="empty-state text-center py-4">
+                                <div class="empty-state-content">
+                                    <i class="bi bi-chat-heart text-muted" style="font-size: 2rem;"></i>
+                                    <p class="mt-2 text-muted fw-semibold">Belum ada data testimoni yang ditemukan.</p>
+                                </div>
                             </td>
                         </tr>
 
@@ -127,7 +130,12 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $testimoni->links() }}
+            <div class="pagination-info">
+                Menampilkan <strong>{{ $testimoni->firstItem() ?? 0 }}</strong> - <strong>{{ $testimoni->lastItem() ?? 0 }}</strong> dari <strong>{{ $testimoni->total() }}</strong> testimoni
+            </div>
+            <div class="pagination-links">
+                {{ $testimoni->links() }}
+            </div>
         </div>
 
     </section>

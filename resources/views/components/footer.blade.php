@@ -73,8 +73,12 @@
     </div>
 
     <div class="footer-bottom">
-        <div class="container footer-bottom-inner">
-            <p>Copyright © {{ date('Y') }} OrangBaik.id. All Rights Reserved.</p>
+        <div class="container footer-bottom-inner" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <p style="margin:0;">Copyright © {{ date('Y') }} OrangBaik.id (Yayasan Dompet Al-Qur'an Indonesia). All Rights Reserved.</p>
+            <div class="footer-trust-badges" style="display:flex; align-items:center; gap:1.25rem; font-size:0.8125rem; color:#94a3b8;">
+                <span><i class="bi bi-shield-check text-success"></i> Pembayaran Aman Terverifikasi</span>
+                <span><i class="bi bi-lock-fill text-blue"></i> 256-bit SSL Enkripsi</span>
+            </div>
         </div>
     </div>
 </footer>

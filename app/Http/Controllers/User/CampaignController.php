@@ -30,7 +30,10 @@ class CampaignController extends Controller
         $query = Campaign::with(['penggalangDana', 'donasi.pembayaran', 'kategori', 'filter'])
             ->where('is_active', true)
             ->where('tanggal_mulai', '<=', $now)
-            ->where('tanggal_berakhir', '>=', $now);
+            ->where(function ($query) use ($now) {
+                $query->whereNull('tanggal_berakhir')
+                    ->orWhere('tanggal_berakhir', '>=', $now);
+            });
 
         // Hanya tampilkan campaign yang approved atau regular
         $query->where(function ($q) {
@@ -141,7 +144,7 @@ class CampaignController extends Controller
             'judul_campaign' => 'required|string|max:255',
             'deskripsi_campaign' => 'required|string',
             'tanggal_mulai' => 'required|date',
-            'tanggal_akhir' => 'required|date|after_or_equal:tanggal_mulai',
+            'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal_mulai',
             'target_donasi' => 'required|numeric|min:1',
             'minimal_donasi' => 'nullable|numeric|min:0',
             'kategori_id' => 'required|exists:kategori,id',
@@ -167,8 +170,9 @@ class CampaignController extends Controller
             // Penggalang Dana
             $penggalang = Penggalang_Dana::where('user_id', Auth::id())->firstOrFail();
 
-            // Set approval only for emergency and sustainable
-            $approvalStatus = in_array($request->campaign_type, ['emergency', 'sustainable']) ? 'pending' : 'approved';
+            // Campaign tanpa tanggal akhir diperlakukan sebagai sustainable.
+            $campaignType = $request->tanggal_akhir ? $request->campaign_type : 'sustainable';
+            $approvalStatus = in_array($campaignType, ['emergency', 'sustainable']) ? 'pending' : 'approved';
 
             // Siapkan custom_slug
             $customSlug = $request->custom_slug ? Str::slug($request->custom_slug) : null;
@@ -187,7 +191,7 @@ class CampaignController extends Controller
                 'target_donasi' => $request->target_donasi,
                 'minimal_donasi' => $minimalDonasi,
                 'kategori_id' => $request->kategori_id,
-                'campaign_type' => $request->campaign_type,
+                'campaign_type' => $campaignType,
                 'approval_status' => $approvalStatus,
                 'penggalang_dana_id' => $penggalang->id,
                 'is_active' => true,
@@ -383,7 +387,7 @@ class CampaignController extends Controller
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal_mulai' => 'required|date',
-            'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
+            'tanggal_berakhir' => 'nullable|date|after:tanggal_mulai',
             'target_donasi' => 'required|numeric|min:0',
             'minimal_donasi' => 'nullable|numeric|min:0',
             'kategori_id' => 'required|exists:kategori,id',
@@ -407,9 +411,11 @@ class CampaignController extends Controller
             // Reset approval if type changed to emergency/sustainable
             $approvalStatus = $campaign->approval_status;
 
-            if (in_array($request->campaign_type, ['emergency', 'sustainable']) && $campaign->campaign_type != $request->campaign_type) {
+            $campaignType = $request->tanggal_berakhir ? $request->campaign_type : 'sustainable';
+
+            if (!$request->tanggal_berakhir || (in_array($campaignType, ['emergency', 'sustainable']) && $campaign->campaign_type != $campaignType)) {
                 $approvalStatus = 'pending';
-            } elseif (!in_array($request->campaign_type, ['emergency', 'sustainable'])) {
+            } elseif (!in_array($campaignType, ['emergency', 'sustainable'])) {
                 $approvalStatus = null;
             }
 
@@ -425,7 +431,7 @@ class CampaignController extends Controller
                 'target_donasi' => $validated['target_donasi'],
                 'minimal_donasi' => $minimalDonasi,
                 'kategori_id' => $validated['kategori_id'],
-                'campaign_type' => $request->campaign_type,
+                'campaign_type' => $campaignType,
                 'approval_status' => $approvalStatus,
                 'enable_quantity' => $request->boolean('enable_quantity'),
                 'enable_nama_donatur' => $request->boolean('enable_donatur_name'),

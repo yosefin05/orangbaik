@@ -44,9 +44,13 @@ require __DIR__ . '/auth.php';
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 // ============================================================
-// PAYMENT WEBHOOKS (PUBLIC - Midtrans & Flip)
+// PAYMENT WEBHOOKS (PUBLIC - Dynamic & Modular Gateway Webhooks)
 // ============================================================
 Route::prefix('payment')->group(function () {
+    // Dynamic universal webhook endpoint for any gateway
+    Route::post('/{gateway}/webhook', [PaymentWebhookController::class, 'handle'])->name('payment.gateway.webhook');
+
+    // Dedicated / legacy aliases
     Route::post('/midtrans/webhook', [MidtransController::class, 'notification'])->name('payment.midtrans.webhook');
     Route::post('/flip/webhook', [FlipController::class, 'notification'])->name('payment.flip.webhook');
 });

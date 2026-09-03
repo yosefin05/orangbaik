@@ -15,11 +15,19 @@
             margin-bottom: 1.5rem;
             border: 1px solid #e2e8f0;
         }
-        .payment-channels-section h2 {
-            font-size: 1.125rem;
+        .group-heading {
+            font-size: 0.9375rem;
             font-weight: 700;
-            color: #0f172a;
-            margin: 0 0 1rem;
+            color: #1e293b;
+            margin: 0.75rem 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .channel-groups-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
         .channel-grid {
             display: grid;
@@ -194,24 +202,42 @@
                     <h2>Pilih Metode Pembayaran</h2>
                     <div id="error-payment_channel_id" class="error-text" style="display:none; margin-bottom: 0.75rem;"></div>
 
-                    <div class="channel-grid">
-                        @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
-                            @foreach ($paymentChannels as $idx => $channel)
-                                <label class="channel-item">
-                                    <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" {{ $idx === 0 ? 'checked' : '' }}>
-                                    <div class="channel-item-content">
-                                        <div class="channel-info">
-                                            <strong class="channel-name">{{ $channel->name }}</strong>
-                                            <span class="channel-type">{{ $channel->payment_type_label }}</span>
-                                        </div>
-                                        <span class="channel-provider-tag">{{ $channel->gateway?->name }}</span>
+                    @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
+                        @php
+                            $grouped = $paymentChannels->groupBy(function($item) {
+                                return $item->gateway?->name ?? 'Metode Pembayaran Lainnya';
+                            });
+                        @endphp
+
+                        <div class="channel-groups-wrapper">
+                            @foreach ($grouped as $groupName => $groupChannels)
+                                <div class="channel-group mb-3">
+                                    <h3 class="group-heading">
+                                        <i class="bi bi-credit-card-2-front text-primary"></i>
+                                        <span>{{ $groupName }}</span>
+                                    </h3>
+                                    <div class="channel-grid">
+                                        @foreach ($groupChannels as $channel)
+                                            <label class="channel-item">
+                                                <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" {{ $loop->parent->first && $loop->first ? 'checked' : '' }}>
+                                                <div class="channel-item-content">
+                                                    <div class="channel-info">
+                                                        <strong class="channel-name">{{ $channel->name }}</strong>
+                                                        <span class="channel-type">{{ $channel->payment_type_label }}</span>
+                                                    </div>
+                                                    <span class="channel-provider-tag">
+                                                        {{ $channel->payment_type === 'instant' ? '⚡ Instan' : ($channel->payment_type === 'va' ? '🤖 VA Otomatis' : '🏢 Transfer Resmi') }}
+                                                    </span>
+                                                </div>
+                                            </label>
+                                        @endforeach
                                     </div>
-                                </label>
+                                </div>
                             @endforeach
-                        @else
-                            <p style="color:#64748b; font-size:0.875rem;">Metode pembayaran belum tersedia.</p>
-                        @endif
-                    </div>
+                        </div>
+                    @else
+                        <p style="color:#64748b; font-size:0.875rem;">Metode pembayaran belum tersedia saat ini.</p>
+                    @endif
                 </section>
 
                 <section class="donor-card">

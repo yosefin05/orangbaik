@@ -87,7 +87,7 @@
 
             <div>
                 <p class="stat-label">Total Donasi</p>
-                <h3 class="stat-value text-gold">{{ $totalDonasi ?? 0 }}</h3>
+                <h3 class="stat-value text-gold">{{ $totalDonasi }}</h3>
             </div>
         </div>
 
@@ -146,6 +146,11 @@
             <a href="{{ route('admin.donasi.index') }}" class="menu-item">
                 <i class="bi bi-wallet2 menu-icon"></i>
                 <span>Donasi</span>
+            </a>
+
+            <a href="{{ route('admin.payment.gateway.index') }}" class="menu-item">
+                <i class="bi bi-credit-card menu-icon"></i>
+                <span>Payment</span>
             </a>
 
             <a href="{{ route('admin.testimoni.index') }}" class="menu-item">

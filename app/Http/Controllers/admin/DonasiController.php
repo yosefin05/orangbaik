@@ -14,7 +14,7 @@ class DonasiController extends Controller
     
     public function index(Request $request)
     {
-        $query = Donasi::with(['campaign', 'user', 'pembayaran']);
+        $query = Donasi::with(['campaign', 'user', 'pembayaran.paymentChannel.gateway']);
 
         // Filter by campaign
         if ($request->filled('campaign_id')) {
@@ -38,7 +38,7 @@ class DonasiController extends Controller
 
         // Search by nama donatur, email, atau nomor hp
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = trim($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('nama_donatur', 'LIKE', "%{$search}%")
                     ->orWhere('email', 'LIKE', "%{$search}%")
@@ -46,11 +46,35 @@ class DonasiController extends Controller
             });
         }
 
-        $donasi = $query->latest()->paginate(20);
-        $campaigns = Campaign::where('is_active', true)->get();
-        $statuses = ['pending', 'settlement', 'expire'];
+        // Hitung statistik akurat berdasarkan query yang difilter
+        $totalDonasiCount = (clone $query)->count();
+        $totalTerkumpul   = (clone $query)->whereHas('pembayaran', function ($q) {
+            $q->where('transaction_status', 'settlement');
+        })->sum('nominal');
+        $settlementCount  = (clone $query)->whereHas('pembayaran', function ($q) {
+            $q->where('transaction_status', 'settlement');
+        })->count();
+        $pendingCount     = (clone $query)->whereHas('pembayaran', function ($q) {
+            $q->where('transaction_status', 'pending');
+        })->count();
+        $expireCount     = (clone $query)->whereHas('pembayaran', function ($q) {
+            $q->where('transaction_status', 'expire');
+        })->count();
 
-        return view('admin.donasi.index', compact('donasi', 'campaigns', 'statuses'));
+        $donasi    = $query->latest()->paginate(20)->withQueryString();
+        $campaigns = Campaign::where('is_active', true)->orderBy('judul')->get();
+        $statuses  = ['pending', 'settlement', 'failed', 'expire'];
+
+        return view('admin.donasi.index', compact(
+            'donasi',
+            'campaigns',
+            'statuses',
+            'totalDonasiCount',
+            'totalTerkumpul',
+            'settlementCount',
+            'pendingCount',
+            'expireCount'
+        ));
     }
 
     
@@ -229,7 +253,7 @@ class DonasiController extends Controller
 
     public function export(Request $request)
     {
-        $query = Donasi::with(['campaign', 'user', 'pembayaran']);
+        $query = Donasi::with(['campaign', 'user', 'pembayaran.paymentChannel.gateway']);
 
         // Apply filters
         if ($request->filled('campaign_id')) {
@@ -246,44 +270,74 @@ class DonasiController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_donatur', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('no_hp', 'LIKE', "%{$search}%");
+            });
+        }
 
-        $donasi = $query->get();
+        $donasi = $query->latest()->get();
+
+        $filename = 'donasi_orangbaik_' . date('Y-m-d_His') . '.csv';
 
         $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="donasi_' . date('Y-m-d') . '.csv"',
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
         ];
 
         $callback = function () use ($donasi) {
             $file = fopen('php://output', 'w');
 
+            // Write UTF-8 BOM so Excel opens special characters correctly
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
             // Header CSV
             fputcsv($file, [
-                'ID',
+                'ID Donasi',
+                'Order ID',
                 'Campaign',
-                'Donatur',
+                'Nama Donatur',
                 'Email',
-                'No HP',
-                'Nominal',
+                'No. HP',
+                'Nominal (Rp)',
                 'Status Pembayaran',
                 'Metode Pembayaran',
-                'Tanggal Donasi',
-                'Tanggal Bayar'
+                'Payment Channel',
+                'Payment Gateway',
+                'Pesan Doa',
+                'Anonim',
+                'Waktu Donasi',
+                'Waktu Pembayaran',
             ]);
 
             // Data CSV
             foreach ($donasi as $d) {
+                $pembayaran = $d->pembayaran;
+                $channel    = $pembayaran?->paymentChannel;
+                $gateway    = $channel?->gateway;
+
                 fputcsv($file, [
                     $d->id,
+                    $pembayaran?->order_id ?? '-',
                     $d->campaign->judul ?? '-',
-                    $d->is_anonim ? 'Anonim' : $d->nama_donatur,
+                    $d->is_anonim ? 'Anonim' : ($d->nama_donatur ?: '-'),
                     $d->email ?? '-',
-                    $d->no_hp ?? '-',
+                    $d->no_hp ? "'" . $d->no_hp : '-',
                     $d->nominal,
-                    $d->pembayaran->transaction_status ?? '-',
-                    $d->pembayaran->payment_type ?? '-',
-                    $d->created_at,
-                    $d->pembayaran->paid_at ?? '-'
+                    ucfirst($pembayaran?->transaction_status ?? 'pending'),
+                    $pembayaran?->payment_type ?? '-',
+                    $channel?->name ?? '-',
+                    $gateway?->name ?? '-',
+                    $d->pesan_doa ?? '-',
+                    $d->is_anonim ? 'Ya' : 'Tidak',
+                    $d->created_at ? $d->created_at->format('Y-m-d H:i:s') : '-',
+                    $pembayaran?->paid_at ? \Carbon\Carbon::parse($pembayaran->paid_at)->format('Y-m-d H:i:s') : '-',
                 ]);
             }
 

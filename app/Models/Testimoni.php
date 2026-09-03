@@ -2,38 +2,28 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Testimoni extends Model
 {
+    use HasFactory;
+
+    protected $table = 'testimoni';
+
+    protected $fillable = [
+        'user_id',
+        'nama',
+        'jabatan',
+        'foto_profil',
+        'isi_testimoni',
+    ];
+
+    /**
+     * Relasi ke User pembuat testimoni (opsional / penggalang dana)
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-    public function showLoginForm()
-    {
-        $testimoni = Testimoni::inRandomOrder()->first();
-
-        return view('auth.login', [
-            'testimoni' => $testimoni,
-        ]);
-    }
-
-    public function showRegistrationForm()
-    {
-        $testimoni = Testimoni::inRandomOrder()->first();
-
-        return view('auth.register', [
-            'testimoni' => $testimoni,
-        ]);
-    }
-    protected $table = 'testimoni';
-    protected $fillable = [
-        'foto_profil',
-        'nama',
-        'jabatan',
-        'isi_testimoni',
-        'user_id'
-    ];
 }

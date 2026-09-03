@@ -38,8 +38,7 @@
                                     @foreach ($berita as $news)
                                         <article class="berita-card">
                                             <a href="{{ route('berita.show', $news->slug) }}">
-                                                <img src="{{ asset('storage/' . $news->thumbnail) }}"
-                                                    alt="{{ $news->judul }}"
+                                                <img src="{{ asset('storage/' . $news->thumbnail) }}" alt="{{ $news->judul }}"
                                                     loading="lazy">
                                                 <div class="berita-body">
                                                     <h4>
@@ -76,18 +75,15 @@
                                         $persen = $campaign->target_donasi
                                             ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                             : 0;
-                                        $hari = max(
-                                            0,
-                                            (int) now()->diffInDays($campaign->tanggal_berakhir, false)
-                                        );
+                                        $hari = $campaign->tanggal_berakhir === null
+                                            ? null
+                                            : max(0, (int) now()->diffInDays($campaign->tanggal_berakhir, false));
                                     @endphp
 
                                     <article class="campaign-card">
                                         <a href="{{ route('campaign.show', $campaign->slug) }}">
-                                            <img class="campaign-image"
-                                                src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                                                alt="{{ $campaign->judul }}"
-                                                loading="lazy">
+                                            <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                                alt="{{ $campaign->judul }}" loading="lazy">
                                         </a>
                                         <div class="campaign-body">
                                             <h3>

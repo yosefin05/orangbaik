@@ -241,6 +241,16 @@
                 <span class="bank-label">Atas Nama</span>
                 <span class="bank-val">{{ $pembayaran->paymentChannel->account_name ?? 'OrangBaik' }}</span>
             </div>
+            @if (!empty($pembayaran->gateway_response['link_url']))
+                <div class="bank-row" style="background:#eff6ff; padding:0.75rem 1rem; border-radius:8px; margin-top:0.5rem;">
+                    <span class="bank-label" style="color:#1e40af; font-weight:600;">Halaman Pembayaran Flip:</span>
+                    <span class="bank-val">
+                        <a href="{{ $pembayaran->gateway_response['link_url'] }}" target="_blank" class="copy-btn" style="background:#2563eb; color:#fff; text-decoration:none; padding:6px 12px; font-weight:600;">
+                            <i class="bi bi-box-arrow-up-right"></i> Buka Halaman Flip
+                        </a>
+                    </span>
+                </div>
+            @endif
         </div>
 
         {{-- Langkah Pembayaran --}}

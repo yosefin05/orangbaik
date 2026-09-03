@@ -203,10 +203,14 @@
 
                                     $hariIni = Carbon::today();
                                     $mulai = Carbon::parse($campaign->tanggal_mulai)->startOfDay();
-                                    $akhir = Carbon::parse($campaign->tanggal_berakhir)->endOfDay();
+                                    $akhir = $campaign->tanggal_berakhir
+                                        ? Carbon::parse($campaign->tanggal_berakhir)->endOfDay()
+                                        : null;
 
                                     if ($hariIni->lt($mulai)) {
                                         $statusHari = 'Mulai dalam ' . $hariIni->diffInDays($mulai) . ' hari';
+                                    } elseif ($akhir === null) {
+                                        $statusHari = 'Tanpa batas waktu';
                                     } elseif ($hariIni->gt($akhir)) {
                                         $statusHari = 'Campaign berakhir';
                                     } else {
@@ -218,7 +222,8 @@
                             </span>
                         </div>
 
-                        <a href="{{ route('donasi.create', $campaign->slug) }}" class="donate-button">Donasi Sekarang</a>
+                        <a href="{{ route('donasi.create', $campaign->slug) }}" class="donate-button">Donasi
+                            Sekarang</a>
                     </div>
 
                     <div class="fundraiser-info-card">
@@ -243,7 +248,7 @@
                         @php
                             // Ambil hanya donasi dengan status settlement
                             $donasiSettlement = $campaign->donasi()
-                                ->whereHas('pembayaran', function($q) {
+                                ->whereHas('pembayaran', function ($q) {
                                     $q->where('transaction_status', 'settlement');
                                 })
                                 ->latest()
@@ -267,7 +272,8 @@
                                             <h4 style="margin:0;">
                                                 {{ $donasi->is_anonymous ? 'Anonim' : ($donasi->nama_donatur ?? $donasi->user->name ?? 'Donatur') }}
                                             </h4>
-                                            <span style="font-size:10px; background:#4ade80; color:#fff; padding:2px 8px; border-radius:12px;">
+                                            <span
+                                                style="font-size:10px; background:#4ade80; color:#fff; padding:2px 8px; border-radius:12px;">
                                                 ✓ Berhasil
                                             </span>
                                         </div>
@@ -317,11 +323,11 @@
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                 </div>
-                                
+
                                 <div style="display: none;">
                                     <span id="sidebarReferralCode">{{ $fundraiser->referral_code }}</span>
                                 </div>
-                                
+
                                 <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
 
                                 <div class="referral-qr-section">
@@ -330,7 +336,8 @@
                                             ->size(180)->margin(1)
                                             ->generate($fundraiser->referral_url);
                                     @endphp
-                                    <div class="qr-canvas-wrapper" onclick="openFundraiserModalFromSidebar()" style="cursor: pointer;">
+                                    <div class="qr-canvas-wrapper" onclick="openFundraiserModalFromSidebar()"
+                                        style="cursor: pointer;">
                                         {!! $qrSvg !!}
                                     </div>
                                     <span style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 8px;">
@@ -369,6 +376,18 @@
                 </aside>
 
             </div>
+        </div>
+
+        {{-- Mobile Sticky Donation CTA Bar --}}
+        <div class="mobile-sticky-cta">
+            <div class="mobile-cta-info">
+                <span class="mobile-cta-label">Terkumpul</span>
+                <strong class="mobile-cta-val">Rp {{ number_format($totalTerkumpul ?? 0, 0, ',', '.') }}</strong>
+            </div>
+            <a href="{{ route('donasi.bayar', $campaign->slug) }}" class="btn-mobile-donate">
+                <span>Donasi Sekarang</span>
+                <i class="bi bi-heart-fill"></i>
+            </a>
         </div>
 
     </main>
@@ -489,7 +508,7 @@
                     title: '{{ $campaign->judul }}',
                     text: 'Dukung campaign ini di OrangBaik.id',
                     url: window.location.href
-                }).catch(() => {});
+                }).catch(() => { });
             } else {
                 const url = window.location.href;
                 navigator.clipboard.writeText(url).then(() => {
@@ -571,7 +590,7 @@
             lightboxImages.forEach((_, i) => {
                 const dot = document.createElement('span');
                 dot.className = 'lightbox-dot' + (i === currentImageIndex ? ' active' : '');
-                dot.onclick = function(e) {
+                dot.onclick = function (e) {
                     e.stopPropagation();
                     goToImage(i);
                 };
@@ -621,13 +640,13 @@
 
         let touchStartX = 0,
             touchEndX = 0;
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const wrapper = document.querySelector('.lightbox-image-wrapper');
             if (wrapper) {
-                wrapper.addEventListener('touchstart', function(e) {
+                wrapper.addEventListener('touchstart', function (e) {
                     touchStartX = e.changedTouches[0].screenX;
                 }, { passive: true });
-                wrapper.addEventListener('touchend', function(e) {
+                wrapper.addEventListener('touchend', function (e) {
                     touchEndX = e.changedTouches[0].screenX;
                     const diff = touchStartX - touchEndX;
                     if (Math.abs(diff) > 50) {
@@ -637,7 +656,7 @@
             }
         });
 
-        document.getElementById('lightboxOverlay').addEventListener('click', function(e) {
+        document.getElementById('lightboxOverlay').addEventListener('click', function (e) {
             if (e.target === this) closeLightbox();
         });
 
@@ -706,9 +725,9 @@
                 showToast('Data referral tidak ditemukan');
                 return;
             }
-            
+
             const referralUrl = referralLinkInput.value;
-            
+
             let referralCode = '';
             const codeElement = document.getElementById('sidebarReferralCode');
             if (codeElement) {
@@ -717,23 +736,23 @@
                 try {
                     const urlParams = new URLSearchParams(new URL(referralUrl).search);
                     referralCode = urlParams.get('ref') || 'REF-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-                } catch(e) {
+                } catch (e) {
                     referralCode = 'REF-' + Math.random().toString(36).substring(2, 10).toUpperCase();
                 }
             }
-            
+
             const qrWrapper = document.querySelector('.qr-canvas-wrapper');
             if (!qrWrapper) {
                 showToast('QR Code tidak ditemukan');
                 return;
             }
-            
+
             const qrSvg = qrWrapper.innerHTML;
             if (!qrSvg || qrSvg.trim() === '') {
                 showToast('QR Code tidak ditemukan');
                 return;
             }
-            
+
             openFundraiserModal(referralCode, referralUrl, qrSvg);
         }
 
@@ -744,24 +763,24 @@
             const referralLinkInput = document.getElementById('modalReferralLink');
             const referralCodeElement = document.getElementById('modalReferralCode');
             const qrContainer = document.getElementById('modalQrContainer');
-            
+
             if (!referralLinkInput || !referralCodeElement || !qrContainer) {
                 showToast('Data tidak ditemukan');
                 return;
             }
-            
+
             const referralUrl = referralLinkInput.value;
             const referralCode = referralCodeElement.textContent;
             const qrSvg = qrContainer.innerHTML;
-            
+
             if (!qrSvg || qrSvg.trim() === '' || qrSvg.includes('<!--')) {
                 showToast('QR Code belum tersedia');
                 return;
             }
-            
+
             closeFundraiserModal();
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 openFundraiserModal(referralCode, referralUrl, qrSvg);
             }, 400);
         }
@@ -800,7 +819,7 @@
                     title: 'Donasi Campaign di OrangBaik.id',
                     text: 'Yuk donasi! Gunakan referral code saya: ' + modalReferralCode,
                     url: modalReferralUrl
-                }).catch(() => {});
+                }).catch(() => { });
             } else {
                 navigator.clipboard.writeText(modalReferralUrl).then(() => {
                     showToast('Link referral berhasil disalin!');
@@ -813,11 +832,11 @@
         // ============================================================
         // KEYBOARD SHORTCUTS
         // ============================================================
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 const fundraiserModal = document.getElementById('fundraiserModal');
                 const lightboxOverlay = document.getElementById('lightboxOverlay');
-                
+
                 if (fundraiserModal && fundraiserModal.classList.contains('active')) {
                     closeFundraiserModal();
                 } else if (lightboxOverlay && lightboxOverlay.classList.contains('active')) {
@@ -827,10 +846,10 @@
         });
 
         // Click outside to close
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const fundraiserModal = document.getElementById('fundraiserModal');
             if (fundraiserModal) {
-                fundraiserModal.addEventListener('click', function(e) {
+                fundraiserModal.addEventListener('click', function (e) {
                     if (e.target === this) {
                         closeFundraiserModal();
                     }
@@ -841,7 +860,7 @@
         // ============================================================
         // DOWNLOAD QR CODE (dari sidebar)
         // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const btn = document.getElementById('btnDownloadQr');
             if (!btn) return;
             const svg = btn.closest('.referral-qr-section').querySelector('svg');
@@ -853,23 +872,23 @@
         // ============================================================
         // TAMPILKAN MODAL DARI SERVER
         // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             @if (session('show_fundraiser_modal') && session('referral_code'))
                 try {
                     const qrContainer = document.getElementById('modalQrContainer');
                     if (!qrContainer) return;
-                    
+
                     const qrSvg = `{!! SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(300)->margin(1)->generate(session('referral_url')) !!}`;
                     qrContainer.innerHTML = qrSvg;
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         openFundraiserModal(
                             '{{ session('referral_code') }}',
                             '{{ session('referral_url') }}',
                             qrSvg
                         );
                     }, 500);
-                    
+
                 } catch (error) {
                     console.error('Error showing modal:', error);
                 }

@@ -80,8 +80,11 @@
                     @empty
 
                         <tr>
-                            <td colspan="3" class="empty-state">
-                                Belum ada data filter.
+                            <td colspan="3" class="empty-state text-center py-4">
+                                <div class="empty-state-content">
+                                    <i class="bi bi-funnel text-muted" style="font-size: 2rem;"></i>
+                                    <p class="mt-2 text-muted fw-semibold">Belum ada data filter yang ditemukan.</p>
+                                </div>
                             </td>
                         </tr>
 
@@ -93,7 +96,12 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $filters->links() }}
+            <div class="pagination-info">
+                Menampilkan <strong>{{ $filters->firstItem() ?? 0 }}</strong> - <strong>{{ $filters->lastItem() ?? 0 }}</strong> dari <strong>{{ $filters->total() }}</strong> filter
+            </div>
+            <div class="pagination-links">
+                {{ $filters->links() }}
+            </div>
         </div>
 
     </section>

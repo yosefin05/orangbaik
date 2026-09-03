@@ -7,8 +7,7 @@ use App\Models\Campaign;
 use App\Models\Donasi;
 use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
-use App\Services\MidtransService;
-use App\Services\FlipService;
+use App\Services\PaymentGatewayManager;
 use App\Services\ManualTransferService;
 use App\Http\Requests\DonasiRequest;
 use Illuminate\Http\Request;
@@ -18,8 +17,7 @@ use Illuminate\Support\Facades\Log;
 class DonasiController extends Controller
 {
     public function __construct(
-        protected MidtransService       $midtransService,
-        protected FlipService           $flipService,
+        protected PaymentGatewayManager $gatewayManager,
         protected ManualTransferService $manualTransferService,
     ) {}
 
@@ -59,13 +57,6 @@ class DonasiController extends Controller
 
     /**
      * Menyimpan data donasi & membuat transaksi pembayaran di gateway yang sesuai
-     *
-     * Flow:
-     * 1. Validasi input via DonasiRequest
-     * 2. Ambil PaymentChannel & cek gateway-nya (Midtrans / Flip / Manual)
-     * 3. Buat record Donasi (DB transaction)
-     * 4. Buat record Pembayaran & dispatch ke service gateway yang sesuai
-     * 5. Return response (snap_token / data VA / redirect URL)
      */
     public function store(DonasiRequest $request, $slug)
     {
@@ -100,7 +91,7 @@ class DonasiController extends Controller
         $nominal     = (int) $request->nominal;
 
         // ============================================================
-        // 3. BUAT DATA DONASI
+        // 3. BUAT DATA DONASI & PEMBAYARAN
         // ============================================================
         DB::beginTransaction();
 
@@ -116,17 +107,21 @@ class DonasiController extends Controller
                 'is_anonim'    => $isAnonim,
             ]);
 
-            // ============================================================
-            // 4. ROUTING KE GATEWAY YANG SESUAI (Midtrans / Flip / Manual)
-            // ============================================================
-            $gatewayCode = $channel->gateway?->code;
+            $orderId = $this->generateOrderId($donasi);
 
-            $result = match ($gatewayCode) {
-                'midtrans' => $this->processMidtrans($donasi, $channel),
-                'flip'     => $this->processFlip($donasi, $channel),
-                'manual'   => $this->processManual($donasi, $channel),
-                default    => throw new \Exception("Gateway '{$gatewayCode}' tidak dikenali."),
-            };
+            $pembayaran = Pembayaran::create([
+                'donasi_id'          => $donasi->id,
+                'payment_channel_id' => $channel->id,
+                'order_id'           => $orderId,
+                'payment_type'       => $channel->payment_type ?? 'instant',
+                'transaction_status' => 'pending',
+            ]);
+
+            // ============================================================
+            // 4. ROUTING DINAMIS VIA DRIVER PATTERN
+            // ============================================================
+            $driver = $this->gatewayManager->driver($channel->gateway);
+            $result = $driver->createTransaction($donasi, $pembayaran, $channel);
 
             DB::commit();
 
@@ -140,85 +135,9 @@ class DonasiController extends Controller
             ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal memproses pembayaran. Silakan coba lagi.',
+                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage(),
             ], 500);
         }
-    }
-
-    /**
-     * Proses donasi via Midtrans (QRIS, GoPay, ShopeePay)
-     * Return: snap_token untuk Midtrans Snap JS
-     */
-    protected function processMidtrans(Donasi $donasi, PaymentChannel $channel): array
-    {
-        $orderId = $this->generateOrderId($donasi);
-
-        $pembayaran = Pembayaran::create([
-            'donasi_id'          => $donasi->id,
-            'payment_channel_id' => $channel->id,
-            'order_id'           => $orderId,
-            'transaction_status' => 'pending',
-        ]);
-
-        $snapToken = $this->midtransService->createTransaction($donasi, $pembayaran, $channel);
-
-        return [
-            'type'       => 'midtrans',
-            'snap_token' => $snapToken,
-            'order_id'   => $orderId,
-            'donasi_id'  => $donasi->id,
-        ];
-    }
-
-    /**
-     * Proses donasi via Flip (Virtual Account)
-     * Return: data VA (bank, nomor VA, expired)
-     */
-    protected function processFlip(Donasi $donasi, PaymentChannel $channel): array
-    {
-        if (!$this->flipService->isConfigured()) {
-            throw new \Exception('Layanan Virtual Account Flip belum tersedia. Silakan pilih metode pembayaran lain.');
-        }
-
-        $orderId = $this->generateOrderId($donasi);
-
-        $pembayaran = Pembayaran::create([
-            'donasi_id'          => $donasi->id,
-            'payment_channel_id' => $channel->id,
-            'order_id'           => $orderId,
-            'payment_type'       => 'va',
-            'transaction_status' => 'pending',
-        ]);
-
-        $vaData = $this->flipService->createVirtualAccount($donasi, $pembayaran, $channel);
-
-        return [
-            'type'           => 'virtual_account',
-            'order_id'       => $orderId,
-            'donasi_id'      => $donasi->id,
-            'bank_name'      => $channel->name,
-            'account_number' => $vaData['account_number'] ?? null,
-            'account_name'   => $channel->account_name ?? 'OrangBaik',
-            'amount'         => $donasi->nominal,
-            'expired_at'     => $vaData['expired_date'] ?? null,
-            'redirect_url'   => route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
-        ];
-    }
-
-    /**
-     * Proses donasi via Transfer Manual
-     * Return: redirect ke halaman instruksi transfer
-     */
-    protected function processManual(Donasi $donasi, PaymentChannel $channel): array
-    {
-        $pembayaran = $this->manualTransferService->createTransaction($donasi, $channel);
-
-        return [
-            'type'         => 'manual_transfer',
-            'order_id'     => $pembayaran->order_id,
-            'donasi_id'    => $donasi->id,
-            'redirect_url' => route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
-        ];
     }
 
     /**
@@ -226,66 +145,71 @@ class DonasiController extends Controller
      */
     public function instruksi(Pembayaran $pembayaran)
     {
-        // Pastikan pembayaran milik user yang login (jika login)
-        $donasi = $pembayaran->donasi()->with(['campaign', 'pembayaran.paymentChannel.gateway'])->firstOrFail();
+        $pembayaran->load(['donasi.campaign', 'paymentChannel.gateway']);
+
+        $donasi = $pembayaran->donasi;
+
+        if (!$donasi) {
+            abort(404, 'Data donasi tidak ditemukan.');
+        }
 
         return view('pages.donasi-instruksi', compact('pembayaran', 'donasi'));
     }
 
     /**
-     * Upload bukti transfer manual oleh donatur
+     * Upload bukti transfer donasi manual oleh donatur
      */
     public function uploadBukti(Request $request, Pembayaran $pembayaran)
     {
         $request->validate([
-            'bukti_transfer' => 'required|file|image|mimes:jpg,jpeg,png,webp|max:5120', // max 5MB
+            'bukti_transfer' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
         ], [
-            'bukti_transfer.required' => 'Bukti transfer wajib diupload.',
-            'bukti_transfer.image'    => 'File harus berupa gambar.',
+            'bukti_transfer.required' => 'Pilih file bukti transfer terlebih dahulu.',
+            'bukti_transfer.image'    => 'File harus berupa gambar (JPG, PNG, WEBP).',
             'bukti_transfer.max'      => 'Ukuran file maksimal 5MB.',
         ]);
 
-        if ($pembayaran->transaction_status !== 'pending') {
-            return back()->with('error', 'Pembayaran ini sudah diproses dan tidak dapat diubah.');
-        }
-
         try {
-            $this->manualTransferService->saveBuktiTransfer(
-                $pembayaran,
-                $request->file('bukti_transfer')
-            );
+            $this->manualTransferService->saveBuktiTransfer($pembayaran, $request->file('bukti_transfer'));
 
-            return back()->with('success', 'Bukti transfer berhasil diupload. Tim kami akan memverifikasi dalam 1x24 jam.');
+            return back()->with('success', 'Bukti transfer berhasil diunggah. Tim OrangBaik akan memverifikasi dalam 1x24 jam.');
 
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+            Log::error('Upload bukti transfer gagal', [
+                'pembayaran_id' => $pembayaran->id,
+                'error'         => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Gagal mengunggah bukti transfer: ' . $e->getMessage());
         }
     }
 
     /**
-     * Halaman status pembayaran
+     * Halaman status pembayaran (sukses, pending, gagal)
      */
     public function status($status)
     {
-        $allowed = ['sukses', 'pending', 'gagal'];
-        if (!in_array($status, $allowed)) {
-            abort(404);
-        }
+        $statusLabels = [
+            'sukses'  => ['title' => 'Pembayaran Berhasil', 'icon' => 'bi-check-circle-fill', 'color' => 'text-green'],
+            'pending' => ['title' => 'Pembayaran Menunggu', 'icon' => 'bi-hourglass-split',    'color' => 'text-orange'],
+            'gagal'   => ['title' => 'Pembayaran Gagal',    'icon' => 'bi-x-circle-fill',       'color' => 'text-red'],
+        ];
 
-        return view('pages.donasi-status', compact('status'));
+        $info = $statusLabels[$status] ?? $statusLabels['pending'];
+
+        return view('pages.donasi-status', compact('status', 'info'));
     }
 
     /**
-     * Generate order ID unik.
-     * Format: OB-{YYYYMMDD}-{donasi_id_padded}
+     * Generate Order ID unik untuk donasi
+     * Format: OB-YYYYMMDD-DONASI_ID-RANDOM
      */
     protected function generateOrderId(Donasi $donasi): string
     {
         $prefix = config('payment.order_id_prefix', 'OB');
         $date   = now()->format('Ymd');
-        $id     = str_pad($donasi->id, 5, '0', STR_PAD_LEFT);
-        $random = strtoupper(\Illuminate\Support\Str::random(3));
+        $rand   = strtoupper(substr(md5(uniqid()), 0, 4));
 
-        return "{$prefix}-{$date}-{$id}-{$random}";
+        return sprintf('%s-%s-%d-%s', $prefix, $date, $donasi->id, $rand);
     }
 }

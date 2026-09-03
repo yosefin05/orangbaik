@@ -124,8 +124,11 @@
                     @empty
 
                         <tr>
-                            <td colspan="7" class="empty-state">
-                                Belum ada pengajuan penggalang dana.
+                            <td colspan="8" class="empty-state text-center py-4">
+                                <div class="empty-state-content">
+                                    <i class="bi bi-people text-muted" style="font-size: 2rem;"></i>
+                                    <p class="mt-2 text-muted fw-semibold">Belum ada data pengajuan penggalang dana.</p>
+                                </div>
                             </td>
                         </tr>
 
@@ -138,7 +141,12 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $penggalangDana->links() }}
+            <div class="pagination-info">
+                Menampilkan <strong>{{ $penggalangDana->firstItem() ?? 0 }}</strong> - <strong>{{ $penggalangDana->lastItem() ?? 0 }}</strong> dari <strong>{{ $penggalangDana->total() }}</strong> penggalang dana
+            </div>
+            <div class="pagination-links">
+                {{ $penggalangDana->links() }}
+            </div>
         </div>
 
     </section>

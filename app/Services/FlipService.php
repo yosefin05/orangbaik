@@ -7,14 +7,14 @@ use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
- * FlipService — Integrasi dengan Flip untuk Virtual Account
+ * FlipService — Integrasi Resmi dengan Flip API (Big Flip / Acceptance PWF API)
  *
- * CATATAN: Flip API Key belum tersedia saat implementasi ini dibuat.
- * Service ini sudah disiapkan sebagai skeleton yang siap diaktifkan
- * setelah API Key Flip dikonfigurasi di .env:
+ * Mendukung pembuatan Virtual Account / Payment Link dan Webhook Callback.
  *
+ * Konfigurasi .env:
  *     FLIP_API_KEY=your_api_key_here
  *     FLIP_IS_PRODUCTION=false
  *     FLIP_WEBHOOK_TOKEN=your_webhook_token_here
@@ -30,8 +30,8 @@ class FlipService
     {
         $isProduction  = config('payment.flip.is_production', false);
         $this->baseUrl = $isProduction
-            ? config('payment.flip.base_url_production')
-            : config('payment.flip.base_url_sandbox');
+            ? (config('payment.flip.base_url_production') ?? 'https://bigflip.id/api')
+            : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
         $this->apiKey  = config('payment.flip.api_key');
     }
 
@@ -44,12 +44,12 @@ class FlipService
     }
 
     /**
-     * Buat Virtual Account untuk pembayaran donasi.
+     * Buat Virtual Account / Bill Payment via Flip API.
      *
      * @param  Donasi          $donasi
      * @param  Pembayaran      $pembayaran
      * @param  PaymentChannel  $channel
-     * @return array  Data VA dari Flip { bank_code, account_number, amount, ... }
+     * @return array  Data VA dari Flip
      * @throws \Exception jika Flip belum dikonfigurasi atau request gagal
      */
     public function createVirtualAccount(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
@@ -58,17 +58,38 @@ class FlipService
             throw new \Exception('Flip belum dikonfigurasi. Tambahkan FLIP_API_KEY di file .env.');
         }
 
+        $bankCode = strtolower($channel->channel_code);
+        $title    = 'Donasi: ' . Str::limit($donasi->campaign->judul ?? 'OrangBaik.id', 35);
+
+        // Payload untuk Flip Accept (PWF / Bill API)
         $payload = [
-            'bank_code'  => strtoupper($channel->channel_code),
-            'name'       => $donasi->nama_donatur,
-            'amount'     => (int) $donasi->nominal,
-            // Flip menggunakan expired_date sebagai unix timestamp
-            'expired_date' => now()->addDay()->timestamp,
+            'title'                    => $title,
+            'type'                     => 'SINGLE',
+            'amount'                   => (int) $donasi->nominal,
+            'expired_date'             => now()->addDays(1)->format('Y-m-d H:i'),
+            'redirect_url'             => route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
+            'is_address_required'      => 0,
+            'is_phone_number_required' => 0,
+            'step'                     => 3,
+            'sender_name'              => $donasi->nama_donatur ?: 'Hamba Allah',
+            'sender_email'             => $donasi->email ?? 'donatur@orangbaik.id',
+            'sender_phone_number'      => $donasi->no_hp ?? '08123456789',
+            'sender_bank'              => $bankCode,
+            'sender_bank_type'         => 'virtual_account',
         ];
 
         try {
+            // Flip API menggunakan Basic Auth dengan apiKey sebagai username (password dikosongkan)
             $response = Http::withBasicAuth($this->apiKey, '')
-                ->post($this->baseUrl . '/disbursement', $payload);
+                ->asForm()
+                ->post($this->baseUrl . '/v2/pwf/bill', $payload);
+
+            // Jika /v2/pwf/bill 404 (beberapa sandbox Flip menggunakan /disbursement atau /bill langsung)
+            if ($response->status() === 404) {
+                $response = Http::withBasicAuth($this->apiKey, '')
+                    ->asForm()
+                    ->post($this->baseUrl . '/bill', $payload);
+            }
 
             if ($response->failed()) {
                 Log::error('Flip createVirtualAccount gagal', [
@@ -76,25 +97,45 @@ class FlipService
                     'body'     => $response->body(),
                     'order_id' => $pembayaran->order_id,
                 ]);
-                throw new \Exception('Gagal membuat Virtual Account. Silakan coba lagi.');
+                throw new \Exception('Gagal membuat Virtual Account Flip: ' . ($response->json('message') ?? $response->body()));
             }
 
             $data = $response->json();
 
+            // Ekstrak nomor Virtual Account dari response Flip
+            $accountNumber = $data['bill_payment']['receiver_bank_account']['account_number']
+                ?? $data['account_number']
+                ?? $data['virtual_account_number']
+                ?? null;
+
+            $flipId = $data['link_id'] ?? $data['id'] ?? null;
+
             // Simpan transaction_id dari Flip dan gateway response
             $pembayaran->update([
-                'transaction_id'   => $data['id'] ?? null,
-                'gateway_response' => $data,
+                'transaction_id'   => (string) $flipId,
+                'gateway_response' => array_merge($data, [
+                    'account_number' => $accountNumber,
+                    'link_url'       => $data['link_url'] ?? null,
+                    'payment_url'    => $data['payment_url'] ?? null,
+                ]),
             ]);
 
-            Log::info('Flip VA created', [
-                'order_id'    => $pembayaran->order_id,
-                'flip_id'     => $data['id'] ?? null,
-                'bank_code'   => $channel->channel_code,
-                'account_num' => $data['account_number'] ?? null,
+            Log::info('Flip VA created successfully', [
+                'order_id'       => $pembayaran->order_id,
+                'flip_id'        => $flipId,
+                'bank_code'      => $bankCode,
+                'account_number' => $accountNumber,
             ]);
 
-            return $data;
+            return [
+                'id'             => $flipId,
+                'account_number' => $accountNumber,
+                'bank_code'      => $bankCode,
+                'link_url'       => $data['link_url'] ?? null,
+                'payment_url'    => $data['payment_url'] ?? null,
+                'expired_date'   => $data['expired_date'] ?? null,
+                'amount'         => (int) $donasi->nominal,
+            ];
 
         } catch (\Exception $e) {
             Log::error('Flip createVirtualAccount exception', [
@@ -107,10 +148,7 @@ class FlipService
 
     /**
      * Menangani webhook callback dari Flip.
-     * Flip mengirim POST request dengan header X-CALLBACK-TOKEN untuk validasi.
-     *
-     * Dokumentasi webhook Flip:
-     * https://docs.flip.id/
+     * Flip mengirim POST request dengan header X-CALLBACK-TOKEN atau token di payload.
      *
      * @param  string  $token    Nilai dari header X-CALLBACK-TOKEN
      * @param  array   $payload  Body request dari Flip
@@ -125,21 +163,37 @@ class FlipService
          */
         $expectedToken = config('payment.flip.webhook_token');
 
-        if (empty($expectedToken) || !hash_equals($expectedToken, $token)) {
-            Log::warning('Flip webhook: token tidak valid');
-            return false;
+        if (!empty($expectedToken)) {
+            $receivedToken = !empty($token) ? $token : ($payload['token'] ?? '');
+            if (!hash_equals($expectedToken, (string) $receivedToken)) {
+                Log::warning('Flip webhook: token tidak valid', [
+                    'expected' => substr($expectedToken, 0, 4) . '***',
+                ]);
+                return false;
+            }
         }
 
         /*
          * =====================================================
-         * 2. AMBIL DATA DARI PAYLOAD
-         * Flip mengirim data dalam format form-encoded.
-         * Field penting: id, bill_link_id, payment_id, amount, status
+         * 2. PARSE PAYLOAD DARI FLIP
+         * Flip dapat mengirim data dalam form-encoded 'data' JSON string
+         * atau langsung sebagai payload JSON.
          * =====================================================
          */
-        $flipId = $payload['id'] ?? null;
-        $status = $payload['status'] ?? null;
-        $amount = $payload['amount'] ?? null;
+        $data = $payload;
+        if (isset($payload['data'])) {
+            if (is_string($payload['data'])) {
+                $decoded = json_decode($payload['data'], true);
+                if (is_array($decoded)) {
+                    $data = $decoded;
+                }
+            } elseif (is_array($payload['data'])) {
+                $data = $payload['data'];
+            }
+        }
+
+        $flipId = $data['id'] ?? $data['link_id'] ?? $data['bill_link_id'] ?? null;
+        $status = $data['status'] ?? null;
 
         if (!$flipId || !$status) {
             Log::warning('Flip webhook: data tidak lengkap', ['payload' => $payload]);
@@ -162,7 +216,7 @@ class FlipService
 
         /*
          * =====================================================
-         * 4. CEGAH ROLLBACK STATUS
+         * 4. CEGAH ROLLBACK STATUS (IDEMPOTENT)
          * =====================================================
          */
         if ($pembayaran->transaction_status === 'settlement') {
@@ -172,20 +226,19 @@ class FlipService
 
         /*
          * =====================================================
-         * 5. MAP STATUS FLIP → STATUS INTERNAL
-         * Flip status: PENDING, SUCCESSFUL, FAILED, CANCELLED
+         * 5. MAP STATUS FLIP → STATUS INTERNAL (pending, settlement, failed, expired)
          * =====================================================
          */
         $internalStatus = match (strtoupper($status)) {
-            'SUCCESSFUL' => 'settlement',
-            'FAILED'     => 'failed',
-            'CANCELLED'  => 'failed',
-            default      => 'pending',
+            'SUCCESSFUL', 'SETTLEMENT', 'PAID' => 'settlement',
+            'FAILED', 'CANCELLED'              => 'failed',
+            'EXPIRED'                          => 'expired',
+            default                            => 'pending',
         };
 
         $updateData = [
             'transaction_status' => $internalStatus,
-            'gateway_response'   => $payload,
+            'gateway_response'   => $data,
         ];
 
         if ($internalStatus === 'settlement') {
@@ -198,6 +251,7 @@ class FlipService
             'flip_id'         => $flipId,
             'flip_status'     => $status,
             'internal_status' => $internalStatus,
+            'order_id'        => $pembayaran->order_id,
         ]);
 
         return true;

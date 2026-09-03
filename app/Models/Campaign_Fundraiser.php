@@ -62,6 +62,6 @@ class Campaign_Fundraiser extends Model
 
     public function getReferralUrlAttribute()
     {
-        return route('campaign.show', $this->campaign->slug) . '?ref=' . $this->referral_code;
+        return route('campaign.show', $this->campaign->getRouteSlug()) . '?ref=' . $this->referral_code;
     }
 }

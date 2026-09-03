@@ -36,25 +36,12 @@ class FundraiserController extends Controller
 
         // Generate referral code yang unik
         $referralCode = 'REF-' . strtoupper(Str::random(8));
-        
-        // ============================================================
-        // BUAT URL REFERRAL - LANGSUNG PAKAI CUSTOM_SLUG TANPA PREFIX
-        // ============================================================
-        // Ambil slug yang benar (custom_slug atau slug biasa)
-        $routeSlug = $campaign->custom_slug ?? $campaign->slug;
-        
-        // BUAT URL MANUAL - langsung pakai slug tanpa prefix /campaign/
-        $referralUrl = url('/' . $routeSlug) . '?ref=' . $referralCode;
-        
-        // Contoh: http://127.0.0.1:8000/po?ref=REF-XXX
 
         // Buat fundraiser
         $fundraiser = Campaign_Fundraiser::create([
             'campaign_id' => $campaign->id,
             'user_id' => Auth::id(),
-            'penggalang_dana_id' => $penggalang->id,
             'referral_code' => $referralCode,
-            'referral_url' => $referralUrl,
             'status' => 'active',
         ]);
 
