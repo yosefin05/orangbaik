@@ -1,25 +1,9 @@
-.rich-text-output {
-    text-align: justify;
-}
-
-.rich-text-output img {
-    display: block;
-    width: auto;
-    max-width: min(72%, 620px);
-    max-height: 360px;
-    height: auto;
-    object-fit: contain;
-    margin: 1rem auto;
-}
-
 /* ============================================================
    CAMPAIGN SHOW - ORANGBAIK.ID
    ============================================================ */
-
 /* ============================================================
    GLOBAL OVERFLOW PROTECTION
    ============================================================ */
-
 body {
     overflow-x: hidden;
 }
@@ -27,7 +11,6 @@ body {
 /* ============================================================
    ALERT
    ============================================================ */
-
 .alert-success {
     background: var(--success-light);
     color: #15803d;
@@ -36,7 +19,6 @@ body {
     margin-bottom: var(--space-5);
     border: 1px solid rgba(34, 197, 94, .18);
 }
-
 .alert-error {
     background: var(--danger-light);
     color: #b91c1c;
@@ -49,43 +31,43 @@ body {
 /* ============================================================
    LAYOUT
    ============================================================ */
-
 .detail-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: var(--space-6) var(--space-4);
 }
-
 .detail-layout {
     display: grid;
     grid-template-columns: 1fr 340px;
     gap: var(--space-8);
     align-items: start;
 }
-
-/* ============================================================
-   MAIN CONTENT
-   ============================================================ */
-
 .detail-main {
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
     min-width: 0;
+    position: sticky;
+    top: 100px;
 }
-
+.detail-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    position: sticky;
+    top: 100px;
+    min-width: 0;
+}
 .campaign-hero-image {
     width: 100%;
-    height: 360px;
-    aspect-ratio: 16 / 9;
+    height: minmax(0, 1fr) 340px;
     object-fit: cover;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     display: block;
 }
-
 .description-section h1 {
-    font-size: var(--fs-lg);
+    font-size: var(--fs-md);
     font-weight: var(--fw-bold);
     color: var(--text-dark);
     margin-bottom: var(--space-3);
@@ -93,18 +75,26 @@ body {
     word-break: break-word;
 }
 
-.description-section p {
-    color: var(--text);
+/* ============================================================
+   RICH TEXT OUTPUT
+   ============================================================ */
+.rich-text-output {
+    text-align: justify;
     font-size: var(--fs-sm);
-    line-height: 1.8;
-    overflow-wrap: break-word;
-    word-break: break-word;
+}
+.rich-text-output img {
+    display: block;
+    width: auto;
+    max-width: min(72%, 620px);
+    max-height: 360px;
+    height: auto;
+    object-fit: contain;
+    margin: 1rem auto;
 }
 
 /* ============================================================
    SECTION HEADER
    ============================================================ */
-
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -113,21 +103,20 @@ body {
     flex-wrap: wrap;
     gap: var(--space-3);
 }
-
 .section-header h2 {
     margin: 0;
+    display: flex;
+    align-items: center;
     font-size: var(--fs-md);
-    font-weight: var(--fw-bold);
+    font-weight: var(--fw-semibold);
     color: var(--text-dark);
 }
-
 .section-actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
     align-items: center;
 }
-
 .btn-share {
     display: inline-flex;
     align-items: center;
@@ -143,18 +132,16 @@ body {
     transition: all 0.25s ease;
     text-decoration: none;
 }
-
 .btn-share:hover {
     background: var(--border-soft);
     transform: translateY(-2px);
     box-shadow: var(--shadow-soft);
 }
-
-.btn-share i {
-    font-size: 1.1rem;
-    color: var(--primary);
+.btn-share i,
+.btn-add-update i {
+    font-size: var(--fs-sm);
+    color: var(--primary-hover);
 }
-
 .btn-add-update {
     display: inline-flex;
     align-items: center;
@@ -169,7 +156,6 @@ body {
     transition: all 0.25s ease;
     text-decoration: none;
 }
-
 .btn-add-update:hover {
     background: var(--primary);
     color: #fff;
@@ -177,20 +163,14 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
-.btn-add-update i {
-    font-size: 1.1rem;
-}
-
 /* ============================================================
    UPDATE CARD
    ============================================================ */
-
 .updates-list {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
 }
-
 .update-card {
     display: flex;
     gap: var(--space-4);
@@ -201,12 +181,10 @@ body {
     box-shadow: var(--shadow-card);
     transition: all 0.2s ease;
 }
-
 .update-card:hover {
     border-color: var(--primary-light);
     box-shadow: var(--shadow-soft);
 }
-
 .update-thumbnail {
     width: 180px;
     height: 120px;
@@ -216,19 +194,16 @@ body {
     border: 1px solid var(--border);
     align-self: flex-start;
 }
-
 .update-thumbnail img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
-
 .update-content-wrapper {
     flex: 1;
     min-width: 0;
 }
-
 .update-title {
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
@@ -238,11 +213,9 @@ body {
     overflow-wrap: break-word;
     word-break: break-word;
 }
-
 .update-meta {
     margin-bottom: var(--space-2);
 }
-
 .update-date {
     color: var(--muted);
     font-size: var(--fs-xxs);
@@ -250,11 +223,9 @@ body {
     align-items: center;
     gap: var(--space-1);
 }
-
 .update-date i {
     font-size: 12px;
 }
-
 .update-preview-text {
     font-size: var(--fs-xs);
     color: var(--text);
@@ -271,7 +242,6 @@ body {
 /* ============================================================
    BUTTON READ MORE
    ============================================================ */
-
 .btn-read-more {
     display: inline-flex;
     align-items: center;
@@ -285,17 +255,14 @@ body {
     padding: 0;
     transition: gap 0.2s ease, color 0.2s ease;
 }
-
 .btn-read-more:hover {
     gap: var(--space-2);
     color: var(--primary-hover);
 }
-
 .btn-read-more i {
     font-size: 14px;
     transition: transform 0.3s ease;
 }
-
 .btn-read-more i.rotated {
     transform: rotate(180deg);
 }
@@ -303,19 +270,16 @@ body {
 /* ============================================================
    UPDATE DETAIL (EXPAND)
    ============================================================ */
-
 .update-detail-wrapper {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
 }
-
 .update-detail-content {
     margin-top: var(--space-3);
     padding-top: var(--space-3);
     border-top: 1px solid var(--border-soft);
 }
-
 .update-full-body {
     font-size: var(--fs-xs);
     line-height: 1.8;
@@ -326,13 +290,11 @@ body {
     overflow-wrap: break-word;
     word-break: break-word;
 }
-
 .update-detail-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: var(--space-2);
 }
-
 .update-detail-gallery-item {
     position: relative;
     aspect-ratio: 1 / 1;
@@ -342,19 +304,16 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .update-detail-gallery-item:hover {
     transform: scale(1.03);
     box-shadow: var(--shadow-soft);
 }
-
 .update-detail-gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
-
 .update-detail-gallery-item .zoom-overlay {
     position: absolute;
     inset: 0;
@@ -367,7 +326,6 @@ body {
     opacity: 0;
     transition: all 0.2s ease;
 }
-
 .update-detail-gallery-item:hover .zoom-overlay {
     background: rgba(0, 0, 0, 0.35);
     opacity: 1;
@@ -376,7 +334,6 @@ body {
 /* ============================================================
    UPDATE FOOTER
    ============================================================ */
-
 .update-footer {
     margin-top: var(--space-3);
     padding-top: var(--space-2);
@@ -385,7 +342,6 @@ body {
     justify-content: flex-end;
     gap: var(--space-2);
 }
-
 .btn-edit-update {
     display: inline-flex;
     align-items: center;
@@ -401,12 +357,10 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .btn-edit-update:hover {
     background: var(--primary);
     color: #fff;
 }
-
 .btn-delete-update {
     display: inline-flex;
     align-items: center;
@@ -421,7 +375,6 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .btn-delete-update:hover {
     background: var(--danger);
     color: #fff;
@@ -430,7 +383,6 @@ body {
 /* ============================================================
    EMPTY UPDATES
    ============================================================ */
-
 .empty-updates {
     text-align: center;
     padding: var(--space-8) var(--space-4);
@@ -438,20 +390,17 @@ body {
     border-radius: var(--radius);
     border: 1px dashed var(--border);
 }
-
 .empty-updates i {
     font-size: 48px;
     color: var(--muted-light);
     display: block;
     margin-bottom: var(--space-3);
 }
-
 .empty-updates p {
     color: var(--muted);
     font-size: var(--fs-sm);
     margin-bottom: var(--space-3);
 }
-
 .btn-outline {
     display: inline-flex;
     align-items: center;
@@ -465,7 +414,6 @@ body {
     text-decoration: none;
     transition: all 0.2s ease;
 }
-
 .btn-outline:hover {
     background: var(--primary);
     color: #fff;
@@ -473,22 +421,189 @@ body {
 }
 
 /* ============================================================
-   SIDEBAR
+   PESAN & DOA DONATUR
    ============================================================ */
+.pesan-doa-section {
+    margin-top: var(--space-2);
+}
+.badge-doa-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    white-space: nowrap;
+}
 
-.detail-sidebar {
+.pesan-doa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+}
+
+.pesan-doa-card {
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-card);
+    transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
-    position: sticky;
-    top: 100px;
+    gap: var(--space-3);
+}
+.pesan-doa-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-2px);
+}
+
+.pesan-doa-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
     min-width: 0;
+}
+
+.pesan-doa-avatar {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--fw-bold);
+    color: var(--primary);
+    font-size: var(--fs-sm);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--border-soft);
+}
+.pesan-doa-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.pesan-doa-avatar .avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.pesan-doa-info {
+    min-width: 0;
+    flex: 1;
+}
+.pesan-doa-info strong {
+    display: block;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    margin-bottom: 2px;
+}
+.pesan-doa-info > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.pesan-doa-nominal {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+}
+
+.pesan-doa-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--fs-xxs);
+    color: var(--muted-light);
+    white-space: nowrap;
+}
+
+.pesan-doa-body {
+    font-size: var(--fs-xs);
+    line-height: 1.7;
+    color: var(--text);
+    font-style: italic;
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--primary-light);
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+.pesan-doa-body p {
+    margin: 0;
+}
+
+.pesan-doa-footer {
+    text-align: center;
+    margin-top: var(--space-5);
+}
+.btn-lihat-semua {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-6);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-full);
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-xs);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.btn-lihat-semua:hover {
+    background: var(--primary);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.empty-pesan-doa {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+}
+.empty-pesan-doa i {
+    font-size: 48px;
+    color: var(--muted-light);
+    display: block;
+    margin-bottom: var(--space-3);
+}
+.empty-pesan-doa p {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    margin-bottom: var(--space-1);
+}
+.empty-pesan-doa small {
+    color: var(--muted-light);
+    font-size: var(--fs-xs);
 }
 
 /* ============================================================
    DONATION SUMMARY
    ============================================================ */
-
 .donation-summary-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
@@ -496,7 +611,6 @@ body {
     padding: var(--space-5);
     box-shadow: var(--shadow-card);
 }
-
 .donation-summary-card h2 {
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
@@ -505,27 +619,22 @@ body {
     overflow-wrap: break-word;
     word-break: break-word;
 }
-
 .summary-amount {
     margin-bottom: var(--space-3);
 }
-
 .summary-amount strong {
     display: block;
-    font-size: var(--fs-xl);
+    font-size: var(--fs-lg);
     font-weight: var(--fw-extrabold);
     color: var(--primary);
 }
-
 .summary-amount span {
     color: var(--muted);
     font-size: var(--fs-xs);
 }
-
 .summary-amount span b {
     color: var(--text-dark);
 }
-
 .summary-progress {
     height: 8px;
     background: var(--bg-soft);
@@ -533,37 +642,39 @@ body {
     overflow: hidden;
     margin-bottom: var(--space-3);
 }
-
 .summary-progress div {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--primary-hover));
     border-radius: var(--radius-full);
     transition: width 0.5s ease;
 }
-
 .summary-meta {
     display: flex;
     justify-content: space-between;
     color: var(--muted);
     font-size: var(--fs-xs);
 }
-
+.donate-button-wrapper {
+    text-align: center;
+    margin-top: var(--space-3);
+}
 .donate-button {
-    display: block;
-    width: 100%;
-    padding: var(--space-3);
+    display: inline-block;
+    width: auto;
+    padding: var(--space-2) var(--space-5);
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     color: #fff;
     text-align: center;
+    align-items: center;
     border: none;
-    border-radius: var(--radius-full);
-    font-weight: var(--fw-bold);
-    font-size: var(--fs-sm);
+    border-radius: var(--radius-xl);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-xs);
     text-decoration: none;
     transition: all 0.2s ease;
     margin-top: var(--space-3);
+    cursor: pointer;
 }
-
 .donate-button:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow);
@@ -572,21 +683,18 @@ body {
 /* ============================================================
    FUNDRAISER INFO
    ============================================================ */
-
 .fundraiser-info-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
     padding: var(--space-4);
 }
-
 .fundraiser-info-card h3 {
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     color: var(--text-dark);
     margin-bottom: var(--space-3);
 }
-
 .fundraiser-profile {
     display: flex;
     align-items: center;
@@ -595,7 +703,6 @@ body {
     color: inherit;
     min-width: 0;
 }
-
 .fundraiser-profile img {
     width: 50px;
     height: 50px;
@@ -604,7 +711,6 @@ body {
     object-fit: cover;
     border: 2px solid var(--border);
 }
-
 .fundraiser-profile h4 {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
@@ -616,21 +722,20 @@ body {
 /* ============================================================
    SIDE LIST
    ============================================================ */
-
 .side-list-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
     padding: var(--space-4);
 }
-
 .side-list-card h3 {
+    display: flex;
+    align-items: center;
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     color: var(--text-dark);
     margin-bottom: var(--space-3);
 }
-
 .side-list-item {
     display: flex;
     align-items: center;
@@ -639,11 +744,9 @@ body {
     border-bottom: 1px solid var(--border-soft);
     min-width: 0;
 }
-
 .side-list-item:last-child {
     border-bottom: none;
 }
-
 .side-list-item .avatar-circle {
     width: 40px;
     height: 40px;
@@ -654,19 +757,16 @@ body {
     background: var(--primary-light);
     flex: 0 0 40px;
     overflow: hidden;
-    font-size: 20px;
+    font-size: var(--fs-sm);
 }
-
 .side-list-item .avatar-circle img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-
 .side-list-item > div {
     min-width: 0;
 }
-
 .side-list-item h4 {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
@@ -675,7 +775,6 @@ body {
     overflow-wrap: break-word;
     word-break: break-word;
 }
-
 .side-list-item p {
     font-size: var(--fs-xxs);
     color: var(--muted);
@@ -683,22 +782,37 @@ body {
     overflow-wrap: break-word;
     word-break: break-word;
 }
-
 .side-list-item span {
     font-size: var(--fs-xxs);
     color: var(--muted-light);
 }
-
+.badge-mini-success {
+    font-size: var(--fs-xxs);
+    background: var(--success);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+.text-hint-light {
+    font-size: var(--fs-xxs);
+    color: var(--muted-light);
+    display: block;
+    margin-bottom: var(--space-2);
+}
 .text-muted {
     color: var(--muted);
     font-size: var(--fs-xs);
     padding: var(--space-2) 0;
+    text-align: center;
+}
+.side-list-card .empty-side-list {
+    text-align: center;
+    padding: var(--space-4) 0;
 }
 
 /* ============================================================
    FUNDRAISER JOIN CARD
    ============================================================ */
-
 .fundraiser-join-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
@@ -706,24 +820,23 @@ body {
     padding: var(--space-4);
     text-align: center;
 }
-
 .fundraiser-join-card h3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     margin-bottom: var(--space-2);
 }
-
 .fundraiser-join-card p {
     color: var(--muted);
     font-size: var(--fs-xs);
     margin-bottom: var(--space-3);
 }
-
 .fundraiser-join-card.joined {
     border-color: var(--success);
     background: var(--success-light);
 }
-
 .btn-fundraiser-join {
     display: inline-flex;
     align-items: center;
@@ -733,17 +846,15 @@ body {
     color: #fff;
     border: none;
     border-radius: var(--radius-full);
-    font-weight: var(--fw-bold);
+    font-weight: var(--fw-semibold);
     font-size: var(--fs-xs);
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .btn-fundraiser-join:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-soft);
 }
-
 .btn-fundraiser-leave {
     display: inline-flex;
     align-items: center;
@@ -758,12 +869,10 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .btn-fundraiser-leave:hover {
     background: var(--danger);
     color: #fff;
 }
-
 .btn-fundraiser-login {
     display: inline-flex;
     align-items: center;
@@ -778,7 +887,6 @@ body {
     text-decoration: none;
     transition: all 0.2s ease;
 }
-
 .btn-fundraiser-login:hover {
     background: var(--border);
 }
@@ -786,26 +894,24 @@ body {
 /* ============================================================
    FUNDRAISER REFERRAL CARD
    ============================================================ */
-
 .fundraiser-referral-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
     padding: var(--space-4);
 }
-
 .fundraiser-referral-card h4 {
+    display: flex;
+    align-items: center;
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     margin-bottom: var(--space-1);
 }
-
 .fundraiser-referral-card p {
     color: var(--muted);
     font-size: var(--fs-xs);
     margin-bottom: var(--space-2);
 }
-
 .fundraiser-total-donasi {
     display: flex;
     justify-content: space-between;
@@ -817,18 +923,15 @@ body {
     color: var(--muted);
     font-size: var(--fs-xs);
 }
-
 .fundraiser-total-donasi strong {
     color: var(--primary);
     white-space: nowrap;
 }
-
 .referral-link-box {
     display: flex;
     gap: var(--space-2);
     margin-bottom: var(--space-2);
 }
-
 .referral-link-box input {
     flex: 1;
     padding: var(--space-2) var(--space-3);
@@ -839,7 +942,6 @@ body {
     color: var(--text);
     min-width: 0;
 }
-
 .btn-copy-link {
     display: inline-flex;
     align-items: center;
@@ -852,18 +954,15 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .btn-copy-link:hover {
     background: var(--primary-hover);
 }
-
 .referral-qr-section {
     margin-top: var(--space-4);
     padding-top: var(--space-4);
     border-top: 1px dashed var(--border-soft);
     text-align: center;
 }
-
 .qr-canvas-wrapper {
     display: inline-flex;
     justify-content: center;
@@ -875,15 +974,12 @@ body {
     cursor: pointer;
     transition: transform 0.2s ease;
 }
-
 .qr-canvas-wrapper:hover {
     transform: scale(1.02);
 }
-
 .qr-canvas-wrapper:active {
     transform: scale(0.95);
 }
-
 .btn-download-qr {
     display: inline-flex;
     align-items: center;
@@ -895,13 +991,12 @@ body {
     color: #fff;
     border: none;
     border-radius: var(--radius-full);
-    font-weight: var(--fw-bold);
+    font-weight: var(--fw-semibold);
     font-size: var(--fs-xs);
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
 }
-
 .btn-download-qr:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-soft);
@@ -910,7 +1005,6 @@ body {
 /* ============================================================
    LIGHTBOX
    ============================================================ */
-
 .lightbox-overlay {
     position: fixed;
     inset: 0;
@@ -924,12 +1018,10 @@ body {
     transition: opacity 0.25s ease;
     padding: var(--space-6);
 }
-
 .lightbox-overlay.active {
     opacity: 1;
     pointer-events: auto;
 }
-
 .lightbox-prev,
 .lightbox-next {
     position: absolute;
@@ -949,21 +1041,17 @@ body {
     transition: all 0.2s ease;
     z-index: 10;
 }
-
 .lightbox-prev {
     left: 20px;
 }
-
 .lightbox-next {
     right: 20px;
 }
-
 .lightbox-prev:hover,
 .lightbox-next:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: translateY(-50%) scale(1.05);
 }
-
 .lightbox-close {
     position: absolute;
     top: 24px;
@@ -982,11 +1070,9 @@ body {
     transition: background 0.2s ease;
     z-index: 10;
 }
-
 .lightbox-close:hover {
     background: rgba(255, 255, 255, 0.25);
 }
-
 .lightbox-image-wrapper {
     width: 100%;
     height: 100%;
@@ -995,14 +1081,12 @@ body {
     justify-content: center;
     padding: var(--space-4);
 }
-
 .lightbox-image-wrapper img {
     max-width: 90vw;
     max-height: 80vh;
     object-fit: contain;
     border-radius: var(--radius-sm);
 }
-
 .lightbox-footer {
     position: absolute;
     bottom: 30px;
@@ -1014,17 +1098,14 @@ body {
     gap: var(--space-2);
     z-index: 10;
 }
-
 #lightboxCounter {
     color: rgba(255, 255, 255, 0.6);
     font-size: var(--fs-xs);
 }
-
 .lightbox-dots {
     display: flex;
     gap: var(--space-2);
 }
-
 .lightbox-dot {
     width: 10px;
     height: 10px;
@@ -1033,34 +1114,40 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
 .lightbox-dot.active {
     background: #fff;
     width: 24px;
     border-radius: var(--radius-full);
 }
-
 .lightbox-dot:hover {
     background: rgba(255, 255, 255, 0.5);
 }
 
+.icon-section {
+    display: block;
+    width: 120px;
+    height: 120px;
+    max-width: 120px;
+    object-fit: contain;
+    margin: 0 auto var(--space-5);
+    opacity: 0.9;
+}
 /* ============================================================
    MODAL POP-UP FUNDRAISER
    ============================================================ */
-
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 9999;
+    inset: 0;
+
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(8px);
-    animation: fadeIn 0.3s ease;
+
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+
+    z-index: 9999;
+    animation: fadeIn 0.25s ease;
 }
 
 .modal-overlay.active {
@@ -1068,15 +1155,16 @@ body {
 }
 
 .modal-content {
-    background: white;
-    border-radius: 24px;
-    max-width: 480px;
-    width: 90%;
+    width: 92%;
+    max-width: 440px;
     max-height: 90vh;
     overflow-y: auto;
-    padding: 0;
-    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    background: var(--bg);
+    border-radius: var(--radius-lg, 20px);
+    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
+
+    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes fadeIn {
@@ -1085,365 +1173,403 @@ body {
 }
 
 @keyframes slideUp {
-    from { 
+    from {
         opacity: 0;
-        transform: translateY(40px) scale(0.95);
+        transform: translateY(24px) scale(0.97);
     }
-    to { 
+    to {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
 }
 
+/* ---------- HEADER ---------- */
 .modal-header {
-    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-    padding: var(--space-6) var(--space-8) var(--space-5);
-    border-radius: 24px 24px 0 0;
-    text-align: center;
     position: relative;
+
+    padding: var(--space-7, 28px) var(--space-7, 28px) var(--space-6, 24px);
+
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    border-radius: var(--radius-lg, 20px) var(--radius-lg, 20px) 0 0;
+
+    text-align: center;
 }
 
 .modal-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
-    margin-bottom: var(--space-2);
+    gap: var(--space-2, 8px);
+
+    margin-bottom: var(--space-4, 16px);
 }
 
 .modal-logo img {
-    height: 40px;
+    height: 28px;
     width: auto;
 }
 
 .modal-logo span {
-    color: white;
-    font-size: var(--fs-md);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    letter-spacing: -0.5px;
+    letter-spacing: -0.2px;
 }
 
 .modal-header h2 {
-    color: white;
-    font-size: var(--fs-lg);
     margin: 0;
-    font-weight: var(--fw-semibold);
+
+    color: #fff;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-extrabold, 800);
+    letter-spacing: -0.02em;
 }
 
 .modal-header .subtitle {
-    color: rgba(255,255,255,0.9);
+    margin-top: var(--space-1, 4px);
+
+    color: rgba(255, 255, 255, 0.85);
     font-size: var(--fs-xs);
-    margin-top: var(--space-1);
 }
 
 .modal-close {
     position: absolute;
-    top: var(--space-4);
-    right: var(--space-5);
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
+    top: var(--space-4, 16px);
+    right: var(--space-4, 16px);
+
+    width: 34px;
+    height: 34px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .modal-close:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.28);
     transform: rotate(90deg);
 }
 
+/* ---------- BODY ---------- */
 .modal-body {
-    padding: var(--space-7) var(--space-8) var(--space-8);
+    padding: var(--space-6, 24px) var(--space-7, 28px) var(--space-7, 28px);
 }
 
 .success-badge {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    background: var(--success-light);
-    color: #166534;
-    padding: var(--space-1) var(--space-4);
+    gap: var(--space-2, 8px);
+
+    margin: calc(var(--space-5, 20px) * -1) auto var(--space-5, 20px);
+    padding: var(--space-2, 8px) var(--space-4, 16px);
+
+    background: var(--bg);
+    border: 1px solid var(--success-light, #dcfce7);
     border-radius: var(--radius-full);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
-    margin-bottom: var(--space-4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    color: #15803d;
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+
+    position: relative;
+    width: fit-content;
 }
 
 .success-badge i {
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .fundraiser-info-modal {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3, 12px);
+
+    padding: var(--space-4, 16px);
+    margin-bottom: var(--space-5, 20px);
+
     background: var(--bg-soft);
-    border-radius: var(--radius);
-    margin-bottom: var(--space-5);
     border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
 }
 
 .fundraiser-avatar-modal {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+
     border-radius: 50%;
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--primary);
     object-fit: cover;
-    border: 2px solid var(--primary);
 }
 
 .fundraiser-name-modal {
-    font-weight: var(--fw-semibold);
-    font-size: var(--fs-sm);
     color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.3;
 }
 
 .fundraiser-name-modal small {
     display: block;
-    font-weight: var(--fw-regular);
-    font-size: var(--fs-xxs);
+    margin-top: 2px;
+
     color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
 }
 
 .modal-divider {
     border: none;
     border-top: 1px solid var(--border-soft);
-    margin: var(--space-5) 0;
+    margin: var(--space-5, 20px) 0;
 }
 
-/* ============================================================
-   MODAL - REFERRAL LINK
-   ============================================================ */
-
+/* ---------- SECTION TITLE ---------- */
 .referral-section-title {
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
-    color: var(--text-dark);
-    margin-bottom: var(--space-2);
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-2, 8px);
+
+    margin-bottom: var(--space-2, 8px);
+
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
 }
 
 .referral-section-title i {
     color: var(--primary);
+    font-size: var(--fs-sm);
 }
 
+/* ---------- REFERRAL LINK ---------- */
 .referral-link-box-modal {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-2, 8px);
+
+    padding: var(--space-1, 4px) var(--space-1, 4px) var(--space-1, 4px) var(--space-4, 16px);
+    margin-bottom: var(--space-2, 8px);
+
     background: var(--bg-soft);
-    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
-    border-radius: var(--radius);
     border: 1px solid var(--border-soft);
-    margin-bottom: var(--space-4);
+    border-radius: var(--radius-md);
 }
 
 .referral-link-box-modal input {
     flex: 1;
+    min-width: 0;
+
     border: none;
     background: transparent;
-    font-size: var(--fs-xs);
-    color: var(--text-dark);
-    padding: var(--space-2) 0;
-    font-family: 'Courier New', monospace;
     outline: none;
-    min-width: 0;
-}
 
-.referral-link-box-modal input:focus {
-    outline: none;
+    padding: var(--space-3, 12px) 0;
+
+    color: var(--text-dark);
+    font-family: 'Courier New', monospace;
+    font-size: var(--fs-xxs);
 }
 
 .btn-copy-link-modal {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-1);
-    padding: var(--space-2) var(--space-3);
+
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+
     background: var(--primary);
-    color: white;
     border: none;
     border-radius: var(--radius-sm);
+    color: #fff;
+
+    font-size: 15px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 16px;
+    transition: 0.2s ease;
 }
 
 .btn-copy-link-modal:hover {
     background: var(--primary-hover);
-    transform: scale(1.02);
+    transform: scale(1.05);
 }
 
-/* ============================================================
-   MODAL - REFERRAL CODE
-   ============================================================ */
-
+/* ---------- REFERRAL CODE ---------- */
 .referral-code-box {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-3, 12px);
+
+    padding: var(--space-3, 12px) var(--space-3, 12px) var(--space-3, 12px) var(--space-4, 16px);
+    margin-bottom: var(--space-5, 20px);
+
     background: var(--bg-soft);
-    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
-    border-radius: var(--radius);
     border: 1px dashed var(--border);
-    margin-bottom: var(--space-4);
+    border-radius: var(--radius-md);
 }
 
 .referral-code-box .code-label {
-    font-size: var(--fs-xxs);
     color: var(--muted);
-    font-weight: var(--fw-medium);
+    font-size: 10px;
+    font-weight: var(--fw-bold);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
 }
 
 .referral-code-box .code-value {
-    font-family: 'Courier New', monospace;
-    font-size: var(--fs-md);
-    font-weight: var(--fw-bold);
-    color: var(--primary);
-    letter-spacing: 1px;
     flex: 1;
+
+    color: var(--primary);
+    font-family: 'Courier New', monospace;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-extrabold, 800);
+    letter-spacing: 1px;
 }
 
 .btn-copy-code {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-1) var(--space-3);
+    gap: var(--space-1, 4px);
+
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+
     background: var(--primary);
-    color: white;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: var(--fs-xs);
+    color: #fff;
+
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
     cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: var(--fw-medium);
+    transition: 0.2s ease;
 }
 
 .btn-copy-code:hover {
     background: var(--primary-hover);
-    transform: scale(1.02);
+    transform: scale(1.05);
 }
 
-/* ============================================================
-   MODAL - QR CODE
-   ============================================================ */
-
+/* ---------- QR CODE ---------- */
 .modal-qr-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: var(--space-4);
+
+    padding: var(--space-5, 20px);
+    margin-bottom: var(--space-2, 8px);
+
     background: var(--bg-soft);
-    border-radius: var(--radius);
     border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+
     cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: var(--space-4);
+    transition: 0.2s ease;
 }
 
 .modal-qr-wrapper:hover {
-    transform: scale(1.02);
     border-color: var(--primary);
+    transform: translateY(-2px);
 }
 
 .modal-qr-wrapper:active {
-    transform: scale(0.95);
+    transform: scale(0.97);
 }
 
 .modal-qr-wrapper svg {
-    max-width: 180px;
+    max-width: 150px;
     height: auto;
-    background: white;
-    padding: var(--space-2);
+
+    padding: var(--space-2, 8px);
+
+    background: #fff;
     border-radius: var(--radius-sm);
 }
 
 .modal-qr-label {
-    font-size: var(--fs-xxs);
+    margin-top: var(--space-3, 12px);
+
     color: var(--muted);
-    margin-top: var(--space-2);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
 }
 
-/* ============================================================
-   MODAL - ACTION BUTTONS
-   ============================================================ */
-
+/* ---------- ACTIONS ---------- */
 .modal-actions {
     display: flex;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
+    gap: var(--space-3, 12px);
+
+    margin-top: var(--space-6, 24px);
 }
 
-.modal-actions .btn-modal-primary {
+.modal-actions .btn-modal-primary,
+.modal-actions .btn-modal-secondary {
     flex: 1;
-    padding: var(--space-3);
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-weight: var(--fw-semibold);
-    cursor: pointer;
-    transition: all 0.2s ease;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
+    gap: var(--space-2, 8px);
+
+    height: 48px;
+
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.modal-actions .btn-modal-primary {
+    background: var(--primary);
+    border: none;
+    color: #fff;
 }
 
 .modal-actions .btn-modal-primary:hover {
     background: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.25);
 }
 
 .modal-actions .btn-modal-secondary {
-    flex: 1;
-    padding: var(--space-3);
-    background: var(--bg-soft);
-    color: var(--text);
+    background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-weight: var(--fw-semibold);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
+    color: var(--text);
 }
 
 .modal-actions .btn-modal-secondary:hover {
-    background: var(--border-soft);
+    background: var(--bg-soft);
+    border-color: var(--muted);
 }
 
 /* ============================================================
    MODAL QR FULLSCREEN
    ============================================================ */
-
 .modal-qr-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 10000;
+    inset: 0;
+
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(10px);
-    animation: fadeIn 0.3s ease;
+
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+
+    z-index: 10000;
+    animation: fadeIn 0.25s ease;
 }
 
 .modal-qr-overlay.active {
@@ -1451,33 +1577,42 @@ body {
 }
 
 .modal-qr-fullscreen {
-    background: white;
-    border-radius: 24px;
-    max-width: 500px;
-    width: 90%;
-    padding: var(--space-8);
     position: relative;
-    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    width: 90%;
+    max-width: 460px;
     max-height: 90vh;
     overflow-y: auto;
+
+    padding: var(--space-8, 32px);
+
+    background: var(--bg);
+    border-radius: var(--radius-lg, 20px);
+    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.4);
+
+    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .modal-qr-close {
     position: absolute;
-    top: var(--space-4);
-    right: var(--space-5);
-    background: var(--bg-soft);
-    border: none;
-    color: var(--text);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    top: var(--space-4, 16px);
+    right: var(--space-4, 16px);
+
+    width: 36px;
+    height: 36px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    background: var(--bg-soft);
+    border: none;
+    border-radius: 50%;
+    color: var(--text);
+
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .modal-qr-close:hover {
@@ -1492,76 +1627,84 @@ body {
 .modal-qr-fullscreen-content #qrFullscreenContainer {
     display: flex;
     justify-content: center;
-    margin-bottom: var(--space-5);
+
+    margin-bottom: var(--space-5, 20px);
 }
 
 .modal-qr-fullscreen-content #qrFullscreenContainer svg {
-    max-width: 280px;
+    max-width: 240px;
     height: auto;
-    background: white;
-    padding: var(--space-4);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+
+    padding: var(--space-4, 16px);
+
+    background: #fff;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
 }
 
 .modal-qr-fullscreen-content h3 {
-    font-size: var(--fs-md);
+    margin-bottom: var(--space-2, 8px);
+
     color: var(--text-dark);
-    margin-bottom: var(--space-2);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold, 800);
 }
 
 .modal-qr-fullscreen-content p {
+    margin-bottom: var(--space-5, 20px);
+
     color: var(--muted);
     font-size: var(--fs-xs);
-    margin-bottom: var(--space-5);
 }
 
 .modal-qr-actions {
     display: flex;
-    gap: var(--space-3);
+    gap: var(--space-3, 12px);
     justify-content: center;
 }
 
 .btn-download-qr-modal,
 .btn-share-qr-modal {
-    padding: var(--space-2) var(--space-6);
-    border: none;
-    border-radius: var(--radius);
-    font-weight: var(--fw-semibold);
-    cursor: pointer;
-    transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-2, 8px);
+
+    padding: var(--space-3, 12px) var(--space-5, 20px);
+
+    border-radius: var(--radius-full);
+
     font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .btn-download-qr-modal {
     background: var(--primary);
-    color: white;
+    border: none;
+    color: #fff;
 }
 
 .btn-download-qr-modal:hover {
     background: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.25);
 }
 
 .btn-share-qr-modal {
-    background: var(--bg-soft);
-    color: var(--text);
+    background: var(--bg);
     border: 1px solid var(--border);
+    color: var(--text);
 }
 
 .btn-share-qr-modal:hover {
-    background: var(--border-soft);
-    transform: translateY(-2px);
+    background: var(--bg-soft);
+    border-color: var(--muted);
 }
 
 /* ============================================================
    TOAST NOTIFICATION
    ============================================================ */
-
 .toast-notification {
     position: fixed;
     bottom: var(--space-8);
@@ -1576,298 +1719,252 @@ body {
     z-index: 10000;
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-lg, var(--shadow));
     display: flex;
     align-items: center;
     gap: var(--space-2);
 }
-
 .toast-notification.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
-
 .toast-notification i {
     font-size: 20px;
+    color: var(--success);
 }
 
 /* ============================================================
    RESPONSIVE
    ============================================================ */
-
 @media (max-width: 992px) {
     .detail-layout {
         grid-template-columns: 1fr;
     }
-
     .detail-sidebar {
         position: static;
     }
 }
-
 @media (max-width: 768px) {
     .detail-container {
         padding: var(--space-4);
     }
-
     .campaign-hero-image {
         height: 220px;
     }
-
     .description-section h1 {
         font-size: var(--fs-md);
     }
-
     .update-card {
         flex-direction: column;
         gap: var(--space-3);
         padding: var(--space-3);
     }
-
     .update-thumbnail {
         width: 100%;
         height: 160px;
         flex: 0 0 160px;
     }
-
     .update-title {
         font-size: var(--fs-xs);
     }
-
     .summary-amount strong {
         font-size: var(--fs-lg);
     }
-
     .update-detail-gallery {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--space-2);
     }
-
+    .pesan-doa-grid {
+        grid-template-columns: 1fr;
+    }
     .lightbox-prev,
     .lightbox-next {
         width: 40px;
         height: 40px;
         font-size: 20px;
     }
-
     .lightbox-prev {
         left: 10px;
     }
-
     .lightbox-next {
         right: 10px;
     }
-
     .lightbox-image-wrapper img {
         max-height: 70vh;
     }
-
     .modal-content {
         max-width: 95%;
     }
-
     .modal-body {
         padding: var(--space-5);
     }
-
     .modal-header {
         padding: var(--space-5) var(--space-5) var(--space-4);
     }
-
     .modal-logo img {
         height: 32px;
     }
-
     .modal-logo span {
         font-size: var(--fs-sm);
     }
-
     .modal-header h2 {
         font-size: var(--fs-md);
     }
-
     .modal-qr-fullscreen {
         padding: var(--space-5);
     }
-
     .modal-qr-fullscreen-content #qrFullscreenContainer svg {
         max-width: 200px;
     }
-
     .modal-actions {
         flex-direction: column;
     }
 }
-
 @media (max-width: 576px) {
     .campaign-hero-image {
         height: 180px;
     }
-
     .description-section h1 {
         font-size: var(--fs-sm);
     }
-
     .description-section p {
         font-size: var(--fs-xs);
     }
-
     .section-header {
         flex-direction: column;
         align-items: stretch;
     }
-
     .section-actions {
         flex-direction: column;
         width: 100%;
     }
-
     .btn-share,
     .btn-add-update {
         width: 100%;
         justify-content: center;
     }
-
     .update-thumbnail {
         height: 140px;
         flex: 0 0 140px;
     }
-
     .update-preview-text {
         font-size: var(--fs-xxs);
     }
-
     .update-detail-gallery {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--space-1);
     }
-
     .update-full-body {
         font-size: var(--fs-xxs);
     }
-
     .summary-amount strong {
         font-size: var(--fs-md);
     }
-
     .donation-summary-card,
     .side-list-card,
     .fundraiser-info-card,
     .fundraiser-join-card {
         padding: var(--space-3);
     }
-
     .btn-fundraiser-join,
     .btn-fundraiser-leave,
     .btn-fundraiser-login {
         width: 100%;
         justify-content: center;
     }
-
     .referral-link-box {
         flex-wrap: wrap;
     }
-
     .referral-link-box input {
         width: 100%;
     }
-
     .btn-copy-link {
         width: 100%;
         justify-content: center;
     }
-
     .referral-link-box-modal {
         flex-wrap: wrap;
         padding: var(--space-2);
     }
-
     .referral-link-box-modal input {
         width: 100%;
         font-size: var(--fs-xxs);
     }
-
     .btn-copy-link-modal {
         width: 100%;
         justify-content: center;
     }
-
     .referral-code-box {
         flex-wrap: wrap;
         gap: var(--space-1);
         padding: var(--space-2);
     }
-
     .referral-code-box .code-value {
         width: 100%;
         text-align: center;
         font-size: var(--fs-sm);
     }
-
     .btn-copy-code {
         width: 100%;
         justify-content: center;
     }
-
     .modal-qr-wrapper svg {
         max-width: 140px;
     }
-
     .lightbox-prev,
     .lightbox-next {
         width: 34px;
         height: 34px;
         font-size: 16px;
     }
-
     .lightbox-prev {
         left: 6px;
     }
-
     .lightbox-next {
         right: 6px;
     }
-
     .lightbox-image-wrapper img {
         max-height: 60vh;
     }
-
     .lightbox-footer {
         bottom: 16px;
     }
-
     .lightbox-dot {
         width: 8px;
         height: 8px;
     }
-
     .lightbox-dot.active {
         width: 18px;
     }
-
     .modal-actions .btn-modal-primary,
     .modal-actions .btn-modal-secondary {
         padding: var(--space-2);
         font-size: var(--fs-xs);
     }
-
     .modal-qr-actions {
         flex-direction: column;
     }
-
     .btn-download-qr-modal,
     .btn-share-qr-modal {
         justify-content: center;
         width: 100%;
     }
-
     .toast-notification {
         max-width: 90%;
         font-size: var(--fs-xxs);
         padding: var(--space-2) var(--space-4);
         bottom: var(--space-4);
     }
-
+    .icon-section {
+        width: 32px;
+        height: 32px;
+        margin-right: 8px;
+    }
+    .pesan-doa-avatar {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+    }
     /* Mobile Sticky Donation CTA */
     .mobile-sticky-cta {
         position: fixed;
@@ -1881,29 +1978,25 @@ body {
         align-items: center;
         justify-content: space-between;
         z-index: 998;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid var(--border-soft);
     }
-
     .mobile-cta-info {
         display: flex;
         flex-direction: column;
         gap: 2px;
     }
-
     .mobile-cta-label {
         font-size: 0.75rem;
-        color: #64748b;
+        color: var(--muted);
         font-weight: 500;
     }
-
     .mobile-cta-val {
         font-size: 1.05rem;
-        color: var(--primary, #2563eb);
+        color: var(--primary);
         font-weight: 800;
     }
-
     .btn-mobile-donate {
-        background: var(--primary, #2563eb);
+        background: var(--primary);
         color: #ffffff;
         padding: 0.7rem 1.35rem;
         border-radius: 10px;
@@ -1913,20 +2006,17 @@ body {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+        box-shadow: 0 4px 12px rgba(51, 101, 175, 0.28);
         transition: transform 0.15s ease, background 0.15s ease;
     }
-
     .btn-mobile-donate:active {
         transform: scale(0.98);
-        background: #1d4ed8;
+        background: var(--primary-hover);
     }
-
     body {
         padding-bottom: 75px;
     }
 }
-
 @media (min-width: 769px) {
     .mobile-sticky-cta {
         display: none !important;

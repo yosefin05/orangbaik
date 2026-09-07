@@ -13,62 +13,57 @@
 
 @include('components.header')
 
-<main class="terms-page">
+<main class="tc-page">
 
-    {{-- HERO --}}
-    <section class="terms-hero">
-        <div class="container">
-
-            <div class="terms-hero-card">
-                <div class="terms-hero-content">
-                    <span class="terms-eyebrow">
-                        Syarat & Ketentuan
-                    </span>
-
-                    <h1>
-                        Pahami Syarat dan Ketentuan Kami
-                    </h1>
-
-                    <p>
-                        Pelajari ketentuan layanan yang berlaku agar Anda dapat menggunakan
-                        platform OrangBaik.id dengan aman, nyaman, dan sesuai aturan.
-                    </p>
-                </div>
-            </div>
-
+    {{-- HEADER --}}
+    <section class="tc-header">
+        <div class="container tc-header-inner">
+            <h1>Syarat &amp; Ketentuan</h1>
+            <p>
+                Ketentuan berikut mengatur penggunaan Anda atas platform OrangBaik.id.
+                Dengan menggunakan layanan kami, Anda dianggap telah membaca dan
+                menyetujui seluruh poin di bawah ini.
+            </p>
         </div>
     </section>
 
     {{-- CONTENT --}}
-    <section class="terms-content-section">
-        <div class="container terms-layout">
+    <section class="tc-content-section">
+        <div class="container tc-layout">
 
-            <aside class="terms-sidebar">
-                <h3>Daftar Isi</h3>
+            <aside class="tc-toc">
+                <span class="tc-toc-label">Daftar Isi</span>
 
                 <nav>
                     @forelse ($terms as $index => $term)
                         <a href="#term-{{ $index + 1 }}">
+                            <em>{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</em>
                             {{ $term->judul }}
                         </a>
                     @empty
-                        <p>Konten syarat dan ketentuan sedang diperbarui.</p>
+                        <p class="tc-toc-empty">Konten sedang diperbarui.</p>
                     @endforelse
                 </nav>
             </aside>
 
-            <article class="terms-document">
+            <article class="tc-document">
                 @forelse ($terms as $index => $term)
-                    <section class="terms-block" id="term-{{ $index + 1 }}">
-                        <h2>{{ $term->judul }}</h2>
+                    <section class="tc-clause" id="term-{{ $index + 1 }}">
+                        <span class="tc-clause-number">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
 
-                        @foreach ($term->paragraphs() as $paragraph)
-                            <p>{{ $paragraph }}</p>
-                        @endforeach
+                        <div class="tc-clause-body">
+                            <h2>{{ $term->judul }}</h2>
+
+                            @foreach ($term->paragraphs() as $paragraph)
+                                <p>{{ $paragraph }}</p>
+                            @endforeach
+                        </div>
                     </section>
                 @empty
-                    <section class="terms-block">
-                        <p>Konten syarat dan ketentuan sedang diperbarui.</p>
+                    <section class="tc-clause">
+                        <div class="tc-clause-body">
+                            <p>Konten syarat dan ketentuan sedang diperbarui.</p>
+                        </div>
                     </section>
                 @endforelse
             </article>
@@ -77,28 +72,22 @@
     </section>
 
     {{-- FAQ --}}
-    <section class="terms-faq">
+    <section class="tc-faq">
         <div class="container">
 
-            <div class="terms-faq-header">
+            <div class="tc-faq-header">
                 <h2>Pertanyaan yang Sering Diajukan</h2>
-
-                <p>
-                    Beberapa informasi umum terkait penggunaan layanan OrangBaik.id.
-                </p>
+                <p>Beberapa informasi umum terkait penggunaan layanan OrangBaik.id.</p>
             </div>
 
-            <div class="faq-list">
+            <div class="tc-faq-list">
                 @forelse ($faqs as $faq)
-                    <details class="faq-item">
+                    <details class="tc-faq-item">
                         <summary>
                             <span>{{ $faq->pertanyaan }}</span>
                             <i class="bi bi-plus-lg"></i>
                         </summary>
-
-                        <p>
-                            {{ $faq->jawaban }}
-                        </p>
+                        <p>{{ $faq->jawaban }}</p>
                     </details>
                 @empty
                     <p>Belum ada pertanyaan yang ditampilkan.</p>

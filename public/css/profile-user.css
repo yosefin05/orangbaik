@@ -248,17 +248,6 @@
     position:relative;
 }
 
-.notif-dot{
-    position:absolute;
-    top:-2px;
-    right:-10px;
-    width:15px;
-    height:15px;
-    border-radius:70%;
-    background:#ef4444;
-    border:2px solid #fff;
-}
-
 .profile-menu-item:hover .menu-text strong {
     color: var(--primary);
 }
@@ -434,9 +423,9 @@
 .notif-dot {
     position: absolute;
     top: -2px;
-    right: -6px;
-    width: 10px;
-    height: 10px;
+    right: -10px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
     background-color: var(--danger);
     border: 2px solid #fff;

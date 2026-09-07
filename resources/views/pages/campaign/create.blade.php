@@ -10,46 +10,6 @@
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/campaign-create.css') }}">
 
-    <style>
-        .campaign-slug-wrap {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ced4da;
-            border-radius: 0.5rem;
-            padding: 0 0.75rem;
-            background: #fff;
-            transition: border-color 0.2s;
-        }
-
-        .campaign-slug-wrap:focus-within {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-
-        .campaign-slug-wrap .slug-prefix {
-            font-weight: 500;
-            color: #6c757d;
-            margin-right: 0.5rem;
-            white-space: nowrap;
-        }
-
-        .campaign-slug-wrap .slug-input {
-            border: none;
-            outline: none;
-            flex: 1;
-            padding: 0.75rem 0;
-            background: transparent;
-            font-size: 1rem;
-        }
-
-        .campaign-slug-wrap .slug-input::placeholder {
-            color: #adb5bd;
-        }
-
-        .campaign-slug-wrap .slug-input:focus {
-            box-shadow: none;
-        }
-    </style>
 </head>
 
 <body>
@@ -119,11 +79,8 @@
 
                             <div class="campaign-field">
                                 <label for="deskripsi_campaign">Deskripsi Campaign <span>*</span></label>
-                                <div class="campaign-input-wrap">
-                                    <x-rich-text-editor name="deskripsi_campaign" id="deskripsi_campaign"
-                                        :value="old('deskripsi_campaign')" />
-                                    <i class="bi bi-pencil-fill"></i>
-                                </div>
+                                <x-rich-text-editor name="deskripsi_campaign" id="deskripsi_campaign"
+                                    :value="old('deskripsi_campaign')" />
                             </div>
                         </section>
 

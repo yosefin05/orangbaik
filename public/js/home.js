@@ -34,6 +34,11 @@ document.addEventListener('DOMContentLoaded', function () {
             showSlide(nextIndex);
         }
 
+        function prevSlide() {
+            const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+            showSlide(prevIndex);
+        }
+
         function buildDots() {
             if (!dotsWrapper) return;
 
@@ -78,6 +83,68 @@ document.addEventListener('DOMContentLoaded', function () {
 
         wrapper.addEventListener('mouseenter', stopAutoplay);
         wrapper.addEventListener('mouseleave', startAutoplay);
+
+        // ============================
+        // SWIPE / DRAG SUPPORT
+        // ============================
+        if (slides.length > 1) {
+            let startX = 0;
+            let isDragging = false;
+            const swipeThreshold = 40; // px minimal geser supaya dianggap swipe
+
+            function onDragStart(x) {
+                isDragging = true;
+                startX = x;
+                stopAutoplay();
+            }
+
+            function onDragEnd(x) {
+                if (!isDragging) return;
+                isDragging = false;
+
+                const diff = x - startX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff < 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+
+                startAutoplay();
+            }
+
+            // Touch (mobile)
+            wrapper.addEventListener('touchstart', function (e) {
+                onDragStart(e.touches[0].clientX);
+            }, { passive: true });
+
+            wrapper.addEventListener('touchend', function (e) {
+                onDragEnd(e.changedTouches[0].clientX);
+            });
+
+            // Mouse (desktop drag)
+            wrapper.addEventListener('mousedown', function (e) {
+                onDragStart(e.clientX);
+                e.preventDefault();
+            });
+
+            wrapper.addEventListener('mouseup', function (e) {
+                onDragEnd(e.clientX);
+            });
+
+            wrapper.addEventListener('mouseleave', function () {
+                isDragging = false;
+            });
+
+            // Cegah link ikut ke-klik kalau ternyata itu swipe (bukan tap biasa)
+            wrapper.addEventListener('click', function (e) {
+                if (Math.abs(e.clientX - startX) > swipeThreshold) {
+                    e.preventDefault();
+                }
+            }, true);
+        }
 
         buildDots();
         showSlide(0);

@@ -36,6 +36,7 @@ class HomeController extends Controller
                 ->orWhereNull('approval_status');
         });
 
+        // 🔥 HERO CAMPAIGN - Emergency (PASTI MUNCUL!)
         $heroCampaigns = Campaign::with(['penggalangDana', 'donasi.pembayaran'])
             ->where('is_active', true)
             ->where('campaign_type', 'emergency')
@@ -48,6 +49,21 @@ class HomeController extends Controller
             ->latest()
             ->take(5)
             ->get();
+
+        // 🔥 HERO ALTERNATIF - Kalau emergency kosong, ambil campaign lain
+        if ($heroCampaigns->isEmpty()) {
+            $heroCampaigns = Campaign::with(['penggalangDana', 'donasi.pembayaran'])
+                ->where('is_active', true)
+                ->where('approval_status', 'approved')
+                ->where('tanggal_mulai', '<=', $now)
+                ->where(function ($query) use ($now) {
+                    $query->whereNull('tanggal_berakhir')
+                        ->orWhere('tanggal_berakhir', '>=', $now);
+                })
+                ->latest()
+                ->take(5)
+                ->get();
+        }
 
         // DARURAT (emergency + approved + aktif)
         $darurat = (clone $query)

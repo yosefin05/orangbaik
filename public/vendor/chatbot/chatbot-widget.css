@@ -1,0 +1,94 @@
+.laravel-chatbot-widget {
+    position: fixed;
+    bottom: 24px;
+    z-index: 9999;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.laravel-chatbot-widget.right {
+    right: 24px;
+}
+
+.laravel-chatbot-widget.left {
+    left: 24px;
+}
+
+.laravel-chatbot-toggle {
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 999px;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+}
+
+.laravel-chatbot-panel {
+    display: none;
+    width: 320px;
+    height: 420px;
+    margin-top: 12px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #dbe2ea;
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.laravel-chatbot-header {
+    padding: 14px 16px;
+    color: #fff;
+}
+
+.laravel-chatbot-subtitle {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.laravel-chatbot-messages {
+    height: 280px;
+    overflow: auto;
+    padding: 16px;
+    background: #f8fafc;
+}
+
+.laravel-chatbot-form {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #dbe2ea;
+}
+
+.laravel-chatbot-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.laravel-chatbot-submit {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.laravel-chatbot-bubble-row {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.laravel-chatbot-bubble-row.user {
+    justify-content: flex-end;
+}
+
+.laravel-chatbot-bubble-row.bot {
+    justify-content: flex-start;
+}
+
+.laravel-chatbot-bubble {
+    max-width: 85%;
+    padding: 10px 12px;
+    border-radius: 14px;
+}

@@ -8,12 +8,14 @@ use App\Models\Campaign_Filter;
 use App\Models\Campaign_Package;
 use App\Models\Filter;
 use App\Models\Kategori;
+use App\Models\Donasi;
 use App\Models\Penggalang_Dana;
 use App\Support\RichText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class CampaignController extends Controller
@@ -151,11 +153,10 @@ class CampaignController extends Controller
             'campaign_type' => 'required|in:regular,emergency,sustainable',
             'filter' => 'required|array|min:1|max:4',
             'filter.*' => 'exists:filter,id',
-            // PACKAGE TIDAK WAJIB - HAPUS VALIDASI REQUIRED
             'packages' => 'nullable|array',
             'packages.*.title' => 'nullable|string|max:255',
             'packages.*.description' => 'nullable|string',
-            'packages.*.nominal' => 'nullable|numeric|min:0', // DIUBAH: nullable, min:0
+            'packages.*.nominal' => 'nullable|numeric|min:0',
             'packages.*.image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'custom_slug' => 'nullable|alpha_dash|unique:campaign,custom_slug',
         ]);
@@ -179,12 +180,14 @@ class CampaignController extends Controller
             // Set minimal donasi ke 5000 jika tidak diisi
             $minimalDonasi = $request->minimal_donasi ?: 5000;
 
+
+            $deskripsiCampaign = $this->processImages($request->deskripsi_campaign);
             // Simpan Campaign
             $campaign = Campaign::create([
                 'thumbnail' => $thumbnail,
                 'judul' => $request->judul_campaign,
                 'slug' => Str::slug($request->judul_campaign) . '-' . time(),
-                'deskripsi' => RichText::clean($request->deskripsi_campaign),
+                'deskripsi' => RichText::clean($deskripsiCampaign),
                 'tanggal_mulai' => $request->tanggal_mulai,
                 'tanggal_berakhir' => $request->tanggal_akhir,
                 'target_donasi' => $request->target_donasi,
@@ -200,12 +203,7 @@ class CampaignController extends Controller
                 'custom_slug' => $customSlug,
             ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Simpan Filter
-            |--------------------------------------------------------------------------
-            */
-
+            // Simpan Filter
             foreach ($request->filter as $filter) {
                 Campaign_Filter::create([
                     'campaign_id' => $campaign->id,
@@ -213,12 +211,7 @@ class CampaignController extends Controller
                 ]);
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Simpan Package - HANYA JIKA ADA DAN NOMINAL > 0
-            |--------------------------------------------------------------------------
-            */
-
+            // Simpan Package - HANYA JIKA ADA DAN NOMINAL > 0
             if ($request->has('packages') && is_array($request->packages)) {
                 foreach ($request->packages as $package) {
                     // CEK: hanya simpan jika nominal ada dan > 0
@@ -273,11 +266,11 @@ class CampaignController extends Controller
     /**
      * Menampilkan campaign – cari berdasarkan slug ATAU custom_slug
      */
-    /**
-     * Menampilkan campaign – cari berdasarkan slug ATAU custom_slug
-     */
     public function show($slug)
     {
+        // ============================================================
+        // 1. AMBIL DATA CAMPAIGN
+        // ============================================================
         $campaign = Campaign::with([
             'penggalangDana',
             'donasi' => function ($query) {
@@ -290,7 +283,10 @@ class CampaignController extends Controller
             'donasi.pembayaran',
             'campaignFundraisers.user',
             'campaignFundraisers.donasis.pembayaran',
-            'fundraisers'
+            'fundraisers',
+            'campaignUpdates',
+            'kategori',
+            'filter'
         ])
             ->where('is_active', true)
             ->where(function ($query) use ($slug) {
@@ -299,7 +295,9 @@ class CampaignController extends Controller
             })
             ->firstOrFail();
 
-        // Hitung total terkumpul dari donasi yang sudah settlement
+        // ============================================================
+        // 2. HITUNG TOTAL TERKUMPUL & DONATUR
+        // ============================================================
         $totalTerkumpul = $campaign->donasi->sum('nominal');
         $totalDonatur = $campaign->donasi->count();
 
@@ -307,6 +305,38 @@ class CampaignController extends Controller
         $campaign->terkumpul = $totalTerkumpul;
         $campaign->donasi_count = $totalDonatur;
 
+        // ============================================================
+        // 3. AMBIL PESAN DOA (HANYA SETTLEMENT + ADA PESAN)
+        // ============================================================
+        $pesanDoa = Donasi::with(['user', 'pembayaran'])
+            ->where('campaign_id', $campaign->id)
+            ->whereHas('pembayaran', function ($q) {
+                $q->where('transaction_status', 'settlement');
+            })
+            ->whereNotNull('pesan_doa')
+            ->where('pesan_doa', '!=', '')
+            ->latest()
+            ->take(10)
+            ->get();
+
+        // ============================================================
+        // 4. CAMPAIGN LAIN UNTUK SIDEBAR (TANPA YANG SEDANG DILIHAT)
+        // ============================================================
+        $campaignLain = Campaign::with(['penggalangDana'])
+            ->where('is_active', true)
+            ->where('id', '!=', $campaign->id)
+            ->where('tanggal_mulai', '<=', now())
+            ->where(function ($query) {
+                $query->whereNull('tanggal_berakhir')
+                    ->orWhere('tanggal_berakhir', '>=', now());
+            })
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // ============================================================
+        // 5. HANDLE REFERRAL CODE (jika ada di URL)
+        // ============================================================
         if (request()->filled('ref')) {
             $fundraiser = $campaign->fundraisers()
                 ->where('referral_code', request('ref'))
@@ -318,7 +348,28 @@ class CampaignController extends Controller
             }
         }
 
-        return view('pages.campaign.show', compact('campaign'));
+        // ============================================================
+        // 6. CEK APAKAH USER ADALAH FUNDRAISER
+        // ============================================================
+        if (auth()->check()) {
+            $isFundraiser = $campaign->fundraisers()
+                ->where('user_id', auth()->id())
+                ->where('status', 'active')
+                ->exists();
+
+            view()->share('isFundraiser', $isFundraiser);
+        }
+
+        // ============================================================
+        // 7. RETURN VIEW DENGAN SEMUA DATA
+        // ============================================================
+        return view('pages.campaign.show', compact(
+            'campaign',
+            'totalTerkumpul',
+            'totalDonatur',
+            'pesanDoa',
+            'campaignLain'
+        ));
     }
 
     public function edit(Campaign $campaign)
@@ -354,6 +405,7 @@ class CampaignController extends Controller
             'minimal_donasi' => $this->cleanMoney($request->minimal_donasi),
         ]);
 
+        // Clean packages nominal
         if ($request->has('packages')) {
             $packages = $request->packages;
             foreach ($packages as $key => $package) {
@@ -364,6 +416,9 @@ class CampaignController extends Controller
             $request->merge(['packages' => $packages]);
         }
 
+        // ============================================================
+        // VALIDASI
+        // ============================================================
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
@@ -374,14 +429,14 @@ class CampaignController extends Controller
             'kategori_id' => 'required|exists:kategori,id',
             'campaign_type' => 'required|in:regular,emergency,sustainable',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'filter' => 'array|max:4',
+            'filter' => 'nullable|array|max:4',
             'filter.*' => 'exists:filter,id',
-            // PACKAGE TIDAK WAJIB
             'packages' => 'nullable|array',
+            'packages.*.id' => 'nullable|exists:campaign_packages,id',
             'packages.*.title' => 'nullable|string|max:255',
             'packages.*.description' => 'nullable|string',
-            'packages.*.nominal' => 'nullable|numeric|min:0', // DIUBAH: nullable
-            'packages.*.image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'packages.*.nominal' => 'nullable|numeric|min:0',
+            'packages.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'custom_slug' => 'nullable|alpha_dash|unique:campaign,custom_slug,' . $campaign->id,
         ]);
 
@@ -405,7 +460,7 @@ class CampaignController extends Controller
             // Update data
             $data = [
                 'judul' => $validated['judul'],
-                'deskripsi' => RichText::clean($validated['deskripsi']),
+                'deskripsi' => RichText::clean($this->processImages($validated['deskripsi'])),
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'tanggal_berakhir' => $validated['tanggal_berakhir'],
                 'target_donasi' => $validated['target_donasi'],
@@ -426,6 +481,7 @@ class CampaignController extends Controller
 
             // Handle thumbnail
             if ($request->hasFile('thumbnail')) {
+                // Hapus thumbnail lama
                 if ($campaign->thumbnail && file_exists(storage_path('app/public/' . $campaign->thumbnail))) {
                     unlink(storage_path('app/public/' . $campaign->thumbnail));
                 }
@@ -447,19 +503,28 @@ class CampaignController extends Controller
                 }
             }
 
-            // Update Package
-            if ($request->has('packages')) {
-                $existingPackageIds = $campaign->packages->pluck('id')->toArray();
-                $updatedPackageIds = [];
+            // ============================================================
+            // UPDATE PACKAGE - DENGAN PENANGANAN GAMBAR YANG BENAR
+            // ============================================================
+            $existingPackageIds = $campaign->packages->pluck('id')->toArray();
+            $updatedPackageIds = [];
 
+            if ($request->has('packages') && is_array($request->packages)) {
                 foreach ($request->packages as $packageData) {
-                    // SKIP jika nominal kosong atau 0
+                    // SKIP jika nominal tidak ada atau 0
                     if (!isset($packageData['nominal']) || $packageData['nominal'] <= 0) {
                         continue;
                     }
 
+                    // Handle gambar package
+                    $imagePath = null;
+                    if (isset($packageData['image']) && $packageData['image'] instanceof \Illuminate\Http\UploadedFile) {
+                        // Upload gambar ke storage
+                        $imagePath = $packageData['image']->store('campaign/package', 'public');
+                    }
+
                     if (isset($packageData['id']) && in_array($packageData['id'], $existingPackageIds)) {
-                        // Update existing package
+                        // UPDATE package existing
                         $package = Campaign_Package::find($packageData['id']);
                         if ($package) {
                             $updateData = [
@@ -468,50 +533,37 @@ class CampaignController extends Controller
                                 'nominal' => $packageData['nominal'],
                             ];
 
-                            if (isset($packageData['image']) && $packageData['image'] instanceof \Illuminate\Http\UploadedFile) {
+                            // Hanya update gambar jika ada file baru
+                            if ($imagePath) {
+                                // Hapus gambar lama
                                 if ($package->gambar && file_exists(storage_path('app/public/' . $package->gambar))) {
                                     unlink(storage_path('app/public/' . $package->gambar));
                                 }
-                                $gambar = $packageData['image']->store('campaign/package', 'public');
-                                $updateData['gambar'] = $gambar;
+                                $updateData['gambar'] = $imagePath;
                             }
 
                             $package->update($updateData);
                             $updatedPackageIds[] = $package->id;
                         }
                     } else {
-                        // Create new package
-                        $gambar = null;
-                        if (isset($packageData['image']) && $packageData['image'] instanceof \Illuminate\Http\UploadedFile) {
-                            $gambar = $packageData['image']->store('campaign/package', 'public');
-                        }
-
+                        // CREATE package baru
                         $package = Campaign_Package::create([
                             'campaign_id' => $campaign->id,
                             'judul' => $packageData['title'] ?? 'Package',
                             'deskripsi' => $packageData['description'] ?? null,
                             'nominal' => $packageData['nominal'],
-                            'gambar' => $gambar,
+                            'gambar' => $imagePath,
                         ]);
                         $updatedPackageIds[] = $package->id;
                     }
                 }
+            }
 
-                // Delete packages not in updated list
-                $packagesToDelete = array_diff($existingPackageIds, $updatedPackageIds);
-                if (!empty($packagesToDelete)) {
-                    $packages = Campaign_Package::whereIn('id', $packagesToDelete)->get();
-                    foreach ($packages as $package) {
-                        if ($package->gambar && file_exists(storage_path('app/public/' . $package->gambar))) {
-                            unlink(storage_path('app/public/' . $package->gambar));
-                        }
-                        $package->delete();
-                    }
-                }
-            } else {
-                // Jika tidak ada packages sama sekali, hapus semua packages yang ada
-                $existingPackages = $campaign->packages;
-                foreach ($existingPackages as $package) {
+            // DELETE packages yang tidak ada di list
+            $packagesToDelete = array_diff($existingPackageIds, $updatedPackageIds);
+            if (!empty($packagesToDelete)) {
+                $packages = Campaign_Package::whereIn('id', $packagesToDelete)->get();
+                foreach ($packages as $package) {
                     if ($package->gambar && file_exists(storage_path('app/public/' . $package->gambar))) {
                         unlink(storage_path('app/public/' . $package->gambar));
                     }
@@ -535,6 +587,50 @@ class CampaignController extends Controller
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    private function processImages(string $html): string
+    {
+        return preg_replace_callback(
+            '/<img([^>]+)src=["\']data:image\/(jpeg|jpg|png);base64,([^"\']+)["\']([^>]*)>/i',
+            function ($matches) {
+                $attributesBefore = $matches[1];
+                $extension = strtolower($matches[2]);
+                $base64 = $matches[3];
+                $attributesAfter = $matches[4];
+
+                // Decode Base64
+                $imageData = base64_decode($base64, true);
+
+                // Kalau gagal decode, biarkan gambar seperti semula
+                if ($imageData === false) {
+                    return $matches[0];
+                }
+
+                // Pastikan ekstensi valid
+                if ($extension === 'jpg') {
+                    $extension = 'jpeg';
+                }
+
+                // Buat nama file unik
+                $filename = Str::uuid() . '.' . $extension;
+
+                // Simpan ke storage/app/public/campaign
+                $path = 'campaign/gambar/' . $filename;
+
+                Storage::disk('public')->put($path, $imageData);
+
+                // URL yang akan disimpan di database
+                $url = Storage::disk('public')->url($path);
+
+                return '<img'
+                    . $attributesBefore
+                    . 'src="' . $url . '"'
+                    . $attributesAfter
+                    . '>';
+            },
+            $html
+        );
     }
 
     public function destroy(Campaign $campaign)

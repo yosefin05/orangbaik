@@ -2,6 +2,7 @@
 
 use App\Models\Testimoni;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\User\{
     PenggalangDanaController,
     BeritaController,
@@ -49,7 +50,7 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 // ============================================================
 Route::prefix('payment')->group(function () {
     // Dynamic universal webhook endpoint for any gateway
-    Route::post('/{gateway}/webhook', [PaymentWebhookController::class, 'handle'])->name('payment.gateway.webhook');
+    Route::post('/webhook', [PaymentWebhookController::class, 'handle']);
 
     // Dedicated / legacy aliases
     Route::post('/midtrans/webhook', [MidtransController::class, 'notification'])->name('payment.midtrans.webhook');
@@ -96,7 +97,7 @@ Route::get('/profil-penggalang/{id}', [PenggalangDanaController::class, 'profile
 // AUTHENTICATED ROUTES (BUTUH LOGIN, TAPI BELUM TENTU VERIFIED)
 // ============================================================
 Route::middleware('auth')->group(function () {
-    
+
     // Set intended URL
     Route::post('/set-intended-url', function (Request $request) {
         session(['url.intended' => $request->url]);
@@ -146,7 +147,7 @@ Route::middleware('auth')->group(function () {
 // AUTHENTICATED + VERIFIED EMAIL ROUTES (WAJIB VERIFIKASI)
 // ============================================================
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+
     // Campaign Management
     Route::get('/campaign/create', [CampaignController::class, 'create'])->name('campaign.create');
     Route::post('/campaign', [CampaignController::class, 'store'])->name('campaign.store');
@@ -158,6 +159,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('campaign/{slug}/update')->group(function () {
         Route::get('/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
         Route::post('/', [CampaignUpdateController::class, 'store'])->name('campaign.update.store');
+        Route::post('/image', [CampaignUpdateController::class, 'uploadImage'])
+            ->name('campaign.update.image');
         Route::get('/{update}/edit', [CampaignUpdateController::class, 'edit'])->name('campaign.update.edit');
         Route::put('/{update}', [CampaignUpdateController::class, 'update'])->name('campaign.update.update');
         Route::delete('/{update}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');

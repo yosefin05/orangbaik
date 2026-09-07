@@ -29,7 +29,6 @@
 
         <div class="header-actions">
 
-            {{-- ✅ PERBAIKAN: action ke route search --}}
             <form action="{{ route('search') }}" method="GET" class="desktop-search-form">
                 <input type="text" name="q" placeholder="Cari campaign..." value="{{ request('q') }}">
                 <button type="submit" aria-label="Cari">
@@ -116,7 +115,14 @@
     {{-- MOBILE HEADER --}}
     <div class="container mobile-header-inner">
 
-        {{-- ✅ SUDAH BENAR: action ke route search --}}
+        {{-- BURGER MENU DI KIRI --}}
+        <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Menu Navigasi">
+            <span class="burger-line"></span>
+            <span class="burger-line"></span>
+            <span class="burger-line"></span>
+        </button>
+
+        {{-- SEARCH FORM --}}
         <form action="{{ route('search') }}" method="GET" class="mobile-search-form">
             <button type="submit" aria-label="Cari">
                 <i class="bi bi-search"></i>
@@ -124,6 +130,7 @@
             <input type="text" name="q" placeholder="Cari Program Donasi" value="{{ request('q') }}">
         </form>
 
+        {{-- PROFILE / LOGIN --}}
         @guest
             <a href="{{ route('login') }}" class="mobile-login-button">
                 Masuk
@@ -143,6 +150,75 @@
         @endauth
 
     </div>
+
+    {{-- MOBILE NAV MENU (SLIDE-IN) --}}
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <nav class="mobile-nav-menu" id="mobileNavMenu">
+        {{-- MOBILE NAV MENU (slide-in) — ini yang dikasih teks --}}
+        <div class="mobile-nav-header">
+            <a href="{{ route('home') }}" class="mobile-nav-brand" aria-label="OrangBaik.id">
+                <img src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id">
+                <span>orangbaik<b>.id</b></span>
+            </a>
+
+            <button type="button" id="mobileNavClose" class="mobile-nav-close" aria-label="Tutup menu">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="mobile-nav-links">
+            <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}">
+                <i class="bi bi-house-door-fill"></i>
+                <span>Beranda</span>
+            </a>
+
+            <a href="{{ url('donasi') }}" class="{{ request()->is('donasi*') ? 'active' : '' }}">
+                <i class="bi bi-heart-fill"></i>
+                <span>Donasi</span>
+            </a>
+
+            <a href="{{ url('kalkulator') }}" class="{{ request()->is('kalkulator*') ? 'active' : '' }}">
+                <i class="bi bi-calculator-fill"></i>
+                <span>Kalkulator</span>
+            </a>
+
+            <a href="{{ url('berita') }}" class="{{ request()->is('berita*') ? 'active' : '' }}">
+                <i class="bi bi-file-earmark-text-fill"></i>
+                <span>Berita</span>
+            </a>
+        </div>
+
+        <div class="mobile-nav-footer">
+            @guest
+                <a href="{{ route('login') }}" class="mobile-nav-login">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Masuk</span>
+                </a>
+                <a href="{{ route('register') }}" class="mobile-nav-register">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Daftar</span>
+                </a>
+            @endguest
+
+            @auth
+                <a href="{{ route('profile.user') }}" class="mobile-nav-profile">
+                    @if(!empty(auth()->user()->foto_profil))
+                        <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="{{ auth()->user()->name }}">
+                    @else
+                        <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                    @endif
+                    <span>{{ auth()->user()->name }}</span>
+                </a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="mobile-nav-logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            @endauth
+        </div>
+    </nav>
 </header>
 
 {{-- MOBILE BOTTOM NAV --}}
@@ -167,3 +243,32 @@
         <span>Berita</span>
     </a>
 </nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const burgerBtn = document.getElementById('mobileBurgerBtn');
+        const closeBtn = document.getElementById('mobileNavClose');
+        const navMenu = document.getElementById('mobileNavMenu');
+        const navOverlay = document.getElementById('mobileNavOverlay');
+
+        function openMenu() {
+            navMenu.classList.add('open');
+            navOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            navMenu.classList.remove('open');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (burgerBtn) burgerBtn.addEventListener('click', openMenu);
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+        if (navOverlay) navOverlay.addEventListener('click', closeMenu);
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeMenu();
+        });
+    });
+</script>

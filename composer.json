@@ -11,6 +11,7 @@
         "laravel/socialite": "^5.28",
         "laravel/tinker": "^2.10.1",
         "midtrans/midtrans-php": "^2.6",
+        "sakibulrasel/laravel-chatbot": "^0.1.0",
         "simplesoftwareio/simple-qrcode": "*"
     },
     "require-dev": {

@@ -162,18 +162,132 @@
             // ==========================================================
             // PREVIEW UPDATE (Live Preview)
             // ==========================================================
-            const judulInput = document.getElementById('judul_update');
-            const isiInput = document.getElementById('isi_update');
             const previewJudul = document.getElementById('previewJudul');
             const previewIsi = document.getElementById('previewIsi');
+            const judulInput = document.getElementById('judul_update');
 
-            judulInput.addEventListener('input', function () {
-                previewJudul.textContent = this.value || 'Judul Update';
+            // Cari editor dengan benar - gunakan ID yang diberikan ke komponen
+            // Komponen rich-text-editor menggunakan ID "isi_update" untuk contenteditable div
+            const editor = document.getElementById('isi_update');
+
+            // Fungsi untuk mendapatkan konten dari editor
+            function getEditorContent() {
+                if (editor) {
+                    // Jika editor adalah contenteditable div
+                    if (editor.contentEditable === 'true') {
+                        return editor.innerHTML;
+                    }
+                    // Jika editor adalah textarea
+                    if (editor.tagName === 'TEXTAREA') {
+                        return editor.value;
+                    }
+                }
+                
+                // Fallback: cari contenteditable lain
+                const contentEditable = document.querySelector('[contenteditable="true"]');
+                if (contentEditable) {
+                    return contentEditable.innerHTML;
+                }
+
+                // Fallback: cari textarea dengan name isi_update
+                const textarea = document.querySelector('textarea[name="isi_update"]');
+                if (textarea) {
+                    return textarea.value;
+                }
+
+                return '';
+            }
+
+            // Fungsi update preview
+            function updatePreview() {
+                // Preview judul
+                const judul = judulInput.value.trim();
+                previewJudul.textContent = judul || 'Judul Update';
+
+                // Preview isi update
+                const content = getEditorContent();
+                const textContent = content.replace(/<[^>]*>/g, '').trim();
+
+                if (content && textContent) {
+                    previewIsi.innerHTML = content;
+                } else {
+                    previewIsi.innerHTML = 'Isi update akan muncul di sini...';
+                }
+            }
+
+            // Event listener untuk judul
+            judulInput.addEventListener('input', updatePreview);
+            judulInput.addEventListener('keyup', updatePreview);
+
+            // Event listener untuk editor (contenteditable)
+            if (editor && editor.contentEditable === 'true') {
+                editor.addEventListener('input', updatePreview);
+                editor.addEventListener('keyup', updatePreview);
+                editor.addEventListener('paste', function () {
+                    setTimeout(updatePreview, 50);
+                });
+                
+                // MutationObserver untuk mendeteksi perubahan yang tidak terdeteksi oleh event biasa
+                const observer = new MutationObserver(function() {
+                    updatePreview();
+                });
+                observer.observe(editor, {
+                    childList: true,
+                    subtree: true,
+                    characterData: true,
+                    attributes: true
+                });
+            }
+
+            // Event listener untuk textarea (jika editor adalah textarea)
+            if (editor && editor.tagName === 'TEXTAREA') {
+                editor.addEventListener('input', updatePreview);
+                editor.addEventListener('keyup', updatePreview);
+                editor.addEventListener('change', updatePreview);
+            }
+
+            // Event listener untuk tombol toolbar (jika ada)
+            const toolbarButtons = document.querySelectorAll('[data-command], [data-insert-image]');
+            toolbarButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    setTimeout(updatePreview, 100);
+                });
             });
 
-            isiInput.addEventListener('input', function () {
-                previewIsi.textContent = this.value || 'Isi update akan muncul di sini...';
+            // Jalankan preview saat halaman pertama kali dibuka
+            // Gunakan multiple timeout untuk memastikan editor sudah siap
+            setTimeout(updatePreview, 100);
+            setTimeout(updatePreview, 300);
+            setTimeout(updatePreview, 500);
+
+            // ==========================================================
+            // VALIDASI FORM
+            // ==========================================================
+            const form = document.getElementById('updateForm');
+            
+            form.addEventListener('submit', function(e) {
+                const judul = judulInput.value.trim();
+                const content = getEditorContent();
+                const textContent = content.replace(/<[^>]*>/g, '').trim();
+
+                let errors = [];
+
+                if (!judul) {
+                    errors.push('Judul update harus diisi');
+                }
+
+                if (!textContent) {
+                    errors.push('Isi update harus diisi');
+                }
+
+                if (errors.length > 0) {
+                    e.preventDefault();
+                    alert('Mohon lengkapi data berikut:\n- ' + errors.join('\n- '));
+                }
             });
+
+            console.log('Preview update siap!');
+            console.log('Editor ditemukan:', !!editor);
 
         });
     </script>

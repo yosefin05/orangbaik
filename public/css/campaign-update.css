@@ -153,14 +153,6 @@
     font-family: inherit;
 }
 
-.campaign-input-wrap input:focus,
-.campaign-input-wrap textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    background: var(--bg);
-    box-shadow: 0 0 0 4px rgba(51, 101, 175, .12);
-}
-
 .campaign-input-wrap textarea {
     resize: vertical;
     min-height: 150px;

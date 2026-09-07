@@ -106,20 +106,25 @@
                         ]
                     ];
 
-                    $randomQuote = $quotes[array_rand($quotes)];
+                    $startIndex = array_rand($quotes);
+                    $randomQuote = $quotes[$startIndex];
                 @endphp
 
-                <div class="quote-box">
+                <div class="quote-box" id="quoteBox" data-start-index="{{ $startIndex }}">
                     <div class="quote-icon">❝</div>
 
-                    <p class="quote-text">
+                    <p class="quote-text" id="quoteText">
                         "{{ $randomQuote['quote'] }}"
                     </p>
 
-                    <span class="quote-author">
+                    <span class="quote-author" id="quoteAuthor">
                         — {{ $randomQuote['author'] }}
                     </span>
                 </div>
+
+                <script id="quotesData" type="application/json">
+                    {!! json_encode($quotes) !!}
+                </script>
 
             </div>
 
@@ -143,6 +148,38 @@
                 eyeClosed.style.display = 'none';
             }
         }
+    </script>
+
+    <script>
+        (function () {
+            const quotesEl = document.getElementById('quotesData');
+            if (!quotesEl) return;
+
+            const quotes = JSON.parse(quotesEl.textContent);
+            const quoteBox = document.getElementById('quoteBox');
+            const quoteText = document.getElementById('quoteText');
+            const quoteAuthor = document.getElementById('quoteAuthor');
+
+            if (!quoteBox || quotes.length <= 1) return;
+
+            let currentIndex = parseInt(quoteBox.dataset.startIndex, 10) || 0;
+
+            function showNextQuote() {
+                quoteBox.classList.add('quote-fade-out');
+
+                setTimeout(function () {
+                    currentIndex = (currentIndex + 1) % quotes.length;
+                    const next = quotes[currentIndex];
+
+                    quoteText.textContent = '"' + next.quote + '"';
+                    quoteAuthor.textContent = '— ' + next.author;
+
+                    quoteBox.classList.remove('quote-fade-out');
+                }, 300);
+            }
+
+            setInterval(showNextQuote, 5000);
+        })();
     </script>
 
 </body>

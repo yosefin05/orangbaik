@@ -8,6 +8,8 @@ use App\Models\Campaign_Update;
 use App\Support\RichText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CampaignUpdateController extends Controller
 {
@@ -32,11 +34,13 @@ class CampaignUpdateController extends Controller
         ]);
 
         // Simpan update
+        $isiUpdate = $this->processImages($request->isi_update);
+
         $update = Campaign_Update::create([
             'campaign_id' => $campaign->id,
             'user_id' => Auth::id(),
             'judul_update' => $request->judul_update,
-            'isi_update' => RichText::clean($request->isi_update),
+            'isi_update' => RichText::clean($isiUpdate),
         ]);
 
         return redirect()
@@ -77,9 +81,11 @@ class CampaignUpdateController extends Controller
         ]);
 
         // Update data
+        $isiUpdate = $this->processImages($request->isi_update);
+
         $update->update([
             'judul_update' => $request->judul_update,
-            'isi_update' => RichText::clean($request->isi_update),
+            'isi_update' => RichText::clean($isiUpdate),
         ]);
 
         return redirect()
@@ -87,6 +93,50 @@ class CampaignUpdateController extends Controller
             ->with('success', 'Update berhasil diperbarui!');
     }
 
+
+    private function processImages(string $html): string
+    {
+        return preg_replace_callback(
+            '/<img([^>]+)src=["\']data:image\/(jpeg|jpg|png);base64,([^"\']+)["\']([^>]*)>/i',
+            function ($matches) {
+                $attributesBefore = $matches[1];
+                $extension = strtolower($matches[2]);
+                $base64 = $matches[3];
+                $attributesAfter = $matches[4];
+
+                // Decode Base64
+                $imageData = base64_decode($base64, true);
+
+                // Kalau gagal decode, biarkan gambar seperti semula
+                if ($imageData === false) {
+                    return $matches[0];
+                }
+
+                // Pastikan ekstensi valid
+                if ($extension === 'jpg') {
+                    $extension = 'jpeg';
+                }
+
+                // Buat nama file unik
+                $filename = Str::uuid() . '.' . $extension;
+
+                // Simpan ke storage/app/public/campaign-updates
+                $path = 'campaign-updates/' . $filename;
+
+                Storage::disk('public')->put($path, $imageData);
+
+                // URL yang akan disimpan di database
+                $url = Storage::disk('public')->url($path);
+
+                return '<img'
+                    . $attributesBefore
+                    . 'src="' . $url . '"'
+                    . $attributesAfter
+                    . '>';
+            },
+            $html
+        );
+    }
     public function destroy($slug, $id)
     {
         $campaign = Campaign::where('slug', $slug)->firstOrFail();

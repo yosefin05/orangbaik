@@ -58,10 +58,12 @@ class BeritaController extends Controller
                 ->file('thumbnail')
                 ->store('berita/thumbnail', 'public');
 
+            $isi = $this->processImages($request->isi);
+
             $berita = Berita::create([
                 'thumbnail' => $thumbnail,
                 'judul' => $request->judul,
-                'isi' => RichText::clean($request->isi),
+                'isi' => RichText::clean($isi),
                 'slug' => Str::slug($request->judul),
                 'custom_slug' => $request->custom_slug ? Str::slug($request->custom_slug) : null,
                 'user_id' => Auth::id(),
@@ -100,9 +102,11 @@ class BeritaController extends Controller
             ]
         );
 
+        $isi = $this->processImages($request->isi);
+
         $data = [
             'judul' => $request->judul,
-            'isi' => RichText::clean($request->isi),
+            'isi' => RichText::clean($isi),
             'slug' => Str::slug($request->judul),
             'custom_slug' => $request->custom_slug ? Str::slug($request->custom_slug) : null,
         ];
@@ -131,6 +135,49 @@ class BeritaController extends Controller
             );
     }
 
+    private function processImages(string $html): string
+    {
+        return preg_replace_callback(
+            '/<img([^>]+)src=["\']data:image\/(jpeg|jpg|png);base64,([^"\']+)["\']([^>]*)>/i',
+            function ($matches) {
+                $attributesBefore = $matches[1];
+                $extension = strtolower($matches[2]);
+                $base64 = $matches[3];
+                $attributesAfter = $matches[4];
+
+                // Decode Base64
+                $imageData = base64_decode($base64, true);
+
+                // Kalau gagal decode, biarkan gambar seperti semula
+                if ($imageData === false) {
+                    return $matches[0];
+                }
+
+                // Pastikan ekstensi valid
+                if ($extension === 'jpg') {
+                    $extension = 'jpeg';
+                }
+
+                // Buat nama file unik
+                $filename = Str::uuid() . '.' . $extension;
+
+                // Simpan ke storage/app/public/berita
+                $path = 'berita/' . $filename;
+
+                Storage::disk('public')->put($path, $imageData);
+
+                // URL yang akan disimpan di database
+                $url = Storage::disk('public')->url($path);
+
+                return '<img'
+                    . $attributesBefore
+                    . 'src="' . $url . '"'
+                    . $attributesAfter
+                    . '>';
+            },
+            $html
+        );
+    }
     public function destroy(Berita $beritum)
     {
         Storage::disk('public')

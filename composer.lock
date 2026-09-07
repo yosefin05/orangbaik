@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "51a4643548e5d3719a7b750bd0bb85ee",
+    "content-hash": "b7521fc522879ef910cd3e01aa80b6a9",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3906,6 +3906,59 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.3"
             },
             "time": "2026-06-18T03:57:49+00:00"
+        },
+        {
+            "name": "sakibulrasel/laravel-chatbot",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sakibulrasel/laravel_chatbot.git",
+                "reference": "8a17d0412366976b8cdcd0d3d3af337bbb537c97"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sakibulrasel/laravel_chatbot/zipball/8a17d0412366976b8cdcd0d3d3af337bbb537c97",
+                "reference": "8a17d0412366976b8cdcd0d3d3af337bbb537c97",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0|^12.0",
+                "illuminate/database": "^11.0|^12.0",
+                "illuminate/filesystem": "^11.0|^12.0",
+                "illuminate/http": "^11.0|^12.0",
+                "illuminate/routing": "^11.0|^12.0",
+                "illuminate/session": "^11.0|^12.0",
+                "illuminate/support": "^11.0|^12.0",
+                "illuminate/view": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0|^10.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "SakibulHaque\\LaravelChatbot\\ChatbotServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SakibulHaque\\LaravelChatbot\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A configurable rule-based chatbot package for Laravel applications.",
+            "support": {
+                "issues": "https://github.com/sakibulrasel/laravel_chatbot/issues",
+                "source": "https://github.com/sakibulrasel/laravel_chatbot/tree/v0.1.0"
+            },
+            "time": "2026-06-06T11:06:22+00:00"
         },
         {
             "name": "simplesoftwareio/simple-qrcode",
