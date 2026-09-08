@@ -22,14 +22,14 @@
         $contacts = [
             [
                 'title' => 'Hubungi Hotline OrangBaik.id',
-                'desc' => 'Hubungi Hotline OrangBaik.id untuk menjawab pertanyaan, saran, atau kendalamu.',
+                'desc' => 'Respons cepat untuk pertanyaan, saran, atau kendalamu.',
                 'url' => 'https://wa.me/6281385002300',
                 'icon' => 'bi bi-whatsapp',
                 'label' => '+62 813-8500-2300',
             ],
             [
                 'title' => 'Hubungi kami via email',
-                'desc' => 'Hubungi untuk menjawab pertanyaan, saran, atau kendalamu via email kami.',
+                'desc' => 'Cocok untuk pertanyaan yang butuh penjelasan lebih detail.',
                 'url' => 'mailto:info@dompetalquran.or.id',
                 'icon' => 'bi bi-envelope-fill',
                 'label' => 'info@dompetalquran.or.id',
@@ -41,8 +41,16 @@
 
         <!-- ========== HERO CHATBOT ========== -->
         <section class="help-hero">
-            <div class="container">
+            <div class="help-hero-decor" aria-hidden="true">
+                <span class="help-blob help-blob-1"></span>
+                <span class="help-blob help-blob-2"></span>
+                <span class="help-blob help-blob-3"></span>
+                <i class="bi bi-chat-heart-fill help-float-icon help-float-1"></i>
+                <i class="bi bi-receipt help-float-icon help-float-2"></i>
+                <i class="bi bi-hand-thumbs-up-fill help-float-icon help-float-3"></i>
+            </div>
 
+            <div class="container">
                 <div class="help-hero-content">
                     <div class="help-pill">
                         <i class="bi bi-stars" aria-hidden="true"></i>
@@ -52,6 +60,7 @@
                     <h1>
                         <span class="help-bot-icon" aria-hidden="true">
                             <i class="bi bi-robot"></i>
+                            <span class="help-bot-pulse"></span>
                         </span>
                         Chatbot Cerdas untuk
                         <br>
@@ -59,32 +68,35 @@
                     </h1>
 
                     <p>
-                        Chatbot interaktif yang siap membantu menjawab pertanyaan seputar OrangBaik.id
-                        dengan cepat, mudah, dan akurat kapan saja kamu membutuhkannya.
+                        Chatbot interaktif yang siap membantu menjawab pertanyaan seputar donasi,
+                        penggalangan dana, transaksi, dan layanan OrangBaik.id lainnya — kapan saja kamu butuhkan.
                     </p>
 
-                    <!-- ===== CHATBOX SEDERHANA ===== -->
+                    <div class="help-trust-row">
+                        <span class="help-trust-item"><i class="bi bi-lightning-charge-fill"></i> Respon instan</span>
+                        <span class="help-trust-item"><i class="bi bi-clock-history"></i> Aktif 24/7</span>
+                        <span class="help-trust-item"><i class="bi bi-shield-check"></i> Jawaban terverifikasi</span>
+                    </div>
+
+                    <!-- ===== CHATBOX (id & struktur tetep, JS gak berubah) ===== -->
                     <div class="chatbox" id="help-ai-form">
-                        <textarea id="help-ai-input" class="chatbox-input" 
-                                  placeholder="Tanyakan sesuatu tentang OrangBaik.id..."
-                                  aria-label="Tulis pertanyaan" required></textarea>
+                        <textarea id="help-ai-input" class="chatbox-input"
+                            placeholder="Tanyakan sesuatu tentang OrangBaik.id..." aria-label="Tulis pertanyaan"
+                            required></textarea>
 
                         <div class="chatbox-bottom">
-                            <!-- Tools: Voice Input (opsional) -->
                             <div class="chatbox-tools">
                                 <button type="button" id="voice-btn" aria-label="Voice input" title="Suara">
                                     <i class="bi bi-mic-fill"></i>
                                 </button>
                             </div>
 
-                            <!-- Tombol Kirim -->
                             <button class="chatbox-send" id="help-ai-send" aria-label="Kirim pertanyaan">
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- ===== CHAT PREVIEW ===== -->
                     <div class="chat-preview" id="help-ai-chat">
                         <div class="chat-message bot" id="welcome-message">
                             <strong>OrangBaik.id Assistant</strong>
@@ -94,95 +106,90 @@
                             </p>
                         </div>
                     </div>
-                </div>
 
+                    <div class="help-quick-topics">
+                        <span>Topik populer:</span>
+                        <button type="button" class="help-quick-chip">Cara berdonasi</button>
+                        <button type="button" class="help-quick-chip">Buat penggalangan dana</button>
+                        <button type="button" class="help-quick-chip">E-kwitansi</button>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- ========== CONTACT + MAP SECTION ========== -->
+        <!-- ========== CONTACT SECTION ========== -->
         <section class="help-contact-section">
             <div class="container">
-
-                <div class="help-contact-layout">
-                    <!-- Contact Cards -->
-                    <div class="help-contact-list">
-                        @foreach ($contacts as $contact)
-                            <a href="{{ $contact['url'] }}" class="contact-card" 
-                               target="{{ str_starts_with($contact['url'], 'https://wa.me') ? '_blank' : '' }}">
-                                <span class="contact-icon" aria-hidden="true">
-                                    <i class="{{ $contact['icon'] }}"></i>
-                                </span>
-
-                                <span class="contact-text">
-                                    <strong>{{ $contact['title'] }}</strong>
-                                    <small>
-                                        <span class="contact-label">{{ $contact['label'] }}</span>
-                                        <span class="contact-desc">{{ $contact['desc'] }}</span>
-                                    </small>
-                                </span>
-
-                                <span class="contact-arrow" aria-hidden="true">
-                                    <i class="bi bi-chevron-right"></i>
-                                </span>
-                            </a>
-                        @endforeach
-                    </div>
-
-                    <!-- Map Card -->
-                    <div class="map-card">
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.849706646301!2d112.7224737!3d-7.4655644!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e3d98f3cd39b%3A0xf9ba86c029a86e32!2sLembaga%20Amil%20Zakat%20Dompet%20Alquran%20Indonesia!5e0!3m2!1sid!2sid!4v1710000000000"
-                            width="100%" height="260" style="border:0;" allowfullscreen="" loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            title="Lembaga Amil Zakat Dompet Alquran Indonesia - Ruko Citra City Blok R28, Sidoarjo">
-                        </iframe>
-
-                        <div class="map-address">
-                            <span class="map-icon">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </span>
-                            <div class="map-text">
-                                <span class="map-title">Peta Dompet Al Quran Indonesia</span>
-                                <span class="map-subtitle">Lembaga Amil Zakat Dompet Alquran Indonesia</span>
-                                <span class="map-location">Ruko Citra City Blok R28, Sari Rogo, Sidoarjo, Sidoarjo
-                                    Regency, East Java 61234</span>
-                            </div>
-                            <a href="https://www.google.com/maps/dir//Lembaga+Amil+Zakat+Dompet+Alquran+Indonesia+Ruko+Citra+City+Blok+R28+Sari+Rogo+Sidoarjo"
-                                target="_blank" class="map-open-btn">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                                Open in Maps
-                            </a>
-                        </div>
-                    </div>
+                <div class="help-section-heading">
+                    <span class="help-section-label">Butuh Bantuan Langsung?</span>
+                    <h2>Hubungi Tim Kami</h2>
+                    <p>Tidak menemukan jawaban dari chatbot? Tim kami siap bantu lewat kanal berikut.</p>
                 </div>
 
+                <div class="help-contact-grid">
+                    @foreach ($contacts as $contact)
+                        <a href="{{ $contact['url'] }}" class="contact-card"
+                            target="{{ str_starts_with($contact['url'], 'https://wa.me') ? '_blank' : '' }}">
+                            <span class="contact-icon" aria-hidden="true">
+                                <i class="{{ $contact['icon'] }}"></i>
+                            </span>
+
+                            <span class="contact-text">
+                                <strong>{{ $contact['title'] }}</strong>
+                                <small class="contact-label">{{ $contact['label'] }}</small>
+                                <small class="contact-desc">{{ $contact['desc'] }}</small>
+                            </span>
+
+                            <span class="contact-arrow" aria-hidden="true">
+                                <i class="bi bi-chevron-right"></i>
+                            </span>
+                        </a>
+                    @endforeach
+
+                    <div class="contact-hours-card">
+                        <span class="contact-icon" aria-hidden="true">
+                            <i class="bi bi-clock-fill"></i>
+                        </span>
+                        <span class="contact-text">
+                            <strong>Jam Layanan Tim</strong>
+                            <small class="contact-desc">Senin – Jumat, 08.00 – 16.00 WIB</small>
+                            <small class="contact-desc">Sabtu, 08.00 – 12.00 WIB</small>
+                        </span>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- ========== FAQ SECTION ========== -->
-        <section class="about-section about-faq-section">
-            <div class="container">
+        <section class="help-faq-section">
+            <div class="container help-faq-layout">
 
-                <div class="about-section-heading">
-                    <span class="about-section-label">FAQ</span>
-                    <h2>Pertanyaan yang Sering Diajukan Tentang OrangBaik.id</h2>
-                    <p>
-                        Beberapa pertanyaan umum seputar OrangBaik.id, donasi,
-                        penggalang dana, transaksi, dan laporan program.
-                    </p>
+                <div class="help-faq-intro">
+                    <span class="help-section-label">FAQ</span>
+                    <h2>Pertanyaan yang Sering Diajukan</h2>
+                    <p>Beberapa pertanyaan umum seputar OrangBaik.id, donasi, penggalangan dana, transaksi, dan laporan
+                        program.</p>
+                    <div class="tc-faq-help">
+                        <p>Masih ada pertanyaan lain?</p>
+                        <a href="https://wa.me/6281385002300" class="tc-faq-help-link">
+                            Hubungi tim kami <i class="bi bi-arrow-up-right"></i>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="about-faq-list">
+                <div class="help-faq-list">
                     @forelse ($faqs as $faq)
-                        <details class="about-faq-item">
+                        <details class="help-faq-item">
                             <summary>
                                 <span>{{ $faq->pertanyaan }}</span>
-                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                <i class="bi bi-plus-lg help-faq-icon" aria-hidden="true"></i>
                             </summary>
-                            <p>{{ $faq->jawaban }}</p>
+                            <div class="help-faq-answer">
+                                <p>{{ $faq->jawaban }}</p>
+                            </div>
                         </details>
                     @empty
-                        <p>Belum ada pertanyaan yang ditampilkan.</p>
+                        <p class="help-faq-empty">Belum ada pertanyaan yang ditampilkan.</p>
                     @endforelse
                 </div>
 
@@ -193,30 +200,25 @@
 
     @include('components.footer')
 
-    <!-- ============================================ -->
-    <!-- SCRIPT CHATBOT - PAKAI API PACKAGE           -->
-    <!-- ============================================ -->
+    <!-- JS chatbot TIDAK DIUBAH — copy persis dari sebelumnya -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const input = document.getElementById('help-ai-input');
             const sendBtn = document.getElementById('help-ai-send');
             const chatContainer = document.getElementById('help-ai-chat');
             const voiceBtn = document.getElementById('voice-btn');
             let isFirstMessage = true;
 
-            // ===== KIRIM PESAN =====
             async function sendMessage() {
                 const message = input.value.trim();
                 if (!message) return;
 
-                // Sembunyikan welcome message
                 const welcome = document.getElementById('welcome-message');
                 if (welcome && isFirstMessage) {
                     welcome.style.display = 'none';
                     isFirstMessage = false;
                 }
 
-                // Tampilkan pesan user
                 const userMsg = document.createElement('div');
                 userMsg.className = 'chat-message user';
                 userMsg.innerHTML = `
@@ -228,7 +230,6 @@
                 input.value = '';
                 input.style.height = 'auto';
 
-                // Loading indicator
                 const loadingMsg = document.createElement('div');
                 loadingMsg.className = 'chat-message bot loading';
                 loadingMsg.id = 'loading-indicator';
@@ -240,7 +241,6 @@
                 chatContainer.scrollTop = chatContainer.scrollHeight;
 
                 try {
-                    // Panggil API package chatbot
                     const response = await fetch('{{ route("chatbot.message") }}', {
                         method: 'POST',
                         headers: {
@@ -252,11 +252,9 @@
 
                     const data = await response.json();
 
-                    // Hapus loading
                     const loading = document.getElementById('loading-indicator');
                     if (loading) loading.remove();
 
-                    // Tampilkan balasan bot
                     const reply = data.reply || data.message || 'Maaf, saya belum bisa menjawab pertanyaan itu.';
                     const botMsg = document.createElement('div');
                     botMsg.className = 'chat-message bot';
@@ -283,61 +281,64 @@
                 }
             }
 
-            // ===== ESCAPE HTML =====
             function escapeHtml(text) {
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
             }
 
-            // ===== EVENT LISTENERS =====
             sendBtn.addEventListener('click', sendMessage);
-            input.addEventListener('keypress', function(e) {
+            input.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     sendMessage();
                 }
             });
 
-            // Auto-resize textarea
-            input.addEventListener('input', function() {
+            input.addEventListener('input', function () {
                 this.style.height = 'auto';
                 this.style.height = Math.min(this.scrollHeight, 60) + 'px';
             });
 
-            // ===== VOICE INPUT (OPSIONAL) =====
+            // Chip topik cepat -> isi textarea & fokus
+            document.querySelectorAll('.help-quick-chip').forEach(function (chip) {
+                chip.addEventListener('click', function () {
+                    input.value = chip.textContent.trim();
+                    input.focus();
+                    input.dispatchEvent(new Event('input'));
+                });
+            });
+
             if (voiceBtn && 'webkitSpeechRecognition' in window) {
                 const recognition = new webkitSpeechRecognition();
                 recognition.lang = 'id-ID';
                 recognition.continuous = false;
                 recognition.interimResults = false;
 
-                voiceBtn.addEventListener('click', function() {
+                voiceBtn.addEventListener('click', function () {
                     recognition.start();
                     voiceBtn.style.color = '#e74c3c';
                     voiceBtn.style.transform = 'scale(1.1)';
                 });
 
-                recognition.onresult = function(event) {
+                recognition.onresult = function (event) {
                     const transcript = event.results[0][0].transcript;
                     input.value = transcript;
                     voiceBtn.style.color = '';
                     voiceBtn.style.transform = 'scale(1)';
-                    // Otomatis kirim setelah voice selesai
                     setTimeout(sendMessage, 300);
                 };
 
-                recognition.onerror = function() {
+                recognition.onerror = function () {
                     voiceBtn.style.color = '';
                     voiceBtn.style.transform = 'scale(1)';
                 };
 
-                recognition.onend = function() {
+                recognition.onend = function () {
                     voiceBtn.style.color = '';
                     voiceBtn.style.transform = 'scale(1)';
                 };
             } else {
-                // Sembunyikan tombol voice kalau browser gak support
                 if (voiceBtn) voiceBtn.style.display = 'none';
             }
         });

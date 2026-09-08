@@ -15,6 +15,8 @@
    ============================ */
 
 .about-hero {
+    position: relative;
+    overflow: hidden;
     padding-top: var(--space-12, 48px);
     padding-bottom: var(--space-14, 56px);
 
@@ -23,7 +25,25 @@
         linear-gradient(180deg, var(--bg), var(--bg-soft));
 }
 
+.about-hero-decor {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.help-blob {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--primary);
+    filter: blur(80px);
+}
+.help-blob-1 { top: -180px; left: -120px; width: 360px; height: 360px; opacity: .10; }
+.help-blob-2 { bottom: -160px; right: -100px; width: 300px; height: 300px; opacity: .08; }
+
 .about-hero-inner {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 420px;
     align-items: center;
@@ -72,11 +92,40 @@
     line-height: 1.85;
 }
 
-.about-hero p:last-child {
+.about-hero p:last-of-type {
     margin-bottom: 0;
 }
 
+.about-trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3, 12px);
+    margin-top: var(--space-6, 24px);
+}
+
+.about-trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: var(--space-2, 8px) var(--space-4, 16px);
+
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+
+    color: var(--text-dark);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+}
+
+.about-trust-item i {
+    color: var(--primary);
+    font-size: 13px;
+}
+
 .about-hero-image {
+    position: relative;
     min-height: 360px;
 
     display: flex;
@@ -98,6 +147,32 @@
     display: block;
     object-fit: contain;
     object-position: bottom center;
+}
+
+.about-hero-badge {
+    position: absolute;
+    top: var(--space-4, 16px);
+    left: var(--space-4, 16px);
+    z-index: 1;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: var(--space-2, 8px) var(--space-4, 16px);
+
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-card);
+
+    color: var(--text-dark);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+}
+
+.about-hero-badge i {
+    color: var(--primary);
 }
 
 /* ============================
@@ -169,6 +244,7 @@
 
 .about-vision-card:hover {
     transform: translateY(-3px);
+    border-color: var(--primary);
     box-shadow: var(--shadow-card);
 }
 
@@ -232,6 +308,7 @@
 }
 
 .about-legal-card {
+    position: relative;
     overflow: hidden;
 
     background: var(--bg);
@@ -244,6 +321,24 @@
 
 .about-legal-card:hover {
     transform: translateY(-4px);
+    border-color: var(--primary);
+}
+
+.about-legal-index {
+    position: absolute;
+    top: var(--space-3, 12px);
+    left: var(--space-3, 12px);
+    z-index: 1;
+
+    padding: 2px 10px;
+
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: var(--fw-extrabold);
 }
 
 .about-legal-card img {
@@ -272,6 +367,11 @@
 
 .about-legal-card a i {
     font-size: var(--fs-xs);
+    transition: .2s ease;
+}
+
+.about-legal-card:hover a i {
+    transform: translate(2px, -2px);
 }
 
 /* ============================
@@ -336,6 +436,7 @@
 .about-report-link:hover {
     border-color: var(--primary);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
 }
 
 .about-report-icon {
@@ -368,29 +469,249 @@
 }
 
 /* ============================
-   FAQ
+   LOKASI & KONTAK
    ============================ */
 
-.about-faq-section {
+.about-location-section {
     background: var(--bg-soft);
 }
 
-.about-faq-list {
-    max-width: 860px;
+.about-location-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 380px) 1fr;
+    gap: var(--space-8, 32px);
+    align-items: stretch;
+}
 
-    overflow: hidden;
-
+.about-location-info {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-7, 28px);
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
 }
 
-.about-faq-item {
-    border-bottom: 1px solid var(--border-soft);
+.about-location-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--space-2, 16px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: var(--fs-xs);
 }
 
-.about-faq-item:last-child {
-    border-bottom: none;
+.about-location-info h3 {
+    margin: 0 0 var(--space-2, 8px);
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.35;
+}
+
+.about-location-info > p {
+    margin: 0 0 var(--space-5, 20px);
+
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    line-height: 1.75;
+}
+
+.about-location-meta {
+    display: grid;
+    gap: var(--space-2, 2px);
+    margin: 0 0 var(--space-2, 12px);
+    padding: 0;
+    list-style: none;
+}
+
+.about-location-meta li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3, 12px);
+
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.6;
+}
+
+.about-location-meta i {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--primary);
+    font-size: var(--fs-xs);
+}
+
+.about-location-btn {
+    margin-top: auto;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2, 8px);
+
+    padding: var(--space-3, 12px) var(--space-5, 20px);
+
+    background: var(--primary);
+    color: #fff;
+    border-radius: var(--radius-full);
+
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+
+    transition: opacity .15s ease;
+}
+
+.about-location-btn:hover {
+    opacity: .88;
+}
+
+/* ---- Map card, dipertahankan persis dari Pusat Bantuan ---- */
+.map-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 16px);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow .2s ease;
+}
+
+.map-card:hover {
+    box-shadow: var(--shadow-card);
+}
+
+.map-card iframe {
+    display: block;
+    width: 100%;
+    height: 260px;
+    border: none;
+}
+
+.map-address {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3, 12px);
+    padding: var(--space-4, 16px) var(--space-5, 20px);
+    background: var(--bg-soft);
+    border-top: 1px solid var(--border-soft);
+}
+
+.map-address .map-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--primary);
+    font-size: var(--fs-sm);
+}
+
+.map-address .map-text {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.map-address .map-title {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.map-address .map-subtitle {
+    color: var(--text);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+}
+
+.map-address .map-location {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.5;
+    margin-top: 2px;
+}
+
+.map-address .map-open-btn {
+    flex-shrink: 0;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1, 4px);
+    padding: var(--space-2, 8px) var(--space-4, 16px);
+    background: var(--primary);
+    color: #fff;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity .15s ease;
+}
+
+.map-address .map-open-btn:hover {
+    opacity: .88;
+}
+
+/* ============================
+   FAQ
+   ============================ */
+
+.about-faq-section {
+    padding: var(--space-16, 64px) 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border-soft);
+}
+
+.about-faq-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--space-12, 48px);
+    align-items: start;
+}
+
+.about-faq-intro {
+    position: sticky;
+    top: 104px;
+}
+
+.about-faq-intro h2 {
+    margin: 0 0 var(--space-2, 8px);
+    color: var(--text-dark);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.25;
+    letter-spacing: -.02em;
+}
+
+.about-faq-intro p {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    line-height: 1.75;
+}
+
+.about-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3, 12px);
+}
+
+.about-faq-item {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 16px);
+    padding: var(--space-5, 20px) var(--space-6, 24px);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.about-faq-item[open] {
+    border-color: var(--primary);
+    background: var(--bg);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .04);
 }
 
 .about-faq-item summary {
@@ -399,40 +720,54 @@
     justify-content: space-between;
     gap: var(--space-4, 16px);
 
-    padding: var(--space-5, 20px) var(--space-6, 24px);
-
-    cursor: pointer;
-    list-style: none;
-}
-
-.about-faq-item summary::-webkit-details-marker {
-    display: none;
-}
-
-.about-faq-item summary span {
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     line-height: 1.5;
+
+    cursor: pointer;
+    list-style: none;
+}
+.about-faq-item summary::-webkit-details-marker {
+    display: none;
 }
 
-.about-faq-item summary i {
+.about-faq-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 50%;
     color: var(--primary);
-    font-size: var(--fs-xs);
+    font-size: 12px;
     transition: .2s ease;
 }
-
-.about-faq-item[open] summary i {
-    transform: rotate(45deg);
+.about-faq-item[open] .about-faq-icon {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    transform: rotate(135deg);
 }
 
-.about-faq-item p {
-    margin: 0;
-    padding: 0 var(--space-6, 24px) var(--space-5, 20px);
-
+.about-faq-answer p {
+    margin: var(--space-3, 12px) 0 0;
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.8;
+}
+
+.about-faq-empty {
+    padding: var(--space-8, 32px);
+    background: var(--bg-soft);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg, 16px);
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    text-align: center;
 }
 
 /* ============================
@@ -455,6 +790,19 @@
 
     .about-legal-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    .about-location-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .about-faq-layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-8, 32px);
+    }
+
+    .about-faq-intro {
+        position: static;
     }
 }
 
@@ -485,6 +833,10 @@
     .about-hero p {
         font-size: var(--fs-xxs);
         line-height: 1.75;
+    }
+
+    .about-trust-row {
+        gap: var(--space-2, 8px);
     }
 
     .about-hero-image {
@@ -632,29 +984,32 @@
         line-height: 1.4;
     }
 
+    /* LOKASI MOBILE */
+    .about-location-info {
+        padding: var(--space-5, 20px);
+    }
+
+    .map-card iframe {
+        height: 200px;
+    }
+
+    .map-address {
+        flex-wrap: wrap;
+        padding: var(--space-3, 12px) var(--space-4, 16px);
+    }
+
+    .map-address .map-open-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     /* FAQ MOBILE */
     .about-faq-section {
         padding-top: var(--space-9, 36px);
         padding-bottom: calc(var(--space-12, 48px) + 86px);
     }
 
-    .about-faq-list {
-        border-radius: var(--radius-md);
-    }
-
-    .about-faq-item summary {
-        padding: var(--space-4, 16px) var(--space-5, 20px);
-    }
-
-    .about-faq-item summary span {
-        font-size: var(--fs-xxs);
-        line-height: 1.5;
-    }
-
-    .about-faq-item p {
-        padding: 0 var(--space-5, 20px) var(--space-4, 16px);
-
-        font-size: var(--fs-xxs);
-        line-height: 1.75;
+    .about-faq-item {
+        padding: var(--space-4, 16px);
     }
 }
