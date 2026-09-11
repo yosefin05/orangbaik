@@ -54,7 +54,7 @@
         {{-- CATEGORY ATAS --}}
         <section class="section">
             <div class="container">
-                <h2 class="section-title">Yuk, Berbuat Baik Hari Ini!</h2>
+                <h2 class="section-title">Yuk, Berbuat Baik Hari Ini! emoh</h2>
 
                 <div class="category-grid">
                     @foreach($kategori as $item)
