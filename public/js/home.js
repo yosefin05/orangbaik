@@ -177,4 +177,22 @@ document.addEventListener('DOMContentLoaded', function () {
         dotClass: '',
         delay: 3500,
     });
+
+    // Sembunyikan bottom-nav & tombol donasi mengambang begitu footer masuk layar,
+// biar footer bisa "ngisi penuh" tanpa ketiban nav yang fixed di bawah.
+(function () {
+    var footer = document.querySelector('.site-footer');
+    if (!footer || !('IntersectionObserver' in window)) return;
+
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            document.body.classList.toggle('footer-in-view', entry.isIntersecting);
+        });
+    }, {
+        root: null,
+        threshold: 0
+    });
+
+    observer.observe(footer);
+})();
 });

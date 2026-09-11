@@ -734,20 +734,6 @@
     color: var(--bg);
 }
 
-.mobile-nav-links a:hover {
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-.mobile-nav-links a.active {
-    background: var(--primary);
-    color: var(--bg);
-}
-
-.mobile-nav-links a.active i {
-    color: var(--bg);
-}
-
 .mobile-nav-footer {
     padding: 16px 20px;
     border-top: 1px solid #e2e8f0;
@@ -895,6 +881,10 @@
    ============================ */
 
 .mobile-bottom-nav {
+    display: none;
+}
+
+.floating-donate-btn {
     display: none;
 }
 
@@ -1068,10 +1058,10 @@
 }
 
 /* ============================
-   RESPONSIVE TABLET
+   RESPONSIVE TABLET (601px - 900px)
    ============================ */
 
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
     .header-inner {
         gap: var(--space-5, 20px);
     }
@@ -1095,10 +1085,10 @@
 }
 
 /* ============================
-   RESPONSIVE MOBILE
+   RESPONSIVE MOBILE (<= 600px)
    ============================ */
 
-@media (max-width: 900px) {
+@media (max-width: 600px) {
     body {
         padding-bottom: 82px;
     }
@@ -1142,5 +1132,130 @@
     }
 
     .mobile-login-button {
-        min-height: 42px;
-        padding
+        min-height: 44px;
+        padding: 0 var(--space-5, 20px);
+    }
+
+    .mobile-profile-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* ============================
+       MOBILE BOTTOM NAV
+       ============================ */
+    .mobile-bottom-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 250;
+
+        height: 64px;
+        padding: 0 var(--space-2, 8px);
+
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -8px 24px rgba(15, 23, 42, .08);
+
+        transition: opacity .25s ease, visibility .25s ease;
+    }
+
+    .mobile-bottom-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+
+        color: var(--muted);
+        font-size: var(--fs-xxs);
+        font-weight: var(--fw-medium);
+    }
+
+    .mobile-bottom-nav a i {
+        font-size: 20px;
+    }
+
+    .mobile-bottom-nav a.active {
+        color: var(--primary);
+    }
+
+    /* ============================
+       FLOATING DONATE BUTTON
+       ============================ */
+    .floating-donate-btn {
+        position: fixed;
+        right: var(--space-4, 16px);
+        bottom: 80px;
+        z-index: 260;
+
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2, 8px);
+
+        height: 48px;
+        padding: 0 var(--space-5, 20px);
+
+        border: none;
+        border-radius: var(--radius-full);
+        background: var(--secondary);
+        color: var(--bg);
+
+        font-size: var(--fs-xs);
+        font-weight: var(--fw-bold);
+
+        box-shadow: 0 10px 26px rgba(217, 119, 6, .35);
+
+        transition: opacity .25s ease, visibility .25s ease, transform .2s ease;
+    }
+
+    .floating-donate-btn:active {
+        transform: scale(.96);
+    }
+
+    .floating-donate-btn i {
+        font-size: 18px;
+    }
+
+    /* ============================
+       STATE: footer sudah masuk layar
+       ============================ */
+    body.footer-in-view {
+        padding-bottom: 0;
+    }
+
+    body.footer-in-view .mobile-bottom-nav,
+    body.footer-in-view .floating-donate-btn {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    body {
+        transition: padding-bottom .25s ease;
+    }
+
+    .footer-inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-6, 24px);
+        text-align: center;
+    }
+
+    .footer-brand {
+        max-width: 100%;
+    }
+
+    .footer-socials,
+    .socials {
+        justify-content: center;
+    }
+
+    .footer-col {
+        align-items: center;
+    }
+}

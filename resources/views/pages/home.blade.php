@@ -336,42 +336,61 @@
         </section>
 
         {{-- TESTIMONIAL --}}
-        <section class="section testimonial">
+       <section class="section testimonial">
             <div class="container">
                 <h2 class="section-title">Apa Kata Mereka?</h2>
 
                 <div class="testimonial-wrapper">
                     @forelse(($testimoni ?? []) as $item)
                         <div class="testimonial-item {{ $loop->first ? 'active' : '' }}">
-                            <p class="testimonial-description">
-                                "{{ $item->isi_testimoni }}"
-                            </p>
+                            <div class="testimonial-card">
+                                <span class="testimonial-quote-icon">❝</span>
 
-                            @if($item->foto_profil)
-                                <img src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama }}" loading="lazy">
-                            @else
-                                <img src="{{ asset('assets/logo.png') }}" alt="{{ $item->nama }}" loading="lazy">
-                            @endif
+                                <p class="testimonial-description">
+                                    {{ $item->isi_testimoni }}
+                                </p>
 
-                            <h3>{{ $item->nama }}</h3>
-                            <span>{{ $item->jabatan }}</span>
+                                <div class="testimonial-divider"></div>
+
+                                <div class="testimonial-person">
+                                    @if($item->foto_profil)
+                                        <img class="testimonial-avatar" src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama }}" loading="lazy">
+                                    @else
+                                        <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="{{ $item->nama }}" loading="lazy">
+                                    @endif
+
+                                    <div class="testimonial-person-info">
+                                        <h3>{{ $item->nama }}</h3>
+                                        <span>{{ $item->jabatan }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @empty
                         <div class="testimonial-item active">
-                            <p class="testimonial-description">
-                                "OrangBaik.id memudahkan kami untuk ikut berbagi dan mendukung program kebaikan."
-                            </p>
+                            <div class="testimonial-card">
+                                <span class="testimonial-quote-icon">❝</span>
 
-                            <img src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id" loading="lazy">
+                                <p class="testimonial-description">
+                                    OrangBaik.id memudahkan kami untuk ikut berbagi dan mendukung program kebaikan.
+                                </p>
 
-                            <h3>OrangBaik.id</h3>
-                            <span>Platform Donasi</span>
+                                <div class="testimonial-divider"></div>
+
+                                <div class="testimonial-person">
+                                    <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id" loading="lazy">
+
+                                    <div class="testimonial-person-info">
+                                        <h3>OrangBaik.id</h3>
+                                        <span>Platform Donasi</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @endforelse
                 </div>
             </div>
         </section>
-
         {{-- KATEGORI FAVORIT --}}
         <section class="section" id="kategori-favorit">
             <div class="container">

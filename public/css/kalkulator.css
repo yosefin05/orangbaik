@@ -255,7 +255,7 @@
     font-weight: var(--fw-bold);
 }
 
-/* --- dynamic fields (rendered by kalkulator.js — keep these class names) --- */
+/* --- dynamic fields --- */
 .zakat-fields {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -631,57 +631,353 @@
 }
 
 /* ============================
-   RESPONSIVE
+   RESPONSIVE TABLET (601px - 900px)
    ============================ */
-@media (max-width: 1100px) {
-    .z-hero-grid,
-    .zakat-calculator-layout {
-        grid-template-columns: 1fr;
+@media (max-width: 900px) {
+    .z-hero {
+        padding: var(--space-14, 56px) 0;
     }
+
+    .z-hero-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-8, 32px);
+    }
+
     .z-hero-receipt {
         max-width: 320px;
         justify-self: start;
     }
+
+    .zakat-calculator-layout {
+        grid-template-columns: 1fr;
+    }
+
     .zakat-result-area {
         position: static;
+        gap: var(--space-4, 16px);
+    }
+
+    .zakat-fields {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .z-terms-list {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 768px) {
+/* ============================
+   RESPONSIVE MOBILE (<= 600px)
+   ============================ */
+@media (max-width: 600px) {
     .z-hero {
-        padding: var(--space-9, 36px) 0;
+        padding: var(--space-11, 44px) 0;
     }
+
+    .z-hero-grid {
+        gap: var(--space-6, 24px);
+    }
+
+    .z-hero-copy h1 {
+        font-size: clamp(24px, 6vw, 32px);
+    }
+
     .z-hero-copy p {
-        max-width: none;
+        font-size: var(--fs-xs);
+        margin-bottom: var(--space-5, 20px);
     }
+
+    .z-hero-receipt {
+        max-width: 100%;
+        transform: none;
+        padding: var(--space-4, 16px);
+    }
+
+    .z-note-section {
+        padding: var(--space-4, 16px) 0;
+    }
+
+    .z-note {
+        font-size: var(--fs-xxs);
+        padding: var(--space-3, 12px);
+        border-left-width: 2px;
+    }
+
+    .zakat-calculator-section {
+        padding: var(--space-6, 24px) 0 var(--space-11, 44px);
+    }
+
+    .zakat-calculator-layout {
+        gap: var(--space-5, 20px);
+    }
+
+    .z-ledger {
+        padding: var(--space-5, 20px);
+    }
+
+    .z-ledger-header h2 {
+        font-size: var(--fs-sm);
+    }
+
+    .z-ledger-header p {
+        font-size: var(--fs-xxs);
+    }
+
     .z-tabbar {
-        gap: var(--space-4, 16px);
+        gap: var(--space-3, 12px);
+        padding-bottom: 0;
     }
+
+    .zakat-tab {
+        padding: var(--space-2, 8px) 0 var(--space-3, 12px);
+        gap: var(--space-1, 4px);
+    }
+
+    .zakat-tab i {
+        font-size: var(--fs-xs);
+    }
+
     .zakat-tab-content small {
         display: none;
     }
+
+    .zakat-tab-content strong {
+        font-size: var(--fs-xxs);
+    }
+
     .z-form-head {
         flex-direction: column;
         align-items: flex-start;
+        gap: var(--space-2, 8px);
+        margin-bottom: var(--space-5, 20px);
     }
+
     .z-nisab {
         text-align: left;
+        width: 100%;
     }
+
+    .z-form-head h3 {
+        font-size: var(--fs-xs);
+    }
+
     .zakat-fields {
         grid-template-columns: 1fr;
+        gap: var(--space-4, 16px);
     }
+
+    .zakat-field label {
+        font-size: var(--fs-xxs);
+    }
+
+    .zakat-input-wrap input {
+        height: 44px;
+        font-size: var(--fs-xs);
+        padding: 0 var(--space-3, 12px);
+    }
+
+    .zakat-input-wrap.has-prefix input {
+        padding-left: 36px;
+    }
+
+    .zakat-input-prefix {
+        left: var(--space-3, 12px);
+        font-size: var(--fs-xxs);
+    }
+
     .zakat-live-preview {
         flex-direction: column;
         align-items: flex-start;
+        gap: var(--space-3, 12px);
+        padding: var(--space-4, 16px);
     }
+
     .zakat-live-preview p {
         text-align: left;
+        max-width: 100%;
+        font-size: var(--fs-xxs);
     }
+
+    .zakat-live-preview strong {
+        font-size: var(--fs-sm);
+    }
+
+    .zakat-submit-button {
+        min-height: 46px;
+        font-size: var(--fs-xxs);
+    }
+
+    .zakat-result-area {
+        gap: var(--space-4, 16px);
+    }
+
+    .zakat-result-card {
+        padding: var(--space-5, 20px);
+    }
+
+    .zakat-result-header {
+        flex-direction: row;
+        margin-bottom: var(--space-5, 20px);
+        padding-bottom: var(--space-4, 16px);
+    }
+
+    .zakat-result-header h2 {
+        font-size: var(--fs-xs);
+    }
+
+    .zakat-result-badge {
+        font-size: 10px;
+        min-width: 44px;
+        height: 26px;
+    }
+
+    .zakat-result-title {
+        font-size: var(--fs-xxs);
+    }
+
+    .zakat-result-amount {
+        font-size: clamp(24px, 6vw, 30px);
+    }
+
+    .zakat-empty-state {
+        min-height: 200px;
+    }
+
+    .zakat-empty-state i {
+        font-size: 32px;
+    }
+
+    .zakat-empty-state p {
+        font-size: var(--fs-xxs);
+        max-width: 100%;
+    }
+
+    .zakat-result-row {
+        font-size: var(--fs-xxs);
+        padding: var(--space-2, 8px) 0;
+    }
+
+    .zakat-result-row.total strong {
+        font-size: var(--fs-xxs);
+    }
+
+    .zakat-law-card {
+        gap: var(--space-2, 8px);
+        margin-top: var(--space-4, 16px);
+        padding-top: var(--space-4, 16px);
+    }
+
+    .zakat-law-card i {
+        font-size: var(--fs-xs);
+    }
+
+    .zakat-law-card h4 {
+        font-size: var(--fs-xxs);
+    }
+
+    .zakat-law-card p {
+        font-size: var(--fs-xxs);
+    }
+
+    .zakat-action-card {
+        padding: var(--space-5, 20px);
+    }
+
+    .zakat-action-card h3 {
+        font-size: var(--fs-xs);
+    }
+
+    .zakat-action-card p {
+        font-size: var(--fs-xxs);
+        margin-bottom: var(--space-4, 16px);
+    }
+
+    .zakat-pay-button,
+    .zakat-print-button {
+        min-height: 42px;
+        font-size: var(--fs-xxs);
+    }
+
+    .z-terms-section {
+        padding: var(--space-11, 44px) 0;
+    }
+
+    .z-terms-heading {
+        margin-bottom: var(--space-7, 28px);
+    }
+
+    .z-terms-heading h2 {
+        font-size: var(--fs-sm);
+    }
+
+    .z-terms-heading p {
+        font-size: var(--fs-xxs);
+    }
+
     .z-terms-list {
         grid-template-columns: 1fr;
+        gap: var(--space-4, 16px);
     }
-    .zakat-panel,
+
+    .z-term-row {
+        gap: var(--space-3, 12px);
+    }
+
+    .z-term-row i {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+        margin-top: 1px;
+    }
+
+    .z-term-row strong {
+        font-size: var(--fs-xxs);
+    }
+
+    .z-term-row p {
+        font-size: var(--fs-xxs);
+    }
+}
+
+/* ============================
+   EXTRA SMALL (<= 400px)
+   ============================ */
+@media (max-width: 400px) {
+    .z-hero-copy h1 {
+        font-size: clamp(20px, 5vw, 26px);
+    }
+
     .z-ledger {
-        padding: var(--space-5, 20px);
+        padding: var(--space-4, 16px);
+    }
+
+    .zakat-tab {
+        padding: var(--space-2, 6px) 0 var(--space-2, 8px);
+    }
+
+    .zakat-tab-content strong {
+        font-size: 10px;
+    }
+
+    .zakat-tab i {
+        font-size: 14px;
+    }
+
+    .zakat-result-card {
+        padding: var(--space-4, 16px);
+    }
+
+    .zakat-result-amount {
+        font-size: clamp(20px, 5vw, 24px);
+    }
+
+    .zakat-action-card {
+        padding: var(--space-4, 16px);
+    }
+
+    .zakat-pay-button,
+    .zakat-print-button {
+        min-height: 38px;
+        font-size: 10px;
     }
 }

@@ -863,7 +863,7 @@ textarea.form-control,
 
 @media (max-width: 768px) {
     .floating-wa-container {
-        bottom: 20px;
+        bottom: 70px;
         right: 20px;
     }
     
