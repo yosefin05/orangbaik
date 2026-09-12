@@ -17,18 +17,6 @@
 
 @include('components.header')
 
-@php
-    $legalities = [
-        ['image' => 'assets/legal-1.png', 'name' => 'Legalitas 1'],
-        ['image' => 'assets/legal-2.png', 'name' => 'Legalitas 2'],
-        ['image' => 'assets/legal-3.png', 'name' => 'Legalitas 3'],
-        ['image' => 'assets/legal-4.png', 'name' => 'Legalitas 4'],
-        ['image' => 'assets/legal-5.png', 'name' => 'Legalitas 5'],
-    ];
-
-    $years = ['2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016'];
-@endphp
-
 <main class="about-page">
 
     {{-- HERO --}}
@@ -146,20 +134,33 @@
             </div>
 
             <div class="about-legal-grid">
-                @foreach ($legalities as $index => $legal)
+                @forelse ($legalities as $index => $legal)
                     <article class="about-legal-card">
                         <span class="about-legal-index">{{ sprintf('%02d', $index + 1) }}</span>
 
-                        <img
-                            src="{{ asset($legal['image']) }}"
-                            alt="{{ $legal['name'] }}">
+                        @if(method_exists($legal, 'isImage') && $legal->isImage())
+                            <img src="{{ asset('storage/' . $legal->file_path) }}" alt="{{ $legal->judul }}">
+                        @elseif(is_array($legal) && isset($legal['image']))
+                            <img src="{{ asset($legal['image']) }}" alt="{{ $legal['name'] }}">
+                        @else
+                            <div style="height: 120px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 8px; font-size: 2.5rem; color: #3365af;">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                            </div>
+                        @endif
 
-                        <a href="#">
+                        <h4 style="font-size:0.95rem; font-weight:700; margin:8px 0 4px; color:#0f172a;">{{ is_object($legal) ? $legal->judul : $legal['name'] }}</h4>
+                        @if(is_object($legal) && $legal->nomor_legalitas)
+                            <p style="font-size:0.75rem; color:#64748b; margin-bottom:8px;">{{ $legal->nomor_legalitas }}</p>
+                        @endif
+
+                        <a href="{{ is_object($legal) ? asset('storage/' . $legal->file_path) : '#' }}" target="_blank" rel="noopener">
                             <span>Lihat Izin</span>
                             <i class="bi bi-arrow-up-right"></i>
                         </a>
                     </article>
-                @endforeach
+                @empty
+                    <p class="text-muted text-center py-4" style="grid-column: 1/-1;">Belum ada data legalitas yang ditampilkan.</p>
+                @endforelse
             </div>
 
         </div>
@@ -178,28 +179,60 @@
                 </p>
             </div>
 
-            <div class="about-year-tabs">
-                @foreach ($years as $index => $year)
-                    <button
-                        class="{{ $index === 0 ? 'active' : '' }}"
-                        type="button">
-                        {{ $year }}
-                    </button>
+            @if(isset($reports) && $reports->isNotEmpty())
+                <div class="about-year-tabs" id="reportYearTabs">
+                    @foreach ($reports as $index => $rep)
+                        <button
+                            class="report-tab-btn {{ $index === 0 ? 'active' : '' }}"
+                            type="button"
+                            data-target="report-file-{{ $rep->id }}">
+                            {{ $rep->tahun }}
+                        </button>
+                    @endforeach
+                </div>
+
+                @foreach ($reports as $index => $rep)
+                    <a href="{{ asset('storage/' . $rep->file_path) }}" target="_blank" rel="noopener" class="about-report-link report-file-item" id="report-file-{{ $rep->id }}" style="{{ $index === 0 ? '' : 'display:none;' }}">
+                        <span class="about-report-icon">
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                        </span>
+
+                        <div>
+                            <strong style="display:block;">{{ $rep->judul }}</strong>
+                            <span style="font-size:0.8125rem; color:#64748b;">Tahun {{ $rep->tahun }} {{ $rep->deskripsi ? '— ' . $rep->deskripsi : '' }}</span>
+                        </div>
+
+                        <i class="bi bi-download ms-auto" style="font-size:1.25rem;"></i>
+                    </a>
                 @endforeach
-            </div>
-
-            <a href="#" class="about-report-link">
-                <span class="about-report-icon">
-                    <i class="bi bi-file-earmark-text-fill"></i>
-                </span>
-
-                <strong>Laporan Keuangan 2025</strong>
-
-                <i class="bi bi-chevron-right"></i>
-            </a>
+            @else
+                <p class="text-muted text-center py-3">Belum ada laporan keuangan yang diunggah.</p>
+            @endif
 
         </div>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.report-tab-btn');
+            const items = document.querySelectorAll('.report-file-item');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    items.forEach(i => i.style.display = 'none');
+
+                    this.classList.add('active');
+                    const targetId = this.getAttribute('data-target');
+                    const targetEl = document.getElementById(targetId);
+                    if (targetEl) {
+                        targetEl.style.display = 'flex';
+                    }
+                });
+            });
+        });
+    </script>
+
 
     {{-- LOKASI & KONTAK (+ MAPS, dari Pusat Bantuan) --}}
     <section class="about-section about-location-section">

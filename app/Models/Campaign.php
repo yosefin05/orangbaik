@@ -215,19 +215,32 @@ class Campaign extends Model
         return $this->custom_slug ?? $this->slug;
     }
 
-    public function getTotalDonasi()
+    /**
+     * Total nominal donasi yang sudah SETTLEMENT (uang yang benar-benar diterima).
+     */
+    public function getTotalDonasiSuccess(): int
     {
-        return $this->donasi()->sum('nominal');
+        return (int) $this->donasi()
+            ->whereHas('pembayaran', fn($q) => $q->where('transaction_status', 'settlement'))
+            ->sum('nominal');
     }
 
-    public function getTotalDonasiSuccess()
+    /**
+     * Alias backward-compat — selalu settlement.
+     */
+    public function getTotalDonasi(): int
     {
-        return $this->donasi()->where('status', 'success')->sum('nominal');
+        return $this->getTotalDonasiSuccess();
     }
 
-    public function getDonaturCount()
+    /**
+     * Jumlah donatur unik yang pembayarannya sudah SETTLEMENT.
+     */
+    public function getDonaturCount(): int
     {
-        return $this->donasi()->where('status', 'success')->count();
+        return (int) $this->donasi()
+            ->whereHas('pembayaran', fn($q) => $q->where('transaction_status', 'settlement'))
+            ->count();
     }
 
     public function getProgressPercentage(): float

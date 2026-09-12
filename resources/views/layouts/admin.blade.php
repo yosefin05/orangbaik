@@ -78,6 +78,9 @@
                     class="{{ request()->routeIs('admin.penggalang_dana.*') ? 'active' : '' }}">
                     <i class="bi bi-people"></i>
                     <span>Penggalang Dana</span>
+                    @if(isset($adminNavBadges['penggalang']) && $adminNavBadges['penggalang'] > 0)
+                        <span class="badge badge-red ms-auto">{{ $adminNavBadges['penggalang'] }}</span>
+                    @endif
                 </a>
 
                 {{-- Campaign --}}
@@ -85,6 +88,9 @@
                     class="{{ request()->routeIs('admin.campaign.*') ? 'active' : '' }}">
                     <i class="bi bi-megaphone"></i>
                     <span>Campaign</span>
+                    @if(isset($adminNavBadges['campaign']) && $adminNavBadges['campaign'] > 0)
+                        <span class="badge badge-yellow ms-auto">{{ $adminNavBadges['campaign'] }}</span>
+                    @endif
                 </a>
 
                 {{-- Berita --}}
@@ -99,6 +105,9 @@
                     class="{{ request()->routeIs('admin.komentar.*') ? 'active' : '' }}">
                     <i class="bi bi-chat-dots"></i>
                     <span>Komentar</span>
+                    @if(isset($adminNavBadges['komentar']) && $adminNavBadges['komentar'] > 0)
+                        <span class="badge badge-blue ms-auto">{{ $adminNavBadges['komentar'] }}</span>
+                    @endif
                 </a>
 
                 {{-- DONASI --}}
@@ -106,6 +115,9 @@
                     class="{{ request()->routeIs('admin.donasi.*') ? 'active' : '' }}">
                     <i class="bi bi-wallet2"></i>
                     <span>Donasi</span>
+                    @if(isset($adminNavBadges['manual_transfer']) && $adminNavBadges['manual_transfer'] > 0)
+                        <span class="badge badge-orange ms-auto">{{ $adminNavBadges['manual_transfer'] }}</span>
+                    @endif
                 </a>
 
                 {{-- PAYMENT --}}
@@ -129,6 +141,20 @@
                     <span>Testimoni</span>
                 </a>
 
+                {{-- Legalitas --}}
+                <a href="{{ route('admin.legalitas.index') }}"
+                    class="{{ request()->routeIs('admin.legalitas.*') ? 'active' : '' }}">
+                    <i class="bi bi-patch-check"></i>
+                    <span>Legalitas</span>
+                </a>
+
+                {{-- Laporan Keuangan --}}
+                <a href="{{ route('admin.laporan-keuangan.index') }}"
+                    class="{{ request()->routeIs('admin.laporan-keuangan.*') ? 'active' : '' }}">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    <span>Laporan Keuangan</span>
+                </a>
+
                 {{-- Syarat & Ketentuan --}}
                 <a href="{{ route('admin.syarat-ketentuan.index') }}"
                     class="{{ request()->routeIs('admin.syarat-ketentuan.*') ? 'active' : '' }}">
@@ -142,6 +168,7 @@
                     <i class="bi bi-question-circle"></i>
                     <span>FAQ</span>
                 </a>
+
 
             </nav>
 

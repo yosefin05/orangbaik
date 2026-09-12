@@ -263,8 +263,9 @@
                                 </span>
                             </div>
                             <div class="donate-button-wrapper">
-                                <a href="{{ route('donasi.create', $campaign->slug) }}" class="donate-button">Donasi
+                                <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}" class="donate-button">Donasi
                                     Sekarang</a>
+
                             </div>
                         </div>
 
@@ -427,10 +428,11 @@
                     <span class="mobile-cta-label">Terkumpul</span>
                     <strong class="mobile-cta-val">Rp {{ number_format($totalTerkumpul ?? 0, 0, ',', '.') }}</strong>
                 </div>
-                <a href="{{ route('donasi.bayar', $campaign->slug) }}" class="btn-mobile-donate">
+                <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}" class="btn-mobile-donate">
                     <span>Donasi Sekarang</span>
                     <i class="bi bi-heart-fill"></i>
                 </a>
+
             </div>
 
         </main>

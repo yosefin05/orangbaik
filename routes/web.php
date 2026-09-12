@@ -15,7 +15,8 @@ use App\Http\Controllers\User\{
     FundraiserController,
     SearchController,
     RiwayatDonasiController,
-    PageController
+    PageController,
+    PenggalangDashboardController
 };
 use App\Http\Controllers\{
     MidtransController,
@@ -85,7 +86,6 @@ Route::post('/donasi/instruksi/{pembayaran}/upload-bukti', [DonasiController::cl
 Route::get('/donasi/status/{status}', [DonasiController::class, 'status'])->name('donasi.status');
 
 // Static pages
-Route::view('/donasi/bayar', 'pages.donasi-bayar')->name('donasi.bayar');
 Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');
 Route::get('/syarat-ketentuan', [PageController::class, 'syaratKetentuan'])->name('syarat.ketentuan');
 Route::get('/pusat-bantuan', [PageController::class, 'pusatBantuan'])->name('pusat.bantuan');
@@ -97,6 +97,9 @@ Route::get('/profil-penggalang/{id}', [PenggalangDanaController::class, 'profile
 // AUTHENTICATED ROUTES (BUTUH LOGIN, TAPI BELUM TENTU VERIFIED)
 // ============================================================
 Route::middleware('auth')->group(function () {
+
+    // Dashboard Penggalang Dana
+    Route::get('/penggalang/dashboard', [PenggalangDashboardController::class, 'index'])->name('penggalang.dashboard');
 
     // Set intended URL
     Route::post('/set-intended-url', function (Request $request) {

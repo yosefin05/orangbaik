@@ -5,6 +5,8 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Faq;
 use App\Models\SyaratKetentuan;
+use App\Models\Legalitas;
+use App\Models\LaporanKeuangan;
 
 class PageController extends Controller
 {
@@ -26,7 +28,10 @@ class PageController extends Controller
     public function tentang()
     {
         $faqs = Faq::aktif()->get();
+        $legalities = Legalitas::aktif()->get();
+        $reports = LaporanKeuangan::aktif()->get();
 
-        return view('pages.tentang', compact('faqs'));
+        return view('pages.tentang', compact('faqs', 'legalities', 'reports'));
     }
 }
+

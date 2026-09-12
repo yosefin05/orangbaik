@@ -52,8 +52,9 @@
                     </div>
                     <div class="penggalang-actions">
                         @php
-                            $canCreateCampaign = auth()->user()->penggalangDana?->status === 'approved';
+                            $canCreateCampaign = auth()->user()?->penggalangDana?->status === 'approved';
                         @endphp
+
 
                         {{-- 🔥 BADGE STATUS: HANYA TAMPIL KALAU BELUM APPROVED --}}
                         @if($penggalang->status !== 'approved')

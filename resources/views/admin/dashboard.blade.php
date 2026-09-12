@@ -32,15 +32,74 @@
     </section>
 
     {{-- ========================================================== --}}
-    {{-- STATISTIK                                                  --}}
+    {{-- STATISTIK KEUANGAN & PEMBAYARAN                            --}}
     {{-- ========================================================== --}}
     <section class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon icon-green">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div>
+                <p class="stat-label">Total Dana Terkumpul (Lunas)</p>
+                <h3 class="stat-value text-green">Rp {{ number_format($totalSettlementAmount, 0, ',', '.') }}</h3>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-gold">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div>
+                <p class="stat-label">Transaksi Settlement (Lunas)</p>
+                <h3 class="stat-value text-gold">{{ $settlementTransaksi }}</h3>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-orange">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div>
+                <p class="stat-label">Transaksi Pending</p>
+                <h3 class="stat-value text-orange">{{ $pendingTransaksi }}</h3>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-red">
+                <div class="bi bi-x-circle-fill"></div>
+            </div>
+            <div>
+                <p class="stat-label">Transaksi Gagal / Expired</p>
+                <h3 class="stat-value text-red">{{ $failedTransaksi }}</h3>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-blue">
+                <i class="bi bi-megaphone"></i>
+            </div>
+            <div>
+                <p class="stat-label">Total Campaign</p>
+                <h3 class="stat-value text-blue">{{ $totalCampaign }}</h3>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-purple">
+                <i class="bi bi-people"></i>
+            </div>
+            <div>
+                <p class="stat-label">Total Penggalang Dana</p>
+                <h3 class="stat-value text-purple">{{ $totalPenggalangDana }}</h3>
+            </div>
+        </div>
 
         <div class="stat-card">
             <div class="stat-icon icon-purple">
                 <i class="bi bi-person"></i>
             </div>
-
             <div>
                 <p class="stat-label">Total User</p>
                 <h3 class="stat-value text-purple">{{ $totalUser }}</h3>
@@ -51,58 +110,14 @@
             <div class="stat-icon icon-red">
                 <i class="bi bi-shield-check"></i>
             </div>
-
             <div>
                 <p class="stat-label">Total Admin</p>
                 <h3 class="stat-value text-red">{{ $totalAdmin }}</h3>
             </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-icon icon-green">
-                <i class="bi bi-people"></i>
-            </div>
-
-            <div>
-                <p class="stat-label">Total Penggalang Dana</p>
-                <h3 class="stat-value text-green">{{ $totalPenggalangDana }}</h3>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon icon-blue">
-                <i class="bi bi-megaphone"></i>
-            </div>
-
-            <div>
-                <p class="stat-label">Total Campaign</p>
-                <h3 class="stat-value text-blue">{{ $totalCampaign }}</h3>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon icon-gold">
-                <i class="bi bi-wallet2"></i>
-            </div>
-
-            <div>
-                <p class="stat-label">Total Donasi</p>
-                <h3 class="stat-value text-gold">{{ $totalDonasi }}</h3>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon icon-orange">
-                <i class="bi bi-newspaper"></i>
-            </div>
-
-            <div>
-                <p class="stat-label">Total Berita</p>
-                <h3 class="stat-value text-orange">{{ $totalBerita }}</h3>
-            </div>
-        </div>
-
     </section>
+
 
     {{-- ========================================================== --}}
     {{-- MENU MANAJEMEN                                             --}}

@@ -15,6 +15,8 @@ use App\Http\Controllers\admin\PaymentGatewayController;
 use App\Http\Controllers\admin\PaymentChannelController;
 use App\Http\Controllers\admin\SyaratKetentuanController;
 use App\Http\Controllers\admin\FaqController;
+use App\Http\Controllers\admin\LegalitasController;
+use App\Http\Controllers\admin\LaporanKeuanganController;
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -82,6 +84,14 @@ Route::middleware(['auth', 'admin'])
             ->except(['show']);
         Route::resource('faq', FaqController::class)
             ->except(['show']);
+
+        // Legalitas
+        Route::patch('legalitas/{legalita}/toggle', [LegalitasController::class, 'toggleActive'])->name('legalitas.toggle');
+        Route::resource('legalitas', LegalitasController::class)->except(['show']);
+
+        // Laporan Keuangan
+        Route::patch('laporan-keuangan/{laporan_keuangan}/toggle', [LaporanKeuanganController::class, 'toggleActive'])->name('laporan-keuangan.toggle');
+        Route::resource('laporan-keuangan', LaporanKeuanganController::class)->except(['show']);
 
         Route::get('donasi/export', [DonasiController::class, 'export'])->name('donasi.export');
         Route::patch('donasi/{donasi}/approve-manual', [DonasiController::class, 'approveManual'])->name('donasi.approve-manual');

@@ -24,7 +24,7 @@ class DonasiController extends Controller
     }
 
     /**
-     * Menampilkan halaman form donasi beserta pilihan payment channel
+     * Menampilkan halaman form donasi beserta pilihan payment channel.
      */
     public function create($slug)
     {
@@ -36,6 +36,11 @@ class DonasiController extends Controller
                 'donasi.pembayaran',
             ])
             ->firstOrFail();
+
+        // Hanya kampanye aktif yang bisa didonasi
+        if (!$campaign->is_active) {
+            abort(404, 'Campaign ini tidak menerima donasi saat ini.');
+        }
 
         $totalTerkumpul = $campaign->donasi
             ->filter(fn($d) => $d->pembayaran && $d->pembayaran->transaction_status === 'settlement')
@@ -59,20 +64,15 @@ class DonasiController extends Controller
     }
 
     /**
-     * Menyimpan data donasi & membuat transaksi pembayaran di gateway yang sesuai
+     * Menyimpan data donasi & membuat transaksi pembayaran di gateway yang sesuai.
+     * Nominal sudah di-merge oleh DonasiRequest::prepareForValidation().
+     * is_anonim sudah di-merge dari anonymous_donor/anonymous_message.
      */
     public function store(DonasiRequest $request, $slug)
     {
         $campaign = Campaign::where('slug', $slug)
             ->orWhere('custom_slug', $slug)
             ->firstOrFail();
-
-        $referralCode = $request->input('ref')
-            ?: session('campaign_referral.' . $campaign->id);
-        $fundraiserId = Campaign_Fundraiser::where('campaign_id', $campaign->id)
-            ->where('referral_code', $referralCode)
-            ->where('status', 'active')
-            ->value('id');
 
         // ============================================================
         // 1. CEK STATUS CAMPAIGN
@@ -85,7 +85,22 @@ class DonasiController extends Controller
         }
 
         // ============================================================
-        // 2. AMBIL PAYMENT CHANNEL
+        // 2. VALIDASI NOMINAL TERHADAP CAMPAIGN MINIMAL
+        // ============================================================
+        $nominal = (int) $request->nominal;
+        $minimalDonasi = (int) ($campaign->minimal_donasi ?? 1000);
+
+        if ($nominal < $minimalDonasi) {
+            return response()->json([
+                'success' => false,
+                'errors'  => [
+                    'nominal' => ["Minimal donasi untuk campaign ini adalah Rp " . number_format($minimalDonasi, 0, ',', '.')],
+                ],
+            ], 422);
+        }
+
+        // ============================================================
+        // 3. AMBIL PAYMENT CHANNEL
         // ============================================================
         $channelId = $request->payment_channel_id;
         $channel = PaymentChannel::with('gateway')->findOrFail($channelId);
@@ -97,41 +112,56 @@ class DonasiController extends Controller
             ], 422);
         }
 
-        // Tentukan nama donatur
-        $isAnonim = $request->boolean('is_anonim', false);
-        $namaDonatur = $isAnonim ? 'Hamba Allah' : ($request->nama_donatur ?: (auth()->user()?->name ?? 'Hamba Allah'));
-        $nominal = (int) $request->nominal;
+        // ============================================================
+        // 4. TENTUKAN IDENTITAS DONATUR
+        // ============================================================
+        $isAnonim = (bool) $request->is_anonim; // sudah di-merge oleh DonasiRequest
+
+        if ($isAnonim) {
+            $namaDonatur = 'Hamba Allah';
+        } else {
+            $namaDonatur = $request->nama_donatur
+                ?: (auth()->user()?->name ?? 'Hamba Allah');
+        }
+
+        // Referral fundraiser
+        $referralCode = $request->input('ref')
+            ?: session('campaign_referral.' . $campaign->id);
+        $fundraiserId = Campaign_Fundraiser::where('campaign_id', $campaign->id)
+            ->where('referral_code', $referralCode)
+            ->where('status', 'active')
+            ->value('id');
 
         // ============================================================
-        // 3. BUAT DATA DONASI & PEMBAYARAN
+        // 5. BUAT DATA DONASI & PEMBAYARAN
         // ============================================================
         DB::beginTransaction();
 
         try {
             $donasi = Donasi::create([
-                'campaign_id' => $campaign->id,
-                'fundraiser_id' => $fundraiserId,
-                'user_id' => auth()->id(),
+                'campaign_id'  => $campaign->id,
+                'fundraiser_id'=> $fundraiserId,
+                'user_id'      => auth()->id(),
                 'nama_donatur' => $namaDonatur,
-                'email' => auth()->user()?->email ?? null,
-                'no_hp' => $request->no_hp,
-                'nominal' => $nominal,
-                'pesan_doa' => $request->pesan,
-                'is_anonim' => $isAnonim,
+                'email'        => auth()->user()?->email ?? null,
+                'no_hp'        => $request->no_hp,
+                'nominal'      => $nominal,
+                'pesan_doa'    => $request->pesan,
+                'is_anonim'    => $isAnonim,
             ]);
 
             $orderId = $this->generateOrderId($donasi);
 
             $pembayaran = Pembayaran::create([
-                'donasi_id' => $donasi->id,
+                'donasi_id'          => $donasi->id,
                 'payment_channel_id' => $channel->id,
-                'order_id' => $orderId,
-                'payment_type' => $channel->payment_type ?? 'instant',
+                'order_id'           => $orderId,
+                'payment_type'       => $channel->payment_type ?? 'instant',
                 'transaction_status' => 'pending',
             ]);
 
             // ============================================================
-            // 4. ROUTING DINAMIS VIA DRIVER PATTERN
+            // 6. ROUTING DINAMIS VIA DRIVER PATTERN
             // ============================================================
             $driver = $this->gatewayManager->driver($channel->gateway);
             $result = $driver->createTransaction($donasi, $pembayaran, $channel);
@@ -143,18 +173,21 @@ class DonasiController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Donasi store error', [
-                'message' => $e->getMessage(),
+                'message'    => $e->getMessage(),
                 'channel_id' => $channelId,
+                'campaign'   => $campaign->id,
             ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage(),
+                'message' => 'Gagal memproses pembayaran. Silakan coba lagi atau hubungi admin.',
             ], 500);
         }
     }
 
     /**
-     * Halaman instruksi pembayaran (VA / Transfer Manual)
+     * Halaman instruksi pembayaran (VA / Transfer Manual).
+     * Authorization: guest dapat melihat jika pembayaran tidak punya user_id,
+     * user terautentikasi hanya boleh melihat miliknya.
      */
     public function instruksi(Pembayaran $pembayaran)
     {
@@ -166,20 +199,53 @@ class DonasiController extends Controller
             abort(404, 'Data donasi tidak ditemukan.');
         }
 
+        // Authorization: jika donasi punya user_id, hanya user tersebut yang boleh lihat
+        if ($donasi->user_id !== null && auth()->id() !== $donasi->user_id) {
+            // Admin boleh akses melalui admin area
+            if (!auth()->user()?->isAdmin()) {
+                abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+            }
+        }
+
         return view('pages.donasi-instruksi', compact('pembayaran', 'donasi'));
     }
 
     /**
-     * Upload bukti transfer donasi manual oleh donatur
+     * Upload bukti transfer donasi manual oleh donatur.
+     * Authorization: hanya owner donasi atau admin yang boleh upload.
      */
     public function uploadBukti(Request $request, Pembayaran $pembayaran)
     {
+        $pembayaran->load('donasi');
+        $donasi = $pembayaran->donasi;
+
+        if (!$donasi) {
+            abort(404, 'Data donasi tidak ditemukan.');
+        }
+
+        // Authorization check
+        if ($donasi->user_id !== null && auth()->id() !== $donasi->user_id) {
+            if (!auth()->user()?->isAdmin()) {
+                abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+            }
+        }
+
+        // Jangan izinkan upload jika sudah settlement
+        if ($pembayaran->transaction_status === 'settlement') {
+            return back()->with('error', 'Pembayaran ini sudah lunas, bukti transfer tidak perlu diunggah.');
+        }
+
         $request->validate([
-            'bukti_transfer' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'bukti_transfer' => [
+                'required',
+                'file',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
         ], [
             'bukti_transfer.required' => 'Pilih file bukti transfer terlebih dahulu.',
-            'bukti_transfer.image' => 'File harus berupa gambar (JPG, PNG, WEBP).',
-            'bukti_transfer.max' => 'Ukuran file maksimal 5MB.',
+            'bukti_transfer.mimes'    => 'File harus berupa gambar (JPG, PNG, WEBP).',
+            'bukti_transfer.max'      => 'Ukuran file maksimal 5MB.',
         ]);
 
         try {
@@ -190,22 +256,22 @@ class DonasiController extends Controller
         } catch (\Exception $e) {
             Log::error('Upload bukti transfer gagal', [
                 'pembayaran_id' => $pembayaran->id,
-                'error' => $e->getMessage(),
+                'error'         => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Gagal mengunggah bukti transfer: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengunggah bukti transfer. Silakan coba lagi.');
         }
     }
 
     /**
-     * Halaman status pembayaran (sukses, pending, gagal)
+     * Halaman status pembayaran (sukses, pending, gagal).
      */
     public function status($status)
     {
         $statusLabels = [
-            'sukses' => ['title' => 'Pembayaran Berhasil', 'icon' => 'bi-check-circle-fill', 'color' => 'text-green'],
-            'pending' => ['title' => 'Pembayaran Menunggu', 'icon' => 'bi-hourglass-split', 'color' => 'text-orange'],
-            'gagal' => ['title' => 'Pembayaran Gagal', 'icon' => 'bi-x-circle-fill', 'color' => 'text-red'],
+            'sukses'  => ['title' => 'Pembayaran Berhasil',  'icon' => 'bi-check-circle-fill',  'color' => 'text-green'],
+            'pending' => ['title' => 'Pembayaran Menunggu',  'icon' => 'bi-hourglass-split',     'color' => 'text-orange'],
+            'gagal'   => ['title' => 'Pembayaran Gagal',     'icon' => 'bi-x-circle-fill',       'color' => 'text-red'],
         ];
 
         $info = $statusLabels[$status] ?? $statusLabels['pending'];
@@ -214,14 +280,14 @@ class DonasiController extends Controller
     }
 
     /**
-     * Generate Order ID unik untuk donasi
+     * Generate Order ID unik untuk donasi.
      * Format: OB-YYYYMMDD-DONASI_ID-RANDOM
      */
     protected function generateOrderId(Donasi $donasi): string
     {
         $prefix = config('payment.order_id_prefix', 'OB');
-        $date = now()->format('Ymd');
-        $rand = strtoupper(substr(md5(uniqid()), 0, 4));
+        $date   = now()->format('Ymd');
+        $rand   = strtoupper(substr(md5(uniqid()), 0, 4));
 
         return sprintf('%s-%s-%d-%s', $prefix, $date, $donasi->id, $rand);
     }

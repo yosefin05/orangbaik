@@ -36,6 +36,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Donasi::class);
     }
 
+    /**
+     * Cek apakah user adalah admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
     public function hasVerifiedEmail()
     {
         return !is_null($this->email_verified_at);

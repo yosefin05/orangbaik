@@ -3,17 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Nominal Donasi - OrangBaik.id</title>
+    <title>Donasi - {{ $campaign->judul }} - OrangBaik.id</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/donasi-bayar.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
+        :root {
+            --primary-color: #3365af;
+            --primary-dark: #244980;
+            --primary-light: #eff6ff;
+        }
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
         .payment-channels-section {
             background: #ffffff;
             border-radius: 16px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
         .group-heading {
             font-size: 0.9375rem;
@@ -46,17 +57,17 @@
             background: #ffffff;
         }
         .channel-item:hover {
-            border-color: #cbd5e1;
+            border-color: #93c5fd;
             background: #f8fafc;
         }
         .channel-item.selected,
         .channel-item input[type="radio"]:checked ~ .channel-item-content {
-            border-color: #2563eb;
-            background: #eff6ff;
+            border-color: var(--primary-color);
+            background: var(--primary-light);
         }
         .channel-item input[type="radio"] {
             margin-right: 0.75rem;
-            accent-color: #2563eb;
+            accent-color: var(--primary-color);
             width: 18px;
             height: 18px;
         }
@@ -92,6 +103,12 @@
             background: #dbeafe;
             color: #1d4ed8;
         }
+        .error-text {
+            color: #dc2626;
+            font-size: 0.8125rem;
+            margin-top: 0.375rem;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -100,46 +117,48 @@
     <div class="payment-container">
 
         <button class="back-button" type="button" onclick="history.back()">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M15 18L9 12L15 6" />
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             </svg>
-            <span>Kembali</span>
+            <span>Kembali ke Detail Campaign</span>
         </button>
 
-        {{-- FORM --}}
+        {{-- FORM DONASI --}}
         <form class="payment-layout" id="donasiForm">
             @csrf
 
-            {{-- LEFT --}}
+            {{-- LEFT COLUMN --}}
             <section class="payment-left">
 
+                {{-- 1. CAMPAIGN SUMMARY CARD --}}
                 <article class="campaign-mini-card">
                     <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}">
                     <div class="campaign-mini-body">
                         <h1>{{ $campaign->judul }}</h1>
                         <p>
-                            {{ $campaign->penggalangDana->nama ?? 'Penggalang' }}
-                            <span>●</span>
+                            <i class="bi bi-patch-check-fill text-primary"></i>
+                            {{ $campaign->penggalangDana->nama_penggalang ?? 'Penggalang Dana' }}
                         </p>
 
                         <div class="mini-amount">
                             <strong>Rp {{ number_format($totalTerkumpul, 0, ',', '.') }}</strong>
-                            <span>Terkumpul</span>
+                            <span>terkumpul dari Rp {{ $campaign->target_donasi ? number_format($campaign->target_donasi, 0, ',', '.') : '∞' }}</span>
                         </div>
 
                         <div class="mini-progress">
-                            <div style="width: {{ $campaign->target > 0 ? min(($totalTerkumpul / $campaign->target) * 100, 100) : 0 }}%;"></div>
+                            <div style="width: {{ $campaign->target_donasi > 0 ? min(($totalTerkumpul / $campaign->target_donasi) * 100, 100) : 0 }}%;"></div>
                         </div>
 
                         <div class="mini-meta">
-                            <span>{{ $jumlahDonatur }} donatur</span>
-                            <span>{{ $campaign->target ? 'Rp ' . number_format($campaign->target, 0, ',', '.') : '∞' }}</span>
+                            <span><i class="bi bi-people"></i> {{ $jumlahDonatur }} Donatur</span>
+                            <span><i class="bi bi-calendar-event"></i> {{ $campaign->tanggal_berakhir ? $campaign->tanggal_berakhir->format('d M Y') : 'Tanpa batas waktu' }}</span>
                         </div>
                     </div>
                 </article>
 
+                {{-- 2. NOMINAL DONATION SECTION --}}
                 <section class="nominal-section">
-                    <h2>Masukkan Nominal Donasi</h2>
+                    <h2>Pilih Nominal Donasi</h2>
 
                     <div class="nominal-list">
                         @forelse ($campaign->packages as $index => $package)
@@ -150,7 +169,7 @@
                                     value="{{ $package->nominal }}"
                                     {{ $index === 0 ? 'checked' : '' }}
                                 >
-                                <span class="nominal-emoji">{{ $package->emoji ?? '💰' }}</span>
+                                <span class="nominal-emoji">{{ $package->emoji ?? '🎁' }}</span>
                                 <strong>Rp {{ number_format($package->nominal, 0, ',', '.') }}</strong>
                             </label>
                         @empty
@@ -178,7 +197,7 @@
                     </div>
 
                     <div class="custom-nominal-card">
-                        <h3>Masukkan Donasi Lainnya</h3>
+                        <h3>Atau Masukkan Nominal Lainnya</h3>
 
                         <div class="custom-input-wrap">
                             <span>Rp</span>
@@ -187,17 +206,19 @@
                                 name="nominal_lainnya"
                                 id="nominal_lainnya"
                                 placeholder="0"
-                                min="{{ $campaign->minimal_donasi ?? 5000 }}"
+                                min="{{ $campaign->minimal_donasi ?? 1000 }}"
                                 value="{{ old('nominal_lainnya') }}"
                             >
                         </div>
 
-                        <p>Min. Donasi sebesar Rp {{ number_format($campaign->minimal_donasi ?? 5000, 0, ',', '.') }}</p>
+                        <p class="mt-2 text-muted" style="font-size:0.8125rem;">
+                            Minimal donasi sebesar Rp {{ number_format($campaign->minimal_donasi ?? 1000, 0, ',', '.') }}
+                        </p>
                         <div id="error-nominal" class="error-text" style="display:none;"></div>
                     </div>
                 </section>
 
-                {{-- METODE PEMBAYARAN --}}
+                {{-- 3. PAYMENT METHOD SECTION --}}
                 <section class="payment-channels-section">
                     <h2>Pilih Metode Pembayaran</h2>
                     <div id="error-payment_channel_id" class="error-text" style="display:none; margin-bottom: 0.75rem;"></div>
@@ -240,17 +261,20 @@
                     @endif
                 </section>
 
+                {{-- 4. DONOR INFORMATION SECTION --}}
                 <section class="donor-card">
+                    <h2>Data Donatur</h2>
                     <p class="donor-title">
                         @if(auth()->check())
-                            <span>Donasi sebagai <strong id="donorNameDisplay">{{ auth()->user()->name }}</strong></span>
+                            <span>Berdonasi sebagai <strong id="donorNameDisplay">{{ auth()->user()->name }}</strong></span>
                         @else
-                            <a href="{{ route('login') }}">Masuk</a> atau lengkapi data di bawah ini
+                            <span>Lengkapi data di bawah ini atau <a href="{{ route('login') }}" style="color:#3365af; font-weight:600;">Masuk Akun</a></span>
                         @endif
                     </p>
 
                     <div class="donor-input-group">
                         <div>
+                            <label for="nama_donatur" style="font-size:0.8125rem; font-weight:600; color:#334155; margin-bottom:4px; display:block;">Nama Lengkap</label>
                             <input
                                 type="text"
                                 name="nama_donatur"
@@ -263,45 +287,48 @@
                         </div>
 
                         <div>
+                            <label for="no_hp" style="font-size:0.8125rem; font-weight:600; color:#334155; margin-bottom:4px; display:block;">Nomor WhatsApp / HP <span style="color:#dc2626;">*</span></label>
                             <input
                                 type="text"
                                 name="no_hp"
                                 id="no_hp"
-                                placeholder="Masukkan Nomor Ponsel"
+                                placeholder="Contoh: 081234567890"
                                 value="{{ old('no_hp', auth()->check() ? auth()->user()->nomor : '') }}"
+                                required
                             >
                             <div id="error-no_hp" class="error-text" style="display:none;"></div>
                         </div>
                     </div>
 
-                    <p class="input-note">
+                    <p class="input-note mt-2">
                         <span>ⓘ</span>
-                        Pastikan email atau nomor ponselmu sudah benar untuk menerima laporan donasi.
+                        Nomor WhatsApp digunakan untuk mengirimkan konfirmasi dan kuitansi donasi.
                     </p>
 
-                    <label class="switch-row">
-                        <span>Sembunyikan nama saya (donasi sebagai orangbaik)</span>
+                    <label class="switch-row mt-3">
+                        <span>Sembunyikan nama saya di daftar donatur (Hamba Allah)</span>
                         <input type="checkbox" name="anonymous_donor" id="anonymous_donor" {{ old('anonymous_donor') ? 'checked' : '' }}>
                         <i></i>
                     </label>
                 </section>
 
+                {{-- 5. MESSAGE / DOA SECTION --}}
                 <section class="message-card">
-                    <h2>Sampaikan doa serta pesan dukungan (opsional)</h2>
+                    <h2>Pesan & Doa Kebaikan (Opsional)</h2>
 
                     <div class="textarea-wrap">
                         <textarea
                             name="pesan"
                             id="pesan"
                             maxlength="255"
-                            placeholder="Tuliskan doa dan harapan Anda untuk penggalang dana atau diri sendiri. Hindari penggunaan emoji agar pesan tetap nyaman dibaca."
+                            placeholder="Tuliskan doa atau dukungan hangat Anda untuk penerima manfaat atau penggalang dana."
                         >{{ old('pesan') }}</textarea>
                         <span id="charCount">0/255</span>
                     </div>
                     <div id="error-pesan" class="error-text" style="display:none;"></div>
 
-                    <label class="switch-row">
-                        <span>Sembunyikan nama saya (donasi sebagai orangbaik)</span>
+                    <label class="switch-row mt-3">
+                        <span>Sembunyikan isi doa dari publik</span>
                         <input type="checkbox" name="anonymous_message" id="anonymous_message" {{ old('anonymous_message') ? 'checked' : '' }}>
                         <i></i>
                     </label>
@@ -309,26 +336,26 @@
 
             </section>
 
-            {{-- RIGHT --}}
+            {{-- RIGHT COLUMN (STICKY SUMMARY) --}}
             <aside class="payment-right">
                 <div class="payment-method-card">
-                    <h2>Ringkasan Donasi</h2>
+                    <h2>Ringkasan Pembayaran</h2>
 
                     <div class="payment-total">
-                        <span>Total Donasi</span>
+                        <span>Total Nominal Donasi</span>
                         <strong id="total-donasi">Rp0</strong>
                     </div>
 
                     <div class="payment-method-info">
-                        <strong>💳 Pembayaran Aman</strong>
-                        <p>Transaksi Anda dilindungi dengan enkripsi keamanan standar perbankan.</p>
+                        <strong><i class="bi bi-shield-check text-success"></i> Transaksi Aman & Terenkripsi</strong>
+                        <p>Pembayaran Anda diproses secara otomatis dengan keamanan standar perbankan.</p>
                     </div>
 
                     <button class="pay-button" type="button" id="payButton">
-                        🛡 Lanjutkan Pembayaran
+                        <i class="bi bi-lock-fill"></i> Lanjutkan Pembayaran
                     </button>
-                    <div id="loading-text" style="display:none;">
-                        ⏳ Memproses...
+                    <div id="loading-text" style="display:none; text-align:center; margin-top:10px; font-weight:600; color:#3365af;">
+                        ⏳ Memproses transaksi...
                     </div>
                 </div>
             </aside>
@@ -343,14 +370,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // ============================================================
-        // 1. AMBIL MINIMAL DONASI DARI DATABASE
-        // ============================================================
-        const minimalDonasi = {{ $campaign->minimal_donasi ?? 5000 }};
+        const minimalDonasi = {{ $campaign->minimal_donasi ?? 1000 }};
 
-        // ============================================================
-        // 2. UPDATE TOTAL DONASI & CHAR COUNT
-        // ============================================================
         const totalEl = document.getElementById('total-donasi');
         const nominalRadios = document.querySelectorAll('input[name="nominal"]');
         const nominalLainnya = document.querySelector('input[name="nominal_lainnya"]');
@@ -359,32 +380,43 @@
 
         function updateTotal() {
             let nominal = 0;
-            const selectedRadio = document.querySelector('input[name="nominal"]:checked');
-            if (selectedRadio) {
-                nominal = parseInt(selectedRadio.value) || 0;
-            }
             const customValue = parseInt(nominalLainnya.value);
             if (customValue && customValue > 0) {
                 nominal = customValue;
+            } else {
+                const selectedRadio = document.querySelector('input[name="nominal"]:checked');
+                if (selectedRadio) {
+                    nominal = parseInt(selectedRadio.value) || 0;
+                }
             }
-            totalEl.textContent = 'Rp' + nominal.toLocaleString('id-ID');
+            totalEl.textContent = 'Rp ' + nominal.toLocaleString('id-ID');
         }
 
         function updateCharCount() {
             const count = textarea.value.length;
             charCounter.textContent = count + '/255';
-            charCounter.style.color = count > 250 ? '#e74c3c' : '';
+            charCounter.style.color = count > 240 ? '#e74c3c' : '';
         }
 
-        nominalRadios.forEach(radio => radio.addEventListener('change', updateTotal));
-        nominalLainnya.addEventListener('input', updateTotal);
+        nominalRadios.forEach(radio => radio.addEventListener('change', function() {
+            if (this.checked) {
+                nominalLainnya.value = '';
+            }
+            updateTotal();
+        }));
+
+        nominalLainnya.addEventListener('input', function() {
+            if (this.value && parseInt(this.value) > 0) {
+                nominalRadios.forEach(r => r.checked = false);
+            }
+            updateTotal();
+        });
+
         textarea.addEventListener('input', updateCharCount);
         updateTotal();
         updateCharCount();
 
-        // ============================================================
-        // 3. ANONIM: UBAH NAMA JADI "Orang Baik" (REAL-TIME)
-        // ============================================================
+        // Anonim realtime sync
         const anonymousDonor = document.getElementById('anonymous_donor');
         const anonymousMessage = document.getElementById('anonymous_message');
         const namaDonaturInput = document.getElementById('nama_donatur');
@@ -396,10 +428,10 @@
 
             if (isAnonim) {
                 if (namaDonaturInput) {
-                    namaDonaturInput.value = 'Orang Baik';
+                    namaDonaturInput.value = 'Hamba Allah';
                 }
                 if (donorNameDisplay) {
-                    donorNameDisplay.textContent = 'Orang Baik';
+                    donorNameDisplay.textContent = 'Hamba Allah';
                 }
             } else {
                 if (namaDonaturInput && !namaDonaturInput.readOnly) {
@@ -413,11 +445,8 @@
 
         anonymousDonor.addEventListener('change', updateAnonim);
         anonymousMessage.addEventListener('change', updateAnonim);
-        updateAnonim();
 
-        // ============================================================
-        // 4. CLEAR ERROR
-        // ============================================================
+        // Clear error inline
         document.querySelectorAll('#nama_donatur, #no_hp, #pesan, #nominal_lainnya').forEach(el => {
             el.addEventListener('input', function() {
                 const errorId = 'error-' + this.id;
@@ -429,9 +458,6 @@
             });
         });
 
-        // ============================================================
-        // 5. VALIDASI NOMINAL SEBELUM SUBMIT
-        // ============================================================
         function validateNominal(nominal) {
             const errorEl = document.getElementById('error-nominal');
             if (nominal < minimalDonasi) {
@@ -443,9 +469,7 @@
             return true;
         }
 
-        // ============================================================
-        // 6. TOMBOL BAYAR (AJAX)
-        // ============================================================
+        // Submit AJAX
         const payButton = document.getElementById('payButton');
         const loadingText = document.getElementById('loading-text');
 
@@ -456,16 +480,26 @@
             });
 
             let nominal = 0;
-            const selectedRadio = document.querySelector('input[name="nominal"]:checked');
-            if (selectedRadio) {
-                nominal = parseInt(selectedRadio.value) || 0;
-            }
             const customValue = parseInt(nominalLainnya.value);
             if (customValue && customValue > 0) {
                 nominal = customValue;
+            } else {
+                const selectedRadio = document.querySelector('input[name="nominal"]:checked');
+                if (selectedRadio) {
+                    nominal = parseInt(selectedRadio.value) || 0;
+                }
             }
 
             if (!validateNominal(nominal)) {
+                return;
+            }
+
+            const noHpInput = document.getElementById('no_hp');
+            if (!noHpInput.value.trim()) {
+                const errorHp = document.getElementById('error-no_hp');
+                errorHp.textContent = 'Nomor WhatsApp / HP wajib diisi.';
+                errorHp.style.display = 'block';
+                noHpInput.focus();
                 return;
             }
 
@@ -477,7 +511,7 @@
             loadingText.style.display = 'block';
 
             try {
-                const response = await fetch('{{ route("donasi.store", $campaign->slug) }}', {
+                const response = await fetch('{{ route("donasi.store", $campaign->getRouteSlug()) }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
@@ -515,7 +549,8 @@
                             window.location.href = '{{ route("donasi.status", "sukses") }}';
                         },
                         onPending: function(res) {
-                            window.location.href = '{{ route("donasi.status", "sukses") }}';
+                            // FIX: onPending redirect to pending status (BUKAN sukses!)
+                            window.location.href = '{{ route("donasi.status", "pending") }}';
                         },
                         onError: function(res) {
                             window.location.href = '{{ route("donasi.status", "gagal") }}';
@@ -532,18 +567,18 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan. Silakan coba lagi.');
+                alert('Terjadi kesalahan koneksi. Silakan coba lagi.');
                 resetButton();
             }
         });
 
         function resetButton() {
             payButton.disabled = false;
-            payButton.textContent = '🛡 Bayar Sekarang';
+            payButton.innerHTML = '<i class="bi bi-lock-fill"></i> Lanjutkan Pembayaran';
             loadingText.style.display = 'none';
         }
     });
 </script>
 
 </body>
-</html> 
+</html>

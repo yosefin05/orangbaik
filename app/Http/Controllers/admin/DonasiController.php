@@ -23,8 +23,13 @@ class DonasiController extends Controller
 
         // Filter by status pembayaran
         if ($request->filled('status')) {
-            $query->whereHas('pembayaran', function ($q) use ($request) {
-                $q->where('transaction_status', $request->status);
+            $statusFilter = $request->status;
+            $query->whereHas('pembayaran', function ($q) use ($statusFilter) {
+                if (in_array($statusFilter, ['expired', 'expire'])) {
+                    $q->whereIn('transaction_status', ['expired', 'expire']);
+                } else {
+                    $q->where('transaction_status', $statusFilter);
+                }
             });
         }
 
@@ -58,12 +63,12 @@ class DonasiController extends Controller
             $q->where('transaction_status', 'pending');
         })->count();
         $expireCount     = (clone $query)->whereHas('pembayaran', function ($q) {
-            $q->where('transaction_status', 'expire');
+            $q->whereIn('transaction_status', ['expired', 'expire']);
         })->count();
 
         $donasi    = $query->latest()->paginate(20)->withQueryString();
         $campaigns = Campaign::where('is_active', true)->orderBy('judul')->get();
-        $statuses  = ['pending', 'settlement', 'failed', 'expire'];
+        $statuses  = ['pending', 'settlement', 'failed', 'expired'];
 
         return view('admin.donasi.index', compact(
             'donasi',
@@ -96,10 +101,11 @@ class DonasiController extends Controller
             'nominal' => 'required|numeric|min:1',
             'pesan_doa' => 'nullable|string',
             'is_anonim' => 'boolean',
-            'transaction_status' => 'required|in:pending,settlement,expire',
+            'transaction_status' => 'required|in:pending,settlement,failed,expired,expire',
             'payment_type' => 'nullable|string',
             'paid_at' => 'nullable|date',
         ]);
+
 
         DB::beginTransaction();
 
