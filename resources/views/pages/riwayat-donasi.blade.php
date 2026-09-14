@@ -124,7 +124,7 @@
                             <article class="history-item" data-status="{{ $donation['status_key'] }}">
                                 <div class="history-item-main">
                                     <div class="history-image-wrap">
-                                        <img src="{{ $donation['image'] }}" alt="{{ $donation['title'] }}"
+                                        <img src="{{ asset('storage/' . $donation['image']) }}" alt="{{ $donation['title'] }}"
                                             class="history-image">
                                     </div>
 

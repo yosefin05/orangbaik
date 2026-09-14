@@ -894,11 +894,9 @@
 
 .site-footer {
     margin-top: var(--space-16);
-
     background:
         radial-gradient(circle at 12% 0%, rgba(255, 255, 255, .16), transparent 28%),
         linear-gradient(180deg, var(--primary), var(--primary-hover));
-
     color: var(--bg);
 }
 
@@ -906,7 +904,6 @@
     display: grid;
     grid-template-columns: 1.5fr 1fr 1.25fr 1.15fr 1.25fr;
     gap: var(--space-8, 32px);
-
     padding-block: var(--space-16);
 }
 
@@ -1095,8 +1092,18 @@
    ============================ */
 
 @media (max-width: 600px) {
-    body {
+    /* Padding hanya kalau ada bottom-nav */
+    body.has-bottom-nav {
         padding-bottom: 82px;
+    }
+
+    /* Kalau footer sudah kelihatan, hilangkan padding */
+    body.has-bottom-nav.footer-in-view {
+        padding-bottom: 0;
+    }
+
+    body.has-bottom-nav {
+        transition: padding-bottom .25s ease;
     }
 
     .site-header {
@@ -1277,10 +1284,8 @@
         column-gap: var(--space-4, 16px);
         row-gap: var(--space-3, 12px);
         align-items: start;
-
         text-align: left;
         padding-block: var(--space-6, 24px);
-
         border-top: 1px solid rgba(255, 255, 255, .18);
     }
 

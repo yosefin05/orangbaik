@@ -16,16 +16,24 @@
         {{-- HERO --}}
         <section class="fundraiser-hero">
             <div class="fundraiser-container">
-                <button class="fundraiser-back" type="button" onclick="window.history.back()"">
-                    <svg viewBox="0 0 24 24">
+                <button class="fundraiser-back" type="button" onclick="window.history.back()">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M15 18L9 12L15 6" />
                     </svg>
                     <span>Kembali</span>
                 </button>
+
                 <div class="banner-wrapper">
-                    <img src="{{ $penggalang->thumbnail
-    ? asset('storage/' . $penggalang->thumbnail)
-    : asset('assets/profile-banner.png') }}" alt="{{ $penggalang->nama_penggalang }}" class="penggalang-banner">
+                    <img
+                        src="{{ $penggalang->thumbnail
+                            ? asset('storage/' . $penggalang->thumbnail)
+                            : asset('assets/profile-banner.png') }}"
+                        alt="{{ $penggalang->nama_penggalang }}"
+                        class="penggalang-banner"
+                        width="1200"
+                        height="250"
+                        loading="eager"
+                        decoding="async">
                 </div>
             </div>
         </section>
@@ -36,9 +44,16 @@
                 <div class="penggalang-summary">
                     <div class="penggalang-left">
                         <div class="logo-wrapper">
-                            <img src="{{ $penggalang->foto_profil
-    ? asset('storage/' . $penggalang->foto_profil)
-    : asset('assets/logo-icon.png') }}" alt="{{ $penggalang->nama_penggalang }}" class="penggalang-logo">
+                            <img
+                                src="{{ $penggalang->foto_profil
+                                    ? asset('storage/' . $penggalang->foto_profil)
+                                    : asset('assets/logo-icon.png') }}"
+                                alt="{{ $penggalang->nama_penggalang }}"
+                                class="penggalang-logo"
+                                width="88"
+                                height="88"
+                                loading="eager"
+                                decoding="async">
                         </div>
                         <div class="penggalang-title">
                             <h1>{{ $penggalang->nama_penggalang }}</h1>
@@ -50,20 +65,18 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="penggalang-actions">
                         @php
                             $canCreateCampaign = auth()->user()?->penggalangDana?->status === 'approved';
                         @endphp
 
-
-                        {{-- 🔥 BADGE STATUS: HANYA TAMPIL KALAU BELUM APPROVED --}}
                         @if($penggalang->status !== 'approved')
                             <span class="status-badge {{ $penggalang->status ?? 'pending' }}">
                                 {{ ucfirst($penggalang->status ?? 'Pending') }}
                             </span>
                         @endif
 
-                        {{-- 🔥 DASHBOARD PENGGALANG (UNTUK YANG SUDAH APPROVED) --}}
                         @if($canCreateCampaign)
                             <a href="#" class="dashboard-link">
                                 📊 Dashboard Penggalang
@@ -142,7 +155,7 @@
                                 <div>
                                     <strong>• {{ $dokumen->nama_dokumen }}</strong>
                                     <p>
-                                        <a href="{{ $dokumen->file_dokumen }}" target="_blank">
+                                        <a href="{{ $dokumen->file_dokumen }}" target="_blank" rel="noopener">
                                             Lihat Dokumen
                                         </a>
                                     </p>
@@ -161,7 +174,7 @@
                         <div class="info-table">
                             <div>
                                 <strong>• Email</strong>
-                                <p>{{ $penggalang->email }}</p>
+                                <p><a href="mailto:{{ $penggalang->email }}">{{ $penggalang->email }}</a></p>
                             </div>
                             <div>
                                 <strong>• Hotline</strong>
@@ -200,80 +213,94 @@
                     <h2>Penggalangan Dana</h2>
                     <div class="campaign-list">
                         @forelse ($penggalang->campaign as $campaign)
-                                            @php
-                                                $terkumpul = $campaign->donasi->sum('nominal');
-                                                $persen = $campaign->target_donasi
-                                                    ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                                    : 0;
-                                            @endphp
+                            @php
+                                $terkumpul = $campaign->donasi->sum('nominal');
+                                $persen = $campaign->target_donasi
+                                    ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                    : 0;
+                            @endphp
 
-                                            <div class="campaign-row">
-                                                <a href="{{ route('campaign.show', $campaign->slug) }}" class="campaign-row-image-link">
-                                                    <img src="{{ $campaign->thumbnail
-                            ? asset('storage/' . $campaign->thumbnail)
-                            : asset('assets/slide1.png') }}" alt="{{ $campaign->judul }}"
-                                                        class="campaign-row-image" />
+                            <div class="campaign-row">
+                                <a href="{{ route('campaign.show', $campaign->slug) }}" class="campaign-row-image-link">
+                                    <img
+                                        src="{{ $campaign->thumbnail
+                                            ? asset('storage/' . $campaign->thumbnail)
+                                            : asset('assets/slide1.png') }}"
+                                        alt="{{ $campaign->judul }}"
+                                        class="campaign-row-image"
+                                        width="520"
+                                        height="293"
+                                        loading="lazy"
+                                        decoding="async" />
+                                </a>
+
+                                <div class="campaign-row-body">
+                                    <div class="campaign-row-header">
+                                        <h3>{{ $campaign->judul }}</h3>
+
+                                        @if ($isOwner)
+                                            <div class="campaign-actions">
+                                                <a href="{{ route('campaign.update.create', $campaign->slug) }}"
+                                                    class="campaign-action update"
+                                                    title="Buat Update Kabar Terbaru"
+                                                    aria-label="Buat Update">
+                                                    <i class="bi bi-megaphone-fill"></i>
                                                 </a>
 
-                                                <div class="campaign-row-body">
-                                                    <div class="campaign-row-header">
-                                                        <h3>{{ $campaign->judul }}</h3>
+                                                <a href="{{ route('campaign.edit', $campaign->id) }}"
+                                                    class="campaign-action edit"
+                                                    title="Edit Campaign"
+                                                    aria-label="Edit Campaign">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
 
-                                                        @if ($isOwner)
-                                                            <div class="campaign-actions">
-                                                                <a href="{{ route('campaign.update.create', $campaign->slug) }}"
-                                                                    class="campaign-action update" title="Buat Update Kabar Terbaru">
-                                                                    <i class="bi bi-megaphone-fill"></i>
-                                                                </a>
-
-                                                                <a href="{{ route('campaign.edit', $campaign->id) }}"
-                                                                    class="campaign-action edit" title="Edit Campaign">
-                                                                    <i class="bi bi-pencil-fill"></i>
-                                                                </a>
-
-                                                                <form action="{{ route('campaign.destroy', $campaign->id) }}" method="POST"
-                                                                    onsubmit="return confirm('Yakin ingin menghapus campaign ini?')">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="campaign-action delete" title="Hapus Campaign">
-                                                                        <i class="bi bi-trash-fill"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-
-                                                    <p>
-                                                        {{ $penggalang->nama_penggalang }}
-                                                        <span>●</span>
-                                                    </p>
-
-                                                    <div class="campaign-row-amount">
-                                                        <strong>
-                                                            Rp{{ number_format($campaign->target_donasi, 0, ',', '.') }}
-                                                        </strong>
-                                                        <span>Target</span>
-                                                    </div>
-
-                                                    <div class="campaign-progress">
-                                                        <div class="progress-fill" style="width: {{ $persen }}%;"></div>
-                                                    </div>
-
-                                                    <div class="campaign-meta">
-                                                        <span>
-                                                            Status: {{ ucfirst($campaign->status) }}
-                                                        </span>
-
-                                                        @if ($campaign->tanggal_berakhir)
-                                                            <span>
-                                                                {{ \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') }}
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                </div>
+                                                <form action="{{ route('campaign.destroy', $campaign->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Yakin ingin menghapus campaign ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="campaign-action delete"
+                                                        title="Hapus Campaign"
+                                                        aria-label="Hapus Campaign">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
                                             </div>
+                                        @endif
+                                    </div>
+
+                                    <p>
+                                        {{ $penggalang->nama_penggalang }}
+                                        <span>●</span>
+                                    </p>
+
+                                    <div class="campaign-row-amount">
+                                        <strong>
+                                            Rp{{ number_format($campaign->target_donasi, 0, ',', '.') }}
+                                        </strong>
+                                        <span>Target</span>
+                                    </div>
+
+                                    <div class="campaign-progress">
+                                        <div class="progress-fill" style="width: {{ $persen }}%;"></div>
+                                    </div>
+
+                                    <div class="campaign-meta">
+                                        <span>Status: {{ ucfirst($campaign->status) }}</span>
+
+                                        @if ($campaign->tanggal_berakhir)
+                                            <span>
+                                                {{ \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         @empty
-                            <p>Belum ada campaign.</p>
+                            <div class="campaign-empty">
+                                <p>Belum ada campaign.</p>
+                            </div>
                         @endforelse
                     </div>
                 </section>

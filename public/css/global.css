@@ -11,10 +11,6 @@
    ============================================================ */
 
 :root {
-    /* ============================
-       COLOR
-       ============================ */
-
     --primary: #3365ae;
     --primary-hover: #28528f;
     --primary-light: #e8f0fb;
@@ -47,21 +43,13 @@
     --border: #dbe3ef;
     --border-soft: #e8eef7;
 
-    /* ============================
-       FONT SCALE
-       ============================ */
-
     --fs-xxs: 12px;
     --fs-xs: 14px;
     --fs-sm: 16px;
     --fs-md: 21px;
     --fs-lg: 26px;
-    --fs-xl: 34px; 
+    --fs-xl: 34px;
     --fs-xxl: 42px;
-
-    /* ============================
-       FONT WEIGHT
-       ============================ */
 
     --fw-light: 300;
     --fw-regular: 400;
@@ -70,10 +58,6 @@
     --fw-bold: 700;
     --fw-extrabold: 800;
 
-    /* ============================
-       RADIUS
-       ============================ */
-
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius: 16px;
@@ -81,18 +65,10 @@
     --radius-xl: 28px;
     --radius-full: 999px;
 
-    /* ============================
-       SHADOW
-       ============================ */
-
     --shadow-soft: 0 6px 16px rgba(51, 101, 175, .08);
     --shadow: 0 10px 30px rgba(0, 0, 0, .08);
     --shadow-card: 0 8px 22px rgba(0, 0, 0, .045);
     --shadow-hover: 0 18px 40px rgba(51, 101, 175, .18);
-
-    /* ============================
-       SPACING SCALE
-       ============================ */
 
     --space-1: 4px;
     --space-2: 8px;
@@ -106,10 +82,6 @@
     --space-16: 64px;
     --space-18: 72px;
     --space-20: 80px;
-
-    /* ============================
-       LAYOUT
-       ============================ */
 
     --container: 1180px;
     --container-sm: 760px;
@@ -186,12 +158,7 @@ ol {
    TYPOGRAPHY
    ============================================================ */
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     color: var(--text-dark);
     line-height: 1.25;
     font-weight: var(--fw-extrabold);
@@ -202,29 +169,12 @@ p {
     line-height: 1.7;
 }
 
-.text-muted {
-    color: var(--muted);
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-primary {
-    color: var(--primary);
-}
-
-.text-secondary {
-    color: var(--secondary);
-}
-
-.text-success {
-    color: var(--success);
-}
-
-.text-danger {
-    color: var(--danger);
-}
+.text-muted { color: var(--muted); }
+.text-center { text-align: center; }
+.text-primary { color: var(--primary); }
+.text-secondary { color: var(--secondary); }
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
 
 /* ============================================================
    CONTAINER
@@ -254,17 +204,9 @@ p {
    SECTION / PAGE LAYOUT
    ============================================================ */
 
-.section {
-    padding-block: var(--section-space);
-}
-
-.section-sm {
-    padding-block: var(--section-space-sm);
-}
-
-.section-lg {
-    padding-block: var(--section-space-lg);
-}
+.section { padding-block: var(--section-space); }
+.section-sm { padding-block: var(--section-space-sm); }
+.section-lg { padding-block: var(--section-space-lg); }
 
 .section-border {
     background: var(--bg);
@@ -272,13 +214,8 @@ p {
     border-bottom: 1px solid var(--border);
 }
 
-.page-wrapper {
-    padding-block: var(--page-padding);
-}
-
-.page-header {
-    margin-bottom: var(--space-8);
-}
+.page-wrapper { padding-block: var(--page-padding); }
+.page-header { margin-bottom: var(--space-8); }
 
 .page-header h1,
 .page-header h2 {
@@ -325,13 +262,8 @@ p {
     box-shadow: var(--shadow-card);
 }
 
-.ob-card-lg {
-    padding: var(--card-padding-lg);
-}
-
-.ob-card-hover {
-    transition: .2s ease;
-}
+.ob-card-lg { padding: var(--card-padding-lg); }
+.ob-card-hover { transition: .2s ease; }
 
 .ob-card-hover:hover {
     transform: translateY(-4px);
@@ -364,19 +296,19 @@ p {
 
 .grid-2 {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-6);
 }
 
 .grid-3 {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-6);
 }
 
 .grid-4 {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-6);
 }
 
@@ -393,18 +325,14 @@ p {
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-
     min-height: 42px;
     padding: 11px 22px;
-
     border: none;
     border-radius: var(--radius-full);
-
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     line-height: 1;
     white-space: nowrap;
-
     transition: .2s ease;
 }
 
@@ -422,18 +350,14 @@ p {
     box-shadow: var(--shadow-soft);
 }
 
-.btn-primary:hover {
-    box-shadow: var(--shadow);
-}
+.btn-primary:hover { box-shadow: var(--shadow); }
 
 .btn-secondary {
     background: #eef2f7;
     color: var(--text);
 }
 
-.btn-secondary:hover {
-    background: var(--border);
-}
+.btn-secondary:hover { background: var(--border); }
 
 .btn-danger {
     background: var(--danger-light);
@@ -469,7 +393,7 @@ p {
 }
 
 /* ============================================================
-   UPLOAD BUTTON WRAPPER (Global)
+   UPLOAD (Global)
    ============================================================ */
 
 .upload-btn-wrapper {
@@ -511,18 +435,12 @@ p {
     box-shadow: var(--shadow-soft);
 }
 
-.upload-btn i {
-    font-size: 18px;
-}
+.upload-btn i { font-size: 18px; }
 
 .upload-hint {
     color: var(--muted);
     font-size: var(--fs-xxs);
 }
-
-/* ============================================================
-   INPUT FILE - TERSEMBUNYI
-   ============================================================ */
 
 .upload-input-hidden {
     position: absolute;
@@ -532,10 +450,6 @@ p {
     overflow: hidden;
     z-index: -1;
 }
-
-/* ============================================================
-   UPLOAD DROPZONE (Global)
-   ============================================================ */
 
 .upload-dropzone {
     position: relative;
@@ -631,15 +545,12 @@ p {
 .form-group select {
     width: 100%;
     padding: 12px 14px;
-
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-soft);
-
     color: var(--text);
     font-size: var(--fs-xs);
     line-height: 1.5;
-
     transition: .2s ease;
 }
 
@@ -661,7 +572,7 @@ textarea.form-control,
 
 .form-row {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-5);
 }
 
@@ -689,9 +600,7 @@ textarea.form-control,
     min-width: 720px;
 }
 
-.data-table thead tr {
-    background: var(--bg-soft);
-}
+.data-table thead tr { background: var(--bg-soft); }
 
 .data-table th {
     padding: 15px 16px;
@@ -712,13 +621,8 @@ textarea.form-control,
     border-bottom: 1px solid var(--border-soft);
 }
 
-.data-table tbody tr {
-    transition: .15s ease;
-}
-
-.data-table tbody tr:hover {
-    background: var(--primary-light);
-}
+.data-table tbody tr { transition: .15s ease; }
+.data-table tbody tr:hover { background: var(--primary-light); }
 
 /* ============================================================
    BADGE GLOBAL
@@ -728,12 +632,9 @@ textarea.form-control,
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     min-height: 24px;
     padding: 4px 12px;
-
     border-radius: var(--radius-full);
-
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
     line-height: 1;
@@ -745,31 +646,11 @@ textarea.form-control,
     margin-right: 4px;
 }
 
-.badge-blue {
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-.badge-green {
-    background: var(--success-light);
-    color: var(--success);
-}
-
-.badge-red {
-    background: var(--danger-light);
-    color: var(--danger);
-}
-
-.badge-yellow {
-    background: var(--secondary-light);
-    color: var(--secondary);
-}
-
-.badge-info {
-    background: #e0f2fe;
-    color: #0369a1;
-    border: 1px solid #7dd3fc;
-}
+.badge-blue { background: var(--primary-light); color: var(--primary); }
+.badge-green { background: var(--success-light); color: var(--success); }
+.badge-red { background: var(--danger-light); color: var(--danger); }
+.badge-yellow { background: var(--secondary-light); color: var(--secondary); }
+.badge-info { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
 
 .badge-group {
     display: flex;
@@ -778,7 +659,10 @@ textarea.form-control,
     flex-wrap: wrap;
 }
 
-/* FLOATING WHATSAPP BUTTON */
+/* ============================================================
+   FLOATING WHATSAPP
+   ============================================================ */
+
 .floating-wa-container {
     position: fixed;
     bottom: 30px;
@@ -807,9 +691,7 @@ textarea.form-control,
     box-shadow: 0 8px 30px rgba(37, 211, 102, 0.5);
 }
 
-.floating-wa-btn .bi-whatsapp {
-    font-size: 32px;
-}
+.floating-wa-btn .bi-whatsapp { font-size: 32px; }
 
 .wa-tooltip {
     position: absolute;
@@ -866,19 +748,14 @@ textarea.form-control,
         bottom: 70px;
         right: 20px;
     }
-    
+
     .floating-wa-btn {
         width: 50px;
         height: 50px;
     }
-    
-    .floating-wa-btn .bi-whatsapp {
-        font-size: 26px !important;
-    }
-    
-    .wa-tooltip {
-        display: none;
-    }
+
+    .floating-wa-btn .bi-whatsapp { font-size: 26px !important; }
+    .wa-tooltip { display: none; }
 }
 
 /* ============================================================
@@ -965,7 +842,7 @@ select:focus-visible {
 @media (max-width: 992px) {
     .grid-3,
     .grid-4 {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -974,10 +851,8 @@ select:focus-visible {
         --section-space: 48px;
         --section-space-sm: 40px;
         --section-space-lg: 56px;
-
         --page-padding: 32px;
         --page-gap: 24px;
-
         --card-padding: 20px;
         --card-padding-lg: 24px;
     }
@@ -989,18 +864,10 @@ select:focus-visible {
         width: min(100% - 32px, var(--container));
     }
 
-    .page-header {
-        margin-bottom: var(--space-6);
-    }
-
+    .page-header { margin-bottom: var(--space-6); }
     .page-header h1,
-    .page-header h2 {
-        font-size: var(--fs-lg);
-    }
-
-    .page-header p {
-        font-size: var(--fs-xs);
-    }
+    .page-header h2 { font-size: var(--fs-lg); }
+    .page-header p { font-size: var(--fs-xs); }
 
     .section-title {
         font-size: var(--fs-md);
@@ -1019,11 +886,9 @@ select:focus-visible {
     :root {
         --fs-xl: 30px;
         --fs-xxl: 36px;
-
         --section-space: 40px;
         --section-space-sm: 32px;
         --section-space-lg: 48px;
-
         --page-padding: 28px;
     }
 
@@ -1050,12 +915,40 @@ select:focus-visible {
 }
 
 /* ============================================================
-   ADMIN LAYOUT - Hanya untuk halaman admin
-   ============================================================ */
+   🔥 STICKY FOOTER PATTERN
+   Halaman USER: <body> tanpa class "admin-body"
+   Halaman ADMIN: <body class="admin-body">
+============================================================ */
+
+body:not(.admin-body) {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body:not(.admin-body) > main,
+body:not(.admin-body) > .page-wrapper {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+body:not(.admin-body) > footer,
+body:not(.admin-body) > .site-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+/* ============================================================
+   🔥 ADMIN LAYOUT
+   Khusus halaman admin — dikecualikan dari sticky footer.
+============================================================ */
 
 .admin-wrapper {
     display: flex;
+    flex-direction: row;
+    align-items: stretch;
     min-height: 100vh;
+    width: 100%;
 }
 
 .admin-wrapper .main-content {
@@ -1067,6 +960,7 @@ select:focus-visible {
 
 .admin-wrapper .content-area {
     padding: var(--space-8);
+    flex: 1;
 }
 
 .admin-wrapper .content-area > .ob-card,
@@ -1078,10 +972,6 @@ select:focus-visible {
 .admin-wrapper .content-area > :last-child {
     margin-bottom: 0;
 }
-
-/* ============================================================
-   ADMIN RESPONSIVE
-   ============================================================ */
 
 @media (max-width: 860px) {
     .admin-wrapper {
@@ -1100,7 +990,7 @@ select:focus-visible {
 }
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE UPLOAD
    ============================================================ */
 
 @media (max-width: 768px) {
@@ -1109,17 +999,10 @@ select:focus-visible {
         padding: var(--space-4);
     }
 
-    .upload-placeholder i {
-        font-size: 40px;
-    }
+    .upload-placeholder i { font-size: 40px; }
+    .upload-placeholder p { font-size: var(--fs-xs); }
 
-    .upload-placeholder p {
-        font-size: var(--fs-xs);
-    }
-
-    .thumbnail-wrapper {
-        max-width: 100%;
-    }
+    .thumbnail-wrapper { max-width: 100%; }
 
     .gallery-preview-grid {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -1132,9 +1015,7 @@ select:focus-visible {
         font-size: 16px;
     }
 
-    .btn-remove-thumbnail i {
-        font-size: 16px;
-    }
+    .btn-remove-thumbnail i { font-size: 16px; }
 }
 
 @media (max-width: 576px) {
@@ -1143,17 +1024,9 @@ select:focus-visible {
         padding: var(--space-3);
     }
 
-    .upload-placeholder i {
-        font-size: 32px;
-    }
-
-    .upload-placeholder p {
-        font-size: var(--fs-xxs);
-    }
-
-    .upload-placeholder .text-muted {
-        font-size: 10px;
-    }
+    .upload-placeholder i { font-size: 32px; }
+    .upload-placeholder p { font-size: var(--fs-xxs); }
+    .upload-placeholder .text-muted { font-size: 10px; }
 
     .upload-preview.thumbnail-preview {
         flex-wrap: wrap;
@@ -1187,9 +1060,7 @@ select:focus-visible {
         font-size: 14px;
     }
 
-    .btn-remove-thumbnail i {
-        font-size: 14px;
-    }
+    .btn-remove-thumbnail i { font-size: 14px; }
 
     .upload-btn {
         padding: 8px 18px;

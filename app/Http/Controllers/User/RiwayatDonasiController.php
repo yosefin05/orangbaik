@@ -48,7 +48,7 @@ class RiwayatDonasiController extends Controller
                 'amount_value' => $donasi->nominal,
                 'method' => $donasi->pembayaran->payment_type ?? 'Belum diketahui',
                 'invoice' => $donasi->pembayaran->order_id ?? 'OB-XXXX',
-                'image' => asset('assets/slide1.png'),
+                'image' => $donasi->campaign->thumbnail,
             ];
         });
 

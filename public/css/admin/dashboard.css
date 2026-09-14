@@ -243,40 +243,309 @@
    RESPONSIVE DASHBOARD
    ============================================================ */
 
+/* ============================
+   TABLET BESAR
+============================ */
 @media (max-width: 1100px) {
     .menu-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 }
 
-@media (max-width: 576px) {
+/* ============================
+   TABLET
+============================ */
+@media (max-width: 860px) {
     .welcome-banner {
-        align-items: stretch;
         padding: var(--space-6);
+        gap: var(--space-5);
+    }
+
+    .stat-card {
+        padding: var(--space-5);
+        min-height: auto;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+    }
+
+    .stat-icon i {
+        font-size: 22px;
+    }
+
+    .stat-value {
+        font-size: var(--fs-md);
+    }
+}
+
+/* ============================
+   HP BESAR
+============================ */
+@media (max-width: 768px) {
+    .welcome-banner {
+        padding: var(--space-5);
+        margin-bottom: var(--space-6);
+        border-radius: var(--radius);
     }
 
     .welcome-banner h2 {
         font-size: var(--fs-md);
     }
 
-    .welcome-banner form,
-    .btn-logout {
-        width: 100%;
+    .welcome-banner h2 i {
+        font-size: 18px;
     }
 
+    .welcome-banner p {
+        font-size: var(--fs-xs);
+    }
+
+    .stats-grid {
+        gap: var(--space-4);
+        margin-bottom: var(--space-6);
+    }
+
+    .stat-card {
+        padding: var(--space-4);
+        gap: var(--space-3);
+    }
+
+    .stat-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: var(--radius-sm);
+    }
+
+    .stat-icon i {
+        font-size: 20px;
+    }
+
+    .stat-label {
+        font-size: var(--fs-xxs);
+    }
+
+    .stat-value {
+        font-size: var(--fs-sm);
+    }
+
+    .menu-grid {
+        gap: var(--space-3);
+    }
+
+    .menu-item {
+        min-height: 120px;
+        padding: var(--space-5) var(--space-4);
+    }
+
+    .menu-icon {
+        font-size: 26px;
+    }
+}
+
+/* ============================
+   HP
+============================ */
+@media (max-width: 576px) {
+    /* --- WELCOME BANNER --- */
+    .welcome-banner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-4);
+        padding: var(--space-5);
+        border-radius: var(--radius-md);
+        text-align: left;
+    }
+
+    .welcome-banner::after {
+        width: 160px;
+        height: 160px;
+        right: -50px;
+        bottom: -60px;
+    }
+
+    .welcome-banner h2 {
+        font-size: var(--fs-sm);
+        letter-spacing: -.02em;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .welcome-banner h2 i {
+        font-size: 16px;
+    }
+
+    .welcome-banner p {
+        font-size: var(--fs-xxs);
+        line-height: 1.6;
+    }
+
+    .welcome-banner form {
+        width: 100%;
+        margin: 0;
+    }
+
+    .btn-logout {
+        width: 100%;
+        min-height: 44px;
+        padding: 12px 20px;
+        font-size: var(--fs-xs);
+        justify-content: center;
+    }
+
+    /* --- STATS GRID --- */
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-3);
+        margin-bottom: var(--space-6);
+    }
+
+    .stat-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+        padding: var(--space-4);
+        min-height: auto;
+        border-radius: var(--radius-sm);
+    }
+
+    .stat-card::before {
+        width: 4px;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-sm);
+    }
+
+    .stat-icon i {
+        font-size: 18px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        line-height: 1.3;
+        margin-bottom: 2px;
+    }
+
+    .stat-value {
+        font-size: var(--fs-sm);
+        line-height: 1.15;
+        word-break: break-word;
+    }
+
+    /* --- MENU GRID --- */
+    .menu-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-3);
+    }
+
+    .menu-item {
+        min-height: 100px;
+        padding: var(--space-4) var(--space-3);
+        gap: var(--space-2);
+        font-size: var(--fs-xxs);
+        border-radius: var(--radius-sm);
+    }
+
+    .menu-icon {
+        font-size: 24px;
+    }
+}
+
+/* ============================
+   HP KECIL
+============================ */
+@media (max-width: 400px) {
+    .welcome-banner {
+        padding: var(--space-4);
+    }
+
+    .welcome-banner h2 {
+        font-size: var(--fs-xs);
+    }
+
+    .stats-grid {
+        gap: var(--space-2);
+    }
+
+    .stat-card {
+        padding: var(--space-3);
+        gap: 6px;
+    }
+
+    .stat-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .stat-icon i {
+        font-size: 16px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    .stat-value {
+        font-size: var(--fs-xs);
+    }
+
+    .menu-grid {
+        gap: var(--space-2);
+    }
+
+    .menu-item {
+        min-height: 88px;
+        padding: var(--space-3) var(--space-2);
+    }
+
+    .menu-icon {
+        font-size: 22px;
+    }
+
+    .menu-item span {
+        font-size: 11px;
+    }
+}
+
+/* ============================
+   HP TERKECIL (Galaxy Fold)
+============================ */
+@media (max-width: 340px) {
     .stats-grid {
         grid-template-columns: 1fr;
     }
 
     .stat-card {
-        padding: var(--space-5);
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .stat-label {
+        font-size: 11px;
     }
 
     .stat-value {
-        font-size: var(--fs-md);
+        font-size: var(--fs-sm);
     }
 
     .menu-grid {
         grid-template-columns: 1fr;
+    }
+
+    .menu-item {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: var(--space-3);
+        min-height: auto;
+        padding: var(--space-4);
+        text-align: left;
     }
 }

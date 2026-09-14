@@ -1,10 +1,14 @@
 /* ================================
    RIWAYAT DONASI - DASHBOARD STYLE
-   Sesuai pondasi global.css:
-   page-wrapper, container, section-label,
-   section-title, section-description,
-   var warna, spacing, radius, shadow
+   Responsive mengikuti pola campaign-show.css
 ================================ */
+
+/* ================================
+   GLOBAL OVERFLOW PROTECTION
+================================ */
+body {
+    overflow-x: hidden;
+}
 
 .history-page {
     min-height: 100vh;
@@ -16,7 +20,6 @@
 /* ================================
    HERO
 ================================ */
-
 .history-hero {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;
@@ -31,14 +34,19 @@
     border: 1px solid var(--border);
     border-radius: calc(var(--radius) + 8px);
     box-shadow: var(--shadow);
+    min-width: 0;
 }
 
 .history-hero-content .section-title {
     margin-bottom: var(--space-3);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .history-hero-content .section-description {
     max-width: 680px;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .history-hero-card {
@@ -49,6 +57,7 @@
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     color: var(--bg);
     box-shadow: var(--shadow);
+    min-width: 0;
 }
 
 .history-hero-card::after {
@@ -82,6 +91,8 @@
     font-size: 34px;
     font-weight: 800;
     line-height: 1.15;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .history-hero-card p {
@@ -93,7 +104,6 @@
 /* ================================
    SUMMARY
 ================================ */
-
 .history-summary {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -110,6 +120,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    min-width: 0;
 }
 
 .summary-icon {
@@ -147,18 +158,20 @@
     font-size: 22px;
     font-weight: 800;
     line-height: 1.2;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* ================================
    PANEL
 ================================ */
-
 .history-panel {
     padding: var(--space-6);
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: calc(var(--radius) + 8px);
     box-shadow: var(--shadow);
+    min-width: 0;
 }
 
 .history-toolbar {
@@ -167,6 +180,7 @@
     justify-content: space-between;
     gap: var(--space-5);
     margin-bottom: var(--space-5);
+    flex-wrap: wrap;
 }
 
 .history-toolbar h2 {
@@ -174,6 +188,8 @@
     color: var(--text);
     font-size: 24px;
     font-weight: 800;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .history-toolbar p {
@@ -191,6 +207,7 @@
     background: var(--bg-soft);
     border: 1px solid var(--border);
     border-radius: 999px;
+    max-width: 100%;
 }
 
 .filter-button {
@@ -203,6 +220,7 @@
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
+    white-space: nowrap;
     transition:
         background 0.2s ease,
         color 0.2s ease,
@@ -219,7 +237,6 @@
 /* ================================
    HISTORY LIST
 ================================ */
-
 .history-list {
     display: grid;
     gap: var(--space-4);
@@ -237,6 +254,7 @@
         transform 0.2s ease,
         border-color 0.2s ease,
         box-shadow 0.2s ease;
+    min-width: 0;
 }
 
 .history-item:hover {
@@ -276,6 +294,7 @@
 
 .history-info {
     min-width: 0;
+    flex: 1;
 }
 
 .history-info-top {
@@ -283,6 +302,7 @@
     align-items: center;
     gap: var(--space-2);
     margin-bottom: var(--space-2);
+    flex-wrap: wrap;
 }
 
 .history-type {
@@ -295,6 +315,7 @@
     color: var(--primary);
     font-size: 12px;
     font-weight: 800;
+    white-space: nowrap;
 }
 
 .history-info h3 {
@@ -305,6 +326,8 @@
     font-size: 17px;
     font-weight: 800;
     line-height: 1.45;
+    overflow-wrap: break-word;
+    word-break: break-word;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -315,6 +338,8 @@
     color: var(--muted);
     font-size: 14px;
     line-height: 1.5;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .history-detail {
@@ -334,12 +359,12 @@
     color: var(--muted);
     font-size: 12px;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 /* ================================
    STATUS
 ================================ */
-
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -370,7 +395,6 @@
 /* ================================
    PAYMENT
 ================================ */
-
 .history-payment {
     display: flex;
     flex-direction: column;
@@ -380,6 +404,7 @@
     padding-left: var(--space-5);
     border-left: 1px dashed var(--border);
     text-align: right;
+    min-width: 0;
 }
 
 .history-payment span {
@@ -392,6 +417,8 @@
     color: var(--text);
     font-size: 20px;
     font-weight: 900;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .receipt-button {
@@ -422,7 +449,6 @@
 /* ================================
    EMPTY STATE
 ================================ */
-
 .history-empty,
 .history-empty-filter {
     padding: var(--space-8);
@@ -447,6 +473,8 @@
     color: var(--text);
     font-size: 22px;
     font-weight: 800;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .history-empty p,
@@ -480,6 +508,7 @@
    RESPONSIVE
 ================================ */
 
+/* Tablet besar / laptop kecil */
 @media (max-width: 1024px) {
     .history-hero {
         grid-template-columns: 1fr;
@@ -491,6 +520,7 @@
 
     .history-toolbar {
         flex-direction: column;
+        align-items: stretch;
     }
 
     .history-filter {
@@ -498,6 +528,12 @@
         overflow-x: auto;
         justify-content: flex-start;
         border-radius: 18px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .history-filter::-webkit-scrollbar {
+        display: none;
     }
 
     .filter-button {
@@ -505,6 +541,19 @@
     }
 }
 
+/* Tablet */
+@media (max-width: 992px) {
+    .history-hero {
+        gap: var(--space-5);
+    }
+
+    .history-hero-content,
+    .history-hero-card {
+        padding: var(--space-6);
+    }
+}
+
+/* Mobile besar */
 @media (max-width: 768px) {
     .history-hero-content,
     .history-hero-card,
@@ -519,6 +568,7 @@
 
     .history-item {
         grid-template-columns: 1fr;
+        gap: var(--space-4);
     }
 
     .history-payment {
@@ -535,6 +585,7 @@
     }
 }
 
+/* Mobile */
 @media (max-width: 520px) {
     .history-page {
         background: var(--bg-soft);
@@ -544,6 +595,11 @@
     .history-hero-card,
     .history-panel {
         padding: var(--space-4);
+        border-radius: 16px;
+    }
+
+    .history-hero-card strong {
+        font-size: 24px;
     }
 
     .history-item-main {
@@ -581,11 +637,51 @@
         font-size: 21px;
     }
 
+    .history-toolbar p {
+        font-size: 13px;
+    }
+
     .summary-card {
         padding: var(--space-4);
     }
+
+    .summary-card strong {
+        font-size: 18px;
+    }
+
+    .summary-icon {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+        border-radius: 14px;
+    }
+
+    .summary-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .history-payment strong {
+        font-size: 18px;
+    }
+
+    .history-empty,
+    .history-empty-filter {
+        padding: var(--space-6) var(--space-4);
+    }
+
+    .history-empty h2,
+    .history-empty-filter h3 {
+        font-size: 18px;
+    }
+
+    .history-empty p,
+    .history-empty-filter p {
+        font-size: 13px;
+    }
 }
 
+/* Mobile kecil */
 @media (max-width: 420px) {
     .history-item-main {
         flex-direction: column;
@@ -599,5 +695,29 @@
 
     .history-info-top {
         flex-wrap: wrap;
+    }
+
+    .history-filter {
+        border-radius: 14px;
+    }
+
+    .filter-button {
+        min-height: 34px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    .history-hero-card strong {
+        font-size: 22px;
+    }
+}
+
+/* ============================================================
+   Sembunyikan elemen mobile-only di desktop
+   (misal bottom-nav atau floating CTA kalau ada)
+============================================================ */
+@media (min-width: 769px) {
+    .mobile-sticky-cta {
+        display: none !important;
     }
 }
