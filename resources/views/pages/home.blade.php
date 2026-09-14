@@ -336,61 +336,169 @@
         </section>
 
         {{-- TESTIMONIAL --}}
-       <section class="section testimonial">
-            <div class="container">
-                <h2 class="section-title">Apa Kata Mereka?</h2>
+<section class="section testimonial">
+    <div class="container">
+        <h2 class="section-title">Apa Kata Mereka?</h2>
 
-                <div class="testimonial-wrapper">
-                    @forelse(($testimoni ?? []) as $item)
-                        <div class="testimonial-item {{ $loop->first ? 'active' : '' }}">
-                            <div class="testimonial-card">
-                                <span class="testimonial-quote-icon">❝</span>
+        <div class="testimonial-wrapper">
+            @forelse(($testimoni ?? []) as $item)
+                <div class="testimonial-item {{ $loop->first ? 'is-active' : ($loop->index === 1 ? 'is-next' : 'is-hidden') }}" data-index="{{ $loop->index }}">
+                    <div class="testimonial-card">
+                        <div class="testimonial-head">
+                            @if($item->foto_profil)
+                                <img class="testimonial-avatar" src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama }}" loading="lazy">
+                            @else
+                                <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="{{ $item->nama }}" loading="lazy">
+                            @endif
 
-                                <p class="testimonial-description">
-                                    {{ $item->isi_testimoni }}
-                                </p>
-
-                                <div class="testimonial-divider"></div>
-
-                                <div class="testimonial-person">
-                                    @if($item->foto_profil)
-                                        <img class="testimonial-avatar" src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama }}" loading="lazy">
-                                    @else
-                                        <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="{{ $item->nama }}" loading="lazy">
-                                    @endif
-
-                                    <div class="testimonial-person-info">
-                                        <h3>{{ $item->nama }}</h3>
-                                        <span>{{ $item->jabatan }}</span>
-                                    </div>
-                                </div>
+                            <div class="testimonial-person-info">
+                                <h3>{{ $item->nama }}</h3>
+                                <span>{{ $item->jabatan }}</span>
                             </div>
                         </div>
-                    @empty
-                        <div class="testimonial-item active">
-                            <div class="testimonial-card">
-                                <span class="testimonial-quote-icon">❝</span>
 
-                                <p class="testimonial-description">
-                                    OrangBaik.id memudahkan kami untuk ikut berbagi dan mendukung program kebaikan.
-                                </p>
-
-                                <div class="testimonial-divider"></div>
-
-                                <div class="testimonial-person">
-                                    <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id" loading="lazy">
-
-                                    <div class="testimonial-person-info">
-                                        <h3>OrangBaik.id</h3>
-                                        <span>Platform Donasi</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforelse
+                        <p class="testimonial-description">
+                            {{ $item->isi_testimoni }}
+                        </p>
+                    </div>
                 </div>
+            @empty
+                <div class="testimonial-item is-active" data-index="0">
+                    <div class="testimonial-card">
+                        <div class="testimonial-head">
+                            <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id" loading="lazy">
+
+                            <div class="testimonial-person-info">
+                                <h3>OrangBaik.id</h3>
+                                <span>Platform Donasi</span>
+                            </div>
+                        </div>
+
+                        <p class="testimonial-description">
+                            OrangBaik.id memudahkan kami untuk ikut berbagi dan mendukung program kebaikan.
+                        </p>
+                    </div>
+                </div>
+            @endforelse
+        </div>
+
+        @if(($testimoni ?? collect())->count() > 1)
+            <div class="testimonial-nav">
+                <button type="button" class="testimonial-arrow" data-dir="prev" aria-label="Testimoni sebelumnya">‹</button>
+
+                <div class="testimonial-dots">
+                    @foreach($testimoni as $item)
+                        <button type="button" class="testimonial-dot {{ $loop->first ? 'active' : '' }}" data-index="{{ $loop->index }}" aria-label="Lihat testimoni {{ $loop->iteration }}"></button>
+                    @endforeach
+                </div>
+
+                <button type="button" class="testimonial-arrow" data-dir="next" aria-label="Testimoni berikutnya">›</button>
             </div>
-        </section>
+        @endif
+    </div>
+</section>
+
+<script>
+(() => {
+    const wrapper = document.querySelector('.testimonial-wrapper');
+    if (!wrapper) return;
+
+    const items = [...wrapper.querySelectorAll('.testimonial-item')];
+    const dots = [...document.querySelectorAll('.testimonial-dot')];
+    const prevBtn = document.querySelector('.testimonial-arrow[data-dir="prev"]');
+    const nextBtn = document.querySelector('.testimonial-arrow[data-dir="next"]');
+    const total = items.length;
+    
+    if (total <= 1) return;
+
+    let current = 0;
+    let timer = null;
+    let startX = 0;
+    let isDragging = false;
+
+    // Perhitungan posisi circular/looping yang presisi
+    function render() {
+        items.forEach((item, i) => {
+            let diff = i - current;
+
+            // Penanganan matematika putaran melingkar (Infinite Wrap)
+            if (diff > total / 2) diff -= total;
+            if (diff < -total / 2) diff += total;
+
+            item.classList.remove('is-active', 'is-prev', 'is-next', 'is-hidden');
+
+            if (diff === 0) {
+                item.classList.add('is-active');
+            } else if (diff === -1 || (current === 0 && i === total - 1)) {
+                item.classList.add('is-prev');
+            } else if (diff === 1 || (current === total - 1 && i === 0)) {
+                item.classList.add('is-next');
+            } else {
+                item.classList.add('is-hidden');
+            }
+        });
+
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
+    }
+
+    function goTo(index) {
+        current = (index + total) % total;
+        render();
+    }
+
+    function next() {
+        goTo(current + 1);
+    }
+
+    function prev() {
+        goTo(current - 1);
+    }
+
+    function restartTimer() {
+        clearInterval(timer);
+        timer = setInterval(next, 5000); // Otomatis berpindah setiap 5 detik
+    }
+
+    // Event Control (Navigasi Button & Dots)
+    dots.forEach(dot => {
+        dot.addEventListener('click', () => { 
+            goTo(parseInt(dot.dataset.index, 10)); 
+            restartTimer(); 
+        });
+    });
+
+    prevBtn?.addEventListener('click', () => { prev(); restartTimer(); });
+    nextBtn?.addEventListener('click', () => { next(); restartTimer(); });
+
+    // Pause saat kursor mouse di atas card
+    wrapper.addEventListener('mouseenter', () => clearInterval(timer));
+    wrapper.addEventListener('mouseleave', restartTimer);
+
+    // Support Swipe Gesture untuk Layar Sentuh / HP
+    wrapper.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        clearInterval(timer);
+    }, { passive: true });
+
+    wrapper.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        const endX = e.changedTouches[0].clientX;
+        const diffX = startX - endX;
+
+        if (Math.abs(diffX) > 40) { // Threshold geser 40px
+            if (diffX > 0) next();
+            else prev();
+        }
+        isDragging = false;
+        restartTimer();
+    }, { passive: true });
+
+    // Inisialisasi awal
+    render();
+    restartTimer();
+})();
+</script>
         {{-- KATEGORI FAVORIT --}}
         <section class="section" id="kategori-favorit">
             <div class="container">

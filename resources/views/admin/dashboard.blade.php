@@ -68,7 +68,7 @@
 
         <div class="stat-card">
             <div class="stat-icon icon-red">
-                <div class="bi bi-x-circle-fill"></div>
+                <i class="bi bi-x-circle-fill"></i>
             </div>
             <div>
                 <p class="stat-label">Transaksi Gagal / Expired</p>
@@ -117,7 +117,6 @@
         </div>
 
     </section>
-
 
     {{-- ========================================================== --}}
     {{-- MENU MANAJEMEN                                             --}}

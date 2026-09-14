@@ -237,6 +237,7 @@ body {
     font-size: var(--fs-lg);
     font-weight: var(--fw-bold);
     line-height: 1.2;
+    color: var(--muted)
     margin-bottom: var(--space-3);
 }
 
@@ -277,6 +278,83 @@ body {
     color: rgba(255, 255, 255, .85);
     font-weight: var(--fw-semibold);
     font-size: var(--fs-sm);
+}
+
+/* =========================================================
+   VERIFY EMAIL & ALERT SPECIFIC STYLES
+   ========================================================= */
+
+/* Alert Sukses (Pesan Pengiriman Email) */
+.alert-success {
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    border-radius: var(--radius-md);
+    color: #047857;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-4);
+    line-height: 1.5;
+}
+
+/* Box Teks Tampilan Informasi */
+.verify-info-box {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* Tata Letak Tombol Aksi */
+/* ACTION GROUP (Tombol Resend & Logout) */
+.action-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3, 12px);
+    margin-top: var(--space-4, 16px);
+}
+
+.action-group form {
+    width: 100%;
+}
+
+.action-group .login-button {
+    width: 100%;
+    margin-top: 0; /* Menghilangkan margin bawaan login-button */
+}
+
+.btn-logout-wrapper {
+    text-align: center;
+    margin-top: var(--space-2, 8px);
+}
+
+.btn-logout {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.btn-logout:hover {
+    color: #ef4444;
+    text-decoration: underline;
+}
+
+/* Tambahan Responsif Mobile (≤576px) */
+@media (max-width: 576px) {
+    .action-group {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
 }
 
 /* =========================================================

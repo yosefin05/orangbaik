@@ -469,125 +469,211 @@
     }
 
     /* ============================
-    TESTIMONIAL
-    ============================ */
+   TESTIMONIAL 3D CAROUSEL
+   ============================ */
 
-    .testimonial {
-        background: var(--bg-soft);
+.testimonial {
+    background: linear-gradient(180deg, var(--bg-soft), var(--primary-light));
+    padding: 60px 0;
+}
+
+.testimonial-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 380px; /* Tambahkan sedikit ruang agar card active tidak terpotong */
+    margin-top: var(--space-8, 32px);
+    overflow: hidden;
+}
+
+.testimonial-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Gunakan kubik bezier agar efek transisi terasa lebih fluid */
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease, z-index 0.6s step-end;
+    transform-origin: center center;
+    will-change: transform, opacity;
+}
+
+.testimonial-item.is-active {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    z-index: 3;
+}
+
+.testimonial-item.is-prev {
+    transform: translate(calc(-50% - 280px), -50%) scale(0.82);
+    opacity: 0.5;
+    z-index: 2;
+}
+
+.testimonial-item.is-next {
+    transform: translate(calc(-50% + 280px), -50%) scale(0.82);
+    opacity: 0.5;
+    z-index: 2;
+}
+
+.testimonial-item.is-hidden {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* CARD */
+.testimonial-card {
+    width: 240px;
+    padding: var(--space-5, 20px);
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    text-align: left;
+    transition: all 0.5s ease;
+}
+
+.testimonial-item.is-active .testimonial-card {
+    width: 340px;
+    padding: 45px var(--space-8, 32px) var(--space-8, 32px);
+    border-color: var(--border);
+    box-shadow: var(--shadow-hover);
+}
+
+/* HEAD — avatar + nama + jabatan */
+.testimonial-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3, 12px);
+    margin-bottom: var(--space-3, 12px);
+    transition: all 0.5s ease;
+}
+
+.testimonial-item.is-active .testimonial-head {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: var(--space-4, 16px);
+}
+
+.testimonial-avatar {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 0 2px var(--bg);
+    transition: all 0.5s ease;
+}
+
+.testimonial-item.is-active .testimonial-avatar {
+    width: 76px;
+    height: 76px;
+    margin-top: -70px;
+    box-shadow: 0 0 0 4px var(--bg), var(--shadow-soft);
+}
+
+.testimonial-person-info h3 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.testimonial-item.is-active .testimonial-person-info h3 {
+    font-size: var(--fs-md);
+}
+
+.testimonial-person-info span {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
+}
+
+/* DESCRIPTION */
+.testimonial-description {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
+    line-height: 1.6;
+    transition: all 0.5s ease;
+}
+
+.testimonial-item.is-active .testimonial-description {
+    color: var(--text);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    line-height: 1.7;
+    text-align: center;
+}
+
+/* NAV — panah + dots */
+.testimonial-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4, 16px);
+    margin-top: var(--space-8, 32px);
+}
+
+.testimonial-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+
+.testimonial-arrow:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.testimonial-arrow:active {
+    transform: scale(.92);
+}
+
+.testimonial-dots {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+}
+
+.testimonial-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--border);
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background .3s ease, transform .3s ease;
+}
+
+.testimonial-dot.active {
+    background: var(--primary);
+    transform: scale(1.4);
+}
+
+@media (max-width: 768px) {
+    .testimonial-item.is-prev {
+        transform: translate(calc(-50% - 160px), -50%) scale(0.7);
+        opacity: 0.2;
     }
-
-    .testimonial-wrapper {
-        position: relative;
-
-        width: 100%;
-        min-height: 320px;
+    .testimonial-item.is-next {
+        transform: translate(calc(-50% + 160px), -50%) scale(0.7);
+        opacity: 0.2;
     }
-
-    .testimonial-item {
-        position: absolute;
-        inset: 0;
-
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(10px);
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        transition:
-            opacity .5s ease,
-            visibility .5s ease,
-            transform .5s ease;
-    }
-
-    .testimonial-item.active {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    /* CARD — gaya editorial pull-quote, tenang & profesional */
-    .testimonial-card {
-        position: relative;
-
-        width: 100%;
-        max-width: 680px;
-        margin: 0 auto;
-
-        padding: var(--space-10, 40px);
-
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-card);
-
-        text-align: left;
-    }
-
-    /* tanda kutip besar sebagai watermark halus, bukan badge mencolok */
-    .testimonial-quote-icon {
-        display: block;
-        margin-bottom: var(--space-2, 8px);
-
-        color: var(--primary-light);
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 52px;
-        font-style: normal;
-        line-height: 1;
-    }
-
-    .testimonial-description {
-        margin: 0 0 var(--space-6, 24px);
-
-        color: var(--text);
-        font-size: var(--fs-sm);
-        font-weight: var(--fw-medium);
-        line-height: 1.75;
-    }
-
-    .testimonial-divider {
-        width: 36px;
-        height: 3px;
-        margin-bottom: var(--space-5, 20px);
-
-        background: var(--primary);
-        border-radius: var(--radius-full);
-    }
-
-    .testimonial-person {
-        display: flex;
-        align-items: center;
-        gap: var(--space-3, 12px);
-    }
-
-    .testimonial-avatar {
-        width: 52px;
-        height: 52px;
-        flex-shrink: 0;
-
-        object-fit: cover;
-        border-radius: var(--radius-full);
-        border: 1px solid var(--border);
-    }
-
-    .testimonial-person-info h3 {
-        margin: 0;
-
-        color: var(--text-dark);
-        font-size: var(--fs-xs);
-        font-weight: var(--fw-bold);
-    }
-
-    .testimonial-person-info span {
-        display: block;
-        margin-top: 2px;
-
-        color: var(--muted);
-        font-size: var(--fs-xxs);
-        font-weight: var(--fw-regular);
-        font-style: normal;
-    }
+}
 
     /* ============================
     LIST CAMPAIGN
@@ -740,9 +826,8 @@
         /* CATEGORY MOBILE: 4 ATAS, 2/4 BAWAH */
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: var(--space-5, 20px) var(--space-3, 12px);
-
             overflow: visible;
             padding-bottom: 0;
         }
