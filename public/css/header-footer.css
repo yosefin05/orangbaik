@@ -1035,6 +1035,12 @@
     padding: var(--space-5) 0;
 }
 
+.footer-trust-badges span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
 /* ============================
    PROFILE MENU ICON
    ============================ */
@@ -1240,14 +1246,24 @@
         transition: padding-bottom .25s ease;
     }
 
+    /* ============================
+       FOOTER — stacked, centered,
+       tiap section dipisah divider
+       ============================ */
     .footer-inner {
         grid-template-columns: 1fr;
-        gap: var(--space-6, 24px);
+        gap: 0;
         text-align: center;
+        padding-block: var(--space-10, 40px) var(--space-6, 24px);
     }
 
     .footer-brand {
         max-width: 100%;
+        padding-bottom: var(--space-6, 24px);
+    }
+
+    .footer-logo {
+        margin-inline: auto;
     }
 
     .footer-socials,
@@ -1256,6 +1272,40 @@
     }
 
     .footer-col {
-        align-items: center;
+        display: grid;
+        grid-template-columns: 128px 1fr;
+        column-gap: var(--space-4, 16px);
+        row-gap: var(--space-3, 12px);
+        align-items: start;
+
+        text-align: left;
+        padding-block: var(--space-6, 24px);
+
+        border-top: 1px solid rgba(255, 255, 255, .18);
+    }
+
+    .footer-col h4 {
+        grid-column: 1;
+        grid-row: 1;
+        align-self: start;
+        white-space: normal;
+    }
+
+    .footer-col a,
+    .footer-col p {
+        grid-column: 2;
+        justify-content: flex-start;
+    }
+
+    .footer-bottom-inner {
+        flex-direction: column !important;
+        gap: var(--space-2, 8px) !important;
+        text-align: center !important;
+    }
+
+    .footer-trust-badges {
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        gap: 6px 16px !important;
     }
 }

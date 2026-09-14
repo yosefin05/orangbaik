@@ -42,12 +42,13 @@ class FlipDriver implements PaymentDriverInterface
             'donasi_id'      => $donasi->id,
             'bank_name'      => $channel->name,
             'account_number' => $vaData['account_number'] ?? null,
-            'account_name'   => $channel->account_name ?? 'OrangBaik',
-            'amount'         => $donasi->nominal,
+            'account_name'   => $vaData['account_name'] ?? $channel->account_name ?? 'OrangBaik',
+            'amount'         => $vaData['amount'] ?? $donasi->nominal,
             'expired_at'     => $vaData['expired_date'] ?? null,
             'redirect_url'   => route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
         ];
     }
+
 
     public function handleWebhook(Request $request): bool
     {
