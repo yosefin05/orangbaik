@@ -60,7 +60,7 @@ body {
 }
 .campaign-hero-image {
     width: 100%;
-    height: minmax(0, 1fr) 340px;
+    height: 340px;
     object-fit: cover;
     border-radius: var(--radius);
     border: 1px solid var(--border);
@@ -650,7 +650,9 @@ body {
 }
 .summary-meta {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
+    gap: var(--space-2);
     color: var(--muted);
     font-size: var(--fs-xs);
 }
@@ -914,6 +916,7 @@ body {
 }
 .fundraiser-total-donasi {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--space-2);
     margin: var(--space-3) 0;
@@ -1740,6 +1743,7 @@ body {
     .detail-layout {
         grid-template-columns: 1fr;
     }
+    .detail-main,
     .detail-sidebar {
         position: static;
     }
@@ -1956,9 +1960,10 @@ body {
         bottom: var(--space-4);
     }
     .icon-section {
-        width: 32px;
-        height: 32px;
-        margin-right: 8px;
+        width: 64px;
+        height: 64px;
+        max-width: 64px;
+        margin: 0 auto var(--space-3);
     }
     .pesan-doa-avatar {
         width: 38px;
@@ -2019,6 +2024,18 @@ body {
 }
 @media (min-width: 769px) {
     .mobile-sticky-cta {
+        display: none !important;
+    }
+}
+
+/* ============================================================
+   Halaman ini punya CTA donasi sendiri (.mobile-sticky-cta),
+   jadi bottom-nav & floating-donate-btn global (dari
+   header-footer.css) disembunyikan biar nggak numpuk di mobile
+   ============================================================ */
+@media (max-width: 600px) {
+    body:has(.mobile-sticky-cta) .mobile-bottom-nav,
+    body:has(.mobile-sticky-cta) .floating-donate-btn {
         display: none !important;
     }
 }
