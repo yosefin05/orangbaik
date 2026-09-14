@@ -1,16 +1,17 @@
 /* ============================================================
    CAMPAIGN SHOW - ORANGBAIK.ID
    ============================================================ */
+
 /* ============================================================
    GLOBAL OVERFLOW PROTECTION
-   ============================================================ */
+============================================================ */
 body {
     overflow-x: hidden;
 }
 
 /* ============================================================
    ALERT
-   ============================================================ */
+============================================================ */
 .alert-success {
     background: var(--success-light);
     color: #15803d;
@@ -29,18 +30,19 @@ body {
 }
 
 /* ============================================================
-   LAYOUT
-   ============================================================ */
+   LAYOUT — pakai .container dari global.css untuk padding
+============================================================ */
 .detail-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--space-6) var(--space-4);
+    /* width & margin & padding-inline sudah dihandle .container */
+    padding-block: var(--space-6);
 }
+
 .detail-layout {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: minmax(0, 1fr) 340px;
     gap: var(--space-8);
     align-items: start;
+    min-width: 0;
 }
 .detail-main {
     display: flex;
@@ -77,10 +79,12 @@ body {
 
 /* ============================================================
    RICH TEXT OUTPUT
-   ============================================================ */
+============================================================ */
 .rich-text-output {
     text-align: justify;
     font-size: var(--fs-sm);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .rich-text-output img {
     display: block;
@@ -94,7 +98,7 @@ body {
 
 /* ============================================================
    SECTION HEADER
-   ============================================================ */
+============================================================ */
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -110,6 +114,8 @@ body {
     font-size: var(--fs-md);
     font-weight: var(--fw-semibold);
     color: var(--text-dark);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .section-actions {
     display: flex;
@@ -165,7 +171,7 @@ body {
 
 /* ============================================================
    UPDATE CARD
-   ============================================================ */
+============================================================ */
 .updates-list {
     display: flex;
     flex-direction: column;
@@ -233,6 +239,7 @@ body {
     margin-bottom: var(--space-2);
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     overflow-wrap: break-word;
@@ -241,7 +248,7 @@ body {
 
 /* ============================================================
    BUTTON READ MORE
-   ============================================================ */
+============================================================ */
 .btn-read-more {
     display: inline-flex;
     align-items: center;
@@ -269,7 +276,7 @@ body {
 
 /* ============================================================
    UPDATE DETAIL (EXPAND)
-   ============================================================ */
+============================================================ */
 .update-detail-wrapper {
     max-height: 0;
     overflow: hidden;
@@ -333,7 +340,7 @@ body {
 
 /* ============================================================
    UPDATE FOOTER
-   ============================================================ */
+============================================================ */
 .update-footer {
     margin-top: var(--space-3);
     padding-top: var(--space-2);
@@ -382,7 +389,7 @@ body {
 
 /* ============================================================
    EMPTY UPDATES
-   ============================================================ */
+============================================================ */
 .empty-updates {
     text-align: center;
     padding: var(--space-8) var(--space-4);
@@ -422,7 +429,7 @@ body {
 
 /* ============================================================
    PESAN & DOA DONATUR
-   ============================================================ */
+============================================================ */
 .pesan-doa-section {
     margin-top: var(--space-2);
 }
@@ -603,13 +610,14 @@ body {
 
 /* ============================================================
    DONATION SUMMARY
-   ============================================================ */
+============================================================ */
 .donation-summary-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
     padding: var(--space-5);
     box-shadow: var(--shadow-card);
+    min-width: 0;
 }
 .donation-summary-card h2 {
     font-size: var(--fs-sm);
@@ -627,6 +635,8 @@ body {
     font-size: var(--fs-lg);
     font-weight: var(--fw-extrabold);
     color: var(--primary);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .summary-amount span {
     color: var(--muted);
@@ -684,7 +694,7 @@ body {
 
 /* ============================================================
    FUNDRAISER INFO
-   ============================================================ */
+============================================================ */
 .fundraiser-info-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
@@ -723,7 +733,7 @@ body {
 
 /* ============================================================
    SIDE LIST
-   ============================================================ */
+============================================================ */
 .side-list-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
@@ -814,7 +824,7 @@ body {
 
 /* ============================================================
    FUNDRAISER JOIN CARD
-   ============================================================ */
+============================================================ */
 .fundraiser-join-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
@@ -895,7 +905,7 @@ body {
 
 /* ============================================================
    FUNDRAISER REFERRAL CARD
-   ============================================================ */
+============================================================ */
 .fundraiser-referral-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
@@ -1007,7 +1017,7 @@ body {
 
 /* ============================================================
    LIGHTBOX
-   ============================================================ */
+============================================================ */
 .lightbox-overlay {
     position: fixed;
     inset: 0;
@@ -1135,20 +1145,18 @@ body {
     margin: 0 auto var(--space-5);
     opacity: 0.9;
 }
+
 /* ============================================================
    MODAL POP-UP FUNDRAISER
-   ============================================================ */
+============================================================ */
 .modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
-
     justify-content: center;
     align-items: center;
-
     background: rgba(15, 23, 42, 0.55);
     backdrop-filter: blur(6px);
-
     z-index: 9999;
     animation: fadeIn 0.25s ease;
 }
@@ -1162,11 +1170,9 @@ body {
     max-width: 440px;
     max-height: 90vh;
     overflow-y: auto;
-
     background: var(--bg);
     border-radius: var(--radius-lg, 20px);
     box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
-
     animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -1186,15 +1192,11 @@ body {
     }
 }
 
-/* ---------- HEADER ---------- */
 .modal-header {
     position: relative;
-
     padding: var(--space-7, 28px) var(--space-7, 28px) var(--space-6, 24px);
-
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     border-radius: var(--radius-lg, 20px) var(--radius-lg, 20px) 0 0;
-
     text-align: center;
 }
 
@@ -1203,7 +1205,6 @@ body {
     align-items: center;
     justify-content: center;
     gap: var(--space-2, 8px);
-
     margin-bottom: var(--space-4, 16px);
 }
 
@@ -1221,7 +1222,6 @@ body {
 
 .modal-header h2 {
     margin: 0;
-
     color: #fff;
     font-size: var(--fs-lg);
     font-weight: var(--fw-extrabold, 800);
@@ -1230,7 +1230,6 @@ body {
 
 .modal-header .subtitle {
     margin-top: var(--space-1, 4px);
-
     color: rgba(255, 255, 255, 0.85);
     font-size: var(--fs-xs);
 }
@@ -1239,19 +1238,15 @@ body {
     position: absolute;
     top: var(--space-4, 16px);
     right: var(--space-4, 16px);
-
     width: 34px;
     height: 34px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     background: rgba(255, 255, 255, 0.15);
     border: none;
     border-radius: 50%;
     color: #fff;
-
     font-size: 16px;
     cursor: pointer;
     transition: 0.2s ease;
@@ -1262,7 +1257,6 @@ body {
     transform: rotate(90deg);
 }
 
-/* ---------- BODY ---------- */
 .modal-body {
     padding: var(--space-6, 24px) var(--space-7, 28px) var(--space-7, 28px);
 }
@@ -1271,19 +1265,15 @@ body {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2, 8px);
-
     margin: calc(var(--space-5, 20px) * -1) auto var(--space-5, 20px);
     padding: var(--space-2, 8px) var(--space-4, 16px);
-
     background: var(--bg);
     border: 1px solid var(--success-light, #dcfce7);
     border-radius: var(--radius-full);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
     color: #15803d;
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
-
     position: relative;
     width: fit-content;
 }
@@ -1296,10 +1286,8 @@ body {
     display: flex;
     align-items: center;
     gap: var(--space-3, 12px);
-
     padding: var(--space-4, 16px);
     margin-bottom: var(--space-5, 20px);
-
     background: var(--bg-soft);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius-md);
@@ -1309,7 +1297,6 @@ body {
     width: 44px;
     height: 44px;
     flex-shrink: 0;
-
     border-radius: 50%;
     border: 2px solid var(--bg);
     box-shadow: 0 0 0 2px var(--primary);
@@ -1326,7 +1313,6 @@ body {
 .fundraiser-name-modal small {
     display: block;
     margin-top: 2px;
-
     color: var(--muted);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-regular);
@@ -1338,14 +1324,11 @@ body {
     margin: var(--space-5, 20px) 0;
 }
 
-/* ---------- SECTION TITLE ---------- */
 .referral-section-title {
     display: flex;
     align-items: center;
     gap: var(--space-2, 8px);
-
     margin-bottom: var(--space-2, 8px);
-
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
@@ -1356,15 +1339,12 @@ body {
     font-size: var(--fs-sm);
 }
 
-/* ---------- REFERRAL LINK ---------- */
 .referral-link-box-modal {
     display: flex;
     align-items: center;
     gap: var(--space-2, 8px);
-
     padding: var(--space-1, 4px) var(--space-1, 4px) var(--space-1, 4px) var(--space-4, 16px);
     margin-bottom: var(--space-2, 8px);
-
     background: var(--bg-soft);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius-md);
@@ -1373,13 +1353,10 @@ body {
 .referral-link-box-modal input {
     flex: 1;
     min-width: 0;
-
     border: none;
     background: transparent;
     outline: none;
-
     padding: var(--space-3, 12px) 0;
-
     color: var(--text-dark);
     font-family: 'Courier New', monospace;
     font-size: var(--fs-xxs);
@@ -1389,16 +1366,13 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     width: 38px;
     height: 38px;
     flex-shrink: 0;
-
     background: var(--primary);
     border: none;
     border-radius: var(--radius-sm);
     color: #fff;
-
     font-size: 15px;
     cursor: pointer;
     transition: 0.2s ease;
@@ -1409,15 +1383,12 @@ body {
     transform: scale(1.05);
 }
 
-/* ---------- REFERRAL CODE ---------- */
 .referral-code-box {
     display: flex;
     align-items: center;
     gap: var(--space-3, 12px);
-
     padding: var(--space-3, 12px) var(--space-3, 12px) var(--space-3, 12px) var(--space-4, 16px);
     margin-bottom: var(--space-5, 20px);
-
     background: var(--bg-soft);
     border: 1px dashed var(--border);
     border-radius: var(--radius-md);
@@ -1433,7 +1404,6 @@ body {
 
 .referral-code-box .code-value {
     flex: 1;
-
     color: var(--primary);
     font-family: 'Courier New', monospace;
     font-size: var(--fs-sm);
@@ -1445,14 +1415,11 @@ body {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1, 4px);
-
     padding: var(--space-2, 8px) var(--space-3, 12px);
-
     background: var(--primary);
     border: none;
     border-radius: var(--radius-sm);
     color: #fff;
-
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
     cursor: pointer;
@@ -1464,19 +1431,15 @@ body {
     transform: scale(1.05);
 }
 
-/* ---------- QR CODE ---------- */
 .modal-qr-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-
     padding: var(--space-5, 20px);
     margin-bottom: var(--space-2, 8px);
-
     background: var(--bg-soft);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius-md);
-
     cursor: pointer;
     transition: 0.2s ease;
 }
@@ -1493,40 +1456,32 @@ body {
 .modal-qr-wrapper svg {
     max-width: 150px;
     height: auto;
-
     padding: var(--space-2, 8px);
-
     background: #fff;
     border-radius: var(--radius-sm);
 }
 
 .modal-qr-label {
     margin-top: var(--space-3, 12px);
-
     color: var(--muted);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-medium);
 }
 
-/* ---------- ACTIONS ---------- */
 .modal-actions {
     display: flex;
     gap: var(--space-3, 12px);
-
     margin-top: var(--space-6, 24px);
 }
 
 .modal-actions .btn-modal-primary,
 .modal-actions .btn-modal-secondary {
     flex: 1;
-
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-2, 8px);
-
     height: 48px;
-
     border-radius: var(--radius-full);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
@@ -1559,18 +1514,15 @@ body {
 
 /* ============================================================
    MODAL QR FULLSCREEN
-   ============================================================ */
+============================================================ */
 .modal-qr-overlay {
     display: none;
     position: fixed;
     inset: 0;
-
     justify-content: center;
     align-items: center;
-
     background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(8px);
-
     z-index: 10000;
     animation: fadeIn 0.25s ease;
 }
@@ -1581,18 +1533,14 @@ body {
 
 .modal-qr-fullscreen {
     position: relative;
-
     width: 90%;
     max-width: 460px;
     max-height: 90vh;
     overflow-y: auto;
-
     padding: var(--space-8, 32px);
-
     background: var(--bg);
     border-radius: var(--radius-lg, 20px);
     box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.4);
-
     animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -1600,19 +1548,15 @@ body {
     position: absolute;
     top: var(--space-4, 16px);
     right: var(--space-4, 16px);
-
     width: 36px;
     height: 36px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     background: var(--bg-soft);
     border: none;
     border-radius: 50%;
     color: var(--text);
-
     font-size: 16px;
     cursor: pointer;
     transition: 0.2s ease;
@@ -1630,16 +1574,13 @@ body {
 .modal-qr-fullscreen-content #qrFullscreenContainer {
     display: flex;
     justify-content: center;
-
     margin-bottom: var(--space-5, 20px);
 }
 
 .modal-qr-fullscreen-content #qrFullscreenContainer svg {
     max-width: 240px;
     height: auto;
-
     padding: var(--space-4, 16px);
-
     background: #fff;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-card);
@@ -1647,7 +1588,6 @@ body {
 
 .modal-qr-fullscreen-content h3 {
     margin-bottom: var(--space-2, 8px);
-
     color: var(--text-dark);
     font-size: var(--fs-md);
     font-weight: var(--fw-extrabold, 800);
@@ -1655,7 +1595,6 @@ body {
 
 .modal-qr-fullscreen-content p {
     margin-bottom: var(--space-5, 20px);
-
     color: var(--muted);
     font-size: var(--fs-xs);
 }
@@ -1671,11 +1610,8 @@ body {
     display: flex;
     align-items: center;
     gap: var(--space-2, 8px);
-
     padding: var(--space-3, 12px) var(--space-5, 20px);
-
     border-radius: var(--radius-full);
-
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     cursor: pointer;
@@ -1707,7 +1643,7 @@ body {
 
 /* ============================================================
    TOAST NOTIFICATION
-   ============================================================ */
+============================================================ */
 .toast-notification {
     position: fixed;
     bottom: var(--space-8);
@@ -1738,7 +1674,9 @@ body {
 
 /* ============================================================
    RESPONSIVE
-   ============================================================ */
+============================================================ */
+
+/* Tablet */
 @media (max-width: 992px) {
     .detail-layout {
         grid-template-columns: 1fr;
@@ -1748,9 +1686,11 @@ body {
         position: static;
     }
 }
+
+/* HP besar */
 @media (max-width: 768px) {
     .detail-container {
-        padding: var(--space-4);
+        padding-block: var(--space-5);
     }
     .campaign-hero-image {
         height: 220px;
@@ -1824,7 +1764,12 @@ body {
         flex-direction: column;
     }
 }
+
+/* HP */
 @media (max-width: 576px) {
+    .detail-container {
+        padding-block: var(--space-4);
+    }
     .campaign-hero-image {
         height: 180px;
     }
@@ -1970,7 +1915,10 @@ body {
         height: 38px;
         flex-basis: 38px;
     }
-    /* Mobile Sticky Donation CTA */
+
+    /* ============================
+       Mobile Sticky Donation CTA
+    ============================ */
     .mobile-sticky-cta {
         position: fixed;
         bottom: 0;
@@ -2018,10 +1966,9 @@ body {
         transform: scale(0.98);
         background: var(--primary-hover);
     }
-    body {
-        padding-bottom: 75px;
-    }
 }
+
+/* Desktop only: sembunyikan sticky CTA */
 @media (min-width: 769px) {
     .mobile-sticky-cta {
         display: none !important;
@@ -2030,9 +1977,8 @@ body {
 
 /* ============================================================
    Halaman ini punya CTA donasi sendiri (.mobile-sticky-cta),
-   jadi bottom-nav & floating-donate-btn global (dari
-   header-footer.css) disembunyikan biar nggak numpuk di mobile
-   ============================================================ */
+   jadi bottom-nav & floating-donate-btn global disembunyikan
+============================================================ */
 @media (max-width: 600px) {
     body:has(.mobile-sticky-cta) .mobile-bottom-nav,
     body:has(.mobile-sticky-cta) .floating-donate-btn {

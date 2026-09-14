@@ -1,9 +1,16 @@
 /* ============================
    ZAKAT CALCULATOR — LEDGER THEME
+   Responsive: tablet, mobile, HP terkecil
    ============================ */
+
+body {
+    overflow-x: hidden;
+}
+
 .zakat-page {
     background: var(--bg);
     color: var(--text-dark);
+    overflow-x: hidden;
 }
 
 /* ============================
@@ -20,6 +27,11 @@
     grid-template-columns: minmax(0, 1fr) 320px;
     gap: var(--space-12, 48px);
     align-items: center;
+    min-width: 0;
+}
+
+.z-hero-copy {
+    min-width: 0;
 }
 
 .z-hero-copy h1 {
@@ -29,6 +41,8 @@
     font-weight: 600;
     line-height: 1.2;
     letter-spacing: -.01em;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .z-hero-copy p {
@@ -37,11 +51,14 @@
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.8;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .z-cta {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 48px;
     padding: 0 var(--space-7, 28px);
     border-radius: var(--radius-full);
@@ -50,6 +67,7 @@
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     transition: .2s ease;
+    white-space: nowrap;
 }
 .z-cta:hover {
     background: var(--primary-hover);
@@ -65,6 +83,7 @@
     border-radius: 4px;
     box-shadow: var(--shadow-card);
     transform: rotate(1.5deg);
+    min-width: 0;
 }
 .z-hero-receipt::before,
 .z-hero-receipt::after {
@@ -86,13 +105,19 @@
     gap: var(--space-4, 16px);
     padding: var(--space-2, 8px) 0;
     font-size: var(--fs-xxs);
+    min-width: 0;
 }
 .z-receipt-row span {
     color: var(--muted);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .z-receipt-row strong {
     color: var(--text-dark);
     font-weight: var(--fw-semibold);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: right;
 }
 .z-receipt-divider {
     border-top: 1px dashed var(--border);
@@ -122,10 +147,13 @@
     color: var(--text);
     font-size: var(--fs-xs);
     line-height: 1.7;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .z-note i {
     margin-top: 3px;
     color: var(--secondary-hover);
+    flex-shrink: 0;
 }
 .z-note a {
     color: var(--primary);
@@ -147,6 +175,7 @@
     grid-template-columns: minmax(0, 1fr) 360px;
     gap: var(--space-8, 32px);
     align-items: start;
+    min-width: 0;
 }
 
 .zakat-panel,
@@ -155,6 +184,7 @@
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
+    min-width: 0;
 }
 
 .z-ledger {
@@ -168,11 +198,15 @@
     margin: 0 0 var(--space-1, 4px);
     font-size: var(--fs-md);
     font-weight: 600;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .z-ledger-header p {
     margin: 0;
     color: var(--muted);
     font-size: var(--fs-xs);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* --- underline tabbar --- */
@@ -182,6 +216,11 @@
     margin-bottom: var(--space-7, 28px);
     border-bottom: 1px solid var(--border-soft);
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.z-tabbar::-webkit-scrollbar {
+    display: none;
 }
 
 .zakat-tab {
@@ -197,6 +236,7 @@
     font-family: inherit;
     cursor: pointer;
     transition: .15s ease;
+    white-space: nowrap;
 }
 .zakat-tab i {
     font-size: var(--fs-sm);
@@ -235,11 +275,14 @@
     align-items: center;
     gap: var(--space-5, 20px);
     margin-bottom: var(--space-6, 24px);
+    flex-wrap: wrap;
 }
 .z-form-head h3 {
     margin: 0;
     font-size: var(--fs-sm);
     font-weight: 600;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .z-nisab {
     text-align: right;
@@ -258,13 +301,14 @@
 /* --- dynamic fields --- */
 .zakat-fields {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-5, 20px);
 }
 .zakat-field {
     display: flex;
     flex-direction: column;
     gap: var(--space-2, 8px);
+    min-width: 0;
 }
 .zakat-field-full {
     grid-column: 1 / -1;
@@ -274,9 +318,12 @@
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-input-wrap {
     position: relative;
+    min-width: 0;
 }
 .zakat-input-prefix {
     position: absolute;
@@ -286,6 +333,7 @@
     color: var(--muted);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
+    pointer-events: none;
 }
 .zakat-input-wrap input {
     width: 100%;
@@ -299,6 +347,7 @@
     font-size: var(--fs-xs);
     outline: none;
     transition: .15s ease;
+    min-width: 0;
 }
 .zakat-input-wrap.has-prefix input {
     padding-left: 44px;
@@ -310,6 +359,8 @@
 .zakat-field small {
     color: var(--muted);
     font-size: var(--fs-xxs);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* --- live preview --- */
@@ -322,6 +373,7 @@
     padding: var(--space-5, 20px);
     background: var(--bg-soft);
     border-radius: var(--radius-sm);
+    min-width: 0;
 }
 .zakat-live-preview span {
     display: block;
@@ -334,6 +386,8 @@
     font-family: "Fraunces", serif;
     font-size: var(--fs-md);
     font-weight: 600;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-live-preview p {
     max-width: 280px;
@@ -341,6 +395,8 @@
     color: var(--muted);
     font-size: var(--fs-xxs);
     text-align: right;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .zakat-submit-button {
@@ -374,6 +430,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-5, 20px);
+    min-width: 0;
 }
 
 .zakat-result-card {
@@ -402,11 +459,14 @@
     margin-bottom: var(--space-6, 24px);
     padding-bottom: var(--space-5, 20px);
     border-bottom: 1px dashed var(--border);
+    flex-wrap: wrap;
 }
 .zakat-result-header h2 {
     margin: 0;
     font-size: var(--fs-sm);
     font-weight: 600;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-result-badge {
     display: inline-flex;
@@ -414,11 +474,13 @@
     justify-content: center;
     min-width: 50px;
     height: 30px;
+    padding: 0 10px;
     border-radius: var(--radius-full);
     background: var(--secondary-light);
     color: var(--secondary-hover);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-extrabold);
+    white-space: nowrap;
 }
 
 .zakat-result-title {
@@ -432,11 +494,15 @@
     font-size: clamp(28px, 4vw, 38px);
     font-weight: 600;
     letter-spacing: -.02em;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-result-subtitle {
     margin: 0 0 var(--space-5, 20px);
     color: var(--muted);
     font-size: var(--fs-xxs);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .zakat-result-detail {
@@ -452,16 +518,22 @@
     padding: var(--space-3, 12px) 0;
     border-bottom: 1px dashed var(--border);
     font-size: var(--fs-xxs);
+    min-width: 0;
 }
 .zakat-result-row:last-child {
     border-bottom: none;
 }
 .zakat-result-row span {
     color: var(--muted);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-result-row strong {
     color: var(--text-dark);
     font-weight: var(--fw-bold);
+    text-align: right;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-result-row.total strong {
     color: var(--secondary-hover);
@@ -481,18 +553,24 @@
 .zakat-law-card i {
     color: var(--primary);
     font-size: var(--fs-sm);
+    flex-shrink: 0;
+    margin-top: 2px;
 }
 .zakat-law-card h4 {
     margin: 0 0 var(--space-1, 4px);
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-law-card p {
     margin: 0;
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.6;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .zakat-empty-state {
@@ -503,6 +581,7 @@
     justify-content: center;
     gap: var(--space-4, 16px);
     text-align: center;
+    padding: var(--space-5, 20px);
 }
 .zakat-empty-state i {
     font-size: 40px;
@@ -514,6 +593,8 @@
     color: var(--muted);
     font-size: var(--fs-xs);
     line-height: 1.7;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .zakat-action-card {
@@ -528,11 +609,15 @@
     margin: 0 0 var(--space-2, 8px);
     font-size: var(--fs-sm);
     font-weight: 600;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-action-card p {
     margin: 0 0 var(--space-5, 20px);
     color: var(--muted);
     font-size: var(--fs-xs);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .zakat-pay-button,
 .zakat-print-button {
@@ -553,6 +638,7 @@
     margin-bottom: var(--space-3, 12px);
     background: var(--primary);
     color: var(--bg);
+    border: none;
 }
 .zakat-pay-button:hover {
     background: var(--primary-hover);
@@ -569,7 +655,7 @@
 }
 
 /* ============================
-   TERMS — checklist, not cards
+   TERMS — checklist
    ============================ */
 .z-terms-section {
     padding: var(--space-14, 56px) 0 var(--space-16, 64px);
@@ -585,23 +671,28 @@
     margin: 0 0 var(--space-2, 8px);
     font-size: var(--fs-lg);
     font-weight: 600;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .z-terms-heading p {
     margin: 0;
     color: var(--muted);
     font-size: var(--fs-xs);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .z-terms-list {
     max-width: 760px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-6, 24px) var(--space-8, 32px);
 }
 .z-term-row {
     display: flex;
     gap: var(--space-4, 16px);
+    min-width: 0;
 }
 .z-term-row i {
     flex-shrink: 0;
@@ -622,17 +713,21 @@
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .z-term-row p {
     margin: 0;
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.6;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
-/* ============================
-   RESPONSIVE TABLET (601px - 900px)
-   ============================ */
+/* ============================================================
+   RESPONSIVE — TABLET (<= 900px)
+   ============================================================ */
 @media (max-width: 900px) {
     .z-hero {
         padding: var(--space-14, 56px) 0;
@@ -650,6 +745,7 @@
 
     .zakat-calculator-layout {
         grid-template-columns: 1fr;
+        gap: var(--space-6, 24px);
     }
 
     .zakat-result-area {
@@ -658,17 +754,17 @@
     }
 
     .zakat-fields {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .z-terms-list {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-/* ============================
-   RESPONSIVE MOBILE (<= 600px)
-   ============================ */
+/* ============================================================
+   RESPONSIVE — MOBILE (<= 600px)
+   ============================================================ */
 @media (max-width: 600px) {
     .z-hero {
         padding: var(--space-11, 44px) 0;
@@ -687,10 +783,24 @@
         margin-bottom: var(--space-5, 20px);
     }
 
+    .z-cta {
+        width: 100%;
+        justify-content: center;
+    }
+
     .z-hero-receipt {
         max-width: 100%;
         transform: none;
         padding: var(--space-4, 16px);
+    }
+
+    .z-receipt-row {
+        font-size: 11px;
+        gap: var(--space-2, 8px);
+    }
+
+    .z-receipt-total strong {
+        font-size: var(--fs-xs);
     }
 
     .z-note-section {
@@ -726,6 +836,7 @@
     .z-tabbar {
         gap: var(--space-3, 12px);
         padding-bottom: 0;
+        margin-bottom: var(--space-5, 20px);
     }
 
     .zakat-tab {
@@ -829,6 +940,7 @@
         font-size: 10px;
         min-width: 44px;
         height: 26px;
+        padding: 0 8px;
     }
 
     .zakat-result-title {
@@ -840,7 +952,8 @@
     }
 
     .zakat-empty-state {
-        min-height: 200px;
+        min-height: 180px;
+        padding: var(--space-4, 16px);
     }
 
     .zakat-empty-state i {
@@ -939,45 +1052,365 @@
     }
 }
 
-/* ============================
-   EXTRA SMALL (<= 400px)
-   ============================ */
-@media (max-width: 400px) {
+/* ============================================================
+   RESPONSIVE — HP KECIL (<= 480px)
+   ============================================================ */
+@media (max-width: 480px) {
+    .z-hero {
+        padding: var(--space-10, 40px) 0;
+    }
+
     .z-hero-copy h1 {
-        font-size: clamp(20px, 5vw, 26px);
+        font-size: clamp(22px, 5.5vw, 28px);
+    }
+
+    .z-hero-copy p {
+        font-size: 12px;
+    }
+
+    .z-cta {
+        min-height: 44px;
+        font-size: 12px;
+        padding: 0 var(--space-5, 20px);
+    }
+
+    .z-hero-receipt {
+        padding: var(--space-3, 12px);
+    }
+
+    .zakat-calculator-section {
+        padding: var(--space-5, 20px) 0 var(--space-10, 40px);
     }
 
     .z-ledger {
         padding: var(--space-4, 16px);
     }
 
-    .zakat-tab {
-        padding: var(--space-2, 6px) 0 var(--space-2, 8px);
+    .z-ledger-header h2 {
+        font-size: var(--fs-xs);
     }
 
-    .zakat-tab-content strong {
-        font-size: 10px;
+    .z-ledger-header p {
+        font-size: 11px;
     }
 
     .zakat-tab i {
-        font-size: 14px;
+        font-size: 13px;
+    }
+
+    .zakat-tab-content strong {
+        font-size: 11px;
+    }
+
+    .z-form-head h3 {
+        font-size: 12px;
+    }
+
+    .z-nisab strong {
+        font-size: 11px;
+    }
+
+    .zakat-field label {
+        font-size: 11px;
+    }
+
+    .zakat-field small {
+        font-size: 10px;
+    }
+
+    .zakat-input-wrap input {
+        height: 42px;
+        font-size: 12px;
+    }
+
+    .zakat-input-wrap.has-prefix input {
+        padding-left: 32px;
+    }
+
+    .zakat-input-prefix {
+        left: 10px;
+        font-size: 11px;
+    }
+
+    .zakat-live-preview {
+        padding: var(--space-3, 12px);
+    }
+
+    .zakat-live-preview strong {
+        font-size: 15px;
+    }
+
+    .zakat-live-preview p {
+        font-size: 10px;
+    }
+
+    .zakat-submit-button {
+        min-height: 42px;
+        font-size: 12px;
+        margin-top: var(--space-5, 20px);
     }
 
     .zakat-result-card {
         padding: var(--space-4, 16px);
     }
 
+    .zakat-result-header h2 {
+        font-size: 12px;
+    }
+
     .zakat-result-amount {
-        font-size: clamp(20px, 5vw, 24px);
+        font-size: clamp(22px, 6vw, 26px);
+    }
+
+    .zakat-result-subtitle {
+        font-size: 10px;
+    }
+
+    .zakat-result-row {
+        font-size: 11px;
+    }
+
+    .zakat-law-card h4 {
+        font-size: 11px;
+    }
+
+    .zakat-law-card p {
+        font-size: 10px;
     }
 
     .zakat-action-card {
         padding: var(--space-4, 16px);
     }
 
+    .zakat-action-card h3 {
+        font-size: 12px;
+    }
+
+    .zakat-action-card p {
+        font-size: 11px;
+    }
+
+    .zakat-pay-button,
+    .zakat-print-button {
+        min-height: 40px;
+        font-size: 11px;
+    }
+
+    .z-terms-section {
+        padding: var(--space-10, 40px) 0;
+    }
+
+    .z-terms-heading h2 {
+        font-size: 15px;
+    }
+
+    .z-terms-heading p {
+        font-size: 11px;
+    }
+
+    .z-term-row i {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+
+    .z-term-row strong {
+        font-size: 12px;
+    }
+
+    .z-term-row p {
+        font-size: 11px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — HP TERKECIL (<= 360px)
+   ============================================================ */
+@media (max-width: 360px) {
+    .z-hero {
+        padding: var(--space-8, 32px) 0;
+    }
+
+    .z-hero-copy h1 {
+        font-size: 20px;
+    }
+
+    .z-hero-copy p {
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .z-cta {
+        min-height: 42px;
+        font-size: 11px;
+        padding: 0 var(--space-4, 16px);
+    }
+
+    .z-hero-receipt {
+        padding: 10px;
+    }
+
+    .z-receipt-row {
+        font-size: 10px;
+    }
+
+    .z-receipt-total strong {
+        font-size: 12px;
+    }
+
+    .z-note {
+        font-size: 10px;
+        padding: 10px;
+    }
+
+    .z-ledger {
+        padding: var(--space-3, 12px);
+    }
+
+    .z-ledger-header h2 {
+        font-size: 12px;
+    }
+
+    .z-ledger-header p {
+        font-size: 10px;
+    }
+
+    .z-tabbar {
+        gap: var(--space-2, 8px);
+    }
+
+    .zakat-tab {
+        padding: 6px 0 8px;
+    }
+
+    .zakat-tab i {
+        font-size: 12px;
+    }
+
+    .zakat-tab-content strong {
+        font-size: 10px;
+    }
+
+    .z-form-head h3 {
+        font-size: 11px;
+    }
+
+    .z-nisab span,
+    .z-nisab strong {
+        font-size: 10px;
+    }
+
+    .zakat-field label {
+        font-size: 10px;
+    }
+
+    .zakat-input-wrap input {
+        height: 40px;
+        font-size: 11px;
+        padding: 0 10px;
+    }
+
+    .zakat-input-wrap.has-prefix input {
+        padding-left: 30px;
+    }
+
+    .zakat-input-prefix {
+        left: 10px;
+        font-size: 10px;
+    }
+
+    .zakat-live-preview strong {
+        font-size: 14px;
+    }
+
+    .zakat-live-preview span,
+    .zakat-live-preview p {
+        font-size: 10px;
+    }
+
+    .zakat-submit-button {
+        min-height: 40px;
+        font-size: 11px;
+    }
+
+    .zakat-result-card {
+        padding: 12px;
+    }
+
+    .zakat-result-header {
+        margin-bottom: var(--space-3, 12px);
+        padding-bottom: var(--space-3, 12px);
+    }
+
+    .zakat-result-header h2 {
+        font-size: 11px;
+    }
+
+    .zakat-result-badge {
+        font-size: 9px;
+        min-width: 40px;
+        height: 22px;
+        padding: 0 6px;
+    }
+
+    .zakat-result-amount {
+        font-size: 20px;
+    }
+
+    .zakat-result-row {
+        font-size: 10px;
+        padding: 6px 0;
+    }
+
+    .zakat-law-card i {
+        font-size: 11px;
+    }
+
+    .zakat-law-card h4 {
+        font-size: 10px;
+    }
+
+    .zakat-law-card p {
+        font-size: 10px;
+    }
+
+    .zakat-action-card {
+        padding: 12px;
+    }
+
+    .zakat-action-card h3 {
+        font-size: 11px;
+    }
+
+    .zakat-action-card p {
+        font-size: 10px;
+    }
+
     .zakat-pay-button,
     .zakat-print-button {
         min-height: 38px;
+        font-size: 10px;
+    }
+
+    .z-terms-heading h2 {
+        font-size: 14px;
+    }
+
+    .z-terms-heading p {
+        font-size: 10px;
+    }
+
+    .z-term-row i {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+    }
+
+    .z-term-row strong {
+        font-size: 11px;
+    }
+
+    .z-term-row p {
         font-size: 10px;
     }
 }
