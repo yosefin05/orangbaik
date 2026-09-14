@@ -1,297 +1,158 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buat Update - {{ $campaign->judul }} - OrangBaik.id</title>
 
-    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/campaign-update.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/campaign-update.css') }}?v={{ time() }}">
 </head>
-
-<body>
+<body class="bg-light">
 
     @include('components.header')
 
     <main class="campaign-update-page">
-        <section class="campaign-update-section">
-            <div class="container">
+        <div class="container">
 
-                {{-- Alert Error --}}
-                <x-alert-error />
+            <x-alert-error />
 
-                <form action="{{ route('campaign.update.store', $campaign->slug) }}" method="POST"
-                    enctype="multipart/form-data" class="campaign-update-layout" id="updateForm" novalidate>
-                    @csrf
+            {{-- Top Compact Navigation & Title --}}
+            <div class="update-top-bar">
+                <a href="{{ route('campaign.show', $campaign->slug) }}" class="back-link">
+                    <i class="bi bi-arrow-left"></i> Kembali ke Campaign
+                </a>
+                <div class="header-titles">
+                    <h1>Tulis Update Kabar Terbaru</h1>
+                    <p>Bagikan cerita atau progres terbaru untuk donatur campaign <strong>{{ $campaign->judul }}</strong></p>
+                </div>
+            </div>
 
-                    {{-- ========================================================== --}}
-                    {{-- LEFT FORM --}}
-                    {{-- ========================================================== --}}
-                    <div class="campaign-update-main">
+            <form action="{{ route('campaign.update.store', $campaign->slug) }}" method="POST" enctype="multipart/form-data" class="update-grid-layout" id="updateForm" novalidate>
+                @csrf
 
-                        {{-- HEADER --}}
-                        <div class="campaign-update-heading">
-                            <h1>Buat Update Kabar Terbaru</h1>
-                            <p>
-                                Bagikan kabar terbaru untuk campaign
-                                <strong>{{ $campaign->judul }}</strong>
-                            </p>
-                            <a href="{{ route('campaign.show', $campaign->slug) }}" class="back-button">
-                                <i class="bi bi-arrow-left"></i>
-                                Kembali ke Campaign
-                            </a>
+                {{-- LEFT COLUMN: FORM EDITING --}}
+                <div class="update-main-content">
+                    <div class="custom-card editor-card">
+                        <div class="card-header-styled">
+                            <div class="icon-badge"><i class="bi bi-pencil-square"></i></div>
+                            <div>
+                                <h2>Form Detail Update</h2>
+                                <p>Pastikan informasi yang ditulis jelas dan transparan</p>
+                            </div>
                         </div>
 
-                        {{-- ========================================================== --}}
-                        {{-- FORM UPDATE --}}
-                        {{-- ========================================================== --}}
-                        <section class="campaign-update-card">
-
-                            <div class="campaign-update-card-head">
-                                <h2>Detail Update</h2>
-                                <p>Lengkapi informasi update yang ingin Anda bagikan kepada donatur.</p>
-                            </div>
-
-                            {{-- Judul Update --}}
-                            <div class="campaign-field">
-                                <label for="judul_update">Judul Update <span>*</span></label>
-                                <div class="campaign-input-wrap">
-                                    <input type="text" id="judul_update" name="judul_update"
-                                        value="{{ old('judul_update') }}" placeholder="Masukkan judul update" required>
-                                    <i class="bi bi-pencil-fill"></i>
+                        <div class="card-body-styled">
+                            {{-- Input Judul --}}
+                            <div class="form-group-custom">
+                                <label for="judul_update">Judul Update <span class="req">*</span></label>
+                                <div class="input-icon-wrapper">
+                                    <input type="text" id="judul_update" name="judul_update" value="{{ old('judul_update') }}" placeholder="Contoh: Penyaluran Dana Tahap 1 Telah Selesai" required>
                                 </div>
                                 @error('judul_update')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <span class="error-msg">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            {{-- Isi Update --}}
-                            <div class="campaign-field">
-                                <label for="isi_update">Isi Update <span>*</span></label>
+                            {{-- Input Rich Text Editor --}}
+                            <div class="form-group-custom">
+                                <label for="isi_update">Isi Update / Berita <span class="req">*</span></label>
                                 <x-rich-text-editor name="isi_update" id="isi_update" :value="old('isi_update')" />
                                 @error('isi_update')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <span class="error-msg">{{ $message }}</span>
                                 @enderror
                             </div>
+                        </div>
+                    </div>
+                </div>
 
-                        </section>
-
+                {{-- RIGHT COLUMN: REALTIME FEED MOCKUP --}}
+                <aside class="update-sidebar-content">
+                    
+                    {{-- Real-time Feed Live Preview Box --}}
+                    <div class="custom-card preview-card">
+                        <div class="card-header-styled compact">
+                            <div class="live-badge"><span class="dot"></span> Live Preview</div>
+                            <small class="text-muted">Tampilan di mata donatur</small>
+                        </div>
+                        
+                        <div class="feed-preview-wrapper">
+                            <div class="feed-header">
+                                <div class="author-avatar">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                <div class="author-info">
+                                    <span class="author-name">{{ $campaign->penggalangDana->nama_penggalang ?? 'Penggalang Dana' }}</span>
+                                    <span class="post-time">Baru saja · Kabar Terbaru</span>
+                                </div>
+                            </div>
+                            <div class="feed-content">
+                                <h3 id="previewJudul">Judul Update Anda Akan Muncul Di Sini</h3>
+                                <div id="previewIsi" class="feed-body-text">
+                                    Tuliskan detail berita di form sebelah kiri untuk melihat simulasi tampilan postingan update...
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {{-- ========================================================== --}}
-                    {{-- RIGHT SIDEBAR --}}
-                    {{-- ========================================================== --}}
-                    <aside class="campaign-update-sidebar">
+                    {{-- Campaign Summary Card --}}
+                    <div class="custom-card info-card">
+                        <div class="info-row">
+                            <span class="info-label">Target Donasi</span>
+                            <span class="info-value">Rp {{ number_format($campaign->target_donasi, 0, ',', '.') }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Kategori Campaign</span>
+                            <span class="info-badge">{{ strtoupper($campaign->campaign_type ?? 'REGULAR') }}</span>
+                        </div>
+                    </div>
 
-                        {{-- Info Campaign --}}
-                        <section class="campaign-side-card">
-                            <div class="campaign-side-head">
-                                <h2>Informasi Campaign</h2>
-                            </div>
-                            <div class="campaign-info-preview">
-                                <div class="campaign-info-item">
-                                    <span class="label">Judul</span>
-                                    <span class="value">{{ $campaign->judul }}</span>
-                                </div>
-                                <div class="campaign-info-item">
-                                    <span class="label">Penggalang</span>
-                                    <span class="value">{{ $campaign->penggalangDana->nama_penggalang }}</span>
-                                </div>
-                                <div class="campaign-info-item">
-                                    <span class="label">Target</span>
-                                    <span class="value">Rp
-                                        {{ number_format($campaign->target_donasi, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="campaign-info-item">
-                                    <span class="label">Tipe</span>
-                                    <span class="value">
-                                        @if($campaign->campaign_type == 'emergency')
-                                            🔥 Darurat
-                                        @elseif($campaign->campaign_type == 'sustainable')
-                                            ♻️ Berkelanjutan
-                                        @else
-                                            📋 Regular
-                                        @endif
-                                    </span>
-                                </div>
-                            </div>
-                        </section>
+                    {{-- Submit Action --}}
+                    <button type="submit" class="btn-primary-action" id="submitBtn">
+                        <i class="bi bi-send-fill"></i> Kirim Update Kabar
+                    </button>
+                </aside>
+            </form>
 
-                        {{-- Preview --}}
-                        <section class="campaign-side-card">
-                            <div class="campaign-side-head">
-                                <h2>Preview Update</h2>
-                                <p>Preview tampilan update yang akan dibagikan.</p>
-                            </div>
-                            <div class="update-preview" id="updatePreview">
-                                <div class="update-preview-header">
-                                    <strong id="previewJudul">Judul Update</strong>
-                                    <span class="date">{{ now()->format('d M Y') }}</span>
-                                </div>
-                                <div class="update-preview-body" id="previewIsi">
-                                    Isi update akan muncul di sini...
-                                </div>
-                            </div>
-                        </section>
-
-                        {{-- Submit --}}
-                        <button type="submit" class="campaign-submit-button" id="submitBtn">
-                            <i class="bi bi-send-fill"></i>
-                            <span>Kirim Update</span>
-                        </button>
-
-                    </aside>
-
-                </form>
-
-            </div>
-        </section>
+        </div>
     </main>
 
     @include('components.footer')
 
-    {{-- ========================================================== --}}
-    {{-- SCRIPTS --}}
-    {{-- ========================================================== --}}
     <script src="{{ asset('js/header.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-
-            // ==========================================================
-            // PREVIEW UPDATE (Live Preview)
-            // ==========================================================
             const previewJudul = document.getElementById('previewJudul');
             const previewIsi = document.getElementById('previewIsi');
             const judulInput = document.getElementById('judul_update');
 
-            // Cari editor dengan benar - gunakan ID yang diberikan ke komponen
-            // Komponen rich-text-editor menggunakan ID "isi_update" untuk contenteditable div
-            const editor = document.getElementById('isi_update');
-
-            // Fungsi untuk mendapatkan konten dari editor
-            function getEditorContent() {
-                if (editor) {
-                    // Jika editor adalah contenteditable div
-                    if (editor.contentEditable === 'true') {
-                        return editor.innerHTML;
-                    }
-                    // Jika editor adalah textarea
-                    if (editor.tagName === 'TEXTAREA') {
-                        return editor.value;
-                    }
-                }
-                
-                // Fallback: cari contenteditable lain
-                const contentEditable = document.querySelector('[contenteditable="true"]');
-                if (contentEditable) {
-                    return contentEditable.innerHTML;
-                }
-
-                // Fallback: cari textarea dengan name isi_update
-                const textarea = document.querySelector('textarea[name="isi_update"]');
-                if (textarea) {
-                    return textarea.value;
-                }
-
-                return '';
-            }
-
-            // Fungsi update preview
             function updatePreview() {
-                // Preview judul
                 const judul = judulInput.value.trim();
-                previewJudul.textContent = judul || 'Judul Update';
+                previewJudul.textContent = judul || 'Judul Update Anda Akan Muncul Di Sini';
 
-                // Preview isi update
-                const content = getEditorContent();
-                const textContent = content.replace(/<[^>]*>/g, '').trim();
+                let content = '';
+                const editor = document.getElementById('isi_update');
+                if (editor) {
+                    content = editor.contentEditable === 'true' ? editor.innerHTML : editor.value;
+                } else {
+                    const fallback = document.querySelector('textarea[name="isi_update"]') || document.querySelector('[contenteditable="true"]');
+                    if(fallback) content = fallback.innerHTML || fallback.value;
+                }
 
-                if (content && textContent) {
+                const textOnly = content.replace(/<[^>]*>/g, '').trim();
+                if (content && textOnly) {
                     previewIsi.innerHTML = content;
                 } else {
-                    previewIsi.innerHTML = 'Isi update akan muncul di sini...';
+                    previewIsi.innerHTML = '<span style="color: #a0aec0;">Tuliskan detail berita di form sebelah kiri untuk melihat simulasi tampilan postingan update...</span>';
                 }
             }
 
-            // Event listener untuk judul
             judulInput.addEventListener('input', updatePreview);
-            judulInput.addEventListener('keyup', updatePreview);
-
-            // Event listener untuk editor (contenteditable)
-            if (editor && editor.contentEditable === 'true') {
-                editor.addEventListener('input', updatePreview);
-                editor.addEventListener('keyup', updatePreview);
-                editor.addEventListener('paste', function () {
-                    setTimeout(updatePreview, 50);
-                });
-                
-                // MutationObserver untuk mendeteksi perubahan yang tidak terdeteksi oleh event biasa
-                const observer = new MutationObserver(function() {
-                    updatePreview();
-                });
-                observer.observe(editor, {
-                    childList: true,
-                    subtree: true,
-                    characterData: true,
-                    attributes: true
-                });
-            }
-
-            // Event listener untuk textarea (jika editor adalah textarea)
-            if (editor && editor.tagName === 'TEXTAREA') {
-                editor.addEventListener('input', updatePreview);
-                editor.addEventListener('keyup', updatePreview);
-                editor.addEventListener('change', updatePreview);
-            }
-
-            // Event listener untuk tombol toolbar (jika ada)
-            const toolbarButtons = document.querySelectorAll('[data-command], [data-insert-image]');
-            toolbarButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    setTimeout(updatePreview, 100);
-                });
-            });
-
-            // Jalankan preview saat halaman pertama kali dibuka
-            // Gunakan multiple timeout untuk memastikan editor sudah siap
-            setTimeout(updatePreview, 100);
-            setTimeout(updatePreview, 300);
-            setTimeout(updatePreview, 500);
-
-            // ==========================================================
-            // VALIDASI FORM
-            // ==========================================================
-            const form = document.getElementById('updateForm');
-            
-            form.addEventListener('submit', function(e) {
-                const judul = judulInput.value.trim();
-                const content = getEditorContent();
-                const textContent = content.replace(/<[^>]*>/g, '').trim();
-
-                let errors = [];
-
-                if (!judul) {
-                    errors.push('Judul update harus diisi');
-                }
-
-                if (!textContent) {
-                    errors.push('Isi update harus diisi');
-                }
-
-                if (errors.length > 0) {
-                    e.preventDefault();
-                    alert('Mohon lengkapi data berikut:\n- ' + errors.join('\n- '));
-                }
-            });
-
-            console.log('Preview update siap!');
-            console.log('Editor ditemukan:', !!editor);
-
+            document.addEventListener('keyup', updatePreview);
+            document.addEventListener('click', function() { setTimeout(updatePreview, 100); });
+            setTimeout(updatePreview, 200);
         });
     </script>
-
 </body>
-
 </html>

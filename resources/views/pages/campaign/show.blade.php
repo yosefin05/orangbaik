@@ -315,7 +315,6 @@
                                                 <h4 style="margin:0;">
                                                     {{ $donasi->is_anonymous ? 'Anonim' : ($donasi->nama_donatur ?? $donasi->user->name ?? 'Donatur') }}
                                                 </h4>
-                                                <span class="badge-mini-success">✓ Berhasil</span>
                                             </div>
                                             <p>Berdonasi sebesar <b>Rp {{ number_format($donasi->nominal, 0, ',', '.') }}</b></p>
                                             <span>{{ $donasi->created_at->diffForHumans() }}</span>

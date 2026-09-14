@@ -1,7 +1,10 @@
-/* ============================
-   FUNDRAISER PROFILE PAGE
-   Responsive sampai HP terkecil
-============================ */
+/* ============================================================
+   FUNDRAISER PROFILE PAGE — ORANGBAIK.ID
+   Redesign: hero banner overlay, floating profile card,
+   campaign showcase grid, refined info hierarchy.
+   Semua warna/spacing pakai token dari global.css.
+   Responsive sampai HP terkecil.
+============================================================ */
 
 /* ============================
    GLOBAL OVERFLOW PROTECTION
@@ -23,36 +26,53 @@ body {
     min-width: 0;
 }
 
-/* ============================
-   HERO
-============================ */
+/* ============================================================
+   HERO — banner besar dengan scrim gradient + tombol kembali
+   yang mengambang di atasnya (bukan lagi baris terpisah)
+============================================================ */
 .fundraiser-hero {
-    background: linear-gradient(180deg, #f4f9ff 0%, #edf6ff 100%);
+    position: relative;
     padding-bottom: 0;
 }
 
+.fundraiser-hero .fundraiser-container {
+    position: relative;
+}
+
 .fundraiser-back {
+    position: absolute;
+    top: 22px;
+    left: 4px;
+    z-index: 5;
+
     display: inline-flex;
     align-items: center;
-    gap: 24px;
+    gap: 10px;
+
     border: none;
-    background: transparent;
-    color: var(--text-dark);
-    font-size: var(--fs-sm);
+    border-radius: var(--radius-full);
+    padding: 10px 20px 10px 14px;
+
+    background: rgba(15, 23, 42, .42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    color: #fff;
+    font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
-    padding-top: 30px;
-    margin-bottom: 36px;
+
     cursor: pointer;
-    transition: color .2s;
+    transition: background .2s ease, transform .2s ease;
 }
 
 .fundraiser-back:hover {
-    color: var(--primary);
+    background: rgba(15, 23, 42, .62);
+    transform: translateX(-2px);
 }
 
 .fundraiser-back svg {
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     fill: none;
     stroke: currentColor;
@@ -65,12 +85,643 @@ body {
    CONTENT
 ============================ */
 .fundraiser-content {
-    padding: 38px 0 70px;
+    padding: 0 0 70px;
+}
+
+/* ============================================================
+   BANNER
+============================================================ */
+.banner-wrapper {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+    border-radius: var(--radius-lg, 20px);
+    box-shadow: var(--shadow-card);
+}
+
+.banner-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0) 58%, rgba(15, 23, 42, .38) 100%);
+    pointer-events: none;
+}
+
+.penggalang-banner {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ==================================================================
+   PENGGALANG SUMMARY — sekarang berupa kartu mengambang di atas
+   banner (bukan sekadar baris dengan border-bottom), dengan avatar
+   ber-ring dan identitas sebagai titik fokus utama halaman.
+================================================================== */
+.penggalang-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+
+    position: relative;
+    z-index: 100;
+    margin-top: -58px;
+
+    padding: 24px 28px;
+
+    background: var(--bg);
+    border: 1px solid var(--border-soft, var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hover, var(--shadow-card));
+}
+
+.penggalang-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+    flex: 1;
+}
+
+.logo-wrapper {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: var(--bg);
+    padding: 4px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, .14);
+    flex-shrink: 0;
+}
+
+.penggalang-logo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.penggalang-title {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.penggalang-title h1 {
+    margin: 0;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-extrabold);
+    color: var(--text-dark);
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.verified-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+}
+
+.jenis-badge {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: #fff;
+    font-size: 11px;
+    padding: 4px 11px;
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-bold);
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(51, 101, 175, .28);
 }
 
 /* ============================
-   SUMMARY
+   BADGE ORGANISASI (legacy, dipakai halaman lain)
 ============================ */
+.org-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 10px;
+    background: #e8f3ff;
+    color: var(--primary);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    white-space: nowrap;
+}
+
+/* ============================
+   ACTIONS ROW (di dalam penggalang-summary)
+   dashboard-link jadi chip outline, edit-button tetap solid
+============================ */
+.penggalang-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+}
+
+.dashboard-link {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+}
+
+.dashboard-link:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+/* separator lama sudah tidak diperlukan karena sekarang jadi chip */
+.dashboard-link + .dashboard-link,
+.dashboard-link + .edit-button {
+    padding-left: 16px;
+    border-left: 1px solid var(--border);
+}
+
+.edit-button {
+    min-width: 80px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 0 18px;
+    box-shadow: 0 6px 16px rgba(51, 101, 175, .24);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.edit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(51, 101, 175, .32);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 14px;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+.status-badge.pending {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.status-badge.approved {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.status-badge.rejected {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+/* ============================================================
+   ACCORDION — hierarki lebih jelas: aksen kiri saat terbuka,
+   lebih banyak napas antar section
+============================================================ */
+.accordion-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 40px;
+}
+
+.info-card {
+    background: var(--bg);
+    border: 1px solid var(--border-soft, var(--border));
+    border-left: 3px solid transparent;
+    border-radius: var(--radius);
+    padding: 0 28px 24px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+    min-width: 0;
+}
+.info-card:hover {
+    box-shadow: var(--shadow-soft, var(--shadow-card));
+}
+.info-card[open] {
+    border-left-color: var(--primary);
+}
+
+.info-card summary {
+    min-height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    border-bottom: 1px solid var(--border-soft, var(--border));
+    list-style: none;
+    cursor: pointer;
+}
+
+.info-card summary::-webkit-details-marker {
+    display: none;
+}
+
+.info-card summary span {
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    letter-spacing: -.01em;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.info-card summary b {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+    transition: transform .25s ease, background .2s ease, color .2s ease;
+}
+
+.info-card:not([open]) {
+    padding-bottom: 0;
+}
+.info-card:not([open]) summary {
+    border-bottom: none;
+}
+.info-card[open] summary b {
+    transform: rotate(180deg);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* ============================
+   INFO TABLE — baris label/value dengan pemisah halus
+============================ */
+.info-table {
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-table div {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--border-soft, var(--border));
+}
+
+.info-table div:last-child {
+    border-bottom: none;
+}
+
+.info-table strong {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.info-table p {
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    line-height: 1.7;
+    margin: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.info-table a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: var(--fw-semibold);
+    transition: color .2s;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.info-table a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+.paragraph-content {
+    padding-top: 18px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.paragraph-content h3 {
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    margin: 14px 0 10px;
+}
+
+.paragraph-content h3:first-child {
+    margin-top: 0;
+}
+
+/* Visi tampil sebagai kutipan yang menonjol, Misi tetap paragraf biasa
+   -- membedakan dua jenis konten yang beda sifatnya (pernyataan
+   aspirasional pendek vs daftar penjelasan) */
+.paragraph-content h3:first-child + p {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--primary);
+    border-radius: 0 var(--radius-sm, 10px) var(--radius-sm, 10px) 0;
+    background: var(--primary-light);
+    color: var(--text-dark);
+    font-weight: var(--fw-semibold);
+    font-style: normal;
+}
+
+.paragraph-content p {
+    color: var(--text);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-regular);
+    line-height: 1.8;
+    margin-bottom: 14px;
+}
+
+.paragraph-content ul {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.paragraph-content li {
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-regular);
+    line-height: 1.7;
+}
+
+/* ============================================================
+   CAMPAIGN SHOWCASE — dari daftar baris jadi grid kartu
+============================================================ */
+.fundraiser-campaign-section {
+    margin-top: 48px;
+}
+
+.fundraiser-campaign-section h2 {
+    color: var(--text-dark);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold);
+    letter-spacing: -.01em;
+    margin-bottom: 22px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.campaign-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.campaign-row {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    background: var(--bg);
+    border: 1px solid var(--border-soft, var(--border));
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.campaign-row:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-hover, var(--shadow-card));
+}
+
+.campaign-row-image-link {
+    display: block;
+    text-decoration: none;
+    overflow: hidden;
+    background: var(--bg-soft);
+    aspect-ratio: 16 / 10;
+}
+
+.campaign-row-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+    display: block;
+}
+
+.campaign-row-image-link:hover .campaign-row-image {
+    transform: scale(1.05);
+}
+
+.campaign-row-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    padding: 18px 20px 20px;
+}
+
+.campaign-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+
+.campaign-row-header h3 {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+    line-height: 1.4;
+    transition: color .2s;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+}
+
+.campaign-row-header:hover h3 {
+    color: var(--primary);
+}
+
+.campaign-row-body > p {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
+}
+.campaign-row-body > p span {
+    margin-left: 6px;
+    color: var(--primary);
+}
+
+.campaign-row-amount {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.campaign-row-amount strong {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-extrabold);
+    color: var(--primary);
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.campaign-row-amount span {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
+}
+
+.campaign-progress {
+    height: 7px;
+    margin-top: 2px;
+    overflow: hidden;
+    background: var(--bg-soft);
+    border-radius: var(--radius-full);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+    border-radius: inherit;
+    transition: width .4s ease;
+}
+
+.campaign-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.campaign-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.campaign-actions form {
+    margin: 0;
+}
+
+.campaign-action {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--bg-soft);
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .2s, color .2s;
+    flex-shrink: 0;
+}
+
+.campaign-action i {
+    font-size: 14px;
+}
+
+.campaign-action.edit:hover {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.campaign-action.update:hover {
+    color: var(--secondary, var(--primary));
+    background: var(--secondary-light, var(--primary-light));
+}
+
+.campaign-action.delete:hover {
+    color: var(--danger);
+    background: var(--danger-light);
+}
+
+/* ============================
+   EMPTY STATE CAMPAIGN
+============================ */
+.campaign-empty {
+    grid-column: 1 / -1;
+    padding: var(--space-10, 48px) var(--space-4);
+    background: var(--bg);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.campaign-empty p {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+}
+
+/* ==================================================================
+   LEGACY BLOCKS — dipakai halaman lain yang reuse class ini,
+   sengaja tidak diubah supaya halaman lain tidak ikut berubah.
+================================================================== */
 .fundraiser-summary {
     display: flex;
     align-items: center;
@@ -83,9 +734,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* ============================
-   INFO
-============================ */
 .fundraiser-info {
     display: flex;
     align-items: center;
@@ -118,36 +766,6 @@ body {
     word-break: break-word;
 }
 
-.verified-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    color: var(--muted-light);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-regular);
-}
-
-/* ============================
-   BADGE ORGANISASI
-============================ */
-.org-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    padding: 0 10px;
-    background: #e8f3ff;
-    color: var(--primary);
-    border-radius: var(--radius-full);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-semibold);
-    white-space: nowrap;
-}
-
-/* ============================
-   ACTIONS
-============================ */
 .fundraiser-actions {
     display: flex;
     align-items: center;
@@ -158,519 +776,9 @@ body {
     min-width: 0;
 }
 
-/* ============================
-   CLASS YANG DIPAKAI DI BLADE
-============================ */
-.penggalang-actions {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
-    min-width: 0;
-}
-
-.penggalang-left {
-    display: flex;
-    align-items: flex-end;
-    gap: 18px;
-    min-width: 0;
-    flex: 1;
-}
-
-.logo-wrapper {
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    background: white;
-    padding: 4px;
-    border: 1px solid #ddd;
-    flex-shrink: 0;
-}
-
-.penggalang-logo {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.penggalang-title {
-    margin-bottom: 25px;
-    min-width: 0;
-}
-
-.penggalang-title h1 {
-    margin: 0;
-    font-size: var(--fs-md);
-    font-weight: var(--fw-bold);
-    color: var(--primary);
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-.jenis-badge {
-    background: var(--primary);
-    color: white;
-    font-size: var(--fs-xxs);
-    padding: 4px 12px;
-    border-radius: var(--radius-full);
-    font-weight: var(--fw-semibold);
-    white-space: nowrap;
-}
-
-/* ============================
-   DASHBOARD LINK
-============================ */
-.dashboard-link {
-    color: var(--primary);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
-    text-decoration: none;
-    padding-right: 18px;
-    border-right: 1px solid var(--border);
-    transition: color .2s;
-    white-space: nowrap;
-}
-.dashboard-link:hover {
-    color: var(--primary-hover);
-}
-.dashboard-link:last-child {
-    border-right: none;
-    padding-right: 0;
-}
-
-/* ============================
-   EDIT BUTTON
-============================ */
-.edit-button {
-    min-width: 96px;
-    height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-full);
-    background: var(--primary);
-    color: var(--bg);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
-    text-decoration: none;
-    transition: background .2s;
-    white-space: nowrap;
-    padding: 0 16px;
-}
-.edit-button:hover {
-    background: var(--primary-hover);
-}
-
-/* ============================
-   STATUS BADGE
-============================ */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 14px;
-    border-radius: var(--radius-full);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    line-height: 1.6;
-    white-space: nowrap;
-}
-
-.status-badge.pending {
-    background: var(--warning-light);
-    color: var(--warning);
-}
-
-.status-badge.approved {
-    background: var(--success-light);
-    color: var(--success);
-}
-
-.status-badge.rejected {
-    background: var(--danger-light);
-    color: var(--danger);
-}
-
-/* ============================
-   ACCORDION
-============================ */
-.accordion-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.info-card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0 28px 22px;
-    transition: box-shadow .2s;
-    min-width: 0;
-}
-.info-card:hover {
-    box-shadow: var(--shadow-soft);
-}
-
-.info-card summary {
-    min-height: 58px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    border-bottom: 1px solid var(--border);
-    list-style: none;
-    cursor: pointer;
-}
-
-.info-card summary::-webkit-details-marker {
-    display: none;
-}
-
-.info-card summary span {
-    color: var(--text-dark);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-.info-card summary b {
-    color: var(--muted);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-regular);
-    transition: transform .25s ease;
-    flex-shrink: 0;
-}
-
-.info-card:not([open]) {
-    padding-bottom: 0;
-}
-.info-card:not([open]) summary {
-    border-bottom: none;
-}
-.info-card[open] summary b {
-    transform: rotate(180deg);
-}
-
-/* ============================
-   INFO TABLE
-============================ */
-.info-table {
-    padding-top: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.info-table div {
-    display: grid;
-    grid-template-columns: 200px minmax(0, 1fr);
-    gap: 20px;
-    align-items: start;
-}
-
-.info-table strong {
-    color: var(--text-dark);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
-    line-height: 1.6;
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-.info-table p {
-    color: var(--text);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-regular);
-    line-height: 1.7;
-    margin: 0;
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-.info-table a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: var(--fw-semibold);
-    transition: color .2s;
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-.info-table a:hover {
-    color: var(--primary-hover);
-    text-decoration: underline;
-}
-
-.paragraph-content {
-    padding-top: 18px;
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-.paragraph-content h3 {
-    color: var(--text-dark);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
-    margin: 12px 0 8px;
-}
-
-.paragraph-content p {
-    color: var(--text);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-regular);
-    line-height: 1.8;
-    margin-bottom: 14px;
-}
-
-.paragraph-content ul {
-    padding-left: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.paragraph-content li {
-    color: var(--text);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-regular);
-    line-height: 1.7;
-}
-
-/* ============================
-   CAMPAIGN LIST
-============================ */
-.fundraiser-campaign-section {
-    margin-top: 42px;
-}
-
-.fundraiser-campaign-section h2 {
-    color: var(--text-dark);
-    font-size: var(--fs-md);
-    font-weight: var(--fw-bold);
-    margin-bottom: 24px;
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-.campaign-list {
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-}
-
-.campaign-row {
-    display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: 24px;
-    padding: 20px 0;
-    border-bottom: 1px solid var(--border);
-    align-items: flex-start;
-    min-width: 0;
-}
-
-.campaign-row-image {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    border-radius: var(--radius);
-    transition: transform .3s ease;
-    display: block;
-}
-.campaign-row-image:hover {
-    transform: scale(1.02);
-}
-
-.campaign-row-image-link {
-    display: block;
-    text-decoration: none;
-}
-
-.campaign-row-body {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 0;
-}
-
-.campaign-row-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    min-width: 0;
-}
-
-.campaign-row-header h3 {
-    margin: 0;
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
-    color: var(--text-dark);
-    line-height: 1.4;
-    transition: color .2s;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    min-width: 0;
-}
-
-.campaign-row-header:hover h3 {
-    color: var(--primary);
-}
-
-.campaign-row-body p {
-    margin: 0;
-    color: var(--muted);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-regular);
-}
-.campaign-row-body p span {
-    margin-left: 6px;
-    color: var(--primary);
-}
-
-.campaign-row-amount {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.campaign-row-amount strong {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    color: var(--primary);
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-.campaign-row-amount span {
-    color: var(--muted);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-regular);
-}
-
-.campaign-progress {
-    height: 6px;
-    margin-top: 6px;
-    overflow: hidden;
-    background: var(--border-soft);
-    border-radius: var(--radius-full);
-}
-
-.progress-fill {
-    height: 100%;
-    background: var(--primary);
-    border-radius: inherit;
-    transition: width .4s ease;
-}
-
-.campaign-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 4px;
-    color: var(--muted);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-regular);
-    flex-wrap: wrap;
-    gap: 4px;
-}
-
-.campaign-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-.campaign-actions form {
-    margin: 0;
-}
-
-.campaign-action {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: var(--radius-full);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    text-decoration: none;
-    transition: background .2s, color .2s;
-    flex-shrink: 0;
-}
-
-.campaign-action i {
-    font-size: 15px;
-}
-
-.campaign-action.edit:hover {
-    color: var(--primary);
-    background: var(--primary-light);
-}
-
-.campaign-action.delete:hover {
-    color: var(--danger);
-    background: var(--danger-light);
-}
-
-/* ============================
-   EMPTY STATE CAMPAIGN
-============================ */
-.campaign-empty {
-    padding: var(--space-8) var(--space-4);
-    background: var(--bg-soft);
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-    text-align: center;
-}
-
-.campaign-empty p {
-    margin: 0;
-    color: var(--muted);
-    font-size: var(--fs-sm);
-}
-
-/* ============================
-   BANNER WRAPPER
-============================ */
-.banner-wrapper {
-    width: 100%;
-    height: 250px;
-    overflow: hidden;
-    border-radius: var(--radius);
-}
-
-.penggalang-banner {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.penggalang-summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-top: -42px;
-    position: relative;
-    z-index: 100;
-    padding: 0 4px 22px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-/* ============================
+/* ============================================================
    RESPONSIVE — URUT DARI BESAR KE KECIL
-============================ */
+================================================================ */
 
 /* Laptop kecil */
 @media (max-width: 1024px) {
@@ -686,11 +794,6 @@ body {
         padding-left: 24px;
         gap: 16px;
     }
-
-    .campaign-row {
-        grid-template-columns: 220px minmax(0, 1fr);
-        gap: 20px;
-    }
 }
 
 /* Tablet */
@@ -699,8 +802,7 @@ body {
         width: min(100% - 40px, var(--container));
     }
 
-    .fundraiser-info h1,
-    .penggalang-title h1 {
+    .fundraiser-info h1 {
         font-size: var(--fs-sm);
     }
 
@@ -714,8 +816,16 @@ body {
         height: 76px;
     }
 
-    .campaign-row {
-        grid-template-columns: 200px minmax(0, 1fr);
+    .penggalang-title h1 {
+        font-size: var(--fs-md);
+    }
+
+    .banner-wrapper {
+        height: 260px;
+    }
+
+    .penggalang-summary {
+        margin-top: -50px;
     }
 }
 
@@ -735,26 +845,14 @@ body {
         border-left: none;
     }
 
-    .penggalang-summary {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-top: -30px;
-        gap: 14px;
-    }
-
-    .penggalang-actions {
-        width: 100%;
-        justify-content: flex-start;
-        margin-top: 12px;
-    }
-
     .info-table div {
         grid-template-columns: 1fr;
-        gap: 2px;
+        gap: 4px;
+        padding: 10px 0;
     }
 
-    .campaign-row {
-        grid-template-columns: 180px minmax(0, 1fr);
+    .campaign-list {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         gap: 18px;
     }
 }
@@ -762,11 +860,21 @@ body {
 /* HP */
 @media (max-width: 768px) {
     .fundraiser-content {
-        padding: 28px 0 56px;
+        padding-bottom: 56px;
     }
 
     .banner-wrapper {
-        height: 200px;
+        height: 210px;
+        border-radius: var(--radius);
+    }
+
+    .penggalang-summary {
+        margin-top: -42px;
+        padding: 20px 20px 22px;
+    }
+
+    .accordion-list {
+        margin-top: 32px;
     }
 
     .info-card {
@@ -774,43 +882,65 @@ body {
     }
 
     .info-card summary {
-        min-height: 52px;
+        min-height: 54px;
         gap: 12px;
     }
 }
 
-/* 🔥 HP: campaign-row jadi 1 KOLOM */
+/* HP: penggalang-summary jadi vertikal, tombol aksi ditata otomatis
+   pakai order + flex tanpa perlu ubah HTML/Blade */
 @media (max-width: 640px) {
-    .campaign-row {
-        grid-template-columns: 1fr;
-        gap: 14px;
-        padding: 18px 0;
-    }
-
-    .campaign-row-image {
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        max-height: 240px;
-    }
-
-    .campaign-row-header {
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
     .campaign-row-header h3 {
         font-size: var(--fs-sm);
         line-height: 1.4;
     }
 
-    .campaign-actions {
-        align-self: flex-start;
-        flex-shrink: 0;
-    }
-
     .campaign-row-amount strong {
         font-size: var(--fs-sm);
+    }
+
+    /* ===========================================================
+       Row 1: [logo+nama] ......................... [tombol Edit]
+       Row 2: Dashboard Penggalang   Tambahkan Campaign
+       .penggalang-actions dibuat "display: contents" jadi isinya
+       (badge, link, edit-button) langsung jadi flex-item di
+       .penggalang-summary, lalu diatur order + flex-grow.
+    =========================================================== */
+    .penggalang-summary {
+        align-items: center;
+        row-gap: 12px;
+        column-gap: 14px;
+    }
+
+    .penggalang-actions {
+        display: contents;
+    }
+
+    .penggalang-left {
+        order: 1;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .status-badge {
+        order: 0;
+        flex: 1 0 100%;
+    }
+
+    .edit-button {
+        order: 2;
+        flex: 0 0 auto;
+    }
+
+    .dashboard-link {
+        order: 3;
+        flex: 0 1 auto;
+    }
+
+    .dashboard-link + .dashboard-link,
+    .dashboard-link + .edit-button {
+        padding-left: 0;
+        border-left: none;
     }
 }
 
@@ -821,25 +951,19 @@ body {
     }
 
     .fundraiser-back {
-        gap: 14px;
+        top: 16px;
+        gap: 8px;
         font-size: var(--fs-xxs);
-        padding-top: 24px;
-        margin-bottom: 28px;
+        padding: 8px 16px 8px 12px;
     }
     .fundraiser-back svg {
-        width: 22px;
-        height: 22px;
+        width: 18px;
+        height: 18px;
         stroke-width: 2.5;
     }
 
     .fundraiser-content {
-        padding-top: 28px;
         padding-bottom: 48px;
-    }
-
-    .penggalang-summary {
-        margin-top: -24px;
-        padding-bottom: 16px;
     }
 
     .fundraiser-info {
@@ -855,13 +979,17 @@ body {
         font-size: var(--fs-sm);
     }
 
+    .banner-wrapper {
+        height: 170px;
+    }
+
+    .penggalang-summary {
+        margin-top: -34px;
+    }
+
     .penggalang-logo {
         width: 64px;
         height: 64px;
-    }
-
-    .penggalang-title h1 {
-        font-size: var(--fs-sm);
     }
 
     .logo-wrapper {
@@ -869,50 +997,25 @@ body {
         height: 68px;
     }
 
-    .banner-wrapper {
-        height: 160px;
+    .penggalang-title h1 {
+        font-size: var(--fs-sm);
     }
 
     .info-card {
         padding-inline: 18px;
     }
 
-    .campaign-row-header h3 {
-        font-size: var(--fs-xs);
-    }
-
-    .campaign-row-amount strong {
-        font-size: var(--fs-xs);
+    .campaign-list {
+        grid-template-columns: 1fr;
     }
 
     .campaign-meta {
         font-size: var(--fs-xxs);
     }
 
-    .status-badge {
-        font-size: 10px;
-        padding: 2px 10px;
-    }
-
     .fundraiser-actions {
         gap: 14px;
         flex-wrap: wrap;
-    }
-
-    .edit-button {
-        min-width: 80px;
-        height: 32px;
-        font-size: var(--fs-xxs);
-    }
-
-    .dashboard-link {
-        font-size: var(--fs-xxs);
-        padding-right: 12px;
-    }
-
-    .penggalang-actions {
-        flex-wrap: wrap;
-        gap: 12px;
     }
 }
 
@@ -923,9 +1026,7 @@ body {
     }
 
     .fundraiser-back {
-        padding-top: 20px;
-        margin-bottom: 22px;
-        gap: 10px;
+        top: 12px;
     }
 
     .fundraiser-info {
@@ -935,6 +1036,19 @@ body {
     .fundraiser-logo {
         width: 52px;
         height: 52px;
+    }
+
+    .fundraiser-info h1 {
+        font-size: var(--fs-xs);
+    }
+
+    .banner-wrapper {
+        height: 140px;
+    }
+
+    .penggalang-summary {
+        margin-top: -26px;
+        padding: 16px 16px 18px;
     }
 
     .penggalang-logo {
@@ -947,21 +1061,8 @@ body {
         height: 60px;
     }
 
-    .fundraiser-info h1,
     .penggalang-title h1 {
         font-size: var(--fs-xs);
-    }
-
-    .banner-wrapper {
-        height: 130px;
-    }
-
-    .penggalang-summary {
-        margin-top: -18px;
-    }
-
-    .campaign-row-image {
-        max-height: 200px;
     }
 
     .campaign-actions .campaign-action {
@@ -1005,20 +1106,33 @@ body {
 
     .fundraiser-back {
         font-size: 11px;
-        gap: 8px;
+        gap: 6px;
+        padding: 7px 14px 7px 10px;
     }
 
     .fundraiser-back svg {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
     }
 
-    .fundraiser-info h1,
-    .penggalang-title h1 {
+    .fundraiser-info h1 {
         font-size: 13px;
     }
 
-    .fundraiser-logo,
+    .fundraiser-logo {
+        width: 46px;
+        height: 46px;
+    }
+
+    .banner-wrapper {
+        height: 120px;
+    }
+
+    .penggalang-summary {
+        margin-top: -20px;
+        padding-bottom: 14px;
+    }
+
     .penggalang-logo {
         width: 46px;
         height: 46px;
@@ -1030,16 +1144,15 @@ body {
         padding: 3px;
     }
 
-    .banner-wrapper {
-        height: 110px;
+    .penggalang-title h1 {
+        font-size: 13px;
     }
 
-    .penggalang-summary {
-        margin-top: -14px;
-        padding-bottom: 12px;
+    .jenis-badge {
+        font-size: 10px;
+        padding: 0 8px;
     }
 
-    .jenis-badge,
     .org-badge {
         font-size: 10px;
         padding: 0 8px;
@@ -1052,27 +1165,10 @@ body {
     .campaign-meta {
         font-size: 10px;
     }
-
-    .dashboard-link {
-        font-size: 11px;
-        padding-right: 8px;
-    }
-
-    .edit-button {
-        min-width: 70px;
-        height: 30px;
-        font-size: 11px;
-        padding: 0 12px;
-    }
-
-    .status-badge {
-        font-size: 9px;
-        padding: 2px 8px;
-    }
 }
 
 /* ============================================================
-   🔥 FIX: HAPUS PADDING BAWAH BODY YANG BIKIN GAP KOSONG
+   FIX: HAPUS PADDING BAWAH BODY YANG BIKIN GAP KOSONG
    (Halaman ini tidak punya bottom-nav, jadi tidak perlu space)
 ============================================================ */
 @media (max-width: 600px) {
@@ -1082,7 +1178,7 @@ body {
 }
 
 /* ============================================================
-   🔥 FIX: STICKY FOOTER (footer selalu di bawah, tidak ada gap)
+   FIX: STICKY FOOTER (footer selalu di bawah, tidak ada gap)
 ============================================================ */
 html, body {
     min-height: 100%;

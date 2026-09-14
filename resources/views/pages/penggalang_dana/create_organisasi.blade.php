@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Penggalang Dana Organisasi - OrangBaik.id</title>
+    <title>Verifikasi Penggalang Dana Organisasi - Orang Baik</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/penggalangdana-organisasi.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/verify-penggalang.css') }}">
 </head>
 
 <body>

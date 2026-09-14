@@ -1,3 +1,9 @@
+/* ============================================================
+   VERIFIKASI PENGGALANG DANA — ORANGBAIK.ID
+   Dipakai bersama oleh halaman Individu & Organisasi
+   (keduanya sudah pakai sistem class "verify-*" yang sama)
+============================================================ */
+
 /* ============================
    PAGE LAYOUT
    ============================ */
@@ -8,16 +14,40 @@
     color: var(--text-dark);
 }
 
-/* HERO */
+/* ============================================================
+   HERO — banner gradient penuh dengan tepi diagonal, senada
+   sama bahasa visual welcome-banner di admin (radial highlight
+   di pojok + gradient primary), bukan lagi band putih polos.
+============================================================ */
 .verify-hero {
-    padding-top: var(--space-8, 32px);
-    padding-bottom: var(--space-10, 40px);
+    position: relative;
+    overflow: hidden;
+
+    padding-top: var(--space-10, 40px);
+    padding-bottom: var(--space-20, 80px);
+
     background:
-        radial-gradient(circle at 10% 0%, rgba(51, 101, 175, .14), transparent 30%),
-        linear-gradient(180deg, var(--bg), var(--bg-soft));
+        radial-gradient(circle at 88% 8%, rgba(255, 255, 255, .22), transparent 32%),
+        linear-gradient(135deg, var(--primary), var(--primary-hover));
+
+    clip-path: polygon(0 0, 100% 0, 100% 84%, 0 100%);
+}
+
+.verify-hero::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    bottom: -70px;
+    width: 200px;
+    height: 200px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, .10);
+    pointer-events: none;
 }
 
 .verify-hero-inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     gap: var(--space-7, 28px);
@@ -29,18 +59,28 @@
 
 .verify-eyebrow {
     display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
     margin-bottom: var(--space-3, 12px);
     padding: var(--space-1, 4px) var(--space-3, 12px);
     border-radius: var(--radius-full);
-    background: var(--primary-light);
-    color: var(--primary);
+    background: rgba(255, 255, 255, .16);
+    color: var(--bg);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
 }
 
+.verify-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--bg);
+}
+
 .verify-heading h1 {
     margin: 0 0 var(--space-3, 12px);
-    color: var(--text-dark);
+    color: var(--bg);
     font-size: var(--fs-xl);
     font-weight: var(--fw-extrabold);
     line-height: 1.2;
@@ -50,14 +90,14 @@
 .verify-heading p {
     max-width: 650px;
     margin: 0;
-    color: var(--muted);
+    color: rgba(255, 255, 255, .86);
     font-size: var(--fs-xs);
     line-height: 1.8;
 }
 
 /* SECTION */
 .verify-section {
-    padding: var(--space-10, 40px) 0 var(--space-16, 64px);
+    padding: var(--space-8, 32px) 0 var(--space-16, 64px);
 }
 
 .verify-form {
@@ -94,7 +134,10 @@
     line-height: 1.7;
 }
 
-/* STATUS CARD */
+/* ============================
+   STATUS / ALERTS / NOTES
+   (dipakai halaman edit individu maupun organisasi)
+   ============================ */
 .status-card {
     margin-bottom: var(--space-5);
 }
@@ -165,6 +208,19 @@
     font-size: 1.2em;
 }
 
+.alert-warning {
+    background-color: var(--warning-light);
+    border-left: 4px solid var(--warning);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    color: var(--text-dark);
+    margin-top: var(--space-2);
+    font-size: var(--fs-xxs);
+}
+.alert-warning strong {
+    color: var(--warning);
+}
+
 .pending-notice {
     background: var(--bg-soft);
     padding: var(--space-4);
@@ -192,7 +248,19 @@
     display: block;
 }
 
-/* PROFILE GRID */
+/* DISABLED OVERLAY */
+.disabled-overlay {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.verify-card-disabled {
+    background: var(--bg-soft);
+}
+
+/* ============================
+   PROFILE GRID (avatar + fields)
+   ============================ */
 .verify-profile-grid {
     display: grid;
     grid-template-columns: 190px 1fr;
@@ -241,6 +309,7 @@
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
 }
 
 .verify-upload-button input {
@@ -249,6 +318,7 @@
 
 .verify-upload-button:hover {
     background: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
 .verify-fields {
@@ -257,7 +327,100 @@
     gap: var(--space-4, 16px);
 }
 
-/* FIELDS */
+/* ============================================================
+   COVER / BANNER UPLOAD — khusus halaman Organisasi
+   (belum ada sebelumnya, dibuat senada dgn verify-upload-button)
+============================================================ */
+.verify-cover-upload {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 21 / 6;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--bg-soft);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+}
+
+.verify-cover-preview {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* JS bisa toggle class ".has-image" di .verify-cover-upload saat
+   sebuah file dipilih, biar preview gambar tampil & placeholder hilang */
+.verify-cover-upload.has-image .verify-cover-preview {
+    display: block;
+}
+.verify-cover-upload.has-image .verify-cover-placeholder {
+    display: none;
+}
+
+.verify-cover-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    color: var(--muted);
+    text-align: center;
+    padding: var(--space-4, 16px);
+}
+
+.verify-cover-placeholder i {
+    font-size: 30px;
+    color: var(--primary);
+}
+
+.verify-cover-placeholder strong {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.verify-cover-placeholder span {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+}
+
+.verify-cover-button {
+    position: absolute;
+    right: var(--space-4, 16px);
+    bottom: var(--space-4, 16px);
+    z-index: 2;
+
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    padding: 0 var(--space-4, 16px);
+
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(51, 101, 175, .22);
+    transition: background .2s ease, transform .2s ease;
+}
+
+.verify-cover-button input {
+    display: none;
+}
+
+.verify-cover-button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* ============================
+   FIELDS
+   ============================ */
 .verify-grid-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -322,17 +485,64 @@
     box-shadow: 0 0 0 4px rgba(51, 101, 175, .10);
 }
 
-/* DISABLED OVERLAY */
-.disabled-overlay {
-    opacity: 0.6;
-    pointer-events: none;
+/* ============================================================
+   DOKUMEN LEGALITAS — khusus halaman Organisasi
+   (belum ada sebelumnya; dokumen ditata sebagai sub-card
+   supaya "Dokumen 1 / Dokumen 2 / Dokumen 3" jelas terpisah)
+============================================================ */
+.verify-document-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5, 20px);
 }
 
-.verify-card-disabled {
+.verify-document-item {
+    padding: var(--space-5, 20px);
     background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
 }
 
-/* ACTIONS */
+.verify-document-title {
+    margin-bottom: var(--space-4, 16px);
+}
+
+.verify-document-title h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.verify-document-title h3 b {
+    color: var(--danger);
+}
+
+.verify-document-title h3 em {
+    font-style: normal;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    padding: 2px 9px;
+    border-radius: var(--radius-full);
+    background: var(--bg);
+    border: 1px solid var(--border);
+}
+
+/* di dalam sub-card, field pakai background putih supaya
+   kontras dengan bg-soft milik .verify-document-item */
+.verify-document-item .verify-field input {
+    background: var(--bg);
+}
+
+/* ============================
+   ACTIONS
+   ============================ */
 .verify-actions {
     display: flex;
     justify-content: flex-end;
@@ -382,78 +592,9 @@
     transform: none;
 }
 
-/* ============================
-   EDIT INDIVIDU - STYLING
-   ============================ */
-
-/* Status Badge */
-.status-badge {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    border-radius: var(--radius-full);
-    font-weight: var(--fw-bold);
-    font-size: var(--fs-xxs);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.status-badge.pending {
-    background-color: var(--secondary-light);
-    color: var(--secondary);
-}
-.status-badge.approved {
-    background-color: var(--success-light);
-    color: var(--success);
-}
-.status-badge.rejected {
-    background-color: var(--danger-light);
-    color: var(--danger);
-}
-
-/* Info Note */
-.info-note {
-    font-size: var(--fs-xxs);
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin-top: var(--space-2);
-}
-.info-note i {
-    font-size: 1.1em;
-}
-
-/* Alert Warning */
-.alert-warning {
-    background-color: var(--warning-light);
-    border-left: 4px solid var(--warning);
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-sm);
-    color: var(--text-dark);
-    margin-top: var(--space-2);
-    font-size: var(--fs-xxs);
-}
-.alert-warning strong {
-    color: var(--warning);
-}
-
-/* Disabled State */
-.disabled-overlay {
-    opacity: 0.6;
-    pointer-events: none;
-}
-.verify-card-disabled {
-    background: var(--bg-soft);
-}
-
-/* Text Danger */
-.text-danger {
-    color: var(--danger);
-    font-size: var(--fs-xxs);
-    margin-top: var(--space-1);
-    display: block;
-}
-
-/* TABLET */
+/* ============================================================
+   RESPONSIVE — TABLET
+============================================================ */
 @media (max-width: 900px) {
     .verify-heading h1 {
         font-size: var(--fs-lg);
@@ -470,13 +611,25 @@
     .verify-grid-2 {
         grid-template-columns: 1fr;
     }
+
+    .verify-cover-upload {
+        aspect-ratio: 16 / 7;
+    }
 }
 
-/* MOBILE */
+/* ============================================================
+   RESPONSIVE — MOBILE
+============================================================ */
 @media (max-width: 640px) {
     .verify-hero {
-        padding-top: var(--space-5, 20px);
-        padding-bottom: var(--space-7, 28px);
+        padding-top: var(--space-6, 24px);
+        padding-bottom: var(--space-8, 32px);
+        clip-path: none;
+    }
+
+    .verify-hero::after {
+        width: 140px;
+        height: 140px;
     }
 
     .verify-section {
@@ -512,6 +665,22 @@
     .verify-field input,
     .verify-field select {
         height: 44px;
+    }
+
+    .verify-cover-upload {
+        aspect-ratio: 4 / 3;
+        min-height: 160px;
+    }
+
+    .verify-cover-button {
+        right: var(--space-3, 12px);
+        bottom: var(--space-3, 12px);
+        padding: 0 var(--space-3, 12px);
+        font-size: var(--fs-xxs);
+    }
+
+    .verify-document-item {
+        padding: var(--space-4, 16px);
     }
 
     .verify-actions {

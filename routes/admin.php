@@ -69,6 +69,7 @@ Route::middleware(['auth', 'admin'])
             // List & Detail
             Route::get('/', [CampaignController::class, 'index'])->name('index');
             Route::get('/{campaign}', [CampaignController::class, 'show'])->name('show');
+            Route::delete('/{campaign}', [CampaignController::class, 'destroy'])->name('destroy');
 
             // ============================================
             // APPROVAL ROUTES - TAMBAHKAN INI!

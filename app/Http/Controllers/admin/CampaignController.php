@@ -114,4 +114,11 @@ class CampaignController extends Controller
 
         return back()->with('success', 'Approval campaign berhasil dibatalkan.');
     }
+
+    public function destroy(Campaign $campaign)
+    {
+        $campaign->delete();
+
+        return back()->with('success', 'Campaign berhasil dihapus.');
+    }
 }

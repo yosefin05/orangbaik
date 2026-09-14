@@ -1,13 +1,15 @@
 .berita-page {
+    padding-top: var(--space-16, 64px);
     min-height: 100vh;
     overflow-x: hidden;
     background: var(--bg-soft);
 }
 
 /* SECTION */
-.berita-section {
-    padding: var(--section-space-sm, 58px) 0 var(--section-space, 72px);
-}
+.berita .section {
+        padding-top: var(--space-16, 64px);
+        padding-bottom: var(--space-16, 64px);
+    } 
 
 /* GRID */
 .berita-grid {

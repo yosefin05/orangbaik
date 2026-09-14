@@ -162,8 +162,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('campaign/{slug}/update')->group(function () {
         Route::get('/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
         Route::post('/', [CampaignUpdateController::class, 'store'])->name('campaign.update.store');
-        Route::post('/image', [CampaignUpdateController::class, 'uploadImage'])
-            ->name('campaign.update.image');
         Route::get('/{update}/edit', [CampaignUpdateController::class, 'edit'])->name('campaign.update.edit');
         Route::put('/{update}', [CampaignUpdateController::class, 'update'])->name('campaign.update.update');
         Route::delete('/{update}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');

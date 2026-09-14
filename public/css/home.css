@@ -15,7 +15,7 @@
     .main .section {
         padding-top: var(--space-16, 64px);
         padding-bottom: var(--space-16, 64px);
-    }
+    } 
 
     .main .section-title {
         margin-bottom: var(--space-9, 36px);

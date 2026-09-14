@@ -289,47 +289,53 @@
                                 <h2>Tambahkan Fitur Lainnya <span>(Opsional)</span></h2>
                             </div>
 
-                            <!-- Jumlah Package -->
-                            <div class="feature-row">
-                                <label class="feature-check">
-                                    <input type="checkbox" id="toggleQuantity" name="enable_quantity">
-                                    <span></span>
-                                </label>
-                                <div class="feature-counter">
-                                    <button type="button" class="minus">
-                                        <i class="bi bi-dash"></i>
-                                    </button>
-                                    <span class="qty">1</span>
-                                    <button type="button" class="plus">
-                                        <i class="bi bi-plus"></i>
-                                    </button>
+                            <div class="campaign-feature-list">
+                                <!-- Jumlah Package -->
+                                <div class="feature-row">
+                                    <label class="feature-check">
+                                        <input type="checkbox" id="toggleQuantity" name="enable_quantity">
+                                        <span></span>
+                                    </label>
+                                    <div class="feature-row-body">
+                                        <strong>Jumlah Package</strong>
+                                        <small>Donatur bisa memilih jumlah lebih dari satu</small>
+                                    </div>
+                                    <div class="feature-counter">
+                                        <button type="button" class="minus">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <span class="qty">1</span>
+                                        <button type="button" class="plus">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Nama Pekurban -->
-                            <div class="feature-input-card">
-                                <label class="feature-check">
-                                    <input type="checkbox" id="toggleDonatur" name="enable_donatur_name">
-                                    <span></span>
-                                </label>
-                                <div class="feature-input">
-                                    <input type="text" placeholder="Nama Pekurban">
-                                    <small>Masukkan Atas Nama Pekurban</small>
-                                    <i class="bi bi-pencil-fill"></i>
+                                <!-- Nama Pekurban -->
+                                <div class="feature-input-card">
+                                    <label class="feature-check">
+                                        <input type="checkbox" id="toggleDonatur" name="enable_donatur_name">
+                                        <span></span>
+                                    </label>
+                                    <div class="feature-input">
+                                        <input type="text" placeholder="Nama Pekurban">
+                                        <small>Masukkan Atas Nama Pekurban</small>
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Nominal -->
-                            <div class="feature-input-card">
-                                <label class="feature-check">
-                                    <input type="checkbox" id="toggleNominal" name="enable_custom_nominal">
-                                    <span></span>
-                                </label>
-                                <div class="feature-money">
-                                    <label>Nominal Lainnya</label>
-                                    <div class="money-box">
-                                        <span>Rp</span>
-                                        <input type="text" placeholder="0" inputmode="numeric" data-money>
+                                <!-- Nominal -->
+                                <div class="feature-input-card">
+                                    <label class="feature-check">
+                                        <input type="checkbox" id="toggleNominal" name="enable_custom_nominal">
+                                        <span></span>
+                                    </label>
+                                    <div class="feature-money">
+                                        <label>Nominal Lainnya</label>
+                                        <div class="money-box">
+                                            <span>Rp</span>
+                                            <input type="text" placeholder="0" inputmode="numeric" data-money>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

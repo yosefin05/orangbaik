@@ -16,7 +16,7 @@
 
     @include('components.header')
     <main class="main">
-
+ 
         {{-- HERO --}}
         <section class="hero-section">
             <div class="container hero-layout">

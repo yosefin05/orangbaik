@@ -1,8 +1,3 @@
-/* ============================
-   ZAKAT CALCULATOR — LEDGER THEME
-   Responsive: tablet, mobile, HP terkecil
-   ============================ */
-
 body {
     overflow-x: hidden;
 }
@@ -11,6 +6,7 @@ body {
     background: var(--bg);
     color: var(--text-dark);
     overflow-x: hidden;
+    
 }
 
 /* ============================

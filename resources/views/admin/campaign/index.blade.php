@@ -46,7 +46,6 @@
                         <th>Status</th>
                         <th>Tipe Campaign</th>
                         <th>Galeri</th>
-                        <th>Update</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -139,6 +138,22 @@
                                         <i class="bi bi-eye"></i>
                                         Detail
                                     </a>
+                                    <a href="{{ route('campaign.edit', $item) }}" class="action-link link-yellow">
+                                        <i class="bi bi-pencil-square"></i>
+                                        Edit
+                                    </a>
+                                    <form
+                                        action="{{ route('admin.campaign.destroy', $item) }}"
+                                        method="POST"
+                                        class="inline-form"
+                                        onsubmit="return confirm('Yakin ingin menghapus FAQ ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="action-link link-red">
+                                            <i class="bi bi-trash"></i>
+                                            Hapus
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

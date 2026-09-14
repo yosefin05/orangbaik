@@ -1,6 +1,7 @@
 /* ============================
    CREATE / EDIT CAMPAIGN PAGE
    Responsive sampai HP terkecil
+   Didesain ulang mengikuti token dari global.css
    ============================ */
 
 /* ============================
@@ -31,6 +32,12 @@ body {
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-extrabold);
+    text-decoration: none;
+    transition: color .2s ease;
+}
+
+.campaign-create-back:hover {
+    color: var(--primary);
 }
 
 .campaign-create-back i {
@@ -42,7 +49,7 @@ body {
 ============================ */
 .campaign-create-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 430px;
+    grid-template-columns: minmax(0, 1fr) 400px;
     gap: var(--space-8, 32px);
     align-items: start;
     min-width: 0;
@@ -50,6 +57,8 @@ body {
 
 .campaign-create-main {
     min-width: 0;
+    /* dipakai untuk penomoran step otomatis di bawah */
+    counter-reset: campaign-step;
 }
 
 .campaign-create-heading {
@@ -92,14 +101,82 @@ body {
 .campaign-create-card {
     padding: var(--space-6, 24px);
     margin-bottom: var(--space-6, 24px);
+    position: relative;
+    transition: border-color .2s ease, box-shadow .2s ease;
 }
 
-.campaign-create-card-head,
+.campaign-create-card:focus-within {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-hover);
+}
+
+.campaign-create-card:last-child {
+    margin-bottom: 0;
+}
+
+/* ------------------------------------------------------------
+   Header kartu di kolom utama: dikasih badge nomor otomatis
+   (counter, bukan hardcode) karena form ini memang alur
+   berurutan — thumbnail → info → detail → kategori.
+   Header kartu sidebar TIDAK kena ini (class beda: campaign-side-head).
+------------------------------------------------------------ */
+.campaign-create-card-head {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: var(--space-3, 12px);
+    row-gap: 4px;
+    margin-bottom: var(--space-5, 20px);
+    counter-increment: campaign-step;
+}
+
+.campaign-create-card-head::before {
+    content: counter(campaign-step);
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: start;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-extrabold);
+    flex-shrink: 0;
+}
+
+.campaign-create-card-head h2 {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.35;
+    padding-top: 4px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.campaign-create-card-head p {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Header kartu sidebar: tanpa badge nomor, lebih ringkas */
 .campaign-side-head {
     margin-bottom: var(--space-5, 20px);
 }
 
-.campaign-create-card-head h2,
 .campaign-side-head h2 {
     margin: 0 0 var(--space-2, 8px);
     color: var(--text-dark);
@@ -110,7 +187,13 @@ body {
     word-break: break-word;
 }
 
-.campaign-create-card-head p,
+.campaign-side-head h2 small,
+.campaign-side-head h2 span {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
+}
+
 .campaign-side-head p {
     margin: 0;
     color: var(--muted);
@@ -122,6 +205,8 @@ body {
 
 /* ============================
    UPLOAD
+   Dibikin kerasa "upload zone" (dashed, tint primer),
+   bukan kotak abu-abu polos.
 ============================ */
 .campaign-upload-large,
 .campaign-upload-small {
@@ -129,10 +214,17 @@ body {
     overflow: hidden;
     display: grid;
     place-items: center;
-    background: #d9d9d9;
-    border: 1px solid var(--border);
+    background: var(--bg-blue-soft);
+    border: 2px dashed var(--border);
     border-radius: var(--radius-md);
     cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.campaign-upload-large:hover,
+.campaign-upload-small:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
 }
 
 .campaign-upload-large {
@@ -151,13 +243,29 @@ body {
 }
 
 .campaign-upload-placeholder {
-    color: var(--bg);
-    font-size: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    color: var(--primary);
+    font-size: 46px;
     line-height: 1;
+    pointer-events: none;
+}
+
+.campaign-upload-placeholder::after {
+    content: 'Klik untuk unggah';
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    color: var(--muted);
 }
 
 .campaign-upload-small .campaign-upload-placeholder {
-    font-size: 54px;
+    font-size: 32px;
+}
+
+.campaign-upload-small .campaign-upload-placeholder::after {
+    font-size: 11px;
 }
 
 .campaign-upload-button {
@@ -237,7 +345,7 @@ body {
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    transition: .2s ease;
+    transition: border-color .2s ease, box-shadow .2s ease;
     min-width: 0;
 }
 
@@ -245,7 +353,7 @@ body {
 .campaign-money-wrap:focus-within,
 .campaign-select-wrap:focus-within {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(51, 101, 175, .10);
+    box-shadow: 0 0 0 4px var(--primary-light);
 }
 
 .campaign-input-wrap input,
@@ -320,24 +428,24 @@ body {
 .campaign-slug-wrap {
     display: flex;
     align-items: center;
-    border: 1px solid #ced4da;
-    border-radius: 0.5rem;
-    padding: 0 0.75rem;
-    background: #fff;
-    transition: border-color 0.2s;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0 var(--space-3, 12px);
+    background: var(--bg);
+    transition: border-color .2s ease, box-shadow .2s ease;
     min-width: 0;
     overflow: hidden;
 }
 
 .campaign-slug-wrap:focus-within {
     border-color: var(--primary);
-    box-shadow: 0 0 0 0.2rem rgba(51, 101, 175, 0.25);
+    box-shadow: 0 0 0 4px var(--primary-light);
 }
 
 .campaign-slug-wrap .slug-prefix {
-    font-weight: 500;
-    color: #6c757d;
-    margin-right: 0.5rem;
+    font-weight: var(--fw-medium);
+    color: var(--muted);
+    margin-right: var(--space-2, 8px);
     white-space: nowrap;
     flex-shrink: 0;
     font-size: var(--fs-xs);
@@ -347,14 +455,14 @@ body {
     border: none;
     outline: none;
     flex: 1;
-    padding: 0.75rem 0;
+    padding: var(--space-3, 12px) 0;
     background: transparent;
     font-size: var(--fs-xs);
     min-width: 0;
 }
 
 .campaign-slug-wrap .slug-input::placeholder {
-    color: #adb5bd;
+    color: var(--muted-light);
 }
 
 /* ============================
@@ -396,11 +504,16 @@ body {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: .2s ease;
+    transition: border-color .2s ease, background .2s ease;
 }
 
 .campaign-filter-item:hover {
     border-color: var(--primary);
+}
+
+.campaign-filter-item:has(input:checked) {
+    border-color: var(--primary);
+    background: var(--primary-light);
 }
 
 .campaign-filter-item input {
@@ -432,10 +545,18 @@ body {
     padding: var(--space-6, 24px);
 }
 
+/* Kartu Package dikasih aksen atas biar kebaca sebagai bagian
+   paling penting di sidebar (yang paling sering diisi donatur). */
+.campaign-side-card:has(#packageList) {
+    border-top: 3px solid var(--primary);
+}
+
 .campaign-package-item {
-    padding-bottom: var(--space-5, 20px);
-    margin-bottom: var(--space-5, 20px);
-    border-bottom: 1px solid var(--border-soft);
+    padding: var(--space-4, 16px);
+    margin-bottom: var(--space-4, 16px);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
 }
 
 .campaign-package-item:last-child {
@@ -460,10 +581,16 @@ body {
     height: 32px;
     border: none;
     border-radius: var(--radius-full);
-    background: rgba(239, 68, 68, .10);
+    background: var(--danger-light);
     color: var(--danger);
     cursor: pointer;
     flex-shrink: 0;
+    transition: background .2s ease;
+}
+
+.campaign-package-title button:hover {
+    background: var(--danger);
+    color: var(--bg);
 }
 
 .package-image-upload {
@@ -475,20 +602,26 @@ body {
 }
 
 .package-image-upload span {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     display: grid;
     place-items: center;
     border-radius: var(--radius-md);
-    background: #d9d9d9;
-    color: var(--bg);
-    font-size: var(--fs-lg);
+    background: var(--bg-blue-soft);
+    border: 2px dashed var(--border);
+    color: var(--primary);
+    font-size: var(--fs-md);
     flex-shrink: 0;
+    transition: border-color .2s ease;
+}
+
+.package-image-upload:hover span {
+    border-color: var(--primary);
 }
 
 .package-image-upload img {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     border-radius: var(--radius-md);
     object-fit: cover;
     flex-shrink: 0;
@@ -507,7 +640,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: var(--space-2, 8px);
-    border: none;
+    border: 1.5px dashed var(--primary);
     border-radius: var(--radius-full);
     background: var(--primary-light);
     color: var(--primary);
@@ -521,6 +654,7 @@ body {
 
 .campaign-add-package:hover {
     background: var(--primary);
+    border-color: var(--primary);
     color: var(--bg);
 }
 
@@ -546,34 +680,125 @@ body {
 }
 
 /* ============================
-   FEATURE ROW / TOGGLE
+   FEATURE ROW / TOGGLE SWITCH
+   (.feature-check dipakai di Blade tapi sebelumnya
+   nggak pernah di-style — makanya kelihatan checkbox mentah)
 ============================ */
 .campaign-feature-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-5, 20px);
 }
 
-.feature-toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.feature-check {
+    position: relative;
+    display: inline-flex;
+    width: 42px;
+    height: 24px;
+    flex-shrink: 0;
     cursor: pointer;
-    font-size: var(--fs-sm);
 }
 
-.feature-toggle input {
+.feature-check input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.feature-check span {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: var(--radius-full);
+    transition: background .2s ease;
+}
+
+.feature-check span::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
     width: 18px;
     height: 18px;
-    accent-color: var(--primary);
+    background: var(--bg);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+    transition: transform .2s ease;
+}
+
+.feature-check input:checked + span {
+    background: var(--primary);
+}
+
+.feature-check input:checked + span::after {
+    transform: translateX(18px);
+}
+
+.feature-check input:focus-visible + span {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.feature-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4, 16px);
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    flex-wrap: wrap;
+}
+
+.feature-row > span,
+.feature-row > strong {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.feature-counter {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+}
+
+.feature-counter button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .2s ease, border-color .2s ease;
+}
+
+.feature-counter button:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.feature-counter span,
+.feature-counter .qty {
+    font-weight: var(--fw-bold);
+    min-width: 20px;
+    text-align: center;
+    font-size: var(--fs-xs);
 }
 
 .campaign-package-features {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    margin-top: 22px;
-    padding-top: 22px;
+    gap: var(--space-4, 16px);
+    margin-top: var(--space-5, 20px);
+    padding-top: var(--space-5, 20px);
     border-top: 1px solid var(--border);
 }
 
@@ -581,41 +806,26 @@ body {
     display: none;
 }
 
-.feature-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.feature-counter {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.feature-counter button {
-    width: 34px;
-    height: 34px;
-    border: 1px solid var(--border);
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.feature-counter span {
-    font-weight: 700;
-    min-width: 20px;
-    text-align: center;
-}
-
 .feature-input-card {
     display: flex;
-    gap: 14px;
+    gap: var(--space-3, 12px);
     align-items: flex-start;
-    margin-bottom: 18px;
+    padding: var(--space-5, 20px) var(--space-4, 16px);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    transition: opacity .2s ease;
+}
+
+.feature-input-card .feature-check {
+    margin-top: 15px;
+}
+
+/* nonaktifkan visual input kalau toggle-nya belum dinyalakan */
+.feature-input-card:has(.feature-check input:not(:checked)) .feature-input,
+.feature-input-card:has(.feature-check input:not(:checked)) .feature-money {
+    opacity: .5;
+    pointer-events: none;
 }
 
 .feature-input {
@@ -626,11 +836,18 @@ body {
 
 .feature-input input {
     width: 100%;
-    height: 56px;
-    padding: 4px 40px 2px 14px;
+    height: 52px;
+    padding: 4px 40px 2px var(--space-3, 12px);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
     font-size: var(--fs-xs);
+}
+
+.feature-input input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-light);
 }
 
 .feature-input small {
@@ -643,8 +860,8 @@ body {
 
 .feature-input i {
     position: absolute;
-    right: 14px;
-    top: 18px;
+    right: var(--space-3, 12px);
+    top: 16px;
     color: var(--primary);
     pointer-events: none;
 }
@@ -656,38 +873,49 @@ body {
 
 .feature-money label {
     display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
+    margin-bottom: var(--space-2, 8px);
+    font-weight: var(--fw-semibold);
     font-size: var(--fs-xs);
+    color: var(--text-dark);
 }
 
 .money-box {
     display: flex;
     align-items: center;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
     overflow: hidden;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.money-box:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-light);
 }
 
 .money-box span {
-    width: 50px;
-    background: #f7f9fc;
+    width: 46px;
+    background: var(--bg-soft);
     text-align: center;
-    font-weight: 600;
-    padding: 15px 0;
+    font-weight: var(--fw-semibold);
+    padding: 14px 0;
     flex-shrink: 0;
     font-size: var(--fs-xs);
+    color: var(--text-dark);
 }
 
 .money-box input {
     flex: 1;
     border: none;
-    padding: 15px;
+    padding: 14px;
     text-align: right;
-    font-weight: 700;
+    font-weight: var(--fw-bold);
     outline: none;
     min-width: 0;
     font-size: var(--fs-xs);
+    background: transparent;
+    color: var(--primary);
 }
 
 /* ============================
@@ -703,37 +931,38 @@ body {
 #previewPackageList {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3, 12px);
 }
 
 .preview-package {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 12px;
-    background: #f8f9fb;
+    gap: var(--space-3, 12px);
+    padding: var(--space-3, 12px);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
     min-width: 0;
 }
 
 .preview-package img {
     width: 58px;
     height: 58px;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     object-fit: cover;
-    background: #ececec;
+    background: var(--border-soft);
     flex-shrink: 0;
 }
 
 .preview-package-placeholder {
     width: 58px;
     height: 58px;
-    border-radius: 10px;
-    background: #ececec;
+    border-radius: var(--radius-sm);
+    background: var(--border-soft);
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #9ca3af;
+    color: var(--muted-light);
     font-size: 22px;
     flex-shrink: 0;
 }
@@ -745,16 +974,17 @@ body {
 
 .preview-package-body h5 {
     margin: 0;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
     overflow-wrap: break-word;
     word-break: break-word;
 }
 
 .preview-package-body p {
     margin: 4px 0;
-    font-size: 12px;
-    color: #6b7280;
+    font-size: var(--fs-xxs);
+    color: var(--muted);
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -764,28 +994,30 @@ body {
 }
 
 .preview-package-body span {
-    color: #16a34a;
-    font-size: 13px;
-    font-weight: 700;
+    color: var(--success);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
 }
 
 .preview-counter {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-2, 8px);
     flex-shrink: 0;
 }
 
 .preview-counter button {
     width: 26px;
     height: 26px;
-    border: none;
-    border-radius: 6px;
-    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+    color: var(--primary);
+    cursor: pointer;
 }
 
 .preview-donatur {
-    margin-top: 10px;
+    margin-top: var(--space-2, 8px);
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -793,29 +1025,33 @@ body {
 
 .preview-donatur small {
     font-size: 11px;
-    font-weight: 600;
-    color: #6b7280;
+    font-weight: var(--fw-semibold);
+    color: var(--muted);
 }
 
 .preview-donatur input {
     width: 100%;
     height: 36px;
-    padding: 0 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    background: #f9fafb;
-    color: #9ca3af;
-    font-size: 12px;
+    padding: 0 var(--space-3, 12px);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+    color: var(--muted-light);
+    font-size: var(--fs-xxs);
     outline: none;
     cursor: not-allowed;
 }
 
 .preview-donatur input::placeholder {
-    color: #9ca3af;
+    color: var(--muted-light);
 }
 
 /* ============================
    SUBMIT
+   Desktop: tombol biasa di akhir sidebar.
+   Mobile (<=768px): jadi sticky bar di bawah layar —
+   ruang untuknya sudah disiapkan lewat padding-bottom
+   .campaign-create-section di breakpoint terkait.
 ============================ */
 .campaign-submit-button {
     width: 100%;
@@ -832,12 +1068,17 @@ body {
     font-size: var(--fs-xs);
     font-weight: var(--fw-extrabold);
     cursor: pointer;
-    transition: .2s ease;
+    transition: background .2s ease, box-shadow .2s ease;
 }
 
 .campaign-submit-button:hover {
     background: var(--primary-hover);
-    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.campaign-submit-button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
 }
 
 /* ============================
@@ -892,6 +1133,7 @@ body {
 @media (max-width: 768px) {
     .campaign-create-section {
         padding-top: var(--space-7, 28px);
+        /* 86px = ruang buat sticky submit bar di bawah (lihat blok sticky submit) */
         padding-bottom: calc(var(--space-12, 48px) + 86px);
     }
 
@@ -908,7 +1150,7 @@ body {
     }
 
     .campaign-upload-placeholder {
-        font-size: 58px;
+        font-size: 40px;
     }
 
     .campaign-upload-button {
@@ -935,6 +1177,20 @@ body {
     .campaign-filter-item span {
         font-size: var(--fs-xxs);
     }
+
+    /* ---- Sticky submit bar ---- */
+    .campaign-submit-button {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 60;
+        width: 100%;
+        min-height: 54px;
+        border-radius: 0;
+        padding: 14px max(16px, env(safe-area-inset-left)) calc(14px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-right));
+        box-shadow: 0 -8px 24px rgba(17, 24, 39, .12);
+    }
 }
 
 /* HP */
@@ -944,6 +1200,16 @@ body {
         padding: var(--space-4, 16px);
         border-radius: var(--radius-md);
         margin-bottom: var(--space-4, 16px);
+    }
+
+    .campaign-create-card-head {
+        grid-template-columns: 28px minmax(0, 1fr);
+    }
+
+    .campaign-create-card-head::before {
+        width: 28px;
+        height: 28px;
+        font-size: var(--fs-xxs);
     }
 
     .campaign-create-card-head h2,
@@ -957,7 +1223,7 @@ body {
     }
 
     .campaign-upload-placeholder {
-        font-size: 48px;
+        font-size: 34px;
     }
 
     .campaign-upload-button {
@@ -1021,33 +1287,34 @@ body {
 
     /* Slug */
     .campaign-slug-wrap {
-        padding: 0 0.5rem;
+        padding: 0 var(--space-2, 8px);
     }
 
     .campaign-slug-wrap .slug-prefix {
         font-size: var(--fs-xxs);
-        margin-right: 0.25rem;
+        margin-right: 4px;
     }
 
     .campaign-slug-wrap .slug-input {
-        padding: 0.6rem 0;
+        padding: 10px 0;
         font-size: var(--fs-xxs);
     }
 
     /* Package upload */
     .package-image-upload span,
     .package-image-upload img {
-        width: 60px;
-        height: 60px;
+        width: 54px;
+        height: 54px;
     }
 
     .package-image-upload span {
-        font-size: var(--fs-md);
+        font-size: var(--fs-sm);
     }
 
     /* Feature row */
-    .feature-row {
-        gap: 10px;
+    .feature-row,
+    .feature-input-card {
+        padding: var(--space-3, 12px);
     }
 
     .feature-counter button {
@@ -1056,18 +1323,18 @@ body {
     }
 
     .feature-input input {
-        height: 48px;
+        height: 46px;
         font-size: var(--fs-xxs);
-        padding-right: 36px;
+        padding-right: 34px;
     }
 
     .feature-input i {
-        top: 15px;
-        right: 12px;
+        top: 14px;
+        right: 10px;
     }
 
     .money-box span {
-        width: 44px;
+        width: 42px;
         padding: 12px 0;
         font-size: var(--fs-xxs);
     }
@@ -1084,8 +1351,8 @@ body {
 
     /* Preview */
     .preview-package {
-        gap: 10px;
-        padding: 10px;
+        gap: var(--space-2, 8px);
+        padding: var(--space-2, 8px);
     }
 
     .preview-package img,
@@ -1099,7 +1366,7 @@ body {
     }
 
     .preview-package-body h5 {
-        font-size: 13px;
+        font-size: var(--fs-xxs);
     }
 
     .preview-package-body p {
@@ -1109,7 +1376,7 @@ body {
     }
 
     .preview-package-body span {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .preview-counter button {
@@ -1139,7 +1406,11 @@ body {
     }
 
     .campaign-upload-placeholder {
-        font-size: 38px;
+        font-size: 28px;
+    }
+
+    .campaign-upload-placeholder::after {
+        font-size: 10px;
     }
 
     .campaign-upload-button {
@@ -1207,7 +1478,7 @@ body {
 
     .campaign-slug-wrap .slug-input {
         font-size: 11px;
-        padding: 0.5rem 0;
+        padding: 8px 0;
     }
 
     /* Package */
@@ -1217,8 +1488,8 @@ body {
 
     .package-image-upload span,
     .package-image-upload img {
-        width: 52px;
-        height: 52px;
+        width: 48px;
+        height: 48px;
     }
 
     .campaign-package-title strong {
@@ -1231,6 +1502,11 @@ body {
     }
 
     /* Feature */
+    .feature-row,
+    .feature-input-card {
+        padding: 10px;
+    }
+
     .feature-counter button {
         width: 28px;
         height: 28px;
@@ -1314,7 +1590,6 @@ body {
 
     /* Submit */
     .campaign-submit-button {
-        min-height: 46px;
         font-size: 12px;
     }
 
@@ -1363,7 +1638,7 @@ body {
 
     .campaign-slug-wrap .slug-prefix {
         font-size: 10px;
-        margin-right: 0.15rem;
+        margin-right: 3px;
     }
 
     .campaign-slug-wrap .slug-input {
@@ -1393,7 +1668,7 @@ body {
     }
 
     .preview-package-body p {
-        display: none;   /* sembunyikan deskripsi di HP terkecil */
+        display: none; /* sembunyikan deskripsi di HP terkecil */
     }
 
     .preview-package-body span {
@@ -1423,5 +1698,15 @@ body {
     .campaign-filter-item input {
         width: 13px;
         height: 13px;
+    }
+}
+
+/* ============================================================
+   ACCESSIBILITY / REDUCED MOTION
+============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
     }
 }

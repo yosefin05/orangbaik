@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Penggalang Dana - OrangBaik.id</title>
+    <title>Profil Penggalang Dana - Orang Baik</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
@@ -98,7 +98,7 @@
                     <details class="info-card" open>
                         <summary>
                             <span>Informasi Penggalang</span>
-                            <b>⌄</b>
+                            <b><i class="bi bi-chevron-down"></i></b>
                         </summary>
                         <div class="info-table">
                             <div>
@@ -125,7 +125,7 @@
                     <details class="info-card" open>
                         <summary>
                             <span>Tentang Penggalang</span>
-                            <b>⌄</b>
+                            <b><i class="bi bi-chevron-down"></i></b>
                         </summary>
                         <div class="paragraph-content">
                             <p>{!! nl2br(e($penggalang->deskripsi)) !!}</p>
@@ -135,7 +135,7 @@
                     <details class="info-card" open>
                         <summary>
                             <span>Visi Misi</span>
-                            <b>⌄</b>
+                            <b><i class="bi bi-chevron-down"></i></b>
                         </summary>
                         <div class="paragraph-content">
                             <h3>Visi</h3>
@@ -148,7 +148,7 @@
                     <details class="info-card" open>
                         <summary>
                             <span>Informasi Legalitas</span>
-                            <b>⌄</b>
+                            <b><i class="bi bi-chevron-down"></i></b>
                         </summary>
                         <div class="info-table">
                             @forelse($penggalang->penggalangDanaDokumen as $dokumen)
@@ -169,7 +169,7 @@
                     <details class="info-card" open>
                         <summary>
                             <span>Kontak & Sosial Media</span>
-                            <b>⌄</b>
+                            <b><i class="bi bi-chevron-down"></i></b>
                         </summary>
                         <div class="info-table">
                             <div>

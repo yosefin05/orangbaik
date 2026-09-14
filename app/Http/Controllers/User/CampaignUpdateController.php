@@ -126,8 +126,7 @@ class CampaignUpdateController extends Controller
                 Storage::disk('public')->put($path, $imageData);
 
                 // URL yang akan disimpan di database
-                $url = Storage::disk('public')->url($path);
-
+                $url = '/storage/' . ltrim($path, '/');
                 return '<img'
                     . $attributesBefore
                     . 'src="' . $url . '"'
