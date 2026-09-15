@@ -439,7 +439,7 @@ class CampaignController extends Controller
             'filter.*' => ['exists:filter,id'],
 
             'packages' => ['nullable', 'array'],
-            'packages.*.id' => ['nullable', 'exists:campaign_packages,id'],
+            'packages.*.id' => ['nullable', 'exists:campaign_package,id'],
             'packages.*.title' => ['nullable', 'string', 'max:255'],
             'packages.*.description' => ['nullable', 'string'],
             'packages.*.nominal' => ['nullable', 'numeric', 'min:0'],
@@ -674,7 +674,7 @@ class CampaignController extends Controller
                     // HISTORICAL PACKAGE → jangan delete
                     // ----------------------------------------------------
                     if ($hasHistoricalDonation) {
-                        if (\Schema::hasColumn('campaign_packages', 'is_active')) {
+                        if (\Schema::hasColumn('campaign_package', 'is_active')) {
                             $package->update(['is_active' => false]);
                         }
 
