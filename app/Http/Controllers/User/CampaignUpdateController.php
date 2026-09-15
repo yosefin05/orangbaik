@@ -95,47 +95,76 @@ class CampaignUpdateController extends Controller
 
 
     private function processImages(string $html): string
-    {
-        return preg_replace_callback(
-            '/<img([^>]+)src=["\']data:image\/(jpeg|jpg|png|webp);base64,([^"\']+)["\']([^>]*)>/i',
-            function ($matches) {
-                $attributesBefore = $matches[1];
-                $extension = strtolower($matches[2]);
-                $base64 = $matches[3];
-                $attributesAfter = $matches[4];
+{
+    $pattern = '/<img\b([^>]*?)\bsrc=["\']data:image\/(jpeg|jpg|png|webp);base64,([^"\']+)["\']([^>]*)>/i';
 
-                // Decode Base64
-                $imageData = base64_decode($base64, true);
+    $result = preg_replace_callback(
+        $pattern,
+        function ($matches) {
+            $attributesBefore = $matches[1];
+            $extension = strtolower($matches[2]);
+            $base64 = $matches[3];
+            $attributesAfter = $matches[4];
 
-                // Kalau gagal decode, biarkan gambar seperti semula
-                if ($imageData === false) {
-                    return $matches[0];
-                }
+            // Normalisasi JPG
+            if ($extension === 'jpg') {
+                $extension = 'jpeg';
+            }
 
-                // Pastikan ekstensi valid
-                if ($extension === 'jpg') {
-                    $extension = 'jpeg';
-                }
+            // Decode Base64
+            $imageData = base64_decode($base64, true);
 
-                // Buat nama file unik
-                $filename = Str::uuid() . '.' . $extension;
+            if ($imageData === false) {
+                return $matches[0];
+            }
 
-                // Simpan ke storage/app/public/campaign-updates
-                $path = 'campaign-updates/' . $filename;
+            // Pastikan data benar-benar gambar
+            $imageInfo = @getimagesizefromstring($imageData);
 
-                Storage::disk('public')->put($path, $imageData);
+            if ($imageInfo === false) {
+                return $matches[0];
+            }
 
-                // URL yang akan disimpan di database
-                $url = '/storage/' . ltrim($path, '/');
-                return '<img'
-                    . $attributesBefore
-                    . 'src="' . $url . '"'
-                    . $attributesAfter
-                    . '>';
-            },
-            $html
-        );
-    }
+            // Pastikan MIME sesuai dengan format yang diizinkan
+            $allowedMimeTypes = [
+                'image/jpeg' => 'jpeg',
+                'image/png'  => 'png',
+                'image/webp' => 'webp',
+            ];
+
+            $mimeType = $imageInfo['mime'] ?? null;
+
+            if (!isset($allowedMimeTypes[$mimeType])) {
+                return $matches[0];
+            }
+
+            $extension = $allowedMimeTypes[$mimeType];
+
+            // Nama file unik
+            $filename = Str::uuid() . '.' . $extension;
+
+            // Simpan ke storage/app/public/campaign-updates
+            $path = 'campaign-updates/' . $filename;
+
+            Storage::disk('public')->put($path, $imageData);
+
+            // URL yang disimpan ke database
+            $url = '/storage/' . ltrim($path, '/');
+
+            return '<img'
+                . $attributesBefore
+                . 'src="' . $url . '"'
+                . $attributesAfter
+                . '>';
+        },
+        $html
+    );
+
+    // preg_replace_callback() bisa mengembalikan null kalau PCRE gagal.
+    // Jangan sampai null keluar dari method yang return type-nya string.
+    return $result ?? $html;
+}
+
     public function destroy($slug, $id)
     {
         $campaign = Campaign::where('slug', $slug)->firstOrFail();
