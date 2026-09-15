@@ -193,10 +193,7 @@
                                 <span class="nominal-emoji">🌟</span>
                                 <strong>Rp100.000</strong>
                             </label>
-                        @endforelse
-                    </div>
-
-                    <div class="custom-nominal-card">
+                            <div class="custom-nominal-card">
                         <h3>Atau Masukkan Nominal Lainnya</h3>
 
                         <div class="custom-input-wrap">
@@ -215,6 +212,8 @@
                             Minimal donasi sebesar Rp {{ number_format($campaign->minimal_donasi ?? 1000, 0, ',', '.') }}
                         </p>
                         <div id="error-nominal" class="error-text" style="display:none;"></div>
+                    </div>
+                        @endforelse
                     </div>
                 </section>
 
