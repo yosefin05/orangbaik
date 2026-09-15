@@ -48,6 +48,10 @@
             const editor = wrapper.querySelector(".rich-text-content");
             const input = wrapper.querySelector("[data-image-input]");
 
+            editor.addEventListener("focus", function () {
+    document.execCommand("defaultParagraphSeparator", false, "p");
+});
+
             wrapper
                 .querySelectorAll("[data-command]")
                 .forEach(function (button) {
