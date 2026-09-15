@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="id">
 
     <head>
@@ -31,8 +31,36 @@
                     {{-- LEFT CONTENT --}}
                     {{-- ========================================================== --}}
                     <div class="detail-main">
-                        <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
-                            class="campaign-hero-image">
+                        @php
+                            $hariIni = \Carbon\Carbon::today();
+                            $mulai = \Carbon\Carbon::parse($campaign->tanggal_mulai)->startOfDay();
+                            $akhir = $campaign->tanggal_berakhir
+                                ? \Carbon\Carbon::parse($campaign->tanggal_berakhir)->endOfDay()
+                                : null;
+
+                            if ($hariIni->lt($mulai)) {
+                                $statusHari = 'Mulai dalam ' . $hariIni->diffInDays($mulai) . ' hari';
+                                $statusHariClass = 'is-upcoming';
+                            } elseif ($akhir === null) {
+                                $statusHari = 'Tanpa batas waktu';
+                                $statusHariClass = 'is-ongoing';
+                            } elseif ($hariIni->gt($akhir)) {
+                                $statusHari = 'Campaign berakhir';
+                                $statusHariClass = 'is-ended';
+                            } else {
+                                $sisaHari = (int) $hariIni->diffInDays($akhir);
+                                $statusHari = $sisaHari == 0 ? 'Hari terakhir' : $sisaHari . ' Hari lagi';
+                                $statusHariClass = $sisaHari <= 3 ? 'is-urgent' : 'is-ongoing';
+                            }
+                        @endphp
+
+                        <div class="hero-wrapper">
+                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
+                                class="campaign-hero-image">
+                            <span class="hero-status-badge {{ $statusHariClass }}">
+                                <i class="bi bi-clock-fill"></i> {{ $statusHari }}
+                            </span>
+                        </div>
                         <section class="description-section">
                             <h1>{{ $campaign->judul }}</h1>
                             <div class="rich-text-output">{!! $campaign->deskripsi !!}</div>
@@ -49,18 +77,25 @@
                                 </h2>
 
                                 <div class="section-actions">
-                                    <button class="btn-share" onclick="shareCampaign()">
-                                        <i class="bi bi-share-fill"></i> Bagikan
+                                    <button class="btn-icon-action" onclick="shareCampaign()" title="Bagikan campaign">
+                                        <i class="bi bi-share-fill"></i>
                                     </button>
 
                                     @auth
                                         @if ($campaign->isOwner(Auth::id()))
-                                            <a href="{{ route('campaign.update.create', $campaign->slug) }}" class="btn-add-update">
-                                                <i class="bi bi-megaphone-fill"></i> Buat Update
-                                            </a>
-                                            <a href="{{ route('campaign.edit', $campaign->id) }}" class="btn-add-update">
-                                                <i class="bi bi-pen"></i> Edit Campaign
-                                            </a>
+                                            <div class="owner-menu">
+                                                <button class="btn-icon-action" onclick="toggleOwnerMenu(event)" title="Kelola campaign">
+                                                    <i class="bi bi-three-dots"></i>
+                                                </button>
+                                                <div class="owner-menu-dropdown" id="ownerMenuDropdown">
+                                                    <a href="{{ route('campaign.update.create', $campaign->slug) }}">
+                                                        <i class="bi bi-megaphone-fill"></i> Buat Update
+                                                    </a>
+                                                    <a href="{{ route('campaign.edit', $campaign->id) }}">
+                                                        <i class="bi bi-pen"></i> Edit Campaign
+                                                    </a>
+                                                </div>
+                                            </div>
                                         @endif
                                     @endauth
                                 </div>
@@ -69,13 +104,9 @@
                             @if ($campaign->campaignUpdates->count() > 0)
                                 <div class="updates-list">
                                     @foreach ($campaign->campaignUpdates as $update)
-                                        @php
-                                            $thumbnailImage = asset('storage/' . $campaign->thumbnail);
-                                        @endphp
-
                                         <div class="update-card" id="update-{{ $update->id }}">
-                                            <div class="update-thumbnail">
-                                                <img src="{{ $thumbnailImage }}" alt="{{ $update->judul_update }}">
+                                            <div class="update-icon-badge">
+                                                <i class="bi bi-megaphone-fill"></i>
                                             </div>
 
                                             <div class="update-content-wrapper">
@@ -240,27 +271,7 @@
 
                             <div class="summary-meta">
                                 <span>👤 {{ $campaign->donasi_count ?? 0 }} donatur</span>
-                                <span>
-                                    @php
-                                        $hariIni = \Carbon\Carbon::today();
-                                        $mulai = \Carbon\Carbon::parse($campaign->tanggal_mulai)->startOfDay();
-                                        $akhir = $campaign->tanggal_berakhir
-                                            ? \Carbon\Carbon::parse($campaign->tanggal_berakhir)->endOfDay()
-                                            : null;
-
-                                        if ($hariIni->lt($mulai)) {
-                                            $statusHari = 'Mulai dalam ' . $hariIni->diffInDays($mulai) . ' hari';
-                                        } elseif ($akhir === null) {
-                                            $statusHari = 'Tanpa batas waktu';
-                                        } elseif ($hariIni->gt($akhir)) {
-                                            $statusHari = 'Campaign berakhir';
-                                        } else {
-                                            $sisaHari = (int) $hariIni->diffInDays($akhir);
-                                            $statusHari = $sisaHari == 0 ? 'Hari terakhir' : $sisaHari . ' Hari lagi';
-                                        }
-                                    @endphp
-                                    {{ $statusHari }}
-                                </span>
+                                <span>{{ $statusHari }}</span>
                             </div>
                             <div class="donate-button-wrapper">
                                 <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}" class="donate-button">Donasi
@@ -514,7 +525,7 @@
                     <div class="referral-section-title">
                         <i class="bi bi-qr-code"></i> QR Code Referral
                     </div>
-                    <div class="modal-qr-wrapper" onclick="openFundraiserModalFromModal()" style="cursor: pointer;">
+                    <div class="modal-qr-wrapper" onclick="openQRFullscreen()" style="cursor: pointer;">
                         <div id="modalQrContainer">
                             <!-- QR Code akan diisi oleh JavaScript -->
                         </div>
@@ -526,6 +537,30 @@
                             <i class="bi bi-x-circle"></i> Tutup
                         </button>
                         <button class="btn-modal-primary" onclick="shareReferralLink()">
+                            <i class="bi bi-share-fill"></i> Bagikan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ========================================================== --}}
+        {{-- MODAL QR CODE FULLSCREEN --}}
+        {{-- ========================================================== --}}
+        <div class="modal-qr-overlay" id="qrFullscreenOverlay">
+            <div class="modal-qr-fullscreen">
+                <button class="modal-qr-close" onclick="closeQRFullscreen()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <div class="modal-qr-fullscreen-content">
+                    <div id="qrFullscreenContainer"></div>
+                    <h3>QR Code Referral Anda</h3>
+                    <p>Minta orang lain scan QR ini untuk berdonasi lewat link referral Anda.</p>
+                    <div class="modal-qr-actions">
+                        <button class="btn-download-qr-modal" id="btnDownloadQrFullscreen">
+                            <i class="bi bi-download"></i> Download
+                        </button>
+                        <button class="btn-share-qr-modal" onclick="shareReferralLink()">
                             <i class="bi bi-share-fill"></i> Bagikan
                         </button>
                     </div>
@@ -573,6 +608,25 @@
                 document.execCommand('copy');
                 showToast('Link referral berhasil disalin!');
             }
+
+            // ============================================================
+            // OWNER "KELOLA" DROPDOWN MENU
+            // ============================================================
+            function toggleOwnerMenu(e) {
+                e.stopPropagation();
+                const dropdown = document.getElementById('ownerMenuDropdown');
+                if (!dropdown) return;
+                dropdown.classList.toggle('open');
+            }
+
+            document.addEventListener('click', function (e) {
+                const dropdown = document.getElementById('ownerMenuDropdown');
+                if (!dropdown) return;
+                const menu = dropdown.closest('.owner-menu');
+                if (menu && !menu.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            });
 
             // ============================================================
             // TOGGLE UPDATE DETAIL
@@ -705,6 +759,28 @@
             });
 
             // ============================================================
+            // AUTO-WIRE LIGHTBOX UNTUK GAMBAR DI KONTEN
+            // (deskripsi campaign & isi update masing-masing jadi galeri sendiri)
+            // ============================================================
+            document.addEventListener('DOMContentLoaded', function () {
+                function wireLightboxImages(containerSelector) {
+                    document.querySelectorAll(containerSelector).forEach(function (container) {
+                        const imgs = Array.from(container.querySelectorAll('img'));
+                        if (!imgs.length) return;
+                        const srcs = imgs.map(img => img.src);
+                        imgs.forEach(function (img) {
+                            img.addEventListener('click', function () {
+                                openLightbox(img.src, srcs);
+                            });
+                        });
+                    });
+                }
+
+                wireLightboxImages('.rich-text-output');
+                wireLightboxImages('.update-full-body');
+            });
+
+            // ============================================================
             // TOAST NOTIFICATION
             // ============================================================
             function showToast(message) {
@@ -723,12 +799,10 @@
             // ============================================================
             let modalReferralCode = '';
             let modalReferralUrl = '';
-            let modalQrSvg = '';
 
             function openFundraiserModal(referralCode, referralUrl, qrSvg) {
                 modalReferralCode = referralCode || '';
                 modalReferralUrl = referralUrl || '';
-                modalQrSvg = qrSvg || '';
 
                 const referralLinkInput = document.getElementById('modalReferralLink');
                 if (referralLinkInput) {
@@ -801,32 +875,46 @@
             }
 
             // ============================================================
-            // OPEN MODAL FROM MODAL QR
+            // QR CODE FULLSCREEN (dari dalam modal fundraiser)
             // ============================================================
-            function openFundraiserModalFromModal() {
-                const referralLinkInput = document.getElementById('modalReferralLink');
-                const referralCodeElement = document.getElementById('modalReferralCode');
+            function openQRFullscreen() {
                 const qrContainer = document.getElementById('modalQrContainer');
+                const overlay = document.getElementById('qrFullscreenOverlay');
+                const fullscreenContainer = document.getElementById('qrFullscreenContainer');
+                if (!qrContainer || !overlay || !fullscreenContainer) return;
 
-                if (!referralLinkInput || !referralCodeElement || !qrContainer) {
-                    showToast('Data tidak ditemukan');
-                    return;
-                }
-
-                const referralUrl = referralLinkInput.value;
-                const referralCode = referralCodeElement.textContent;
                 const qrSvg = qrContainer.innerHTML;
-
-                if (!qrSvg || qrSvg.trim() === '' || qrSvg.includes('<!--')) {
+                if (!qrSvg || qrSvg.trim() === '') {
                     showToast('QR Code belum tersedia');
                     return;
                 }
 
-                closeFundraiserModal();
+                fullscreenContainer.innerHTML = qrSvg;
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
 
-                setTimeout(function () {
-                    openFundraiserModal(referralCode, referralUrl, qrSvg);
-                }, 400);
+                const btnDownload = document.getElementById('btnDownloadQrFullscreen');
+                if (btnDownload) {
+                    btnDownload.onclick = function () {
+                        const svg = fullscreenContainer.querySelector('svg');
+                        if (!svg) return;
+                        const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = 'qr-referral-' + (modalReferralCode || 'orangbaik') + '.svg';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    };
+                }
+            }
+
+            function closeQRFullscreen() {
+                const overlay = document.getElementById('qrFullscreenOverlay');
+                if (overlay) {
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
             }
 
             // ============================================================
@@ -878,10 +966,13 @@
             // ============================================================
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
+                    const qrOverlay = document.getElementById('qrFullscreenOverlay');
                     const fundraiserModal = document.getElementById('fundraiserModal');
                     const lightboxOverlay = document.getElementById('lightboxOverlay');
 
-                    if (fundraiserModal && fundraiserModal.classList.contains('active')) {
+                    if (qrOverlay && qrOverlay.classList.contains('active')) {
+                        closeQRFullscreen();
+                    } else if (fundraiserModal && fundraiserModal.classList.contains('active')) {
                         closeFundraiserModal();
                     } else if (lightboxOverlay && lightboxOverlay.classList.contains('active')) {
                         closeLightbox();
@@ -896,6 +987,15 @@
                     fundraiserModal.addEventListener('click', function (e) {
                         if (e.target === this) {
                             closeFundraiserModal();
+                        }
+                    });
+                }
+
+                const qrOverlay = document.getElementById('qrFullscreenOverlay');
+                if (qrOverlay) {
+                    qrOverlay.addEventListener('click', function (e) {
+                        if (e.target === this) {
+                            closeQRFullscreen();
                         }
                     });
                 }

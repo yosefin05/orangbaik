@@ -480,8 +480,8 @@
 .testimonial-wrapper {
     position: relative;
     width: 100%;
-    min-height: 380px; /* Tambahkan sedikit ruang agar card active tidak terpotong */
-    margin-top: var(--space-8, 32px);
+    min-height: 240px; /* Tambahkan sedikit ruang agar card active tidak terpotong */
+    margin-top: var(--space-6, 24px);
     overflow: hidden;
 }
 
