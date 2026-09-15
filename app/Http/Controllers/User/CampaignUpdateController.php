@@ -97,7 +97,7 @@ class CampaignUpdateController extends Controller
     private function processImages(string $html): string
     {
         return preg_replace_callback(
-            '/<img([^>]+)src=["\']data:image\/(jpeg|jpg|png);base64,([^"\']+)["\']([^>]*)>/i',
+            '/<img([^>]+)src=["\']data:image\/(jpeg|jpg|png\webp);base64,([^"\']+)["\']([^>]*)>/i',
             function ($matches) {
                 $attributesBefore = $matches[1];
                 $extension = strtolower($matches[2]);
