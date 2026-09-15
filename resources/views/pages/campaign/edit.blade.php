@@ -389,7 +389,7 @@
                             <div class="campaign-side-head">
                                 <h2>Tambahkan Fitur Lainnya <span>(Opsional)</span></h2>
                             </div>
-
+                            <div class="campaign-feature-list">
                             <div class="feature-row">
                                 <label class="feature-check">
                                     <input type="checkbox" id="toggleQuantity" name="enable_quantity" {{ $campaign->enable_quantity ? 'checked' : '' }}>
@@ -430,6 +430,7 @@
                                             name="custom_nominal">
                                     </div>
                                 </div>
+                            </div>
                             </div>
                         </section>
 
