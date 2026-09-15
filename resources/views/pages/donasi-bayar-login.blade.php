@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/donasi-bayar.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 
@@ -25,7 +26,7 @@
     <div class="nominal-container">
 
         <button class="back-button" type="button" onclick="history.back()">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
                 <path d="M15 18L9 12L15 6" />
             </svg>
             <span>Kembali</span>
@@ -36,8 +37,8 @@
 
             {{-- CAMPAIGN INFO --}}
             <article class="campaign-preview">
-                <img 
-                    src="{{ asset('assets/slide1.png') }}" 
+                <img
+                    src="{{ asset('assets/slide1.png') }}"
                     alt="Beasiswa Yatim Dhuafa"
                     class="campaign-preview-image"
                 >
@@ -46,8 +47,8 @@
                     <h1>Gotong Royong Infaq Jariyah Hadirkan Layanan Ambulan Gratis</h1>
 
                     <p class="campaign-organizer">
+                        <i class="bi bi-patch-check-fill"></i>
                         Dompet Al-Qur'an Indonesia
-                        <span>●</span>
                     </p>
 
                     <div class="campaign-amount">
@@ -60,8 +61,8 @@
                     </div>
 
                     <div class="campaign-meta">
-                        <span>👤 100rb ± donatur</span>
-                        <span>∞</span>
+                        <span><i class="bi bi-people-fill"></i> 100rb ± donatur</span>
+                        <span><i class="bi bi-infinity"></i> Tanpa batas waktu</span>
                     </div>
                 </div>
             </article>
@@ -70,12 +71,12 @@
             <section class="nominal-section">
                 <h2>Masukkan Nominal Donasi</h2>
 
-                <div class="nominal-grid">
+                <div class="nominal-list">
                     @foreach ($nominals as $index => $nominal)
-                        <label class="nominal-option">
-                            <input 
-                                type="radio" 
-                                name="nominal" 
+                        <label class="nominal-card">
+                            <input
+                                type="radio"
+                                name="nominal"
                                 value="{{ $nominal['value'] }}"
                                 {{ $index === 0 ? 'checked' : '' }}
                             >
@@ -88,15 +89,15 @@
             </section>
 
             {{-- CUSTOM NOMINAL --}}
-            <section class="custom-nominal">
+            <section class="nominal-section">
                 <h2>Masukkan Donasi Lainnya</h2>
 
-                <div class="custom-input">
+                <div class="custom-input-wrap">
                     <span>Rp</span>
                     <input type="number" name="nominal_lainnya" placeholder="0" min="5000">
                 </div>
 
-                <p>Min. Donasi sebesar Rp5.000</p>
+                <p class="custom-nominal-hint">Min. Donasi sebesar Rp5.000</p>
             </section>
 
         </form>
@@ -104,9 +105,12 @@
     </div>
 
     <div class="bottom-action">
-        <button type="submit" form="nominalForm" class="continue-button">
-            Lanjutkan Pembayaran
-        </button>
+        <div class="bottom-action-inner">
+            <button type="submit" form="nominalForm" class="continue-button">
+                Lanjutkan Pembayaran
+                <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
     </div>
 </main>
 

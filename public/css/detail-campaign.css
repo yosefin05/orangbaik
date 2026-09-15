@@ -117,9 +117,53 @@ body {
 .rich-text-output {
     text-align: justify;
     font-size: var(--fs-sm);
+    font-weight: 400;
+    line-height: 1.7;
     overflow-wrap: break-word;
     word-break: break-word;
 }
+
+/* Semua teks normal mengikuti ukuran output */
+.rich-text-output p,
+.rich-text-output div,
+.rich-text-output span,
+.rich-text-output li {
+    font-size: inherit;
+    font-weight: 400;
+    font-family: inherit;
+}
+
+/* Heading tetap punya tingkatan, tapi dikontrol */
+.rich-text-output h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.rich-text-output h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.rich-text-output h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* Formatting yang memang sengaja dibuat bold */
+.rich-text-output strong,
+.rich-text-output b {
+    font-weight: 700;
+}
+
+/* Italic */
+.rich-text-output em,
+.rich-text-output i {
+    font-style: italic;
+}
+
 .rich-text-output img {
     display: block;
     width: auto;

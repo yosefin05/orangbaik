@@ -9,6 +9,7 @@
 
 .payment-page {
     background: var(--bg-soft);
+    color: var(--text-dark);
     min-height: 100vh;
     padding: var(--space-8) var(--page-padding) var(--space-20);
 }
@@ -77,7 +78,8 @@
 .nominal-section,
 .donor-card,
 .message-card,
-.payment-method-card {
+.payment-method-card,
+.payment-channels-section {
     background: var(--bg);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius-lg);
@@ -87,12 +89,14 @@
 .nominal-section,
 .donor-card,
 .message-card,
-.payment-method-card {
+.payment-method-card,
+.payment-channels-section {
     padding: var(--card-padding-lg);
 }
 
 .nominal-section h2,
-.message-card h2 {
+.message-card h2,
+.payment-channels-section h2 {
     font-size: var(--fs-sm);
     font-weight: var(--fw-semibold);
     color: var(--text-dark);
@@ -150,6 +154,10 @@
 
 .campaign-mini-body > p span {
     color: var(--muted-light);
+}
+
+.campaign-mini-body > p i {
+    color: var(--primary);
 }
 
 .mini-amount {
@@ -347,6 +355,18 @@
     margin-bottom: var(--space-4);
 }
 
+.field-label {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
+    margin-bottom: var(--space-1);
+    display: block;
+}
+
+.required-mark {
+    color: var(--danger);
+}
+
 .donor-input-group input[type="text"] {
     width: 100%;
     border: 1.5px solid var(--border);
@@ -402,6 +422,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
+    margin-top: var(--space-4);
     cursor: pointer;
 }
 
@@ -493,10 +514,12 @@
     bottom: var(--space-3);
     font-size: var(--fs-xxs);
     color: var(--muted-light);
+    transition: color .15s ease;
 }
 
-.message-card .switch-row {
-    margin-top: var(--space-4);
+.textarea-wrap #charCount.char-limit-warning {
+    color: var(--danger);
+    font-weight: var(--fw-semibold);
 }
 
 /* ------------------------------------------------------------
@@ -506,11 +529,132 @@
 .error-text {
     font-size: var(--fs-xxs);
     color: var(--danger);
+    font-weight: var(--fw-medium);
     margin-top: var(--space-1);
 }
 
 /* ------------------------------------------------------------
-   9. PAYMENT SUMMARY (RIGHT SIDEBAR)
+   9. PAYMENT CHANNEL SELECTOR
+   ------------------------------------------------------------ */
+
+.payment-channels-section #error-payment_channel_id {
+    margin-bottom: var(--space-3);
+}
+
+.channel-groups-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.group-heading {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+    margin: 0 0 var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.group-heading i {
+    color: var(--primary);
+}
+
+.channel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-3);
+}
+
+.channel-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: var(--space-4);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    background: var(--bg);
+    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+
+.channel-item:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.channel-item:has(input:checked) {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.channel-item:has(input:focus-visible) {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.channel-item input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.channel-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: var(--space-3);
+}
+
+.channel-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.channel-name {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text-dark);
+}
+
+.channel-item:has(input:checked) .channel-name {
+    color: var(--primary);
+}
+
+.channel-type {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+}
+
+.channel-provider-tag {
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    padding: 2px var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--bg-soft);
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.channel-item:has(input:checked) .channel-provider-tag {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.channel-empty-text {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+}
+
+/* ------------------------------------------------------------
+   10. PAYMENT SUMMARY (RIGHT SIDEBAR)
    ------------------------------------------------------------ */
 
 .payment-method-card h2 {
@@ -552,9 +696,16 @@
 }
 
 .payment-method-info strong {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
     color: var(--text-dark);
+}
+
+.payment-method-info strong i {
+    color: var(--success);
 }
 
 .payment-method-info p {
@@ -604,12 +755,179 @@
 #loading-text {
     text-align: center;
     margin-top: var(--space-4);
-    color: var(--muted);
+    color: var(--primary);
     font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
 }
 
 /* ------------------------------------------------------------
-   10. RESPONSIVE
+   11. NOMINAL INPUT PAGE (pilih nominal sebelum bayar)
+   ------------------------------------------------------------ */
+
+.nominal-page {
+    background: var(--bg-soft);
+    color: var(--text-dark);
+    min-height: 100vh;
+    padding: var(--space-8) var(--page-padding) calc(var(--space-20) + 64px);
+}
+
+.nominal-container {
+    max-width: var(--container-form);
+    margin: 0 auto;
+}
+
+.nominal-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.custom-nominal-hint {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    margin: var(--space-2) 0 0;
+}
+
+/* Campaign preview hero card */
+.campaign-preview {
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.campaign-preview-image {
+    display: block;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: var(--bg-soft);
+}
+
+.campaign-preview-body {
+    padding: var(--card-padding-lg);
+}
+
+.campaign-preview-body h1 {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+    line-height: 1.35;
+    margin: 0 0 var(--space-2);
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.campaign-organizer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+    margin: 0 0 var(--space-4);
+}
+
+.campaign-organizer i {
+    color: var(--primary);
+    font-size: var(--fs-sm);
+}
+
+.campaign-amount {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.campaign-amount strong {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-extrabold);
+    color: var(--primary);
+}
+
+.campaign-amount span {
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+}
+
+.campaign-progress {
+    height: 8px;
+    background: var(--bg-soft);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--space-3);
+}
+
+.campaign-progress div {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+    border-radius: var(--radius-full);
+    transition: width .5s ease;
+}
+
+.campaign-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: var(--fs-xxs);
+    color: var(--muted);
+}
+
+.campaign-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+/* Sticky bottom CTA */
+.bottom-action {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border-soft);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+    padding: var(--space-4) var(--page-padding);
+    z-index: 50;
+}
+
+.bottom-action-inner {
+    max-width: var(--container-form);
+    margin: 0 auto;
+}
+
+.continue-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-full);
+    padding: var(--space-4);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.continue-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover, var(--shadow));
+}
+
+.continue-button:active {
+    transform: translateY(0);
+}
+
+/* ------------------------------------------------------------
+   12. RESPONSIVE
    ------------------------------------------------------------ */
 
 @media (max-width: 960px) {
@@ -644,8 +962,29 @@
     .nominal-section,
     .donor-card,
     .message-card,
-    .payment-method-card {
+    .payment-method-card,
+    .payment-channels-section {
         padding: var(--card-padding);
+    }
+
+    .channel-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nominal-page {
+        padding: var(--space-5) var(--space-4) calc(var(--space-16) + 64px);
+    }
+
+    .campaign-preview-image {
+        height: 160px;
+    }
+
+    .campaign-preview-body {
+        padding: var(--card-padding);
+    }
+
+    .bottom-action {
+        padding: var(--space-3) var(--space-4);
     }
 }
 

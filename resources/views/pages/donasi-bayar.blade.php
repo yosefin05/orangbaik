@@ -8,108 +8,6 @@
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/donasi-bayar.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        :root {
-            --primary-color: #3365af;
-            --primary-dark: #244980;
-            --primary-light: #eff6ff;
-        }
-        body {
-            background-color: #f8fafc;
-            color: #0f172a;
-        }
-        .payment-channels-section {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        .group-heading {
-            font-size: 0.9375rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0.75rem 0 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .channel-groups-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .channel-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 0.75rem;
-        }
-        .channel-item {
-            position: relative;
-            display: flex;
-            align-items: center;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: #ffffff;
-        }
-        .channel-item:hover {
-            border-color: #93c5fd;
-            background: #f8fafc;
-        }
-        .channel-item.selected,
-        .channel-item input[type="radio"]:checked ~ .channel-item-content {
-            border-color: var(--primary-color);
-            background: var(--primary-light);
-        }
-        .channel-item input[type="radio"] {
-            margin-right: 0.75rem;
-            accent-color: var(--primary-color);
-            width: 18px;
-            height: 18px;
-        }
-        .channel-item-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-        .channel-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .channel-name {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: #0f172a;
-        }
-        .channel-type {
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-        .channel-provider-tag {
-            font-size: 0.6875rem;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            background: #f1f5f9;
-            color: #475569;
-        }
-        .channel-item input[type="radio"]:checked + .channel-item-content .channel-provider-tag {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-        .error-text {
-            color: #dc2626;
-            font-size: 0.8125rem;
-            margin-top: 0.375rem;
-            font-weight: 500;
-        }
-    </style>
 </head>
 <body>
 
@@ -136,7 +34,7 @@
                     <div class="campaign-mini-body">
                         <h1>{{ $campaign->judul }}</h1>
                         <p>
-                            <i class="bi bi-patch-check-fill text-primary"></i>
+                            <i class="bi bi-patch-check-fill"></i>
                             {{ $campaign->penggalangDana->nama_penggalang ?? 'Penggalang Dana' }}
                         </p>
 
@@ -194,25 +92,23 @@
                                 <strong>Rp100.000</strong>
                             </label>
                             <div class="custom-nominal-card">
-                        <h3>Atau Masukkan Nominal Lainnya</h3>
+                                <h3>Atau Masukkan Nominal Lainnya</h3>
 
-                        <div class="custom-input-wrap">
-                            <span>Rp</span>
-                            <input
-                                type="number"
-                                name="nominal_lainnya"
-                                id="nominal_lainnya"
-                                placeholder="0"
-                                min="{{ $campaign->minimal_donasi ?? 1000 }}"
-                                value="{{ old('nominal_lainnya') }}"
-                            >
-                        </div>
+                                <div class="custom-input-wrap">
+                                    <span>Rp</span>
+                                    <input
+                                        type="number"
+                                        name="nominal_lainnya"
+                                        id="nominal_lainnya"
+                                        placeholder="0"
+                                        min="{{ $campaign->minimal_donasi ?? 1000 }}"
+                                        value="{{ old('nominal_lainnya') }}"
+                                    >
+                                </div>
 
-                        <p class="mt-2 text-muted" style="font-size:0.8125rem;">
-                            Minimal donasi sebesar Rp {{ number_format($campaign->minimal_donasi ?? 1000, 0, ',', '.') }}
-                        </p>
-                        <div id="error-nominal" class="error-text" style="display:none;"></div>
-                    </div>
+                                <p>Minimal donasi sebesar Rp {{ number_format($campaign->minimal_donasi ?? 1000, 0, ',', '.') }}</p>
+                                <div id="error-nominal" class="error-text" style="display:none;"></div>
+                            </div>
                         @endforelse
                     </div>
                 </section>
@@ -220,7 +116,7 @@
                 {{-- 3. PAYMENT METHOD SECTION --}}
                 <section class="payment-channels-section">
                     <h2>Pilih Metode Pembayaran</h2>
-                    <div id="error-payment_channel_id" class="error-text" style="display:none; margin-bottom: 0.75rem;"></div>
+                    <div id="error-payment_channel_id" class="error-text" style="display:none;"></div>
 
                     @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
                         @php
@@ -231,9 +127,9 @@
 
                         <div class="channel-groups-wrapper">
                             @foreach ($grouped as $groupName => $groupChannels)
-                                <div class="channel-group mb-3">
+                                <div class="channel-group">
                                     <h3 class="group-heading">
-                                        <i class="bi bi-credit-card-2-front text-primary"></i>
+                                        <i class="bi bi-credit-card-2-front"></i>
                                         <span>{{ $groupName }}</span>
                                     </h3>
                                     <div class="channel-grid">
@@ -256,7 +152,7 @@
                             @endforeach
                         </div>
                     @else
-                        <p style="color:#64748b; font-size:0.875rem;">Metode pembayaran belum tersedia saat ini.</p>
+                        <p class="channel-empty-text">Metode pembayaran belum tersedia saat ini.</p>
                     @endif
                 </section>
 
@@ -267,13 +163,13 @@
                         @if(auth()->check())
                             <span>Berdonasi sebagai <strong id="donorNameDisplay">{{ auth()->user()->name }}</strong></span>
                         @else
-                            <span>Lengkapi data di bawah ini atau <a href="{{ route('login') }}" style="color:#3365af; font-weight:600;">Masuk Akun</a></span>
+                            <span>Lengkapi data di bawah ini atau <a href="{{ route('login') }}">Masuk Akun</a></span>
                         @endif
                     </p>
 
                     <div class="donor-input-group">
                         <div>
-                            <label for="nama_donatur" style="font-size:0.8125rem; font-weight:600; color:#334155; margin-bottom:4px; display:block;">Nama Lengkap</label>
+                            <label for="nama_donatur" class="field-label">Nama Lengkap</label>
                             <input
                                 type="text"
                                 name="nama_donatur"
@@ -286,7 +182,7 @@
                         </div>
 
                         <div>
-                            <label for="no_hp" style="font-size:0.8125rem; font-weight:600; color:#334155; margin-bottom:4px; display:block;">Nomor WhatsApp / HP <span style="color:#dc2626;">*</span></label>
+                            <label for="no_hp" class="field-label">Nomor WhatsApp / HP <span class="required-mark">*</span></label>
                             <input
                                 type="text"
                                 name="no_hp"
@@ -299,12 +195,12 @@
                         </div>
                     </div>
 
-                    <p class="input-note mt-2">
+                    <p class="input-note">
                         <span>ⓘ</span>
                         Nomor WhatsApp digunakan untuk mengirimkan konfirmasi dan kuitansi donasi.
                     </p>
 
-                    <label class="switch-row mt-3">
+                    <label class="switch-row">
                         <span>Sembunyikan nama saya di daftar donatur (Hamba Allah)</span>
                         <input type="checkbox" name="anonymous_donor" id="anonymous_donor" {{ old('anonymous_donor') ? 'checked' : '' }}>
                         <i></i>
@@ -326,7 +222,7 @@
                     </div>
                     <div id="error-pesan" class="error-text" style="display:none;"></div>
 
-                    <label class="switch-row mt-3">
+                    <label class="switch-row">
                         <span>Sembunyikan isi doa dari publik</span>
                         <input type="checkbox" name="anonymous_message" id="anonymous_message" {{ old('anonymous_message') ? 'checked' : '' }}>
                         <i></i>
@@ -346,14 +242,14 @@
                     </div>
 
                     <div class="payment-method-info">
-                        <strong><i class="bi bi-shield-check text-success"></i> Transaksi Aman & Terenkripsi</strong>
+                        <strong><i class="bi bi-shield-check"></i> Transaksi Aman & Terenkripsi</strong>
                         <p>Pembayaran Anda diproses secara otomatis dengan keamanan standar perbankan.</p>
                     </div>
 
                     <button class="pay-button" type="button" id="payButton">
                         <i class="bi bi-lock-fill"></i> Lanjutkan Pembayaran
                     </button>
-                    <div id="loading-text" style="display:none; text-align:center; margin-top:10px; font-weight:600; color:#3365af;">
+                    <div id="loading-text" style="display:none;">
                         ⏳ Memproses transaksi...
                     </div>
                 </div>
@@ -394,7 +290,7 @@
         function updateCharCount() {
             const count = textarea.value.length;
             charCounter.textContent = count + '/255';
-            charCounter.style.color = count > 240 ? '#e74c3c' : '';
+            charCounter.classList.toggle('char-limit-warning', count > 240);
         }
 
         nominalRadios.forEach(radio => radio.addEventListener('change', function() {
