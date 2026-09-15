@@ -56,66 +56,66 @@
 
                 {{-- 2. NOMINAL DONATION SECTION --}}
                 <section class="nominal-section">
-                    <h2>Pilih Nominal Donasi</h2>
+                    <div class="section-heading">
+                        <span class="section-number">1</span>
+                        <h2>Pilih Nominal Donasi</h2>
+                    </div>
 
-                    <div class="nominal-list">
+                    <div class="amount-grid">
                         @forelse ($campaign->packages as $index => $package)
-                            <label class="nominal-card">
+                            <label class="amount-chip">
                                 <input
                                     type="radio"
                                     name="nominal"
                                     value="{{ $package->nominal }}"
                                     {{ $index === 0 ? 'checked' : '' }}
                                 >
-                                <span class="nominal-emoji">{{ $package->emoji ?? '🎁' }}</span>
-                                <strong>Rp {{ number_format($package->nominal, 0, ',', '.') }}</strong>
+                                <span>Rp {{ number_format($package->nominal, 0, ',', '.') }}</span>
                             </label>
                         @empty
-                            <label class="nominal-card">
+                            <label class="amount-chip">
                                 <input type="radio" name="nominal" value="10000" checked>
-                                <span class="nominal-emoji">💰</span>
-                                <strong>Rp10.000</strong>
+                                <span>Rp10.000</span>
                             </label>
-                            <label class="nominal-card">
+                            <label class="amount-chip">
                                 <input type="radio" name="nominal" value="25000">
-                                <span class="nominal-emoji">💎</span>
-                                <strong>Rp25.000</strong>
+                                <span>Rp25.000</span>
                             </label>
-                            <label class="nominal-card">
+                            <label class="amount-chip">
                                 <input type="radio" name="nominal" value="50000">
-                                <span class="nominal-emoji">🎁</span>
-                                <strong>Rp50.000</strong>
+                                <span>Rp50.000</span>
                             </label>
-                            <label class="nominal-card">
+                            <label class="amount-chip">
                                 <input type="radio" name="nominal" value="100000">
-                                <span class="nominal-emoji">🌟</span>
-                                <strong>Rp100.000</strong>
+                                <span>Rp100.000</span>
                             </label>
-                            <div class="custom-nominal-card">
-                                <h3>Atau Masukkan Nominal Lainnya</h3>
-
-                                <div class="custom-input-wrap">
-                                    <span>Rp</span>
-                                    <input
-                                        type="number"
-                                        name="nominal_lainnya"
-                                        id="nominal_lainnya"
-                                        placeholder="0"
-                                        min="{{ $campaign->minimal_donasi ?? 1000 }}"
-                                        value="{{ old('nominal_lainnya') }}"
-                                    >
-                                </div>
-
-                                <p>Minimal donasi sebesar Rp {{ number_format($campaign->minimal_donasi ?? 1000, 0, ',', '.') }}</p>
-                                <div id="error-nominal" class="error-text" style="display:none;"></div>
-                            </div>
                         @endforelse
                     </div>
+
+                    <p class="custom-amount-label">
+                        <i class="bi bi-pencil-square"></i> Atau masukkan nominal lainnya
+                    </p>
+                    <div class="custom-input-wrap">
+                        <span>Rp</span>
+                        <input
+                            type="number"
+                            name="nominal_lainnya"
+                            id="nominal_lainnya"
+                            placeholder="0"
+                            min="{{ $campaign->minimal_donasi ?? 1000 }}"
+                            value="{{ old('nominal_lainnya') }}"
+                        >
+                    </div>
+                    <p class="custom-amount-hint">Minimal donasi sebesar Rp {{ number_format($campaign->minimal_donasi ?? 1000, 0, ',', '.') }}</p>
+                    <div id="error-nominal" class="error-text" style="display:none;"></div>
                 </section>
 
                 {{-- 3. PAYMENT METHOD SECTION --}}
                 <section class="payment-channels-section">
-                    <h2>Pilih Metode Pembayaran</h2>
+                    <div class="section-heading">
+                        <span class="section-number">2</span>
+                        <h2>Pilih Metode Pembayaran</h2>
+                    </div>
                     <div id="error-payment_channel_id" class="error-text" style="display:none;"></div>
 
                     @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
@@ -132,23 +132,32 @@
                                         <i class="bi bi-credit-card-2-front"></i>
                                         <span>{{ $groupName }}</span>
                                     </h3>
-                                    <div class="channel-grid">
+                                    <div class="channel-row-list">
                                         @foreach ($groupChannels as $channel)
-                                            <label class="channel-item">
-                                                <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" {{ $loop->parent->first && $loop->first ? 'checked' : '' }}>
-                                                <div class="channel-item-content">
-                                                    <div class="channel-info">
-                                                        <strong class="channel-name">{{ $channel->name }}</strong>
-                                                        <span class="channel-type">{{ $channel->payment_type_label }}</span>
-                                                    </div>
-                                                    <span class="channel-provider-tag">
-                                                        {{ $channel->payment_type === 'instant' ? '⚡ Instan' : ($channel->payment_type === 'va' ? '🤖 VA Otomatis' : '🏢 Transfer Resmi') }}
-                                                    </span>
-                                                </div>
+                                            @php
+                                                $rowIcon = match ($channel->payment_type) {
+                                                    'instant' => 'bi-lightning-charge-fill',
+                                                    'va' => 'bi-bank2',
+                                                    default => 'bi-building',
+                                                };
+                                            @endphp
+                                            <label class="channel-row">
+                                                <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" data-name="{{ $channel->name }}" {{ $loop->parent->first && $loop->first ? 'checked' : '' }}>
+                                                <span class="channel-row-icon">
+                                                    <i class="bi {{ $rowIcon }}"></i>
+                                                </span>
+                                                <span class="channel-row-info">
+                                                    <strong>{{ $channel->name }}</strong>
+                                                    <small>{{ $channel->payment_type_label }}</small>
+                                                </span>
+                                                <span class="channel-row-check">
+                                                    <i class="bi bi-check-circle-fill"></i>
+                                                </span>
                                             </label>
                                         @endforeach
                                     </div>
                                 </div>
+
                             @endforeach
                         </div>
                     @else
@@ -158,7 +167,10 @@
 
                 {{-- 4. DONOR INFORMATION SECTION --}}
                 <section class="donor-card">
-                    <h2>Data Donatur</h2>
+                    <div class="section-heading">
+                        <span class="section-number">3</span>
+                        <h2>Data Donatur</h2>
+                    </div>
                     <p class="donor-title">
                         @if(auth()->check())
                             <span>Berdonasi sebagai <strong id="donorNameDisplay">{{ auth()->user()->name }}</strong></span>
@@ -209,7 +221,10 @@
 
                 {{-- 5. MESSAGE / DOA SECTION --}}
                 <section class="message-card">
-                    <h2>Pesan & Doa Kebaikan (Opsional)</h2>
+                    <div class="section-heading">
+                        <span class="section-number">4</span>
+                        <h2>Pesan & Doa Kebaikan (Opsional)</h2>
+                    </div>
 
                     <div class="textarea-wrap">
                         <textarea
@@ -236,8 +251,19 @@
                 <div class="payment-method-card">
                     <h2>Ringkasan Pembayaran</h2>
 
+                    <div class="payment-summary-list">
+                        <div class="summary-row">
+                            <span>Nominal Donasi</span>
+                            <strong id="summary-nominal">Rp0</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Metode Pembayaran</span>
+                            <strong id="summary-metode">Belum dipilih</strong>
+                        </div>
+                    </div>
+
                     <div class="payment-total">
-                        <span>Total Nominal Donasi</span>
+                        <span>Total Bayar</span>
                         <strong id="total-donasi">Rp0</strong>
                     </div>
 
@@ -268,8 +294,11 @@
         const minimalDonasi = {{ $campaign->minimal_donasi ?? 1000 }};
 
         const totalEl = document.getElementById('total-donasi');
+        const summaryNominalEl = document.getElementById('summary-nominal');
+        const summaryMetodeEl = document.getElementById('summary-metode');
         const nominalRadios = document.querySelectorAll('input[name="nominal"]');
         const nominalLainnya = document.querySelector('input[name="nominal_lainnya"]');
+        const channelRadios = document.querySelectorAll('input[name="payment_channel_id"]');
         const charCounter = document.getElementById('charCount');
         const textarea = document.querySelector('textarea[name="pesan"]');
 
@@ -284,8 +313,21 @@
                     nominal = parseInt(selectedRadio.value) || 0;
                 }
             }
-            totalEl.textContent = 'Rp ' + nominal.toLocaleString('id-ID');
+            const formatted = 'Rp ' + nominal.toLocaleString('id-ID');
+            totalEl.textContent = formatted;
+            if (summaryNominalEl) {
+                summaryNominalEl.textContent = formatted;
+            }
         }
+
+        function updateMetodeSummary() {
+            if (!summaryMetodeEl) return;
+            const selected = document.querySelector('input[name="payment_channel_id"]:checked');
+            summaryMetodeEl.textContent = selected ? (selected.dataset.name || 'Terpilih') : 'Belum dipilih';
+        }
+
+        channelRadios.forEach(radio => radio.addEventListener('change', updateMetodeSummary));
+        updateMetodeSummary();
 
         function updateCharCount() {
             const count = textarea.value.length;

@@ -96,11 +96,33 @@
 
 .nominal-section h2,
 .message-card h2,
-.payment-channels-section h2 {
+.payment-channels-section h2,
+.donor-card h2 {
     font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-bold);
     color: var(--text-dark);
-    margin: 0 0 var(--space-5);
+    margin: 0;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.section-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
 }
 
 /* ------------------------------------------------------------
@@ -205,77 +227,73 @@
    4. NOMINAL SECTION
    ------------------------------------------------------------ */
 
-.nominal-list {
+.amount-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-3);
     margin-bottom: var(--space-5);
 }
 
-.nominal-card {
+.amount-chip {
     position: relative;
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4);
+    justify-content: center;
+    padding: var(--space-4) var(--space-2);
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
-    cursor: pointer;
     background: var(--bg);
-    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease, color .15s ease;
 }
 
-.nominal-card:hover {
-    border-color: var(--primary);
-    background: var(--primary-light);
-}
-
-.nominal-card input {
+.amount-chip input {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.nominal-card:has(input:checked) {
-    border-color: var(--primary);
-    background: var(--primary-light);
-    box-shadow: 0 0 0 3px var(--primary-light);
+.amount-chip span {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+    white-space: nowrap;
 }
 
-.nominal-card:has(input:focus-visible) {
+.amount-chip:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.amount-chip:has(input:checked) {
+    border-color: var(--primary);
+    background: var(--primary);
+    box-shadow: 0 6px 16px -6px rgba(51, 101, 175, .45);
+}
+
+.amount-chip:has(input:checked) span {
+    color: #fff;
+}
+
+.amount-chip:has(input:focus-visible) {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
 
-.nominal-emoji {
-    font-size: var(--fs-md);
-    line-height: 1;
-    flex-shrink: 0;
-}
-
-.nominal-card strong {
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
-    color: var(--text);
-}
-
-.nominal-card:has(input:checked) strong {
-    color: var(--primary);
-}
-
-.custom-nominal-card {
-    padding: var(--space-4);
-    border: 1.5px dashed var(--border);
-    border-radius: var(--radius-md);
-    background: var(--bg-blue-soft);
-}
-
-.custom-nominal-card h3 {
+.custom-amount-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
     color: var(--text-dark);
-    margin: 0 0 var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.custom-amount-label i {
+    color: var(--primary);
 }
 
 .custom-input-wrap {
@@ -295,8 +313,8 @@
 }
 
 .custom-input-wrap span {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
     color: var(--muted);
 }
 
@@ -305,8 +323,8 @@
     border: none;
     outline: none;
     background: transparent;
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
     color: var(--text-dark);
     padding: var(--space-3) 0;
     min-width: 0;
@@ -317,7 +335,7 @@
     font-weight: var(--fw-regular);
 }
 
-.custom-nominal-card > p {
+.custom-amount-hint {
     font-size: var(--fs-xxs);
     color: var(--muted);
     margin: var(--space-2) 0 0;
@@ -544,13 +562,15 @@
 .channel-groups-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-5);
 }
 
 .group-heading {
-    font-size: var(--fs-xs);
+    font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
-    color: var(--text-dark);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
     margin: 0 0 var(--space-3);
     display: flex;
     align-items: center;
@@ -559,92 +579,105 @@
 
 .group-heading i {
     color: var(--primary);
+    font-size: var(--fs-sm);
+    text-transform: none;
 }
 
-.channel-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: var(--space-3);
+.channel-row-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    overflow: hidden;
 }
 
-.channel-item {
+.channel-row {
     position: relative;
     display: flex;
     align-items: center;
+    gap: var(--space-3);
     padding: var(--space-4);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-md);
     cursor: pointer;
     background: var(--bg);
-    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+    transition: background-color .15s ease;
 }
 
-.channel-item:hover {
-    border-color: var(--primary);
+.channel-row + .channel-row {
+    border-top: 1px solid var(--border-soft);
+}
+
+.channel-row:hover {
+    background: var(--bg-soft);
+}
+
+.channel-row:has(input:checked) {
     background: var(--primary-light);
 }
 
-.channel-item:has(input:checked) {
-    border-color: var(--primary);
-    background: var(--primary-light);
-    box-shadow: 0 0 0 3px var(--primary-light);
-}
-
-.channel-item:has(input:focus-visible) {
+.channel-row:has(input:focus-visible) {
     outline: 2px solid var(--primary);
-    outline-offset: 2px;
+    outline-offset: -2px;
 }
 
-.channel-item input[type="radio"] {
+.channel-row input[type="radio"] {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.channel-item-content {
+.channel-row-icon {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    width: 100%;
-    gap: var(--space-3);
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    color: var(--primary);
+    font-size: var(--fs-sm);
+    transition: background-color .15s ease, color .15s ease;
 }
 
-.channel-info {
+.channel-row:has(input:checked) .channel-row-icon {
+    background: var(--primary);
+    color: #fff;
+}
+
+.channel-row-info {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    min-width: 0;
 }
 
-.channel-name {
+.channel-row-info strong {
     font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
     color: var(--text-dark);
 }
 
-.channel-item:has(input:checked) .channel-name {
+.channel-row:has(input:checked) .channel-row-info strong {
     color: var(--primary);
 }
 
-.channel-type {
+.channel-row-info small {
     font-size: var(--fs-xxs);
     color: var(--muted);
 }
 
-.channel-provider-tag {
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-semibold);
-    padding: 2px var(--space-3);
-    border-radius: var(--radius-full);
-    background: var(--bg-soft);
-    color: var(--muted);
-    white-space: nowrap;
+.channel-row-check {
     flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--border);
 }
 
-.channel-item:has(input:checked) .channel-provider-tag {
-    background: var(--primary-light);
+.channel-row:has(input:checked) .channel-row-check {
     color: var(--primary);
 }
 
@@ -659,9 +692,34 @@
 
 .payment-method-card h2 {
     font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-bold);
     color: var(--text-dark);
     margin: 0 0 var(--space-5);
+}
+
+.payment-summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: var(--fs-xxs);
+}
+
+.summary-row span {
+    color: var(--muted);
+}
+
+.summary-row strong {
+    color: var(--text-dark);
+    font-weight: var(--fw-semibold);
+    text-align: right;
 }
 
 .payment-total {
@@ -669,7 +727,8 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: var(--space-5);
-    padding-bottom: var(--space-5);
+    padding: var(--space-4) 0 var(--space-5);
+    border-top: 1px dashed var(--border-soft);
     border-bottom: 1px solid var(--border-soft);
 }
 
