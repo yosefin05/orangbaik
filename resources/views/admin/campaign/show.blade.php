@@ -45,8 +45,7 @@
     </section>
 
     {{-- Approval Section --}}
-    <section class="ob-card ob-card-lg"
-        style="border-left: 4px solid {{ $campaign->campaign_type == 'emergency' ? '#dc3545' : ($campaign->campaign_type == 'sustainable' ? '#28a745' : '#6c757d') }};">
+    <section class="ob-card ob-card-lg emergency-section {{ $campaign->campaign_type == 'emergency' ? 'emergency' : ($campaign->campaign_type == 'sustainable' ? 'sustainable' : 'regular') }}">
         <div class="card-topbar">
             <div>
                 <h2>
@@ -144,7 +143,7 @@
                 <div class="approval-actions">
                     <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-approve">
+                        <button type="submit" class="btn btn-lg btn-success">
                             <i class="bi bi-check-circle-fill"></i>
                             Setujui & Tampilkan di Landing Page
                         </button>
@@ -153,7 +152,7 @@
                         </small>
                     </form>
 
-                    <button type="button" class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                    <button type="button" class="btn btn-lg btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
                         <i class="bi bi-x-circle-fill"></i>
                         Tolak Campaign
                     </button>
@@ -163,7 +162,7 @@
                 <div class="alert-approval success">
                     <i class="bi bi-check-circle-fill"></i>
                     <div class="alert-content">
-                        <div class="alert-title">✅ Campaign sudah disetujui</div>
+                        <div class="alert-title">Campaign sudah disetujui</div>
                         <div class="alert-text">
                             Campaign akan tampil di landing page.
                             @if(!$campaign->is_active)
@@ -180,7 +179,7 @@
 
                 <form action="{{ route('admin.campaign.unapprove', $campaign->id) }}" method="POST" class="d-inline">
                     @csrf
-                    <button type="submit" class="btn btn-unapprove" onclick="return confirm('Yakin ingin membatalkan approval?')">
+                    <button type="submit" class="btn btn-lg btn-warning" onclick="return confirm('Yakin ingin membatalkan approval?')">
                         <i class="bi bi-arrow-counterclockwise"></i>
                         Batalkan Approval
                     </button>
@@ -190,7 +189,7 @@
                 <div class="alert-approval danger">
                     <i class="bi bi-x-circle-fill"></i>
                     <div class="alert-content">
-                        <div class="alert-title">❌ Campaign ditolak</div>
+                        <div class="alert-title">Campaign ditolak</div>
                         <div class="alert-text">
                             Campaign ini telah ditolak.
                             @if($campaign->rejection_reason)
@@ -205,7 +204,7 @@
 
                 <form action="{{ route('admin.campaign.approve', $campaign->id) }}" method="POST" class="d-inline">
                     @csrf
-                    <button type="submit" class="btn btn-approve">
+                    <button type="submit" class="btn btn-lg btn-success">
                         <i class="bi bi-check-circle-fill"></i>
                         Setujui Ulang Campaign
                     </button>
@@ -216,7 +215,7 @@
             <div class="alert-approval info">
                 <i class="bi bi-info-circle-fill"></i>
                 <div class="alert-content">
-                    <div class="alert-title">ℹ️ Campaign Regular</div>
+                    <div class="alert-title">Campaign Regular</div>
                     <div class="alert-text">
                         Campaign regular tidak memerlukan approval dan langsung dapat tampil di landing page.
                     </div>
@@ -234,7 +233,7 @@
                 <p class="card-subtitle">Detail utama campaign donasi.</p>
             </div>
 
-            <a href="{{ route('admin.campaign.index') }}" class="btn-secondary">
+            <a href="{{ route('admin.campaign.index') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> <span>Kembali</span>
             </a>
         </div>
@@ -300,7 +299,7 @@
                 @endforeach
             </div>
         @else
-            <p class="text-muted">Tidak ada filter.</p>
+            <p class="text-muted-strong">Tidak ada filter.</p>
         @endif
     </section>
 
@@ -367,7 +366,7 @@
                             <td>Rp {{ number_format($fundraiser->total_donasi_settlement, 0, ',', '.') }}</td>
                         </tr>
                     @empty
-                        <tr><td class="empty-state">Tidak ada fundraiser pendukung.</td></tr>
+                        <tr><td colspan="2" class="empty-state">Tidak ada fundraiser pendukung.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -419,7 +418,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-reject">
+                        <button type="submit" class="btn btn-danger">
                             <i class="bi bi-x-circle-fill"></i> Tolak Campaign
                         </button>
                     </div>

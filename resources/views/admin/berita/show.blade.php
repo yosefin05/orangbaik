@@ -2,6 +2,10 @@
 
 @section('page-title', 'Detail Berita')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/berita/show.css') }}">
+@endpush
+
 @section('content')
     <section class="ob-card ob-card-lg detail-card">
         <div class="card-topbar">
@@ -9,7 +13,7 @@
                 <h2>{{ $berita->judul }}</h2>
                 <p class="card-subtitle">Pratinjau dan informasi berita.</p>
             </div>
-            <a href="{{ route('admin.berita.index') }}" class="btn-secondary">
+            <a href="{{ route('admin.berita.index') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i>
                 <span>Kembali</span>
             </a>
@@ -17,6 +21,11 @@
 
         @if ($berita->thumbnail)
             <img src="{{ asset('storage/' . $berita->thumbnail) }}" alt="{{ $berita->judul }}" class="detail-thumbnail">
+        @else
+            <div class="detail-thumbnail-placeholder">
+                <i class="bi bi-image"></i>
+                <span>Belum ada thumbnail</span>
+            </div>
         @endif
 
         <div class="detail-meta">
@@ -40,11 +49,11 @@
         </div>
 
         <div class="form-actions">
-            <a href="{{ route('berita.show', $berita->custom_slug ?? $berita->slug) }}" class="btn-primary">
+            <a href="{{ route('berita.show', $berita->custom_slug ?? $berita->slug) }}" class="btn btn-primary">
                 <i class="bi bi-box-arrow-up-right"></i>
                 <span>Lihat Berita</span>
             </a>
-            <a href="{{ route('admin.berita.edit', $berita) }}" class="btn-secondary">
+            <a href="{{ route('admin.berita.edit', $berita) }}" class="btn btn-secondary">
                 <i class="bi bi-pencil-square"></i>
                 <span>Edit Berita</span>
             </a>
@@ -52,7 +61,7 @@
                 onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn-danger">
+                <button type="submit" class="btn btn-danger">
                     <i class="bi bi-trash"></i>
                     <span>Hapus Berita</span>
                 </button>
