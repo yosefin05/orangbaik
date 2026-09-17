@@ -552,7 +552,7 @@
 }
 
 /* ------------------------------------------------------------
-   9. PAYMENT CHANNEL SELECTOR
+   9. PAYMENT CHANNEL SELECTOR (accordion / dropdown per gateway)
    ------------------------------------------------------------ */
 
 .payment-channels-section #error-payment_channel_id {
@@ -562,32 +562,104 @@
 .channel-groups-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    gap: var(--space-3);
 }
 
-.group-heading {
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    color: var(--muted);
-    margin: 0 0 var(--space-3);
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-}
-
-.group-heading i {
-    color: var(--primary);
-    font-size: var(--fs-sm);
-    text-transform: none;
-}
-
-.channel-row-list {
-    display: flex;
-    flex-direction: column;
+/* Each gateway group is a native <details> element = zero-JS collapse/expand */
+.channel-group {
     border: 1px solid var(--border-soft);
     border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.channel-group[open] {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-soft);
+}
+
+.channel-group summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color .15s ease;
+}
+
+.channel-group summary::-webkit-details-marker,
+.channel-group summary::marker {
+    display: none;
+    content: "";
+}
+
+.channel-group summary:hover {
+    background: var(--bg-soft);
+}
+
+.group-heading-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: var(--fs-sm);
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.channel-group[open] .group-heading-icon {
+    background: var(--primary);
+    color: #fff;
+}
+
+.group-heading-text {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    color: var(--text-dark);
+}
+
+.group-heading-selected {
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    color: var(--primary);
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.group-heading-selected:empty {
+    display: none;
+}
+
+.group-heading-chevron {
+    flex-shrink: 0;
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    transition: transform .2s ease, color .2s ease;
+}
+
+.channel-group[open] .group-heading-chevron {
+    color: var(--primary);
+    transform: rotate(180deg);
+}
+
+.channel-group .channel-row-list {
+    display: flex;
+    flex-direction: column;
+    border: none;
+    border-top: 1px solid var(--border-soft);
+    border-radius: 0;
     overflow: hidden;
 }
 
@@ -1028,6 +1100,25 @@
 
     .channel-grid {
         grid-template-columns: 1fr;
+    }
+
+    .channel-group summary {
+        padding: var(--space-3);
+        gap: var(--space-2);
+    }
+
+    .group-heading-icon {
+        width: 32px;
+        height: 32px;
+        font-size: var(--fs-xs);
+    }
+
+    .group-heading-selected {
+        display: none;
+    }
+
+    .channel-row {
+        padding: var(--space-3);
     }
 
     .nominal-page {

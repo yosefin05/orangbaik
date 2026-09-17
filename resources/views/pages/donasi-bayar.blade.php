@@ -125,13 +125,20 @@
                             });
                         @endphp
 
+                        {{-- Setiap gateway ditampilkan sebagai dropdown/accordion (native <details>),
+                             jadi daftar metode pembayaran tidak langsung memenuhi layar. --}}
                         <div class="channel-groups-wrapper">
                             @foreach ($grouped as $groupName => $groupChannels)
-                                <div class="channel-group">
-                                    <h3 class="group-heading">
-                                        <i class="bi bi-credit-card-2-front"></i>
-                                        <span>{{ $groupName }}</span>
-                                    </h3>
+                                <details class="channel-group" {{ $loop->first ? 'open' : '' }}>
+                                    <summary class="group-heading">
+                                        <span class="group-heading-icon">
+                                            <i class="bi bi-credit-card-2-front"></i>
+                                        </span>
+                                        <span class="group-heading-text">{{ $groupName }}</span>
+                                        <span class="group-heading-selected" data-group-selected></span>
+                                        <i class="bi bi-chevron-down group-heading-chevron"></i>
+                                    </summary>
+
                                     <div class="channel-row-list">
                                         @foreach ($groupChannels as $channel)
                                             @php
@@ -156,8 +163,7 @@
                                             </label>
                                         @endforeach
                                     </div>
-                                </div>
-
+                                </details>
                             @endforeach
                         </div>
                     @else
@@ -299,6 +305,7 @@
         const nominalRadios = document.querySelectorAll('input[name="nominal"]');
         const nominalLainnya = document.querySelector('input[name="nominal_lainnya"]');
         const channelRadios = document.querySelectorAll('input[name="payment_channel_id"]');
+        const channelGroups = document.querySelectorAll('.channel-group');
         const charCounter = document.getElementById('charCount');
         const textarea = document.querySelector('textarea[name="pesan"]');
 
@@ -326,8 +333,35 @@
             summaryMetodeEl.textContent = selected ? (selected.dataset.name || 'Terpilih') : 'Belum dipilih';
         }
 
-        channelRadios.forEach(radio => radio.addEventListener('change', updateMetodeSummary));
+        // Tampilkan metode yang sedang terpilih di judul setiap dropdown,
+        // supaya tetap kelihatan walau dropdown-nya sedang tertutup.
+        function updateGroupSelectedLabels() {
+            channelGroups.forEach(function(group) {
+                const checked = group.querySelector('input[name="payment_channel_id"]:checked');
+                const label = group.querySelector('[data-group-selected]');
+                if (label) {
+                    label.textContent = checked ? checked.dataset.name : '';
+                }
+            });
+        }
+
+        // Accordion: buka satu dropdown metode pembayaran, otomatis tutup yang lain.
+        channelGroups.forEach(function(group) {
+            group.addEventListener('toggle', function() {
+                if (group.open) {
+                    channelGroups.forEach(function(other) {
+                        if (other !== group) other.open = false;
+                    });
+                }
+            });
+        });
+
+        channelRadios.forEach(radio => radio.addEventListener('change', function() {
+            updateMetodeSummary();
+            updateGroupSelectedLabels();
+        }));
         updateMetodeSummary();
+        updateGroupSelectedLabels();
 
         function updateCharCount() {
             const count = textarea.value.length;
