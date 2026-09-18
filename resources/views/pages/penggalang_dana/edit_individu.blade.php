@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/penggalang-individu.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/verify-penggalang.css') }}">
 </head>
 
 <body>
