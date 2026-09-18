@@ -167,7 +167,7 @@
     </section>
 
     {{-- LAPORAN KEUANGAN --}}
-    <section class="about-section about-report-section">
+    <section id="laporan-keuangan" class="about-section about-report-section">
         <div class="container">
 
             <div class="about-section-heading">

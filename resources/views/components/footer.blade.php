@@ -49,7 +49,7 @@
             <a href="{{ url('/tentang') }}">Tentang Kami</a>
             <a href="{{ url('/syarat-ketentuan') }}">Syarat & Ketentuan</a>
             <a href="{{ url('/pusat-bantuan') }}">Pusat Bantuan</a>
-            <a href="{{ url('/laporan-keuangan') }}">Laporan Keuangan</a>
+            <a href="{{ url('/tentang') }}#laporan-keuangan">Laporan Keuangan</a>
         </div>
 
         <div class="footer-col">
