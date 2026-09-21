@@ -247,13 +247,13 @@
                         </div>
                     </section>
 
-                    {{-- ACTION --}}
-                    <div class="verify-actions">
-                        <a href="{{ route('profile.user') }}" class="verify-cancel-button">Batal</a>
-                        <button type="submit" class="verify-submit-button" {{ $isPending ? 'disabled' : '' }}>
-                            Simpan Perubahan
-                        </button>
-                    </div>
+                        {{-- ACTION --}}
+                        <div class="verify-actions">
+                            <a href="{{ route('profile.user') }}" class="verify-cancel-button">Batal</a>
+                            <button type="submit" class="verify-submit-button" {{ $isPending ? 'disabled' : '' }}>
+                                Simpan Perubahan
+                            </button>
+                        </div>
 
                 </form>
 

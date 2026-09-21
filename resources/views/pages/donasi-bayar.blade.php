@@ -120,19 +120,84 @@
 
                     @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
                         @php
-                            $grouped = $paymentChannels->groupBy(function($item) {
-                                return $item->gateway?->name ?? 'Metode Pembayaran Lainnya';
-                            });
+                            // Dikelompokkan berdasarkan tipe pembayaran (bukan lagi berdasarkan payment
+                            // gateway di belakangnya), supaya donatur melihat kategori yang familiar:
+                            // E-Wallet, Virtual Account, dan lainnya.
+                            $paymentTypeLabels = [
+                                'instant' => 'E-Wallet',
+                                'va' => 'Virtual Account',
+                            ];
+
+                            $groupOrder = ['E-Wallet', 'Virtual Account', 'Transfer Manual'];
+
+                            $grouped = $paymentChannels
+                                ->groupBy(function ($item) use ($paymentTypeLabels) {
+                                    return $paymentTypeLabels[$item->payment_type] ?? 'Transfer Manual';
+                                })
+                                ->sortBy(function ($channels, $groupName) use ($groupOrder) {
+                                    $index = array_search($groupName, $groupOrder);
+                                    return $index === false ? count($groupOrder) : $index;
+                                });
+
+                            $groupIcons = [
+                                'E-Wallet' => 'bi-wallet2',
+                                'Virtual Account' => 'bi-bank2',
+                            ];
+
+                            // Pencocokan logo resmi berdasarkan nama channel, memakai paket
+                            // "idn-finlogos" (katalog logo bank/e-wallet Indonesia) via CDN jsDelivr.
+                            // CATATAN LISENSI: aset SVG paket ini berlisensi CC BY-NC 4.0 — gratis untuk
+                            // ditampilkan, tapi penggunaan komersial tiap logo butuh izin dari brand
+                            // pemiliknya. Untuk produksi, sebaiknya diganti dengan aset resmi yang
+                            // didapat langsung dari masing-masing penyedia (lihat catatan di akhir chat).
+                            $logoMap = [
+                                'gopay' => 'gopay',
+                                'ovo' => 'ovo-new',
+                                'dana' => 'dana',
+                                'shopeepay' => 'shopee-pay',
+                                'shopee pay' => 'shopee-pay',
+                                'linkaja' => 'linkaja',
+                                'link aja' => 'linkaja',
+                                'astrapay' => 'astra-pay',
+                                'astra pay' => 'astra-pay',
+                                'doku' => 'doku',
+                                'bca' => 'bca',
+                                'mandiri' => 'mandiri',
+                                'bni' => 'bni',
+                                'bri' => 'bri',
+                                'permata' => 'permata',
+                                'cimb' => 'cimb-niaga',
+                                'danamon' => 'danamon',
+                                'bsi' => 'bsi',
+                                'btn' => 'btn',
+                                'jago' => 'jago',
+                                'jenius' => 'jenius',
+                                'seabank' => 'seabank',
+                                'qris' => 'qris',
+                                'midtrans' => 'midtrans',
+                                'xendit' => 'xendit',
+                                'flip' => 'flip',
+                            ];
+
+                            $findLogoSlug = function (string $channelName) use ($logoMap) {
+                                $name = strtolower($channelName);
+                                foreach ($logoMap as $keyword => $slug) {
+                                    if (str_contains($name, $keyword)) {
+                                        return $slug;
+                                    }
+                                }
+                                return null;
+                            };
                         @endphp
 
-                        {{-- Setiap gateway ditampilkan sebagai dropdown/accordion (native <details>),
+                        {{-- Setiap kategori ditampilkan sebagai dropdown/accordion (native <details>),
                              jadi daftar metode pembayaran tidak langsung memenuhi layar. --}}
                         <div class="channel-groups-wrapper">
                             @foreach ($grouped as $groupName => $groupChannels)
                                 <details class="channel-group" {{ $loop->first ? 'open' : '' }}>
                                     <summary class="group-heading">
                                         <span class="group-heading-icon">
-                                            <i class="bi bi-credit-card-2-front"></i>
+                                            <i class="bi {{ $groupIcons[$groupName] ?? 'bi-credit-card-2-front' }}"></i>
                                         </span>
                                         <span class="group-heading-text">{{ $groupName }}</span>
                                         <span class="group-heading-selected" data-group-selected></span>
@@ -147,11 +212,16 @@
                                                     'va' => 'bi-bank2',
                                                     default => 'bi-building',
                                                 };
+                                                $logoSlug = $findLogoSlug($channel->name);
                                             @endphp
                                             <label class="channel-row">
                                                 <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" data-name="{{ $channel->name }}" {{ $loop->parent->first && $loop->first ? 'checked' : '' }}>
                                                 <span class="channel-row-icon">
-                                                    <i class="bi {{ $rowIcon }}"></i>
+                                                    @if ($logoSlug)
+                                                        <img src="{{ asset('images/payment-logos/' . $logoSlug . '.svg') }}" alt="{{ $channel->name }}" loading="lazy">
+                                                    @else
+                                                        <i class="bi {{ $rowIcon }}"></i>
+                                                    @endif
                                                 </span>
                                                 <span class="channel-row-info">
                                                     <strong>{{ $channel->name }}</strong>

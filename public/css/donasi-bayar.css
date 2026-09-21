@@ -674,6 +674,12 @@
     transition: background-color .15s ease;
 }
 
+.channel-row-icon img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}   
+
 .channel-row + .channel-row {
     border-top: 1px solid var(--border-soft);
 }
