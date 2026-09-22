@@ -100,7 +100,10 @@ class FlipService
             'type'                     => 'SINGLE',
             'amount'                   => (int) $donasi->nominal,
             'expired_date'             => now()->addDays(1)->format('Y-m-d H:i'),
-            'redirect_url'             => route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
+            'redirect_url'             => route('donasi.bayar.instruksi', [
+                'pembayaran' => $pembayaran->id,
+                'token'      => $pembayaran->payment_token,
+            ]),
             'is_address_required'      => 0,
             'is_phone_number_required' => 0,
             'sender_name'              => $donasi->nama_donatur ?: 'Hamba Allah',
@@ -396,6 +399,35 @@ class FlipService
             'EXPIRED'                          => 'expired',
             default                            => 'pending',
         };
+
+        /*
+         * =====================================================
+         * 5.5. VALIDASI INTEGRITAS AMOUNT
+         * =====================================================
+         */
+        if ($internalStatus === 'settlement') {
+            $expectedNominal = (int) ($pembayaran->donasi?->nominal ?? 0);
+            $callbackAmount  = isset($data['amount'])
+                ? (int) $data['amount']
+                : (isset($data['bill_payment']['amount']) ? (int) $data['bill_payment']['amount'] : null);
+
+            if ($callbackAmount !== null) {
+                $savedUniqueCode = (int) ($pembayaran->gateway_response['unique_code'] ?? 0);
+                $isMatching = ($callbackAmount === $expectedNominal) ||
+                              ($savedUniqueCode > 0 && $callbackAmount === ($expectedNominal + $savedUniqueCode));
+
+                if (!$isMatching) {
+                    Log::error('Flip webhook: nominal tidak sesuai (Amount Integrity Mismatch)', [
+                        'bill_link_id'    => $billLinkId,
+                        'payment_id'      => $paymentId,
+                        'expected_amount' => $expectedNominal,
+                        'callback_amount' => $callbackAmount,
+                        'order_id'        => $pembayaran->order_id,
+                    ]);
+                    return false;
+                }
+            }
+        }
 
         $updateData = [
             'transaction_status' => $internalStatus,

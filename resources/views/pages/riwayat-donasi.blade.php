@@ -157,10 +157,18 @@
                                     <span>Nominal</span>
                                     <strong>{{ $donation['amount'] }}</strong>
 
-                                    <a href="{{ route('riwayat-donasi.kwitansi', ['donasi' => $donation['id']]) }}"
-                                        class="receipt-button" target="_blank">
-                                        E-Kwitansi
-                                    </a>
+                                    @if ($donation['status_key'] === 'selesai')
+                                        <a href="{{ route('riwayat-donasi.kwitansi', ['donasi' => $donation['id']]) }}"
+                                            class="receipt-button" target="_blank">
+                                            E-Kwitansi
+                                        </a>
+                                    @elseif ($donation['status_key'] === 'menunggu' && !empty($donation['resume_url']))
+                                        <a href="{{ $donation['resume_url'] }}"
+                                            class="resume-button btn-resume"
+                                            data-resume-url="{{ $donation['resume_url'] }}">
+                                            Lanjutkan Pembayaran
+                                        </a>
+                                    @endif
                                 </div>
                             </article>
                         @endforeach
@@ -189,7 +197,113 @@
 
     @include('components.footer')
 
+    @php
+        $isMidtransProd = config('payment.midtrans.is_production', config('midtrans.isProduction', false));
+        $midtransClientKey = config('payment.midtrans.client_key', config('midtrans.clientKey', ''));
+    @endphp
+    @if (!empty($midtransClientKey))
+        <script src="{{ $isMidtransProd ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
+            data-client-key="{{ $midtransClientKey }}"></script>
+    @endif
+
     <script src="{{ asset('js/riwayat.js') }}"></script>
+
+    <script>
+    document.querySelectorAll('.btn-resume').forEach(function (btn) {
+        btn.addEventListener('click', async function (e) {
+            const resumeUrl = this.getAttribute('data-resume-url');
+
+            if (!resumeUrl) {
+                return;
+            }
+
+            e.preventDefault();
+
+            const originalText = this.textContent;
+
+            this.textContent = 'Memproses...';
+            this.style.pointerEvents = 'none';
+
+            try {
+                const res = await fetch(resumeUrl, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(
+                        data.message || 'Gagal melanjutkan pembayaran.'
+                    );
+                }
+
+                /*
+                 * MIDTRANS
+                 *
+                 * Resume mengambil snap_token langsung
+                 * dari database melalui DonasiController@resume.
+                 */
+                if (
+                    data.type === 'midtrans' &&
+                    data.snap_token &&
+                    typeof snap !== 'undefined'
+                ) {
+                    snap.pay(data.snap_token, {
+
+                        onSuccess: function () {
+                            window.location.href =
+                                '{{ route("donasi.status", "sukses") }}';
+                        },
+
+                        onPending: function () {
+                            window.location.href =
+                                '{{ route("donasi.status", "pending") }}';
+                        },
+
+                        onError: function () {
+                            window.location.href =
+                                '{{ route("donasi.status", "gagal") }}';
+                        },
+
+                        onClose: function () {
+                            btn.textContent = originalText;
+                            btn.style.pointerEvents = 'auto';
+                        }
+                    });
+
+                    return;
+                }
+
+                /*
+                 * FLIP / MANUAL / GATEWAY LAIN
+                 */
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                    return;
+                }
+
+                /*
+                 * Fallback
+                 */
+                window.location.href = resumeUrl;
+
+            } catch (err) {
+                console.error('Resume payment error:', err);
+
+                btn.textContent = originalText;
+                btn.style.pointerEvents = 'auto';
+
+                alert(
+                    err.message ||
+                    'Terjadi kesalahan saat melanjutkan pembayaran.'
+                );
+            }
+        });
+    });
+</script>
 
 </body>
 

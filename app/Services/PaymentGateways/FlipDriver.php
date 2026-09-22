@@ -45,7 +45,10 @@ class FlipDriver implements PaymentDriverInterface
             'account_name'   => $vaData['account_name'] ?? $channel->account_name ?? 'OrangBaik',
             'amount'         => $vaData['amount'] ?? $donasi->nominal,
             'expired_at'     => $vaData['expired_date'] ?? null,
-            'redirect_url'   => route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
+            'redirect_url'   => route('donasi.bayar.instruksi', [
+                'pembayaran' => $pembayaran->id,
+                'token'      => $pembayaran->payment_token,
+            ]),
         ];
     }
 

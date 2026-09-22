@@ -11,6 +11,7 @@ class Pembayaran extends Model
     protected $fillable = [
         'donasi_id',
         'payment_channel_id',
+        'payment_token',
         'order_id',
         'snap_token',
         'payment_type',
@@ -95,5 +96,28 @@ class Pembayaran extends Model
     public function isPending(): bool
     {
         return $this->transaction_status === 'pending';
+    }
+
+    /**
+     * Apakah pembayaran bisa dilanjutkan (masih pending, belum terminal).
+     */
+    public function isResumable(): bool
+    {
+        return $this->transaction_status === 'pending';
+    }
+
+    /**
+     * Cek apakah request guest memiliki token yang valid untuk mengakses pembayaran ini.
+     * Digunakan di instruksi dan upload bukti untuk mencegah IDOR pada guest donation.
+     *
+     * @param  string|null  $token  Token dari query string
+     * @return bool
+     */
+    public function isValidGuestToken(?string $token): bool
+    {
+        if (empty($token) || empty($this->payment_token)) {
+            return false;
+        }
+        return hash_equals($this->payment_token, $token);
     }
 }

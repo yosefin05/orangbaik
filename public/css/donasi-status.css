@@ -1,0 +1,302 @@
+/* ===================================================================
+   Donasi - Status Page (v2, lebih menarik & persuasif)
+   Token-based (var(--...) dengan fallback aman).
+   =================================================================== */
+
+.status-page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6, 24px);
+    background: var(--bg-muted, #f7f8fb);
+    overflow: hidden;
+}
+
+/* Dekorasi blob gradasi di background, bikin halaman terasa hidup */
+.status-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.status-blob--1 {
+    width: 380px;
+    height: 380px;
+    top: -120px;
+    left: -100px;
+    background: radial-gradient(circle, var(--primary, #2563eb), transparent 70%);
+}
+
+.status-blob--2 {
+    width: 320px;
+    height: 320px;
+    bottom: -100px;
+    right: -80px;
+    background: radial-gradient(circle, var(--success, #16a34a), transparent 70%);
+}
+
+.status-card {
+    position: relative;
+    z-index: 1;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    padding: var(--space-10, 40px) var(--space-8, 32px) var(--space-8, 32px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: status-card-in 0.5s ease both;
+}
+
+@keyframes status-card-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- STEP TRACKER ---------- */
+.status-stepper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-2, 8px);
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-8, 32px);
+    width: 100%;
+}
+
+.status-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1, 6px);
+    flex: 1;
+    position: relative;
+}
+
+.status-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 55%;
+    width: 90%;
+    height: 2px;
+    background: var(--border, #e5e7eb);
+    z-index: 0;
+}
+
+.status-step--done:not(:last-child)::after {
+    background: var(--success, #16a34a);
+}
+
+.status-step-dot {
+    position: relative;
+    z-index: 1;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    background: var(--border, #e5e7eb);
+    color: #fff;
+}
+
+.status-step-label {
+    font-size: var(--fs-xxs, 11px);
+    color: var(--text-muted, #9ca3af);
+    font-weight: var(--fw-medium, 500);
+}
+
+.status-step--done .status-step-dot {
+    background: var(--success, #16a34a);
+}
+.status-step--done .status-step-label {
+    color: var(--success, #16a34a);
+}
+
+.status-step--active .status-step-dot {
+    background: var(--warning, #f59e0b);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--warning, #f59e0b) 20%, transparent);
+}
+.status-step--active .status-step-label {
+    color: var(--warning, #f59e0b);
+    font-weight: var(--fw-semibold, 600);
+}
+
+.status-step--failed .status-step-dot {
+    background: var(--danger, #dc2626);
+}
+.status-step--failed .status-step-label {
+    color: var(--danger, #dc2626);
+}
+
+/* ---------- ICON BADGE ---------- */
+.status-icon-badge {
+    position: relative;
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-md, 30px);
+    margin-bottom: var(--space-5, 20px);
+}
+
+.status-icon-badge--success {
+    background: color-mix(in srgb, var(--success, #16a34a) 14%, white);
+    color: var(--success, #16a34a);
+}
+.status-icon-badge--warning {
+    background: color-mix(in srgb, var(--warning, #f59e0b) 14%, white);
+    color: var(--warning, #f59e0b);
+}
+.status-icon-badge--danger {
+    background: color-mix(in srgb, var(--danger, #dc2626) 14%, white);
+    color: var(--danger, #dc2626);
+}
+
+.status-icon-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    opacity: 0.25;
+}
+
+.status-icon-ring--pulse {
+    animation: status-ring-pulse 1.8s ease-out infinite;
+}
+
+@keyframes status-ring-pulse {
+    0%   { transform: scale(0.9); opacity: 0.45; }
+    100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* ---------- TEXT ---------- */
+.status-title {
+    font-size: var(--fs-md, 26px);
+    font-weight: var(--fw-bold, 700);
+    color: var(--text-strong, #1f2937);
+    margin: 0 0 var(--space-2, 10px);
+    line-height: 1.25;
+}
+
+.status-desc {
+    font-size: var(--fs-sm, 14px);
+    color: var(--text-muted, #6b7280);
+    line-height: 1.65;
+    margin: 0 0 var(--space-6, 26px);
+    max-width: 34ch;
+}
+
+/* ---------- BUTTONS ---------- */
+.status-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2, 8px);
+    width: 100%;
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+    border-radius: var(--radius-full, 999px);
+    font-size: var(--fs-sm, 16px);
+    font-weight: var(--fw-semibold, 600);
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    margin-bottom: var(--space-3, 12px);
+}
+
+.status-btn:last-of-type { margin-bottom: 0; }
+
+.status-btn:hover {
+    transform: translateY(-2px);
+}
+
+.status-btn--primary {
+    background: linear-gradient(135deg, var(--primary, #2563eb), var(--primary-dark, #1d4ed8));
+    color: #fff;
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--primary, #2563eb) 35%, transparent);
+}
+
+.status-btn--glow {
+    animation: status-btn-glow 2.2s ease-in-out infinite;
+}
+
+@keyframes status-btn-glow {
+    0%, 100% { box-shadow: 0 10px 24px color-mix(in srgb, var(--primary, #2563eb) 35%, transparent); }
+    50%      { box-shadow: 0 10px 32px color-mix(in srgb, var(--primary, #2563eb) 60%, transparent); }
+}
+
+.status-btn--danger {
+    background: linear-gradient(135deg, var(--danger, #dc2626), var(--danger-dark, #b91c1c));
+    color: #fff;
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--danger, #dc2626) 35%, transparent);
+}
+.status-btn-group .status-btn--primary.status-btn--glow {
+    background: linear-gradient(135deg, var(--danger, #dc2626), var(--danger-dark, #b91c1c));
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--danger, #dc2626) 35%, transparent);
+}
+@keyframes status-btn-glow-danger {
+    0%, 100% { box-shadow: 0 10px 24px color-mix(in srgb, var(--danger, #dc2626) 35%, transparent); }
+    50%      { box-shadow: 0 10px 32px color-mix(in srgb, var(--danger, #dc2626) 60%, transparent); }
+}
+.status-btn-group .status-btn--glow {
+    animation-name: status-btn-glow-danger;
+}
+
+.status-btn--ghost {
+    background: var(--bg-muted, #f3f4f6);
+    color: var(--text-strong, #374151);
+    box-shadow: none;
+}
+
+.status-btn-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* ---------- NOTE / TRUST FOOTER ---------- */
+.status-note {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 6px);
+    justify-content: center;
+    font-size: var(--fs-xs, 12px);
+    color: var(--text-muted, #9ca3af);
+    margin: var(--space-2, 10px) 0 0;
+    text-align: left;
+}
+
+.status-trust {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 6px);
+    justify-content: center;
+    font-size: var(--fs-xxs, 11px);
+    color: var(--text-muted, #9ca3af);
+    margin-top: var(--space-6, 24px);
+    padding-top: var(--space-5, 18px);
+    border-top: 1px solid var(--border, #f0f1f3);
+    width: 100%;
+}
+
+.status-trust i { color: var(--success, #16a34a); }
+
+@media (max-width: 480px) {
+    .status-card {
+        padding: var(--space-8, 30px) var(--space-5, 20px);
+    }
+    .status-title {
+        font-size: var(--fs-lg, 22px);
+    }
+}

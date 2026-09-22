@@ -41,7 +41,10 @@ class ManualTransferDriver implements PaymentDriverInterface
             'type'         => 'manual_transfer',
             'order_id'     => $pembayaran->order_id,
             'donasi_id'    => $donasi->id,
-            'redirect_url' => route('donasi.bayar.instruksi', ['pembayaran' => $pembayaran->id]),
+            'redirect_url' => route('donasi.bayar.instruksi', [
+                'pembayaran' => $pembayaran->id,
+                'token'      => $pembayaran->payment_token,
+            ]),
         ];
     }
 

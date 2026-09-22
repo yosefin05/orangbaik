@@ -585,23 +585,33 @@
                 }
 
                 if (result.snap_token) {
-                    snap.pay(result.snap_token, {
-                        onSuccess: function(res) {
-                            window.location.href = '{{ route("donasi.status", "sukses") }}';
-                        },
-                        onPending: function(res) {
-                            // FIX: onPending redirect to pending status (BUKAN sukses!)
-                            window.location.href = '{{ route("donasi.status", "pending") }}';
-                        },
-                        onError: function(res) {
-                            window.location.href = '{{ route("donasi.status", "gagal") }}';
-                        },
-                        onClose: function() {
-                            resetButton();
-                            alert('Anda menutup popup pembayaran.');
-                        }
-                    });
-                } else {
+    snap.pay(result.snap_token, {
+        onSuccess: function(res) {
+            window.location.href = '{{ route("donasi.status", "sukses") }}';
+        },
+
+        onPending: function(res) {
+            const statusUrl = new URL(
+                '{{ route("donasi.status", "pending") }}',
+                window.location.origin
+            );
+
+            statusUrl.searchParams.set('pembayaran', result.pembayaran_id);
+            statusUrl.searchParams.set('token', result.payment_token);
+
+            window.location.href = statusUrl.toString();
+        },
+
+        onError: function(res) {
+            window.location.href = '{{ route("donasi.status", "gagal") }}';
+        },
+
+        onClose: function() {
+            resetButton();
+            alert('Anda menutup popup pembayaran.');
+        }
+    });
+} else {
                     alert('Gagal mendapatkan informasi pembayaran.');
                     resetButton();
                 }

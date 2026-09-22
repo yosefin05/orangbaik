@@ -4,150 +4,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Status Donasi - OrangBaik.id</title>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            background: #f8f9fa;
-        }
-        .card {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 16px;
-            text-align: center;
-            max-width: 450px;
-            width: 100%;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-        }
-        .icon { font-size: 60px; }
-        h1 { margin: 15px 0 10px; }
-        p { color: #4b5563; margin: 5px 0 20px; }
-        .btn {
-            display: inline-block;
-            background: #2563eb;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .btn:hover { background: #1d4ed8; }
-        .btn-bayar {
-            background: #e74c3c;
-            color: #fff;
-            border: none;
-            padding: 14px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: background 0.3s;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .btn-bayar:hover { background: #c0392b; }
-        .btn-bayar:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .loading {
-            margin-top: 15px;
-            color: #888;
-            font-size: 14px;
-        }
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #e74c3c;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/donasi-status.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <div class="card">
+
+<main class="status-page">
+
+    {{-- Dekorasi background --}}
+    <div class="status-blob status-blob--1"></div>
+    <div class="status-blob status-blob--2"></div>
+
+    <div class="ob-card status-card status-card--{{ $status }}">
+
+        {{-- STEP TRACKER --}}
+        <ol class="status-stepper">
+            <li class="status-step status-step--done">
+                <span class="status-step-dot"><i class="bi bi-check-lg"></i></span>
+                <span class="status-step-label">Nominal</span>
+            </li>
+            <li class="status-step
+                {{ $status == 'sukses' ? 'status-step--done' : '' }}
+                {{ $status == 'pending' ? 'status-step--active' : '' }}
+                {{ $status == 'gagal' ? 'status-step--failed' : '' }}">
+                <span class="status-step-dot">
+                    @if($status == 'sukses')
+                        <i class="bi bi-check-lg"></i>
+                    @elseif($status == 'gagal')
+                        <i class="bi bi-x-lg"></i>
+                    @else
+                        <i class="bi bi-hourglass-split"></i>
+                    @endif
+                </span>
+                <span class="status-step-label">Bayar</span>
+            </li>
+            <li class="status-step {{ $status == 'sukses' ? 'status-step--done' : '' }}">
+                <span class="status-step-dot"><i class="bi bi-flag-fill"></i></span>
+                <span class="status-step-label">Selesai</span>
+            </li>
+        </ol>
+
         @if($status == 'sukses')
-            <div class="icon">✅</div>
-            <h1 style="color: #16a34a;">Donasi Berhasil!</h1>
-            <p>Terima kasih atas donasi Anda. Semoga kebaikan ini membawa berkah.</p>
-            <p><a href="/" class="btn">Kembali ke Beranda</a></p>
+            <div class="status-icon-badge status-icon-badge--success">
+                <span class="status-icon-ring"></span>
+                <i class="bi bi-check-lg"></i>
+            </div>
+
+            <h1 class="status-title">Donasi Berhasil! 🎉</h1>
+            <p class="status-desc">Terima kasih banyak atas kebaikan Anda. Donasi ini akan langsung disalurkan dan membawa manfaat nyata bagi yang membutuhkan.</p>
+
+            <a href="/" class="status-btn status-btn--primary">
+                <i class="bi bi-house-door-fill"></i> Kembali ke Beranda
+            </a>
+
+            <button type="button" class="status-btn status-btn--ghost" id="shareBtn">
+                <i class="bi bi-share-fill"></i> Ajak Teman Berdonasi Juga
+            </button>
 
         @elseif($status == 'pending')
-            <div class="icon">⏳</div>
-            <h1 style="color: #f59e0b;">Selesaikan Pembayaran</h1>
-            <p>Klik tombol di bawah untuk melanjutkan ke halaman pembayaran.</p>
-            
-            <button id="pay-button" class="btn-bayar">🛡 Bayar Sekarang</button>
-            <div id="loading-text" class="loading" style="display:none;">
-                <span class="spinner"></span> Memproses...
+            <div class="status-icon-badge status-icon-badge--warning">
+                <span class="status-icon-ring status-icon-ring--pulse"></span>
+                <i class="bi bi-hourglass-split"></i>
             </div>
-            <p style="margin-top: 15px; font-size: 12px; color: #999;">
-                ⚡ Tersedia: Kartu Kredit, Virtual Account, E-Wallet, QRIS, dan lainnya.
+
+            <h1 class="status-title">Tinggal Selangkah Lagi!</h1>
+            <p class="status-desc">Pembayaran Anda sedang diproses. Selesaikan pembayaran di aplikasi/metode yang Anda pilih agar donasi segera sampai ke penerima manfaat.</p>
+
+            @if ($pembayaran)
+                <a
+                    href="{{ route('donasi.bayar.instruksi', [
+                        'pembayaran' => $pembayaran->id,
+                        'token' => request('token'),
+                    ]) }}"
+                    class="status-btn status-btn--primary status-btn--glow"
+                >
+                    <i class="bi bi-lightning-charge-fill"></i> Lanjutkan Pembayaran
+                </a>
+            @elseif (auth()->check())
+                <a href="{{ route('riwayat.donasi') }}" class="status-btn status-btn--primary status-btn--glow">
+                    <i class="bi bi-clock-history"></i> Lihat Riwayat Donasi
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="status-btn status-btn--primary status-btn--glow">
+                    <i class="bi bi-box-arrow-in-right"></i> Login untuk Melihat Riwayat
+                </a>
+            @endif
+
+            <p class="status-note">
+                <i class="bi bi-shield-check"></i>
+                Status akan diperbarui otomatis begitu pembayaran Anda terkonfirmasi.
             </p>
 
         @elseif($status == 'gagal')
-            <div class="icon">❌</div>
-            <h1 style="color: #dc2626;">Donasi Gagal</h1>
-            <p>Pembayaran Anda tidak berhasil. Silakan coba lagi.</p>
-            <p>
-                <a href="javascript:history.back()" class="btn" style="background: #dc2626;">Coba Lagi</a>
-                <a href="/" class="btn" style="background: #6b7280;">Beranda</a>
-            </p>
+            <div class="status-icon-badge status-icon-badge--danger">
+                <span class="status-icon-ring"></span>
+                <i class="bi bi-x-lg"></i>
+            </div>
+
+            <h1 class="status-title">Yah, Pembayaran Belum Berhasil</h1>
+            <p class="status-desc">Tenang, niat baik Anda belum hilang! Coba lagi sekarang — biasanya cuma butuh beberapa detik untuk menyelesaikan donasi Anda.</p>
+
+            <div class="status-btn-group">
+                <a href="javascript:history.back()" class="status-btn status-btn--primary status-btn--glow">
+                    <i class="bi bi-arrow-repeat"></i> Coba Lagi Sekarang
+                </a>
+                <a href="/" class="status-btn status-btn--ghost">
+                    Kembali ke Beranda
+                </a>
+            </div>
         @endif
+
+        <div class="status-trust">
+            <i class="bi bi-shield-lock-fill"></i>
+            <span>Transaksi aman & terenkripsi standar perbankan</span>
+        </div>
+
     </div>
+</main>
 
-    <!-- Midtrans Snap -->
-    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-        data-client-key="{{ config('midtrans.clientKey') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const payButton = document.getElementById('pay-button');
-            const loadingText = document.getElementById('loading-text');
-            
-            // Ambil snap_token dari session
-            const snapToken = '{{ session('snap_token') }}';
-            const donasiId = '{{ session('donasi_id') }}';
-
-            if (payButton && snapToken) {
-                payButton.addEventListener('click', function() {
-                    payButton.disabled = true;
-                    payButton.textContent = '⏳ Menghubungkan...';
-                    loadingText.style.display = 'block';
-
-                    snap.pay(snapToken, {
-                        onSuccess: function(result) {
-                            window.location.href = '{{ route("donasi.status", "sukses") }}';
-                        },
-                        onPending: function(result) {
-                            // Tunggu webhook
-                            window.location.href = '{{ route("donasi.status", "sukses") }}';
-                        },
-                        onError: function(result) {
-                            window.location.href = '{{ route("donasi.status", "gagal") }}';
-                        },
-                        onClose: function() {
-                            payButton.disabled = false;
-                            payButton.textContent = '🛡 Bayar Sekarang';
-                            loadingText.style.display = 'none';
-                            alert('Anda menutup popup pembayaran.');
-                        }
-                    });
-                });
-            } else if (payButton && !snapToken) {
-                payButton.disabled = true;
-                payButton.textContent = '❌ Token tidak ditemukan';
+<script>
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', async function () {
+            const shareData = {
+                title: 'OrangBaik.id',
+                text: 'Aku baru aja berdonasi lewat OrangBaik.id, yuk sama-sama berbuat baik!',
+                url: window.location.origin,
+            };
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(shareData.url);
+                    shareBtn.innerHTML = '<i class="bi bi-check2"></i> Link Disalin!';
+                    setTimeout(function () {
+                        shareBtn.innerHTML = '<i class="bi bi-share-fill"></i> Ajak Teman Berdonasi Juga';
+                    }, 2000);
+                }
+            } catch (e) {
+                // user membatalkan share, biarkan saja
             }
         });
-    </script>
+    }
+</script>
+
 </body>
 </html>

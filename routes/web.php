@@ -135,10 +135,12 @@ Route::middleware('auth')->group(function () {
         return view('pages.profile-user', compact('penggalang'));
     })->name('profile.user');
 
-    // Riwayat Donasi
+    // Riwayat Donasi & Resume Pembayaran
     Route::get('/riwayat-donasi', [RiwayatDonasiController::class, 'index'])->name('riwayat.donasi');
     Route::get('/riwayat-donasi/{donasi}/kwitansi', [RiwayatDonasiController::class, 'kwitansi'])
         ->name('riwayat-donasi.kwitansi');
+    Route::get('/donasi/pembayaran/{pembayaran}/resume', [DonasiController::class, 'resume'])
+        ->name('donasi.resume');
 
     // Profile (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

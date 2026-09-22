@@ -71,6 +71,14 @@ class MidtransService
     }
 
     /**
+     * Cek apakah Midtrans sudah dikonfigurasi (Server Key tersedia).
+     */
+    public function isConfigured(): bool
+    {
+        return !empty(config('midtrans.serverKey'));
+    }
+
+    /**
      * Menangani webhook dari Midtrans.
      * Idempotent: jika transaksi sudah settlement, langsung return true.
      */
@@ -105,7 +113,7 @@ class MidtransService
          * 2. CARI DATA PEMBAYARAN
          * =====================================================
          */
-        $pembayaran = Pembayaran::with('paymentChannel.gateway')
+        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
             ->where('order_id', $orderId)
             ->first();
 
@@ -143,6 +151,25 @@ class MidtransService
             'expire'     => 'expired',
             default      => $rawStatus ?? 'pending',
         };
+
+        /*
+         * =====================================================
+         * 4.5. VALIDASI INTEGRITAS AMOUNT
+         * =====================================================
+         */
+        if ($internalStatus === 'settlement') {
+            $expectedNominal = (int) ($pembayaran->donasi?->nominal ?? 0);
+            $actualGrossAmount = (int) round((float) $grossAmount);
+
+            if ($expectedNominal <= 0 || $actualGrossAmount !== $expectedNominal) {
+                Log::error('Midtrans webhook: nominal tidak sesuai (Amount Integrity Mismatch)', [
+                    'order_id'        => $orderId,
+                    'expected_amount' => $expectedNominal,
+                    'actual_amount'   => $actualGrossAmount,
+                ]);
+                return false;
+            }
+        }
 
         /*
          * =====================================================
