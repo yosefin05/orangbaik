@@ -29,11 +29,11 @@ class FlipService
 
     public function __construct()
     {
-        $isProduction  = config('payment.flip.is_production', false);
+        $isProduction = config('payment.flip.is_production', false);
         $this->baseUrl = $isProduction
             ? (config('payment.flip.base_url_production') ?? 'https://bigflip.id/api')
             : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
-        $this->apiKey  = config('payment.flip.api_key');
+        $this->apiKey = config('payment.flip.api_key');
     }
 
     /**
@@ -90,33 +90,33 @@ class FlipService
             throw new \Exception('Flip belum dikonfigurasi. Tambahkan FLIP_API_KEY di file .env.');
         }
 
-        $bankCode       = self::normalizeBankCode($channel->channel_code);
+        $bankCode = self::normalizeBankCode($channel->channel_code);
         $senderBankType = self::determineSenderBankType($bankCode);
-        $title          = 'Donasi: ' . Str::limit($donasi->campaign->judul ?? 'OrangBaik.id', 27);
+        $title = 'Donasi: ' . Str::limit($donasi->campaign->judul ?? 'OrangBaik.id', 27);
 
         // Siapkan base payload
         $basePayload = [
-            'title'                    => $title,
-            'type'                     => 'SINGLE',
-            'amount'                   => (int) $donasi->nominal,
-            'expired_date'             => now()->addDays(1)->format('Y-m-d H:i'),
-            'redirect_url'             => route('donasi.bayar.instruksi', [
+            'title' => $title,
+            'type' => 'SINGLE',
+            'amount' => (int) $donasi->nominal,
+            'expired_date' => now()->addDays(1)->format('Y-m-d H:i'),
+            'redirect_url' => route('donasi.bayar.instruksi', [
                 'pembayaran' => $pembayaran->id,
-                'token'      => $pembayaran->payment_token,
+                'token' => $pembayaran->payment_token,
             ]),
-            'is_address_required'      => 0,
+            'is_address_required' => 0,
             'is_phone_number_required' => 0,
-            'sender_name'              => $donasi->nama_donatur ?: 'Hamba Allah',
-            'sender_email'             => $donasi->email ?? 'donatur@orangbaik.id',
-            'sender_phone_number'      => $donasi->no_hp ?? '08123456789',
+            'sender_name' => $donasi->nama_donatur ?: 'Hamba Allah',
+            'sender_email' => $donasi->email ?? 'donatur@orangbaik.id',
+            'sender_phone_number' => $donasi->no_hp ?? '08123456789',
         ];
 
         // 1. Coba request dengan bank spesifik (step = 3)
         $attempts = [
             // Attempt 1: Tipe yang ditentukan (VA untuk 8 bank, bank_account untuk Muamalat)
             array_merge($basePayload, [
-                'step'             => 3,
-                'sender_bank'      => $bankCode,
+                'step' => 3,
+                'sender_bank' => $bankCode,
                 'sender_bank_type' => $senderBankType,
             ]),
         ];
@@ -124,8 +124,8 @@ class FlipService
         // Attempt 2: Jika tipe awal adalah VA tapi gagal (misal BCA di sandbox/tier tertentu), fallback ke bank_account
         if ($senderBankType === 'virtual_account') {
             $attempts[] = array_merge($basePayload, [
-                'step'             => 3,
-                'sender_bank'      => $bankCode,
+                'step' => 3,
+                'sender_bank' => $bankCode,
                 'sender_bank_type' => 'bank_account',
             ]);
         }
@@ -133,14 +133,14 @@ class FlipService
         // Attempt 3: Jika CIMB atau BSI memiliki kode alternatif di beberapa versi API Flip
         if ($bankCode === 'cimb') {
             $attempts[] = array_merge($basePayload, [
-                'step'             => 3,
-                'sender_bank'      => 'cimb_niaga',
+                'step' => 3,
+                'sender_bank' => 'cimb_niaga',
                 'sender_bank_type' => 'virtual_account',
             ]);
         } elseif ($bankCode === 'bsi') {
             $attempts[] = array_merge($basePayload, [
-                'step'             => 3,
-                'sender_bank'      => 'bsm',
+                'step' => 3,
+                'sender_bank' => 'bsm',
                 'sender_bank_type' => 'virtual_account',
             ]);
         }
@@ -150,9 +150,9 @@ class FlipService
             'step' => 2,
         ]);
 
-        $response     = null;
-        $successData  = null;
-        $lastError    = null;
+        $response = null;
+        $successData = null;
+        $lastError = null;
 
         foreach ($attempts as $index => $payload) {
             try {
@@ -165,9 +165,9 @@ class FlipService
 
                 $lastError = $response->json('message') ?? $response->body();
                 Log::warning('Flip attempt ' . ($index + 1) . ' failed', [
-                    'bank'     => $bankCode,
-                    'status'   => $response->status(),
-                    'error'    => $lastError,
+                    'bank' => $bankCode,
+                    'status' => $response->status(),
+                    'error' => $lastError,
                     'order_id' => $pembayaran->order_id,
                 ]);
             } catch (\Exception $e) {
@@ -178,9 +178,9 @@ class FlipService
 
         if (!$successData) {
             Log::error('Semua percobaan pembuatan transaksi Flip gagal', [
-                'bank'     => $bankCode,
+                'bank' => $bankCode,
                 'order_id' => $pembayaran->order_id,
-                'error'    => $lastError,
+                'error' => $lastError,
             ]);
             throw new \Exception('Gagal membuat transaksi Flip (' . $bankCode . '): ' . $lastError);
         }
@@ -236,9 +236,11 @@ class FlipService
 
         // URL pembayaran Flip (PWF Link)
         $linkUrl = $data['link_url']
-            ?? $data['payment_url']
             ?? $data['url']
             ?? null;
+
+        $paymentUrl = $data['payment_url']
+            ?? $linkUrl;
 
         // Flip ID / Link ID
         $flipId = $data['link_id']
@@ -255,37 +257,37 @@ class FlipService
 
         // Simpan transaction_id dari Flip dan gateway response
         $pembayaran->update([
-            'transaction_id'   => (string) $flipId,
+            'transaction_id' => (string) $flipId,
             'gateway_response' => array_merge($data, [
-                'flip_id'        => $flipId,
-                'link_id'        => $data['link_id'] ?? $flipId,
+                'flip_id' => $flipId,
+                'link_id' => $data['link_id'] ?? $flipId,
                 'account_number' => $accountNumber,
-                'account_name'   => $accountName,
-                'link_url'       => $linkUrl,
-                'payment_url'    => $linkUrl,
-                'final_amount'   => $finalAmount,
-                'unique_code'    => $uniqueCode,
+                'account_name' => $accountName,
+                'link_url' => $linkUrl,
+                'payment_url' => $paymentUrl,
+                'final_amount' => $finalAmount,
+                'unique_code' => $uniqueCode,
             ]),
         ]);
 
         Log::info('Flip payment created successfully', [
-            'order_id'       => $pembayaran->order_id,
-            'flip_id'        => $flipId,
-            'bank_code'      => $bankCode,
+            'order_id' => $pembayaran->order_id,
+            'flip_id' => $flipId,
+            'bank_code' => $bankCode,
             'account_number' => $accountNumber,
-            'amount'         => $finalAmount,
+            'amount' => $finalAmount,
         ]);
 
         return [
-            'id'             => $flipId,
+            'id' => $flipId,
             'account_number' => $accountNumber,
-            'account_name'   => $accountName,
-            'bank_code'      => $bankCode,
-            'link_url'       => $linkUrl,
-            'payment_url'    => $linkUrl,
-            'expired_date'   => $data['expired_date'] ?? null,
-            'amount'         => $finalAmount,
-            'unique_code'    => $uniqueCode,
+            'account_name' => $accountName,
+            'bank_code' => $bankCode,
+            'link_url' => $linkUrl,
+            'payment_url' => $paymentUrl,
+            'expired_date' => $data['expired_date'] ?? null,
+            'amount' => $finalAmount,
+            'unique_code' => $uniqueCode,
         ];
     }
 
@@ -337,8 +339,8 @@ class FlipService
 
         // Flip PWF Callback ID fields
         $billLinkId = $data['bill_link_id'] ?? $data['link_id'] ?? null;
-        $paymentId  = $data['id'] ?? $data['bill_payment_id'] ?? null;
-        $status     = $data['status'] ?? null;
+        $paymentId = $data['id'] ?? $data['bill_payment_id'] ?? null;
+        $status = $data['status'] ?? null;
 
         if ((!$billLinkId && !$paymentId) || !$status) {
             Log::warning('Flip webhook: data tidak lengkap', ['payload' => $payload]);
@@ -371,7 +373,7 @@ class FlipService
         if (!$pembayaran) {
             Log::warning('Flip webhook: pembayaran tidak ditemukan', [
                 'bill_link_id' => $billLinkId,
-                'payment_id'   => $paymentId,
+                'payment_id' => $paymentId,
             ]);
             return false;
         }
@@ -395,9 +397,9 @@ class FlipService
          */
         $internalStatus = match (strtoupper($status)) {
             'SUCCESSFUL', 'SETTLEMENT', 'PAID' => 'settlement',
-            'FAILED', 'CANCELLED'              => 'failed',
-            'EXPIRED'                          => 'expired',
-            default                            => 'pending',
+            'FAILED', 'CANCELLED' => 'failed',
+            'EXPIRED' => 'expired',
+            default => 'pending',
         };
 
         /*
@@ -407,22 +409,22 @@ class FlipService
          */
         if ($internalStatus === 'settlement') {
             $expectedNominal = (int) ($pembayaran->donasi?->nominal ?? 0);
-            $callbackAmount  = isset($data['amount'])
+            $callbackAmount = isset($data['amount'])
                 ? (int) $data['amount']
                 : (isset($data['bill_payment']['amount']) ? (int) $data['bill_payment']['amount'] : null);
 
             if ($callbackAmount !== null) {
                 $savedUniqueCode = (int) ($pembayaran->gateway_response['unique_code'] ?? 0);
                 $isMatching = ($callbackAmount === $expectedNominal) ||
-                              ($savedUniqueCode > 0 && $callbackAmount === ($expectedNominal + $savedUniqueCode));
+                    ($savedUniqueCode > 0 && $callbackAmount === ($expectedNominal + $savedUniqueCode));
 
                 if (!$isMatching) {
                     Log::error('Flip webhook: nominal tidak sesuai (Amount Integrity Mismatch)', [
-                        'bill_link_id'    => $billLinkId,
-                        'payment_id'      => $paymentId,
+                        'bill_link_id' => $billLinkId,
+                        'payment_id' => $paymentId,
                         'expected_amount' => $expectedNominal,
                         'callback_amount' => $callbackAmount,
-                        'order_id'        => $pembayaran->order_id,
+                        'order_id' => $pembayaran->order_id,
                     ]);
                     return false;
                 }
@@ -431,7 +433,7 @@ class FlipService
 
         $updateData = [
             'transaction_status' => $internalStatus,
-            'gateway_response'   => array_merge($pembayaran->gateway_response ?? [], $data),
+            'gateway_response' => array_merge($pembayaran->gateway_response ?? [], $data),
         ];
 
         if ($internalStatus === 'settlement') {
@@ -441,11 +443,11 @@ class FlipService
         $pembayaran->update($updateData);
 
         Log::info('Flip webhook berhasil diproses', [
-            'bill_link_id'    => $billLinkId,
-            'payment_id'      => $paymentId,
-            'flip_status'     => $status,
+            'bill_link_id' => $billLinkId,
+            'payment_id' => $paymentId,
+            'flip_status' => $status,
             'internal_status' => $internalStatus,
-            'order_id'        => $pembayaran->order_id,
+            'order_id' => $pembayaran->order_id,
         ]);
 
         return true;
