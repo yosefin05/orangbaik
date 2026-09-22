@@ -719,7 +719,7 @@
 }
 
 .channel-row:has(input:checked) .channel-row-icon {
-    background: var(--primary);
+    background: var(--bg);
     color: #fff;
 }
 
