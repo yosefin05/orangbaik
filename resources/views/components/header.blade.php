@@ -154,7 +154,7 @@
     {{-- MOBILE NAV MENU (SLIDE-IN) --}}
     <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
     <nav class="mobile-nav-menu" id="mobileNavMenu">
-        {{-- MOBILE NAV MENU (slide-in) — ini yang dikasih teks --}}
+
         <div class="mobile-nav-header">
             <a href="{{ route('home') }}" class="mobile-nav-brand" aria-label="OrangBaik.id">
                 <img src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id">
@@ -166,49 +166,94 @@
             </button>
         </div>
 
-        <div class="mobile-nav-links">
-            <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}">
-                <i class="bi bi-house-door-fill"></i>
-                <span>Beranda</span>
+        @auth
+            <a href="{{ route('profile.user') }}" class="mobile-nav-profile-card">
+                <span class="mobile-nav-profile-avatar">
+                    @if(!empty(auth()->user()->foto_profil))
+                        <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="{{ auth()->user()->name }}">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    @endif
+                </span>
+                <span class="mobile-nav-profile-info">
+                    <strong>{{ auth()->user()->name }}</strong>
+                    <small>Lihat profil saya <i class="bi bi-arrow-right"></i></small>
+                </span>
             </a>
+        @endauth
 
-            <a href="{{ url('donasi') }}" class="{{ request()->is('donasi*') ? 'active' : '' }}">
-                <i class="bi bi-heart-fill"></i>
-                <span>Donasi</span>
-            </a>
+        <div class="mobile-nav-scroll">
 
-            <a href="{{ url('kalkulator') }}" class="{{ request()->is('kalkulator*') ? 'active' : '' }}">
-                <i class="bi bi-calculator-fill"></i>
-                <span>Kalkulator</span>
-            </a>
+            <div class="mobile-nav-section">
+                <span class="mobile-nav-section-label">Menu</span>
+                <div class="mobile-nav-links">
+                    <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}">
+                        <span class="mobile-nav-icon"><i class="bi bi-house-door-fill"></i></span>
+                        <span>Beranda</span>
+                    </a>
 
-            <a href="{{ url('berita') }}" class="{{ request()->is('berita*') ? 'active' : '' }}">
-                <i class="bi bi-file-earmark-text-fill"></i>
-                <span>Berita</span>
-            </a>
+                    <a href="{{ url('donasi') }}" class="{{ request()->is('donasi*') ? 'active' : '' }}">
+                        <span class="mobile-nav-icon"><i class="bi bi-heart-fill"></i></span>
+                        <span>Donasi</span>
+                    </a>
+
+                    <a href="{{ url('kalkulator') }}" class="{{ request()->is('kalkulator*') ? 'active' : '' }}">
+                        <span class="mobile-nav-icon"><i class="bi bi-calculator-fill"></i></span>
+                        <span>Kalkulator</span>
+                    </a>
+
+                    <a href="{{ url('berita') }}" class="{{ request()->is('berita*') ? 'active' : '' }}">
+                        <span class="mobile-nav-icon"><i class="bi bi-file-earmark-text-fill"></i></span>
+                        <span>Berita</span>
+                    </a>
+                </div>
+            </div>
+
+            @auth
+                @php
+                    $mobilePenggalang = auth()->user()->penggalangDana;
+                @endphp
+                @if(($mobilePenggalang && $mobilePenggalang->status === 'approved') || auth()->user()->role === 'admin')
+                    <div class="mobile-nav-section">
+                        <span class="mobile-nav-section-label">Akun Saya</span>
+                        <div class="mobile-nav-links">
+                            @if($mobilePenggalang && $mobilePenggalang->status === 'approved')
+                                <a href="{{ route('profil.penggalang', $mobilePenggalang->id) }}">
+                                    <span class="mobile-nav-icon"><i class="bi bi-people-fill"></i></span>
+                                    <span>Profil Penggalang</span>
+                                </a>
+                                <a href="{{ route('campaign.create', $mobilePenggalang->id) }}">
+                                    <span class="mobile-nav-icon"><i class="bi bi-megaphone-fill"></i></span>
+                                    <span>Tambah Campaign</span>
+                                </a>
+                            @endif
+
+                            @if(auth()->user()->role === 'admin')
+                                <a href="{{ route('admin.dashboard') }}">
+                                    <span class="mobile-nav-icon"><i class="bi bi-speedometer2"></i></span>
+                                    <span>Dashboard Admin</span>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+            @endauth
+
         </div>
 
         <div class="mobile-nav-footer">
             @guest
+                <a href="{{ route('register') }}" class="mobile-nav-register">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Daftar Sekarang</span>
+                </a>
                 <a href="{{ route('login') }}" class="mobile-nav-login">
                     <i class="bi bi-box-arrow-in-right"></i>
                     <span>Masuk</span>
                 </a>
-                <a href="{{ route('register') }}" class="mobile-nav-register">
-                    <i class="bi bi-person-plus-fill"></i>
-                    <span>Daftar</span>
-                </a>
             @endguest
 
             @auth
-                <a href="{{ route('profile.user') }}" class="mobile-nav-profile">
-                    @if(!empty(auth()->user()->foto_profil))
-                        <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="{{ auth()->user()->name }}">
-                    @else
-                        <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-                    @endif
-                    <span>{{ auth()->user()->name }}</span>
-                </a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="mobile-nav-logout">
@@ -254,12 +299,14 @@
         function openMenu() {
             navMenu.classList.add('open');
             navOverlay.classList.add('active');
+            document.body.classList.add('mobile-nav-open');
             document.body.style.overflow = 'hidden';
         }
 
         function closeMenu() {
             navMenu.classList.remove('open');
             navOverlay.classList.remove('active');
+            document.body.classList.remove('mobile-nav-open');
             document.body.style.overflow = '';
         }
 
