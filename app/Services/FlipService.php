@@ -242,6 +242,12 @@ class FlipService
         $paymentUrl = $data['payment_url']
             ?? $linkUrl;
 
+        // Flip Sandbox v2 kadang mengembalikan URL tanpa scheme.
+            // Normalisasi agar browser tidak menganggapnya sebagai relative URL.
+        if ($paymentUrl && !preg_match('#^https?://#i', $paymentUrl)) {
+            $paymentUrl = 'https://' . $paymentUrl;
+        }
+
         // Flip ID / Link ID
         $flipId = $data['link_id']
             ?? $data['id']
