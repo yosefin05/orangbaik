@@ -351,8 +351,10 @@
                         </button>
 
                     </div>
+
+                </form>
             </div>
-            </form>
+        </section>
     </main>
     @include('components.footer')
 
