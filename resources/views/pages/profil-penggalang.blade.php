@@ -141,7 +141,33 @@
                             <h3>Visi</h3>
                             <p>{{ $penggalang->visi }}</p>
                             <h3>Misi</h3>
-                            <p>{!! nl2br(e($penggalang->misi)) !!}</p>
+@php
+    $misiRaw = trim((string) $penggalang->misi);
+    $misiItems = [];
+
+    foreach (preg_split('/\R+/', $misiRaw) as $line) {
+        // Pisah hanya pada "-" atau "•" di awal baris / setelah spasi DAN diikuti spasi.
+        // Hyphen dalam kata ("tri-dharma") atau tanpa spasi tidak ikut terpecah.
+        foreach (preg_split('/(?:^|\s)[-•]\s+/u', $line, -1, PREG_SPLIT_NO_EMPTY) as $item) {
+            $item = trim($item);
+            if ($item !== '') {
+                $misiItems[] = $item;
+            }
+        }
+    }
+
+    $misiAsList = count($misiItems) > 1 || preg_match('/^[-•]\s/u', $misiRaw);
+@endphp
+
+@if($misiAsList)
+    <ul class="misi-list">
+        @foreach($misiItems as $item)
+            <li>{{ $item }}</li>
+        @endforeach
+    </ul>
+@elseif($misiRaw !== '')
+    <p>{!! nl2br(e($penggalang->misi)) !!}</p>
+@endif
                         </div>
                     </details>
 
