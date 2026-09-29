@@ -485,6 +485,10 @@
     box-shadow: 0 0 0 4px rgba(51, 101, 175, .10);
 }
 
+.verify-vision-mission {
+    grid-template-columns: 1fr;
+}
+
 /* ============================================================
    DOKUMEN LEGALITAS — khusus halaman Organisasi
    (belum ada sebelumnya; dokumen ditata sebagai sub-card
