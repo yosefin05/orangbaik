@@ -67,6 +67,9 @@
                                 <span>Pilih Banner</span>
                             </label>
                         </div>
+                        @error('thumbnail')
+                            <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:6px; display:block;">{{ $message }}</small>
+                        @enderror
                     </section>
 
                     {{-- PROFIL --}}
@@ -88,6 +91,9 @@
                                     <i class="bi bi-camera-fill"></i>
                                     <span>Upload Logo</span>
                                 </label>
+                                @error('foto_profil')
+                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px; display:block;">{{ $message }}</small>
+                                @enderror
                             </div>
 
                             <div class="verify-fields">
@@ -103,6 +109,9 @@
 
                                     <input type="text" name="nama_penggalang" value="{{ old('nama_penggalang') }}"
                                         placeholder="Masukkan nama organisasi">
+                                    @error('nama_penggalang')
+                                        <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                                    @enderror
                                 </label>
                             </div>
 
@@ -121,13 +130,9 @@
                                         </option>
                                     @endfor
                                 </select>
-                            </label>
-
-                            <label class="verify-field">
-                                <span>Email Pendaftar<b>*</b></span>
-
-                                <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}"
-                                    placeholder="Masukkan email organisasi">
+                                @error('tahun_berdiri')
+                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                                @enderror
                             </label>
                         </div>
 
@@ -136,6 +141,9 @@
 
                             <textarea name="alamat" rows="3"
                                 placeholder="Masukkan alamat kantor organisasi">{{ old('alamat') }}</textarea>
+                            @error('alamat')
+                                <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                            @enderror
                         </label>
                     </section>
 
@@ -151,6 +159,9 @@
 
                             <textarea name="deskripsi" rows="6"
                                 placeholder="Masukkan deskripsi organisasi">{{ old('deskripsi') }}</textarea>
+                            @error('deskripsi')
+                                <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                            @enderror
                         </label>
 
                         <div class="verify-grid-2">
@@ -159,6 +170,9 @@
 
                                 <input type="text" name="visi" value="{{ old('visi') }}"
                                     placeholder="Masukkan visi organisasi">
+                                @error('visi')
+                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                                @enderror
                             </label>
 
                             <label class="verify-field">
@@ -166,6 +180,9 @@
 
                                 <input type="text" name="misi" value="{{ old('misi') }}"
                                     placeholder="Masukkan misi organisasi">
+                                @error('misi')
+                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                                @enderror
                             </label>
                         </div>
                     </section>
@@ -203,6 +220,11 @@
                                             <input type="text" name="nama_dokumen[]"
                                                 value="{{ old('nama_dokumen.' . ($i - 1)) }}"
                                                 placeholder="Contoh: SK Kemenkumham, Akta, BAZNAS">
+                                            @if($i === 1)
+                                                @error('nama_dokumen.0')
+                                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                                                @enderror
+                                            @endif
                                         </label>
 
                                         <label class="verify-field">
@@ -211,6 +233,11 @@
                                             <input type="url" name="file_dokumen[]"
                                                 value="{{ old('file_dokumen.' . ($i - 1)) }}"
                                                 placeholder="Masukkan link Google Drive dokumen">
+                                            @if($i === 1)
+                                                @error('file_dokumen.0')
+                                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                                                @enderror
+                                            @endif
                                         </label>
                                     </div>
                                 </div>
@@ -236,11 +263,11 @@
 
                                 <span>Email <b>*</b></span>
 
-                                <input type="email" name="email" value="{{ old('email') }}"
+                                <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}"
                                     placeholder="Masukkan Email Organisasi">
 
                                 @error('email')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
                                 @enderror
 
                             </label>
@@ -249,11 +276,11 @@
 
                                 <span>Nomor Hotline <b>*</b></span>
 
-                                <input type="text" name="no_telepon" value="{{ old('no_telepon') }}"
+                                <input type="text" name="no_telepon" value="{{ old('no_telepon', $user->nomor ?? '') }}"
                                     placeholder="Masukkan Nomor Hotline">
 
                                 @error('no_telepon')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
                                 @enderror
 
                             </label>

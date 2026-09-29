@@ -69,15 +69,22 @@
                         </div>
                     </div>
 
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-4);">
+                        <label for="remember" style="display:inline-flex; align-items:center; gap:8px; font-size:var(--fs-xs); color:var(--text-dark); cursor:pointer; margin-bottom:0;">
+                            <input type="checkbox" id="remember" name="remember" style="width:16px; height:16px; cursor:pointer;">
+                            <span>Ingat Saya</span>
+                        </label>
+                        <a href="{{ route('password.request') }}" style="font-size:var(--fs-xs); color:var(--primary); text-decoration:none; font-weight:var(--fw-medium);">Lupa Password?</a>
+                    </div>
+
                     <button type="submit" class="login-button">
                         Masuk Sekarang
                     </button>
 
                 </form>
                 <div class="register-links">
-                    <a href="{{ route('password.request') }}">Reset Password</a>
-                    <span class="divider">|</span>
-                    <a href="{{ route('register') }}">Daftar Sekarang</a>
+                    <span>Belum punya akun?</span>
+                    <a href="{{ route('register') }}" style="font-weight:var(--fw-semibold);">Daftar Sekarang</a>
                 </div>
 
             </div>
