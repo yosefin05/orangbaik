@@ -56,8 +56,10 @@
                             {{-- Custom Slug --}}
                             <div class="form-group-custom">
                                 <label for="custom_slug">Link Berita <small>(Opsional)</small></label>
+                                <div class="input-icon-wrapper">
                                 <input type="text" id="custom_slug" name="custom_slug" value="{{ old('custom_slug') }}"
                                     placeholder="contoh: penyaluran-bantuan-tahap-1">
+                                </div>
                                 <small style="color: var(--muted); font-size: 12px;">Kosongkan untuk menggunakan slug otomatis dari judul.</small>
                                 @error('custom_slug')
                                     <span class="error-msg">{{ $message }}</span>

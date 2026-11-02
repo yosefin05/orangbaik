@@ -23,7 +23,7 @@
                     @endif
                     <h1>{{ $berita->judul }}</h1>
                     <div class="news-meta-row">
-                        <span>{{ $berita->user->nama ?? 'Orang Baik' }}</span>
+                        <span>{{ $berita->user->name ?? 'Admin' }}</span>
                         <span>{{ $berita->created_at->translatedFormat('d F Y') }}</span>
                     </div>
                     <div class="news-content">
@@ -108,7 +108,7 @@
                             <div class="sidebar-news-content">
                                 <h4>{{ Str::limit($news->judul, 55) }}</h4>
                                 <span>
-                                    {{ $news->user->nama ?? 'Admin' }}
+                                    {{ $news->user->name ?? 'Admin' }}
                                 </span>
                                 <span>
                                     {{ $news->created_at->translatedFormat('d F Y') }}
