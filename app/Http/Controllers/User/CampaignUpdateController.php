@@ -13,11 +13,29 @@ use Illuminate\Support\Str;
 
 class CampaignUpdateController extends Controller
 {
+    /**
+     * Verifikasi apakah user berhak mengelola update campaign ini.
+     * Berhak jika: owner campaign (penggalang dana) atau admin.
+     */
+    private function authorizedCampaign(string $slug): Campaign
+    {
+        $campaign = Campaign::where('slug', $slug)->firstOrFail();
+
+        if (auth()->user()->isAdmin()) {
+            return $campaign;
+        }
+
+        $penggalang = auth()->user()->penggalangDana;
+        if ($penggalang && $campaign->penggalang_dana_id === $penggalang->id) {
+            return $campaign;
+        }
+
+        abort(403, 'Anda tidak memiliki hak akses untuk mengelola update campaign ini.');
+    }
+
     public function create($slug)
     {
-        $campaign = Campaign::where('slug', $slug)
-            ->where('penggalang_dana_id', Auth::user()->penggalangDana->id ?? 0)
-            ->firstOrFail();
+        $campaign = $this->authorizedCampaign($slug);
 
         return view('pages.campaign.update.create', compact('campaign'));
     }

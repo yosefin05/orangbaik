@@ -16,7 +16,8 @@ use App\Http\Controllers\User\{
     SearchController,
     RiwayatDonasiController,
     PageController,
-    PenggalangDashboardController
+    PenggalangDashboardController,
+    PenggalangDanaBeritaController
 };
 use App\Http\Controllers\{
     MidtransController,
@@ -176,6 +177,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/campaign/{slug}/fundraiser', [FundraiserController::class, 'destroy'])
         ->name('fundraiser.destroy')
         ->where('slug', '.*');
+
+    // ============================================================
+    // BERITA MANAGEMENT (Admin & Penggalang Dana)
+    // ============================================================
+    Route::prefix('penggalang/berita')->name('penggalang.berita.')->group(function () {
+        Route::get('/create', [PenggalangDanaBeritaController::class, 'create'])->name('create');
+        Route::post('/', [PenggalangDanaBeritaController::class, 'store'])->name('store');
+        Route::get('/{beritum}/edit', [PenggalangDanaBeritaController::class, 'edit'])->name('edit');
+        Route::put('/{beritum}', [PenggalangDanaBeritaController::class, 'update'])->name('update');
+        Route::delete('/{beritum}', [PenggalangDanaBeritaController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // ============================================================

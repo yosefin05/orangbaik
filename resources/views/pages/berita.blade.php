@@ -18,6 +18,32 @@
     <main class="berita-page page-wrapper">
         <section class="berita-section">
             <div class="container">
+
+                {{-- Header dengan tombol Tambah Berita --}}
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h1 style="font-size: var(--fs-lg); font-weight: var(--fw-bold); margin: 0; color: var(--text-dark);">Berita Terbaru</h1>
+                        <p style="color: var(--muted); margin-top: 4px; font-size: var(--fs-xs);">Informasi dan kabar terbaru dari OrangBaik.id</p>
+                    </div>
+                    @auth
+                        @php
+                            $isPenggalang = Auth::user()->penggalangDana &&
+                                in_array(Auth::user()->penggalangDana->status, ['approved', 'verified']);
+                        @endphp
+                        @if (Auth::user()->isAdmin())
+                            <a href="{{ route('admin.berita.create') }}"
+                                style="display:inline-flex; align-items:center; gap:6px; padding: 10px 20px; background: var(--primary); color: #fff; border-radius: var(--radius-full); font-weight: 600; font-size: var(--fs-xs); text-decoration:none; transition:.2s ease; box-shadow: var(--shadow-soft);">
+                                <i class="bi bi-plus-lg"></i> Tambah Berita
+                            </a>
+                        @elseif ($isPenggalang)
+                            <a href="{{ route('penggalang.berita.create') }}"
+                                style="display:inline-flex; align-items:center; gap:6px; padding: 10px 20px; background: var(--primary); color: #fff; border-radius: var(--radius-full); font-weight: 600; font-size: var(--fs-xs); text-decoration:none; transition:.2s ease; box-shadow: var(--shadow-soft);">
+                                <i class="bi bi-plus-lg"></i> Tambah Berita
+                            </a>
+                        @endif
+                    @endauth
+                </div>
+
                 <div class="berita-grid">
                     @forelse ($beritas as $berita)
                         <article class="berita-card">
