@@ -67,7 +67,7 @@ body {
 }
 .campaign-hero-image {
     width: 100%;
-    height: 340px;
+    aspect-ratio: 16 / 9;    
     object-fit: cover;
     border-radius: var(--radius);
     border: 1px solid var(--border);
@@ -420,29 +420,169 @@ body {
     transform: rotate(180deg);
 }
 
+
 /* ============================================================
-   UPDATE DETAIL (EXPAND)
+   UPDATE DETAIL (EXPAND / COLLAPSE)
 ============================================================ */
+
+/* Container detail */
 .update-detail-wrapper {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease;
+    margin-top: 12px;
+    animation: updateFadeIn 0.3s ease;
 }
+
+/* Garis pemisah konten */
 .update-detail-content {
-    margin-top: var(--space-3);
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--border-soft);
+    margin-top: var(--space-3, 12px);
+    padding-top: var(--space-3, 12px);
+    border-top: 1px solid var(--border-soft, #e5e7eb);
 }
+
+/* ============================================================
+   TOMBOL BACA SELENGKAPNYA
+============================================================ */
+
+.update-readmore {
+    width: 100%;
+}
+
+/* Area yang bisa diklik */
+.update-readmore summary {
+    display: block;
+    cursor: pointer;
+    list-style: none;
+    margin-top: 10px;
+    user-select: none;
+    outline: none;
+}
+
+/* Hilangkan marker default browser */
+.update-readmore summary::-webkit-details-marker {
+    display: none;
+}
+
+.update-readmore summary::marker {
+    content: "";
+}
+
+/* Preview teks */
+.update-readmore .update-preview-text {
+    display: block;
+    color: var(--text-secondary, #667085);
+    line-height: 1.7;
+}
+
+
+/* ============================================================
+   READ MORE BUTTON
+============================================================ */
+
+.update-readmore .readmore-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: #3365af;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+/* Tulisan tombol */
+.update-readmore .readmore-text::before {
+    content: "Baca Selengkapnya";
+}
+
+/* Ketika detail dibuka */
+.update-readmore[open] .readmore-text::before {
+    content: "Tutup Selengkapnya";
+}
+
+/* Chevron rounded */
+.update-readmore .update-chevron {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    border-radius: 1px;
+    transform: rotate(45deg);
+    margin-top: -5px;
+    transition: transform 0.25s ease;
+}
+
+/* Chevron menghadap atas */
+.update-readmore[open] .update-chevron {
+    transform: rotate(225deg);
+    margin-top: 5px;
+}
+
+/* Hover */
+.update-readmore summary:hover .readmore-text {
+    color: #244d8a;
+}
+
+/* Fokus keyboard */
+.update-readmore summary:focus-visible {
+    outline: 2px solid #3365af;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+
+/* ============================================================
+   ISI PARAGRAF DETAIL
+============================================================ */
+
 .update-full-body {
-    font-size: var(--fs-xs);
+    color: #344054;
     line-height: 1.8;
-    color: var(--text);
-    margin-bottom: var(--space-3);
-    padding-left: var(--space-3);
-    border-left: 3px solid var(--primary-light);
-    overflow-wrap: break-word;
-    word-break: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
+
+.update-full-body p {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.update-full-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* Heading dalam konten */
+.update-full-body h1,
+.update-full-body h2,
+.update-full-body h3,
+.update-full-body h4 {
+    margin-top: 16px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    color: var(--text-primary, #1d2939);
+}
+
+/* List dalam konten */
+.update-full-body ul,
+.update-full-body ol {
+    padding-left: 24px;
+    margin-bottom: 12px;
+}
+
+.update-full-body li {
+    margin-bottom: 6px;
+}
+
+/* Link dalam konten */
+.update-full-body a {
+    color: #3365af;
+    text-decoration: underline;
+    overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   GAMBAR DALAM DETAIL
+============================================================ */
+
 .update-full-body img {
     display: block;
     width: auto;
@@ -451,37 +591,51 @@ body {
     height: auto;
     object-fit: contain;
     margin: 0.75rem auto;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-sm, 8px);
     cursor: zoom-in;
     transition: opacity 0.2s ease;
 }
+
 .update-full-body img:hover {
     opacity: 0.92;
 }
+
+/* ============================================================
+   GALERI DETAIL
+============================================================ */
+
 .update-detail-gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: var(--space-2);
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(120px, 1fr)
+    );
+    gap: var(--space-2, 8px);
 }
+
 .update-detail-gallery-item {
     position: relative;
     aspect-ratio: 1 / 1;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-sm, 8px);
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border, #e5e7eb);
     cursor: pointer;
     transition: all 0.2s ease;
 }
+
 .update-detail-gallery-item:hover {
     transform: scale(1.03);
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-soft, 0 4px 12px rgba(0, 0, 0, 0.1));
 }
+
 .update-detail-gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
+
+/* Overlay gambar */
 .update-detail-gallery-item .zoom-overlay {
     position: absolute;
     inset: 0;
@@ -494,9 +648,55 @@ body {
     opacity: 0;
     transition: all 0.2s ease;
 }
+
 .update-detail-gallery-item:hover .zoom-overlay {
     background: rgba(0, 0, 0, 0.35);
     opacity: 1;
+}
+
+/* Sembunyikan preview ketika detail dibuka */
+.update-readmore[open] .update-preview-text {
+    display: none !important;
+}
+
+/* Pastikan tombol tetap terlihat */
+.update-readmore[open] .readmore-text {
+    display: inline-flex;
+}
+
+/* ============================================================
+   ANIMASI
+============================================================ */
+
+@keyframes updateFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 576px) {
+    .update-full-body img {
+        max-width: 100%;
+        max-height: 260px;
+    }
+
+    .update-detail-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .update-readmore .readmore-text {
+        font-size: 13px;
+    }
 }
 
 /* ============================================================
@@ -1830,6 +2030,84 @@ body {
 /* ============================================================
    RESPONSIVE
 ============================================================ */
+
+@media (max-width: 768px) {
+    .detail-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Gabungkan isi kedua kolom agar bisa diurutkan */
+    .detail-main,
+    .detail-sidebar {
+        display: contents;
+    }
+
+    /* Urutan elemen mobile */
+    .detail-main > .hero-wrapper {
+        order: 1;
+    }
+
+    .detail-sidebar > .donation-summary-card {
+        order: 2;
+    }
+
+    .detail-main > .description-section {
+        order: 3;
+    }
+
+    .detail-sidebar > .fundraiser-info-card {
+        order: 4;
+    }
+
+    .detail-main > .latest-news-section {
+        order: 5;
+    }
+
+    .detail-main > .pesan-doa-section {
+        order: 6;
+    }
+
+    .detail-sidebar > .side-list-card {
+        order: 7;
+    }
+
+    .detail-sidebar > .fundraiser-join-card,
+    .detail-sidebar > .fundraiser-referral-card {
+        order: 8;
+    }
+
+    /* Reset sticky pada tampilan mobile */
+    .detail-main,
+    .detail-sidebar {
+        position: static;
+    }
+
+    /* Pastikan setiap section memenuhi lebar layar */
+    .detail-main > *,
+    .detail-sidebar > * {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    /* Hilangkan tombol Donasi Sekarang hanya di card aksi donasi */
+    .donation-summary-card .btn-donate,
+    .donation-summary-card .donate-button {
+        display: none !important;
+    }
+
+    .description-section h1 {
+        display: none !important;
+    }
+
+    .campaign-detail-page {
+        padding-bottom: 90px;
+    }
+}
 
 /* Tablet */
 @media (max-width: 992px) {

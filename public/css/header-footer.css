@@ -74,12 +74,10 @@
 
 .nav-menu a {
     position: relative;
-
     color: rgba(255, 255, 255, .84);
     font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-bold);
     line-height: 1;
-
     transition: .2s ease;
 }
 

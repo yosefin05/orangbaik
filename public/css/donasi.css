@@ -523,7 +523,7 @@
     }
 
     .donasi-category-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: var(--space-7, 28px) var(--space-6, 24px);
     }
 
@@ -535,8 +535,8 @@
 
     .donasi-new-overlay h3 {
         font-size: var(--fs-xxs);
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
         margin-bottom: 0;
     }
 
@@ -647,7 +647,7 @@
 
     /* CATEGORY MOBILE */
     .donasi-category-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 22px 12px;
     }
 
@@ -745,8 +745,8 @@
 
     .donasi-new-overlay h3 {
         font-size: var(--fs-xxs);
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
         margin-bottom: 0;
     }
 

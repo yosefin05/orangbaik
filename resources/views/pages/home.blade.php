@@ -16,7 +16,7 @@
 
     @include('components.header')
     <main class="main">
- 
+
         {{-- HERO --}}
         <section class="hero-section">
             <div class="container hero-layout">
@@ -100,65 +100,16 @@
                 <h2 class="section-title">
                     Darurat! Bantu Sekarang
                 </h2>
-
                 <div class="campaign-grid">
                     @forelse ($darurat as $campaign)
-                        @php
-                            // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
-                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
-                            });
-                            $terkumpul = $donasiSettlement->sum('nominal');
-                            $totalDonatur = $donasiSettlement->count();
-                            $persen = $campaign->target_donasi
-                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                : 0;
-
-                            // ♻️ PERHITUNGAN HARI – PASTI INTEGER
-                            $now = \Carbon\Carbon::now();
-                            $end = $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir) : null;
-                            $diff = $end ? (int) $now->diffInDays($end, false) : null;
-
-                            if ($diff === null) {
-                                $labelHari = 'Tanpa batas';
-                            } elseif ($diff < 0) {
-                                $labelHari = 'Selesai';
-                            } elseif ($diff == 0) {
-                                $labelHari = 'Hari terakhir';
-                            } else {
-                                $labelHari = $diff . ' Hari';
-                            }
-                        @endphp
-                        <article class="campaign-card">
-                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
-                                <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                                    alt="{{ $campaign->judul }}" loading="lazy">
-                            </a>
-                            <div class="campaign-body">
-                                <h3>{{ $campaign->judul }}</h3>
-                                <p>
-                                    {{ $campaign->penggalangDana->nama_penggalang }}
-                                    <span>●</span>
-                                </p>
-                                <div class="campaign-price">
-                                    <strong>
-                                        Rp {{ number_format($terkumpul, 0, ',', '.') }}
-                                    </strong>
-                                    <span>Terkumpul</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
-                                </div>
-                                <div class="campaign-meta">
-                                    <span>{{ $totalDonatur }} Donatur</span>
-                                    <span>{{ $labelHari }}</span>
-                                </div>
-                            </div>
-                        </article>
+                        @include('components.campaign-card', [
+                            'campaign' => $campaign
+                        ])
                     @empty
                         <p>Belum ada campaign darurat.</p>
                     @endforelse
                 </div>
+
             </div>
         </section>
 
@@ -212,122 +163,26 @@
 
                 <div class="campaign-grid">
                     @forelse ($pemberdayaan as $campaign)
-                        @php
-                            // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
-                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
-                            });
-                            $terkumpul = $donasiSettlement->sum('nominal');
-                            $totalDonatur = $donasiSettlement->count();
-                            $persen = $campaign->target_donasi
-                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                : 0;
-
-                            // ♻️ SAMA PERSIS DENGAN DARURAT
-                            $now = \Carbon\Carbon::now();
-                            $end = $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir) : null;
-                            $diff = $end ? (int) $now->diffInDays($end, false) : null;
-
-                            if ($diff === null) {
-                                $labelHari = 'Tanpa batas';
-                            } elseif ($diff < 0) {
-                                $labelHari = 'Selesai';
-                            } elseif ($diff == 0) {
-                                $labelHari = 'Hari terakhir';
-                            } else {
-                                $labelHari = $diff . ' Hari';
-                            }
-                        @endphp
-                        <article class="campaign-card">
-                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
-                                <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                                    alt="{{ $campaign->judul }}" loading="lazy">
-                            </a>
-                            <div class="campaign-body">
-                                <h3>{{ $campaign->judul }}</h3>
-                                <p>
-                                    {{ $campaign->penggalangDana->nama_penggalang }}
-                                    <span>●</span>
-                                </p>
-                                <div class="campaign-price">
-                                    <strong>
-                                        Rp {{ number_format($terkumpul, 0, ',', '.') }}
-                                    </strong>
-                                    <span>Terkumpul</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
-                                </div>
-                                <div class="campaign-meta">
-                                    <span>{{ $totalDonatur }} Donatur</span>
-                                    <span>{{ $labelHari }}</span>
-                                </div>
-                            </div>
-                        </article>
+                        @include('components.campaign-card', [
+                            'campaign' => $campaign
+                        ])
                     @empty
                         <p>Belum ada campaign berkelanjutan.</p>
                     @endforelse
                 </div>
             </div>
         </section>
+
+        <!-- campaign lainnya -->
         <section class="section section-border">
             <div class="container">
                 <h2 class="section-title">Campaign Lainnya</h2>
 
                 <div class="campaign-grid">
                     @forelse ($campaigns as $campaign)
-                        @php
-                            // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
-                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
-                            });
-                            $terkumpul = $donasiSettlement->sum('nominal');
-                            $totalDonatur = $donasiSettlement->count();
-                            $persen = $campaign->target_donasi
-                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                : 0;
-
-                            // ♻️ SAMA PERSIS DENGAN DARURAT
-                            $now = \Carbon\Carbon::now();
-                            $end = $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir) : null;
-                            $diff = $end ? (int) $now->diffInDays($end, false) : null;
-
-                            if ($diff === null) {
-                                $labelHari = 'Tanpa batas';
-                            } elseif ($diff < 0) {
-                                $labelHari = 'Selesai';
-                            } elseif ($diff == 0) {
-                                $labelHari = 'Hari terakhir';
-                            } else {
-                                $labelHari = $diff . ' Hari';
-                            }
-                        @endphp
-                        <article class="campaign-card">
-                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
-                                <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                                    alt="{{ $campaign->judul }}" loading="lazy">
-                            </a>
-                            <div class="campaign-body">
-                                <h3>{{ $campaign->judul }}</h3>
-                                <p>
-                                    {{ $campaign->penggalangDana->nama_penggalang }}
-                                    <span>●</span>
-                                </p>
-                                <div class="campaign-price">
-                                    <strong>
-                                        Rp {{ number_format($terkumpul, 0, ',', '.') }}
-                                    </strong>
-                                    <span>Terkumpul</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
-                                </div>
-                                <div class="campaign-meta">
-                                    <span>{{ $totalDonatur }} Donatur</span>
-                                    <span>{{ $labelHari }}</span>
-                                </div>
-                            </div>
-                        </article>
+                        @include('components.campaign-card', [
+                            'campaign' => $campaign
+                        ])
                     @empty
                         <p>Belum ada campaign lainnya.</p>
                     @endforelse
@@ -336,169 +191,177 @@
         </section>
 
         {{-- TESTIMONIAL --}}
-<section class="section testimonial">
-    <div class="container">
-        <h2 class="section-title">Apa Kata Mereka?</h2>
+        <section class="section testimonial">
+            <div class="container">
+                <h2 class="section-title">Apa Kata Mereka?</h2>
 
-        <div class="testimonial-wrapper">
-            @forelse(($testimoni ?? []) as $item)
-                <div class="testimonial-item {{ $loop->first ? 'is-active' : ($loop->index === 1 ? 'is-next' : 'is-hidden') }}" data-index="{{ $loop->index }}">
-                    <div class="testimonial-card">
-                        <div class="testimonial-head">
-                            @if($item->foto_profil)
-                                <img class="testimonial-avatar" src="{{ asset('storage/' . $item->foto_profil) }}" alt="{{ $item->nama }}" loading="lazy">
-                            @else
-                                <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="{{ $item->nama }}" loading="lazy">
-                            @endif
+                <div class="testimonial-wrapper">
+                    @forelse(($testimoni ?? []) as $item)
+                        <div class="testimonial-item {{ $loop->first ? 'is-active' : ($loop->index === 1 ? 'is-next' : 'is-hidden') }}"
+                            data-index="{{ $loop->index }}">
+                            <div class="testimonial-card">
+                                <div class="testimonial-head">
+                                    @if($item->foto_profil)
+                                        <img class="testimonial-avatar" src="{{ asset('storage/' . $item->foto_profil) }}"
+                                            alt="{{ $item->nama }}" loading="lazy">
+                                    @else
+                                        <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}"
+                                            alt="{{ $item->nama }}" loading="lazy">
+                                    @endif
 
-                            <div class="testimonial-person-info">
-                                <h3>{{ $item->nama }}</h3>
-                                <span>{{ $item->jabatan }}</span>
+                                    <div class="testimonial-person-info">
+                                        <h3>{{ $item->nama }}</h3>
+                                        <span>{{ $item->jabatan }}</span>
+                                    </div>
+                                </div>
+
+                                <p class="testimonial-description">
+                                    {{ $item->isi_testimoni }}
+                                </p>
                             </div>
                         </div>
+                    @empty
+                        <div class="testimonial-item is-active" data-index="0">
+                            <div class="testimonial-card">
+                                <div class="testimonial-head">
+                                    <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id"
+                                        loading="lazy">
 
-                        <p class="testimonial-description">
-                            {{ $item->isi_testimoni }}
-                        </p>
-                    </div>
-                </div>
-            @empty
-                <div class="testimonial-item is-active" data-index="0">
-                    <div class="testimonial-card">
-                        <div class="testimonial-head">
-                            <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}" alt="OrangBaik.id" loading="lazy">
+                                    <div class="testimonial-person-info">
+                                        <h3>OrangBaik.id</h3>
+                                        <span>Platform Donasi</span>
+                                    </div>
+                                </div>
 
-                            <div class="testimonial-person-info">
-                                <h3>OrangBaik.id</h3>
-                                <span>Platform Donasi</span>
+                                <p class="testimonial-description">
+                                    OrangBaik.id memudahkan kami untuk ikut berbagi dan mendukung program kebaikan.
+                                </p>
                             </div>
                         </div>
+                    @endforelse
+                </div>
 
-                        <p class="testimonial-description">
-                            OrangBaik.id memudahkan kami untuk ikut berbagi dan mendukung program kebaikan.
-                        </p>
+                @if(($testimoni ?? collect())->count() > 1)
+                    <div class="testimonial-nav">
+                        <button type="button" class="testimonial-arrow" data-dir="prev"
+                            aria-label="Testimoni sebelumnya">‹</button>
+
+                        <div class="testimonial-dots">
+                            @foreach($testimoni as $item)
+                                <button type="button" class="testimonial-dot {{ $loop->first ? 'active' : '' }}"
+                                    data-index="{{ $loop->index }}"
+                                    aria-label="Lihat testimoni {{ $loop->iteration }}"></button>
+                            @endforeach
+                        </div>
+
+                        <button type="button" class="testimonial-arrow" data-dir="next"
+                            aria-label="Testimoni berikutnya">›</button>
                     </div>
-                </div>
-            @endforelse
-        </div>
-
-        @if(($testimoni ?? collect())->count() > 1)
-            <div class="testimonial-nav">
-                <button type="button" class="testimonial-arrow" data-dir="prev" aria-label="Testimoni sebelumnya">‹</button>
-
-                <div class="testimonial-dots">
-                    @foreach($testimoni as $item)
-                        <button type="button" class="testimonial-dot {{ $loop->first ? 'active' : '' }}" data-index="{{ $loop->index }}" aria-label="Lihat testimoni {{ $loop->iteration }}"></button>
-                    @endforeach
-                </div>
-
-                <button type="button" class="testimonial-arrow" data-dir="next" aria-label="Testimoni berikutnya">›</button>
+                @endif
             </div>
-        @endif
-    </div>
-</section>
+        </section>
 
-<script>
-(() => {
-    const wrapper = document.querySelector('.testimonial-wrapper');
-    if (!wrapper) return;
+        <script>
+            (() => {
+                const wrapper = document.querySelector('.testimonial-wrapper');
+                if (!wrapper) return;
 
-    const items = [...wrapper.querySelectorAll('.testimonial-item')];
-    const dots = [...document.querySelectorAll('.testimonial-dot')];
-    const prevBtn = document.querySelector('.testimonial-arrow[data-dir="prev"]');
-    const nextBtn = document.querySelector('.testimonial-arrow[data-dir="next"]');
-    const total = items.length;
-    
-    if (total <= 1) return;
+                const items = [...wrapper.querySelectorAll('.testimonial-item')];
+                const dots = [...document.querySelectorAll('.testimonial-dot')];
+                const prevBtn = document.querySelector('.testimonial-arrow[data-dir="prev"]');
+                const nextBtn = document.querySelector('.testimonial-arrow[data-dir="next"]');
+                const total = items.length;
 
-    let current = 0;
-    let timer = null;
-    let startX = 0;
-    let isDragging = false;
+                if (total <= 1) return;
 
-    // Perhitungan posisi circular/looping yang presisi
-    function render() {
-        items.forEach((item, i) => {
-            let diff = i - current;
+                let current = 0;
+                let timer = null;
+                let startX = 0;
+                let isDragging = false;
 
-            // Penanganan matematika putaran melingkar (Infinite Wrap)
-            if (diff > total / 2) diff -= total;
-            if (diff < -total / 2) diff += total;
+                // Perhitungan posisi circular/looping yang presisi
+                function render() {
+                    items.forEach((item, i) => {
+                        let diff = i - current;
 
-            item.classList.remove('is-active', 'is-prev', 'is-next', 'is-hidden');
+                        // Penanganan matematika putaran melingkar (Infinite Wrap)
+                        if (diff > total / 2) diff -= total;
+                        if (diff < -total / 2) diff += total;
 
-            if (diff === 0) {
-                item.classList.add('is-active');
-            } else if (diff === -1 || (current === 0 && i === total - 1)) {
-                item.classList.add('is-prev');
-            } else if (diff === 1 || (current === total - 1 && i === 0)) {
-                item.classList.add('is-next');
-            } else {
-                item.classList.add('is-hidden');
-            }
-        });
+                        item.classList.remove('is-active', 'is-prev', 'is-next', 'is-hidden');
 
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
-    }
+                        if (diff === 0) {
+                            item.classList.add('is-active');
+                        } else if (diff === -1 || (current === 0 && i === total - 1)) {
+                            item.classList.add('is-prev');
+                        } else if (diff === 1 || (current === total - 1 && i === 0)) {
+                            item.classList.add('is-next');
+                        } else {
+                            item.classList.add('is-hidden');
+                        }
+                    });
 
-    function goTo(index) {
-        current = (index + total) % total;
-        render();
-    }
+                    dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
+                }
 
-    function next() {
-        goTo(current + 1);
-    }
+                function goTo(index) {
+                    current = (index + total) % total;
+                    render();
+                }
 
-    function prev() {
-        goTo(current - 1);
-    }
+                function next() {
+                    goTo(current + 1);
+                }
 
-    function restartTimer() {
-        clearInterval(timer);
-        timer = setInterval(next, 5000); // Otomatis berpindah setiap 5 detik
-    }
+                function prev() {
+                    goTo(current - 1);
+                }
 
-    // Event Control (Navigasi Button & Dots)
-    dots.forEach(dot => {
-        dot.addEventListener('click', () => { 
-            goTo(parseInt(dot.dataset.index, 10)); 
-            restartTimer(); 
-        });
-    });
+                function restartTimer() {
+                    clearInterval(timer);
+                    timer = setInterval(next, 5000); // Otomatis berpindah setiap 5 detik
+                }
 
-    prevBtn?.addEventListener('click', () => { prev(); restartTimer(); });
-    nextBtn?.addEventListener('click', () => { next(); restartTimer(); });
+                // Event Control (Navigasi Button & Dots)
+                dots.forEach(dot => {
+                    dot.addEventListener('click', () => {
+                        goTo(parseInt(dot.dataset.index, 10));
+                        restartTimer();
+                    });
+                });
 
-    // Pause saat kursor mouse di atas card
-    wrapper.addEventListener('mouseenter', () => clearInterval(timer));
-    wrapper.addEventListener('mouseleave', restartTimer);
+                prevBtn?.addEventListener('click', () => { prev(); restartTimer(); });
+                nextBtn?.addEventListener('click', () => { next(); restartTimer(); });
 
-    // Support Swipe Gesture untuk Layar Sentuh / HP
-    wrapper.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        isDragging = true;
-        clearInterval(timer);
-    }, { passive: true });
+                // Pause saat kursor mouse di atas card
+                wrapper.addEventListener('mouseenter', () => clearInterval(timer));
+                wrapper.addEventListener('mouseleave', restartTimer);
 
-    wrapper.addEventListener('touchend', (e) => {
-        if (!isDragging) return;
-        const endX = e.changedTouches[0].clientX;
-        const diffX = startX - endX;
+                // Support Swipe Gesture untuk Layar Sentuh / HP
+                wrapper.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                    clearInterval(timer);
+                }, { passive: true });
 
-        if (Math.abs(diffX) > 40) { // Threshold geser 40px
-            if (diffX > 0) next();
-            else prev();
-        }
-        isDragging = false;
-        restartTimer();
-    }, { passive: true });
+                wrapper.addEventListener('touchend', (e) => {
+                    if (!isDragging) return;
+                    const endX = e.changedTouches[0].clientX;
+                    const diffX = startX - endX;
 
-    // Inisialisasi awal
-    render();
-    restartTimer();
-})();
-</script>
+                    if (Math.abs(diffX) > 40) { // Threshold geser 40px
+                        if (diffX > 0) next();
+                        else prev();
+                    }
+                    isDragging = false;
+                    restartTimer();
+                }, { passive: true });
+
+                // Inisialisasi awal
+                render();
+                restartTimer();
+            })();
+        </script>
         {{-- KATEGORI FAVORIT --}}
         <section class="section" id="kategori-favorit">
             <div class="container">
