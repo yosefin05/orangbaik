@@ -1094,12 +1094,6 @@
     padding: var(--space-5) 0;
 }
 
-.footer-trust-badges span {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
 /* ============================
    PROFILE MENU ICON
    ============================ */
@@ -1122,9 +1116,20 @@
     height: 24px;
 }
 
-/* ============================
+
+
+/* ========================================
+   MOBILE PAGE NAVIGATION
+======================================== */
+
+/* Back button: desktop */
+.mobile-page-back {
+    display: none;
+}
+
+/* ========================================
    RESPONSIVE TABLET (601px - 900px)
-   ============================ */
+======================================== */
 
 @media (max-width: 900px) {
     .header-inner {
@@ -1149,26 +1154,40 @@
     }
 }
 
-/* ============================
+/* ========================================
    RESPONSIVE MOBILE (<= 600px)
-   ============================ */
+======================================== */
 
 @media (max-width: 600px) {
+
+    /* ============================
+       GENERAL
+    ============================ */
+
     body {
         padding-bottom: 82px;
+        transition: padding-bottom 0.3s ease;
     }
+
+    /* ============================
+       MOBILE HEADER
+    ============================ */
 
     .site-header {
         background: var(--primary) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, .24);
-        box-shadow: 0 2px 14px rgba(15, 23, 42, .12);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.24);
+        box-shadow: 0 2px 14px rgba(15, 23, 42, 0.12);
     }
 
     .site-header.is-scrolled {
         background: var(--primary) !important;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
-        box-shadow: 0 8px 28px rgba(15, 23, 42, .12);
+        box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .site-header:not(.mobile-header-home) {
+        display: none;
     }
 
     .desktop-header {
@@ -1177,14 +1196,9 @@
 
     .mobile-header-inner {
         min-height: 66px;
-
         display: flex;
         align-items: center;
         gap: var(--space-3, 12px);
-    }
-
-    .mobile-burger-btn {
-        display: flex;
     }
 
     .mobile-brand {
@@ -1208,8 +1222,42 @@
     }
 
     /* ============================
+       MOBILE PAGE BACK BUTTON
+    ============================ */
+
+    .mobile-page-back {
+        position: fixed;
+        top: max(12px, env(safe-area-inset-top));
+        left: 12px;
+        z-index: 1200;
+
+        width: 40px;
+        height: 40px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--text-primary, #222);
+
+        font-size: 20px;
+        text-decoration: none;
+
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-page-back:active {
+        transform: scale(0.95);
+    }
+
+    /* ============================
        MOBILE BOTTOM NAV
-       ============================ */
+    ============================ */
+
     .mobile-bottom-nav {
         display: flex;
         align-items: center;
@@ -1226,9 +1274,16 @@
 
         background: var(--bg);
         border-top: 1px solid var(--border);
-        box-shadow: 0 -8px 24px rgba(15, 23, 42, .08);
+        box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
 
-        transition: opacity .25s ease, visibility .25s ease;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+
+        transition:
+            transform 0.3s ease,
+            opacity 0.3s ease,
+            visibility 0.3s ease;
     }
 
     .mobile-bottom-nav a {
@@ -1251,9 +1306,18 @@
         color: var(--primary);
     }
 
+    /* Navbar menghilang saat footer terlihat */
+    .mobile-bottom-nav.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(100%);
+        pointer-events: none;
+    }
+
     /* ============================
        FLOATING DONATE BUTTON
-       ============================ */
+    ============================ */
+
     .floating-donate-btn {
         position: fixed;
         right: var(--space-4, 16px);
@@ -1275,13 +1339,16 @@
         font-size: var(--fs-xs);
         font-weight: var(--fw-bold);
 
-        box-shadow: 0 10px 26px rgba(217, 119, 6, .35);
+        box-shadow: 0 10px 26px rgba(217, 119, 6, 0.35);
 
-        transition: opacity .25s ease, visibility .25s ease, transform .2s ease;
+        transition:
+            opacity 0.25s ease,
+            visibility 0.25s ease,
+            transform 0.2s ease;
     }
 
     .floating-donate-btn:active {
-        transform: scale(.96);
+        transform: scale(0.96);
     }
 
     .floating-donate-btn i {
@@ -1289,42 +1356,33 @@
     }
 
     /* ============================
-       STATE: sidebar mobile lagi kebuka
-       ============================ */
-    body.mobile-nav-open .mobile-bottom-nav,
-    body.mobile-nav-open .floating-donate-btn {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-    }
+       FOOTER VISIBLE STATE
+    ============================ */
 
-    /* ============================
-       STATE: footer sudah masuk layar
-       ============================ */
     body.footer-in-view {
         padding-bottom: 0;
     }
 
-    body.footer-in-view .mobile-bottom-nav,
     body.footer-in-view .floating-donate-btn {
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
     }
 
-    body {
-        transition: padding-bottom .25s ease;
-    }
-
     /* ============================
-       FOOTER — stacked, centered,
-       tiap section dipisah divider
-       ============================ */
+       FOOTER
+    ============================ */
+
     .footer-inner {
         grid-template-columns: 1fr;
         gap: 0;
+
         text-align: center;
-        padding-block: var(--space-10, 40px) var(--space-6, 24px);
+
+        padding-block:
+            var(--space-10, 40px)
+            var(--space-6, 24px);
+
         padding-inline: var(--space-4, 16px);
     }
 
@@ -1359,13 +1417,14 @@
         text-align: left;
         padding-block: var(--space-6, 24px);
 
-        border-top: 1px solid rgba(255, 255, 255, .18);
+        border-top: 1px solid rgba(255, 255, 255, 0.18);
     }
 
     .footer-col h4 {
         grid-column: 1;
         grid-row: 1;
         align-self: start;
+
         white-space: normal;
         word-break: break-word;
     }
@@ -1374,6 +1433,7 @@
     .footer-col p {
         grid-column: 2;
         justify-content: flex-start;
+
         word-break: break-word;
         overflow-wrap: anywhere;
     }
@@ -1381,25 +1441,23 @@
     .footer-bottom-inner {
         flex-direction: column !important;
         gap: var(--space-2, 8px) !important;
+
         text-align: center !important;
         padding-inline: var(--space-4, 16px);
     }
-
-    .footer-trust-badges {
-        justify-content: center !important;
-        flex-wrap: wrap !important;
-        gap: 6px 16px !important;
-    }
 }
 
-/* ============================
+/* ========================================
    RESPONSIVE HP SANGAT KECIL (<= 380px)
-   ============================ */
+======================================== */
 
 @media (max-width: 380px) {
+
     .footer-inner {
         padding-inline: var(--space-3, 12px);
-        padding-block: var(--space-8, 32px) var(--space-5, 20px);
+        padding-block:
+            var(--space-8, 32px)
+            var(--space-5, 20px);
     }
 
     .footer-logo img {
@@ -1426,6 +1484,7 @@
     .footer-col {
         grid-template-columns: 1fr;
         row-gap: var(--space-2, 8px);
+
         padding-block: var(--space-5, 20px);
         text-align: left;
     }
@@ -1433,6 +1492,7 @@
     .footer-col h4 {
         grid-column: 1;
         grid-row: auto;
+
         margin-bottom: var(--space-1, 4px);
         font-size: var(--fs-xs, 12px);
     }
@@ -1454,22 +1514,14 @@
         line-height: 1.6;
         padding-inline: var(--space-3, 12px);
     }
-
-    .footer-trust-badges {
-        gap: 4px 10px !important;
-        font-size: 10px;
-    }
-
-    .footer-trust-badges span {
-        gap: 4px;
-    }
 }
 
-/* ============================
+/* ========================================
    RESPONSIVE HP SUPER KECIL (<= 320px)
-   ============================ */
+======================================== */
 
 @media (max-width: 320px) {
+
     .footer-inner {
         padding-inline: 10px;
     }
@@ -1497,5 +1549,17 @@
     .footer-bottom p,
     .copyright {
         font-size: 9.5px;
+    }
+}
+
+/* ========================================
+   REDUCED MOTION
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .mobile-bottom-nav,
+    .floating-donate-btn,
+    body {
+        transition: none;
     }
 }

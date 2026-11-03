@@ -87,7 +87,6 @@
                     <i
                         class="bi bi-infinity"
                         aria-label="Tanpa batas"
-                        title="Tanpa batas"
                     ></i>
                 @else
                     <i class="bi bi-clock"></i>

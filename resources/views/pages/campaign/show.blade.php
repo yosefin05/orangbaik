@@ -60,7 +60,7 @@
                         <span class="hero-status-badge {{ $statusHariClass }}">
                             <i class="bi bi-clock-fill"></i> {{ $statusHari }}
                         </span>
-                    </div>
+                    </div> 
                     <section class="description-section">
                         <h1>{{ $campaign->judul }}</h1>
                         <div class="rich-text-output">{!! $campaign->deskripsi !!}</div>
