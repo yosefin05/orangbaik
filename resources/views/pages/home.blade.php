@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beranda - Orang Baik </title>
+    <title>Beranda - Orang Baik</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
@@ -14,7 +14,32 @@
 
 <body>
 
+    @php
+        // Hanya untuk tampilan: icon kategori, statistik donasi (status SETTLEMENT), testimoni
+        $iconKategori = fn($nama) => 'assets/' . match (strtolower($nama)) {
+            'zakat' => 'zakat',
+            'wakaf' => 'wakaf',
+            'infaq' => 'infaq',
+            'kemanusiaan' => 'kemanusiaan',
+            'sedekah rutin' => 'sedekah-rutin',
+            default => 'lainnya',
+        } . '.svg';
+
+        $statistik = function ($campaign) {
+            $settlement = $campaign->donasi->filter(
+                fn($donasi) => $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement'
+            );
+            $terkumpul = $settlement->sum('nominal');
+            $persen = $campaign->target_donasi ? min(100, ($terkumpul / $campaign->target_donasi) * 100) : 0;
+
+            return [$terkumpul, $settlement->count(), $persen];
+        };
+
+        $testimoni = $testimoni ?? collect();
+    @endphp
+
     @include('components.header')
+
     <main class="main">
 
         {{-- HERO --}}
@@ -47,46 +72,31 @@
 
                     <div class="hero-side-dots"></div>
                 </div>
-
             </div>
         </section>
 
-        {{-- CATEGORY ATAS --}}
+        {{-- KATEGORI --}}
         <section class="section">
             <div class="container">
                 <h2 class="section-title">Yuk, Berbuat Baik Hari Ini!</h2>
 
                 <div class="category-grid">
-                    @foreach($kategori as $item)
-                        @php
-                            $icon = match (strtolower($item->nama_kategori)) {
-                                'zakat' => 'assets/zakat.svg',
-                                'wakaf' => 'assets/wakaf.svg',
-                                'infaq' => 'assets/infaq.svg',
-                                'kemanusiaan' => 'assets/kemanusiaan.svg',
-                                'sedekah rutin' => 'assets/sedekah-rutin.svg',
-                                default => 'assets/lainnya.svg',
-                            };
-                        @endphp
-
+                    @foreach ($kategori as $item)
                         <a href="{{ route('donasi', ['kategori' => $item->id]) }}"
                             class="category-item {{ request('kategori') == $item->id ? 'active' : '' }}">
-
                             <div class="category-icon">
-                                <img src="{{ asset($icon) }}" alt="{{ $item->nama_kategori }}">
+                                <img src="{{ asset($iconKategori($item->nama_kategori)) }}"
+                                    alt="{{ $item->nama_kategori }}">
                             </div>
-
                             <p>{{ $item->nama_kategori }}</p>
                         </a>
                     @endforeach
 
                     <a href="{{ route('donasi') }}"
                         class="category-item {{ request()->filled('kategori') ? '' : 'active' }}">
-
                         <div class="category-icon">
                             <img src="{{ asset('assets/lainnya.svg') }}" alt="Semua Campaign">
                         </div>
-
                         <p>Lainnya</p>
                     </a>
                 </div>
@@ -96,20 +106,15 @@
         {{-- DARURAT --}}
         <section class="section section-border">
             <div class="container">
+                <h2 class="section-title">Darurat! Bantu Sekarang</h2>
 
-                <h2 class="section-title">
-                    Darurat! Bantu Sekarang
-                </h2>
                 <div class="campaign-grid">
                     @forelse ($darurat as $campaign)
-                        @include('components.campaign-card', [
-                            'campaign' => $campaign
-                        ])
+                        <x-campaign-card :campaign="$campaign" />
                     @empty
                         <p>Belum ada campaign darurat.</p>
                     @endforelse
                 </div>
-
             </div>
         </section>
 
@@ -117,32 +122,28 @@
         <section class="section">
             <div class="container">
                 <h2 class="section-title">Yuk, Lihat yang Baru!</h2>
+
                 <div class="new-grid">
                     @forelse ($campaignTerbaru as $campaign)
-                        @php
-                            // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
-                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
-                            });
-                            $terkumpul = $donasiSettlement->sum('nominal');
-                            $totalDonatur = $donasiSettlement->count();
-                            $persen = $campaign->target_donasi
-                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                : 0;
-                        @endphp
+                        @php [$terkumpul, $totalDonatur, $persen] = $statistik($campaign); @endphp
+
                         <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
                             <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
                                 loading="lazy">
+
                             <div class="new-item-overlay">
                                 <h3>{{ $campaign->judul }}</h3>
                                 <p>{{ $campaign->penggalangDana->nama_penggalang }}</p>
+
                                 <div class="new-item-price">
                                     <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
                                     <span>Terkumpul</span>
                                 </div>
+
                                 <div class="progress">
                                     <div class="progress-fill" style="width: {{ $persen }}%;"></div>
                                 </div>
+
                                 <div class="new-item-meta">
                                     <span>{{ $totalDonatur }} Donatur</span>
                                     <span>{{ round($persen) }}%</span>
@@ -163,9 +164,7 @@
 
                 <div class="campaign-grid">
                     @forelse ($pemberdayaan as $campaign)
-                        @include('components.campaign-card', [
-                            'campaign' => $campaign
-                        ])
+                        <x-campaign-card :campaign="$campaign" />
                     @empty
                         <p>Belum ada campaign berkelanjutan.</p>
                     @endforelse
@@ -173,16 +172,14 @@
             </div>
         </section>
 
-        <!-- campaign lainnya -->
+        {{-- CAMPAIGN LAINNYA --}}
         <section class="section section-border">
             <div class="container">
                 <h2 class="section-title">Campaign Lainnya</h2>
 
                 <div class="campaign-grid">
                     @forelse ($campaigns as $campaign)
-                        @include('components.campaign-card', [
-                            'campaign' => $campaign
-                        ])
+                        <x-campaign-card :campaign="$campaign" />
                     @empty
                         <p>Belum ada campaign lainnya.</p>
                     @endforelse
@@ -196,18 +193,14 @@
                 <h2 class="section-title">Apa Kata Mereka?</h2>
 
                 <div class="testimonial-wrapper">
-                    @forelse(($testimoni ?? []) as $item)
+                    @forelse ($testimoni as $item)
                         <div class="testimonial-item {{ $loop->first ? 'is-active' : ($loop->index === 1 ? 'is-next' : 'is-hidden') }}"
                             data-index="{{ $loop->index }}">
                             <div class="testimonial-card">
                                 <div class="testimonial-head">
-                                    @if($item->foto_profil)
-                                        <img class="testimonial-avatar" src="{{ asset('storage/' . $item->foto_profil) }}"
-                                            alt="{{ $item->nama }}" loading="lazy">
-                                    @else
-                                        <img class="testimonial-avatar" src="{{ asset('assets/logo.png') }}"
-                                            alt="{{ $item->nama }}" loading="lazy">
-                                    @endif
+                                    <img class="testimonial-avatar"
+                                        src="{{ $item->foto_profil ? asset('storage/' . $item->foto_profil) : asset('assets/logo.png') }}"
+                                        alt="{{ $item->nama }}" loading="lazy">
 
                                     <div class="testimonial-person-info">
                                         <h3>{{ $item->nama }}</h3>
@@ -215,9 +208,7 @@
                                     </div>
                                 </div>
 
-                                <p class="testimonial-description">
-                                    {{ $item->isi_testimoni }}
-                                </p>
+                                <p class="testimonial-description">{{ $item->isi_testimoni }}</p>
                             </div>
                         </div>
                     @empty
@@ -241,13 +232,13 @@
                     @endforelse
                 </div>
 
-                @if(($testimoni ?? collect())->count() > 1)
+                @if ($testimoni->count() > 1)
                     <div class="testimonial-nav">
                         <button type="button" class="testimonial-arrow" data-dir="prev"
                             aria-label="Testimoni sebelumnya">‹</button>
 
                         <div class="testimonial-dots">
-                            @foreach($testimoni as $item)
+                            @foreach ($testimoni as $item)
                                 <button type="button" class="testimonial-dot {{ $loop->first ? 'active' : '' }}"
                                     data-index="{{ $loop->index }}"
                                     aria-label="Lihat testimoni {{ $loop->iteration }}"></button>
@@ -261,202 +252,35 @@
             </div>
         </section>
 
-        <script>
-            (() => {
-                const wrapper = document.querySelector('.testimonial-wrapper');
-                if (!wrapper) return;
-
-                const items = [...wrapper.querySelectorAll('.testimonial-item')];
-                const dots = [...document.querySelectorAll('.testimonial-dot')];
-                const prevBtn = document.querySelector('.testimonial-arrow[data-dir="prev"]');
-                const nextBtn = document.querySelector('.testimonial-arrow[data-dir="next"]');
-                const total = items.length;
-
-                if (total <= 1) return;
-
-                let current = 0;
-                let timer = null;
-                let startX = 0;
-                let isDragging = false;
-
-                // Perhitungan posisi circular/looping yang presisi
-                function render() {
-                    items.forEach((item, i) => {
-                        let diff = i - current;
-
-                        // Penanganan matematika putaran melingkar (Infinite Wrap)
-                        if (diff > total / 2) diff -= total;
-                        if (diff < -total / 2) diff += total;
-
-                        item.classList.remove('is-active', 'is-prev', 'is-next', 'is-hidden');
-
-                        if (diff === 0) {
-                            item.classList.add('is-active');
-                        } else if (diff === -1 || (current === 0 && i === total - 1)) {
-                            item.classList.add('is-prev');
-                        } else if (diff === 1 || (current === total - 1 && i === 0)) {
-                            item.classList.add('is-next');
-                        } else {
-                            item.classList.add('is-hidden');
-                        }
-                    });
-
-                    dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
-                }
-
-                function goTo(index) {
-                    current = (index + total) % total;
-                    render();
-                }
-
-                function next() {
-                    goTo(current + 1);
-                }
-
-                function prev() {
-                    goTo(current - 1);
-                }
-
-                function restartTimer() {
-                    clearInterval(timer);
-                    timer = setInterval(next, 5000); // Otomatis berpindah setiap 5 detik
-                }
-
-                // Event Control (Navigasi Button & Dots)
-                dots.forEach(dot => {
-                    dot.addEventListener('click', () => {
-                        goTo(parseInt(dot.dataset.index, 10));
-                        restartTimer();
-                    });
-                });
-
-                prevBtn?.addEventListener('click', () => { prev(); restartTimer(); });
-                nextBtn?.addEventListener('click', () => { next(); restartTimer(); });
-
-                // Pause saat kursor mouse di atas card
-                wrapper.addEventListener('mouseenter', () => clearInterval(timer));
-                wrapper.addEventListener('mouseleave', restartTimer);
-
-                // Support Swipe Gesture untuk Layar Sentuh / HP
-                wrapper.addEventListener('touchstart', (e) => {
-                    startX = e.touches[0].clientX;
-                    isDragging = true;
-                    clearInterval(timer);
-                }, { passive: true });
-
-                wrapper.addEventListener('touchend', (e) => {
-                    if (!isDragging) return;
-                    const endX = e.changedTouches[0].clientX;
-                    const diffX = startX - endX;
-
-                    if (Math.abs(diffX) > 40) { // Threshold geser 40px
-                        if (diffX > 0) next();
-                        else prev();
-                    }
-                    isDragging = false;
-                    restartTimer();
-                }, { passive: true });
-
-                // Inisialisasi awal
-                render();
-                restartTimer();
-            })();
-        </script>
         {{-- KATEGORI FAVORIT --}}
         <section class="section" id="kategori-favorit">
             <div class="container">
                 <h2 class="section-title">Pilih Kategori Favoritmu</h2>
 
                 <div class="category-grid category-grid-small">
-                    @foreach($kategori as $item)
-                        @php
-                            $icon = match (strtolower($item->nama_kategori)) {
-                                'zakat' => 'assets/zakat.svg',
-                                'wakaf' => 'assets/wakaf.svg',
-                                'infaq' => 'assets/infaq.svg',
-                                'kemanusiaan' => 'assets/kemanusiaan.svg',
-                                'sedekah rutin' => 'assets/sedekah-rutin.svg',
-                                default => 'assets/lainnya.svg',
-                            };
-                        @endphp
-
-                        <a href="{{ route('home', ['kategori' => $item->id]) }} #kategori-favorit"
+                    @foreach ($kategori as $item)
+                        <a href="{{ route('home', ['kategori' => $item->id]) }}#kategori-favorit"
                             class="category-item {{ request('kategori') == $item->id ? 'active' : '' }}">
-
                             <div class="category-icon">
-                                <img src="{{ asset($icon) }}" alt="{{ $item->nama_kategori }}">
+                                <img src="{{ asset($iconKategori($item->nama_kategori)) }}"
+                                    alt="{{ $item->nama_kategori }}">
                             </div>
-
                             <p>{{ $item->nama_kategori }}</p>
                         </a>
                     @endforeach
 
                     <a href="{{ route('home') }}#kategori-favorit"
                         class="category-item {{ request()->filled('kategori') ? '' : 'active' }}">
-
                         <div class="category-icon">
                             <img src="{{ asset('assets/lainnya.svg') }}" alt="Semua Campaign">
                         </div>
-
                         <p>Lainnya</p>
                     </a>
                 </div>
 
                 <div class="list-campaign">
                     @forelse ($campaigns as $campaign)
-                        @php
-                            // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
-                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
-                            });
-                            $terkumpul = $donasiSettlement->sum('nominal');
-                            $totalDonatur = $donasiSettlement->count();
-                            $persen = $campaign->target_donasi
-                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                : 0;
-
-                            // ♻️ SAMA LAGI
-                            $now = \Carbon\Carbon::now();
-                            $end = $campaign->tanggal_berakhir ? \Carbon\Carbon::parse($campaign->tanggal_berakhir) : null;
-                            $diff = $end ? (int) $now->diffInDays($end, false) : null;
-
-                            if ($diff === null) {
-                                $labelHari = 'Tanpa batas';
-                            } elseif ($diff < 0) {
-                                $labelHari = 'Selesai';
-                            } elseif ($diff == 0) {
-                                $labelHari = 'Hari terakhir';
-                            } else {
-                                $labelHari = $diff . ' Hari';
-                            }
-                        @endphp
-
-                        <article class="list-card">
-                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
-                                <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
-                                    loading="lazy">
-                            </a>
-
-                            <div class="list-body">
-                                <h3>{{ $campaign->judul }}</h3>
-
-                                <p>
-                                    {{ $campaign->penggalangDana->nama_penggalang }}
-                                    <span>●</span>
-                                </p>
-
-                                <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
-
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
-                                </div>
-
-                                <div class="campaign-meta">
-                                    <span>{{ $totalDonatur }} Donatur</span>
-                                    <span>{{ $labelHari }}</span>
-                                </div>
-                            </div>
-                        </article>
+                        <x-campaign-card :campaign="$campaign" variant="list" />
                     @empty
                         <p>Belum ada campaign aktif.</p>
                     @endforelse
@@ -466,8 +290,8 @@
 
     </main>
 
-    <!-- FLOATING WHATSAPP BUTTON -->
-    @if(env('ENABLE_WA_FLOATING', true))
+    {{-- FLOATING WHATSAPP BUTTON --}}
+    @if (env('ENABLE_WA_FLOATING', true))
         <div class="floating-wa-container">
             <a href="https://wa.me/{{ env('WHATSAPP_NUMBER', '6281385002300') }}?text={{ urlencode(env('WHATSAPP_MESSAGE', 'Halo tim OrangBaik.id, saya mau bertanya mengenai...')) }}"
                 target="_blank" rel="noopener noreferrer" class="floating-wa-btn"
@@ -484,6 +308,81 @@
 
     <script src="{{ asset('js/header.js') }}"></script>
     <script src="{{ asset('js/home.js') }}"></script>
+
+    {{-- Testimonial carousel --}}
+    <script>
+        (() => {
+            const wrapper = document.querySelector('.testimonial-wrapper');
+            if (!wrapper) return;
+
+            const items = [...wrapper.querySelectorAll('.testimonial-item')];
+            const dots = [...document.querySelectorAll('.testimonial-dot')];
+            const arrows = [...document.querySelectorAll('.testimonial-arrow')];
+            const total = items.length;
+            if (total <= 1) return;
+
+            const states = { '0': 'is-active', '-1': 'is-prev', '1': 'is-next' };
+            let current = 0;
+            let timer = null;
+            let startX = 0;
+
+            // jarak item ke slide aktif, melingkar (infinite loop)
+            const offsetOf = (i) => {
+                let d = (i - current) % total;
+                if (d > total / 2) d -= total;
+                if (d < -total / 2) d += total;
+                return d;
+            };
+
+            const render = () => {
+                items.forEach((item, i) => {
+                    item.classList.remove('is-active', 'is-prev', 'is-next', 'is-hidden');
+                    item.classList.add(states[offsetOf(i)] ?? 'is-hidden');
+                });
+                dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
+            };
+
+            const goTo = (i) => {
+                current = (i + total) % total;
+                render();
+            };
+
+            const startAuto = () => {
+                clearInterval(timer);
+                timer = setInterval(() => goTo(current + 1), 5000);
+            };
+
+            const stopAuto = () => clearInterval(timer);
+
+            const goByUser = (i) => {
+                goTo(i);
+                startAuto();
+            };
+
+            dots.forEach((dot) => dot.addEventListener('click', () => goByUser(+dot.dataset.index)));
+            arrows.forEach((btn) =>
+                btn.addEventListener('click', () => goByUser(current + (btn.dataset.dir === 'next' ? 1 : -1)))
+            );
+
+            // pause saat hover, geser (swipe) di layar sentuh
+            wrapper.addEventListener('mouseenter', stopAuto);
+            wrapper.addEventListener('mouseleave', startAuto);
+
+            wrapper.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                stopAuto();
+            }, { passive: true });
+
+            wrapper.addEventListener('touchend', (e) => {
+                const diffX = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diffX) > 40) goTo(current + (diffX > 0 ? 1 : -1));
+                startAuto();
+            }, { passive: true });
+
+            render();
+            startAuto();
+        })();
+    </script>
 
 </body>
 

@@ -1014,24 +1014,19 @@
 .socials span {
     width: 38px;
     height: 38px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     border-radius: var(--radius-full);
     background: rgba(255, 255, 255, .12);
     color: var(--bg);
-
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-
     transition: .2s ease;
 }
 
 .footer-socials a:hover,
 .socials span:hover {
-    background: var(--secondary);
     color: var(--bg);
     transform: translateY(-3px);
 }

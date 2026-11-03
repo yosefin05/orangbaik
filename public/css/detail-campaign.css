@@ -84,8 +84,8 @@ body {
     border-radius: var(--radius-full);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    color: #fff;
-    background: rgba(15, 23, 42, 0.55);
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
     backdrop-filter: blur(6px);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
@@ -93,13 +93,13 @@ body {
     background: linear-gradient(135deg, var(--danger), #dc2626);
 }
 .hero-status-badge.is-ongoing {
-    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
 }
 .hero-status-badge.is-upcoming {
-    background: rgba(15, 23, 42, 0.6);
+    background: color-mix(in srgb, var(--bg) 92%, transparent       );
 }
 .hero-status-badge.is-ended {
-    background: rgba(100, 116, 139, 0.75);
+    background: color-mix(in srgb, var(--bg) 92%, transparent           );
 }
 .description-section h1 {
     font-size: var(--fs-lg);

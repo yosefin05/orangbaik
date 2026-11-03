@@ -1,25 +1,47 @@
 
 /* =========================================================
    HOME PAGE
-   Menggunakan variabel dari global.css
+   Dipakai oleh:
+   - home.blade.php
+   - Halaman donasi
+   - components.campaign-card
+
+   Seluruh nilai mengacu pada token global.css.
+
+   DAFTAR ISI
+   1. Global
+   2. Hero
+   3. Kategori
+   4. Campaign card
+   5. Campaign baru
+   6. Testimonial
+   7. List campaign
+   8. Filter donasi
+   9. Responsive tablet
+   10. Responsive mobile
+   11. Aksesibilitas
 ========================================================= */
 
 
 /* =========================================================
-   1. GLOBAL HOME
+   1. GLOBAL
 ========================================================= */
 
 .main {
+    --scrim: color-mix(in srgb, var(--text-dark) 72%, transparent);
+    --on-dark: var(--bg);
+    --on-dark-soft: color-mix(in srgb, var(--bg) 75%, transparent);
+
     overflow-x: hidden;
     background: var(--bg-soft);
 }
 
 .main .section {
-    padding-block: var(--space-16, 64px);
+    padding-block: var(--section-space);
 }
 
 .main .section-title {
-    margin-bottom: var(--space-9, 36px);
+    margin-bottom: var(--space-8);
     color: var(--text-dark);
     font-size: var(--fs-md);
     font-weight: var(--fw-bold);
@@ -38,14 +60,13 @@
 ========================================================= */
 
 .hero-section {
-    padding-top: var(--space-10, 40px);
-    padding-bottom: var(--space-16, 64px);
+    padding-block: var(--space-10) var(--section-space);
 }
 
 .hero-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 340px;
-    gap: var(--space-12, 48px);
+    gap: var(--space-12);
     align-items: stretch;
 }
 
@@ -53,17 +74,22 @@
 .hero-side-slider {
     position: relative;
     overflow: hidden;
-    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+    background: var(--bg);
     box-shadow: var(--shadow);
 }
 
-.hero-main-slider {
-    position: relative;
+.hero-main-slider,
+.hero-side-slider {
     min-height: 320px;
+}
+
+.hero-main-slider {
     aspect-ratio: 16 / 9;
 }
+
+/* Slide utama */
 
 .hero-slide {
     position: absolute;
@@ -83,6 +109,11 @@
     transform: scale(1);
 }
 
+.hero-slide a {
+    display: block;
+    height: 100%;
+}
+
 .hero-slide img,
 .hero-side-card img {
     display: block;
@@ -92,43 +123,7 @@
     object-position: center;
 }
 
-.hero-dots,
-.hero-side-dots {
-    position: absolute;
-    z-index: 5;
-    bottom: var(--space-4, 16px);
-    left: 50%;
-    display: flex;
-    align-items: center;
-    gap: var(--space-2, 8px);
-    transform: translateX(-50%);
-}
-
-.hero-dot,
-.hero-side-dot {
-    width: 8px;
-    height: 8px;
-    padding: 0;
-    border: 0;
-    border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, .55);
-    transition: .2s ease;
-}
-
-.hero-dot.active,
-.hero-side-dot.active {
-    width: 24px;
-    background: var(--bg);
-}
-
-
-/* =========================================================
-   3. HERO SIDE NEWS
-========================================================= */
-
-.hero-side-slider {
-    min-height: 320px;
-}
+/* Slide berita */
 
 .hero-side-card {
     position: absolute;
@@ -154,8 +149,8 @@
     inset: 0;
     background: linear-gradient(
         180deg,
-        rgba(0, 0, 0, .02) 25%,
-        rgba(0, 0, 0, .68) 100%
+        transparent 25%,
+        var(--scrim) 100%
     );
     content: "";
 }
@@ -163,48 +158,81 @@
 .hero-side-body {
     position: absolute;
     z-index: 2;
-    right: var(--space-4, 16px);
-    bottom: var(--space-6, 24px);
-    left: var(--space-4, 16px);
+    right: var(--space-4);
+    bottom: var(--space-6);
+    left: var(--space-4);
 }
 
 .hero-side-body span {
     display: inline-flex;
-    margin-bottom: var(--space-2, 8px);
-    padding: var(--space-1, 4px) var(--space-3, 12px);
+    margin-bottom: var(--space-2);
+    padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, .20);
-    color: var(--bg);
+    background: color-mix(in srgb, var(--bg) 20%, transparent);
+    color: var(--on-dark);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
 }
 
 .hero-side-body h3 {
     margin: 0;
-    color: var(--bg);
+    color: var(--on-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     line-height: 1.45;
 }
 
+/* Dots slider */
+
+.hero-dots,
 .hero-side-dots {
-    bottom: var(--space-3, 12px);
+    position: absolute;
+    z-index: 5;
+    bottom: var(--space-4);
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    transform: translateX(-50%);
+}
+
+.hero-side-dots {
+    bottom: var(--space-3);
+}
+
+.hero-dot,
+.hero-side-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--bg) 55%, transparent);
+    transition:
+        width .2s ease,
+        background .2s ease;
+}
+
+.hero-dot.active,
+.hero-side-dot.active {
+    width: 24px;
+    background: var(--bg);
 }
 
 
 /* =========================================================
-   4. CATEGORY
+   3. KATEGORI
 ========================================================= */
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--space-8, 32px) var(--space-9, 36px);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--space-8);
     align-items: start;
 }
 
 .category-grid-small {
-    margin-bottom: var(--space-10, 40px);
+    margin-bottom: var(--space-10);
 }
 
 .category-item {
@@ -212,8 +240,7 @@
     min-width: 0;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    gap: var(--space-3, 12px);
+    gap: var(--space-3);
     text-align: center;
 }
 
@@ -221,7 +248,6 @@
     display: grid;
     width: 74px;
     height: 74px;
-    margin-inline: auto;
     place-items: center;
 }
 
@@ -230,7 +256,6 @@
     width: 60px;
     height: 60px;
     object-fit: contain;
-    object-position: center;
 }
 
 .category-item p {
@@ -243,84 +268,144 @@
 
 
 /* =========================================================
-   5. STANDARD CAMPAIGN CARD
-   Digunakan oleh:
-   - Campaign Darurat
-   - Pemberdayaan Berkelanjutan
-   - Campaign Lainnya
+   4. CAMPAIGN CARD
+   Variant default: vertikal
 ========================================================= */
 
 .campaign-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-6, 24px);
+    gap: var(--space-6);
 }
 
-.campaign-card {
-    overflow: hidden;
+/* Dasar kartu */
+
+.campaign-card,
+.list-card {
+    min-width: 0;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg);
     box-shadow: var(--shadow-card);
-    transition: transform .2s ease, box-shadow .2s ease;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
 }
 
-.campaign-card:hover {
+.campaign-card {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+}
+
+.campaign-card:hover,
+.list-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow);
+}
+
+.campaign-card:focus-visible,
+.list-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+/* Thumbnail */
+
+.campaign-image-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: var(--bg-soft);
 }
 
 .campaign-image {
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 100%;
     object-fit: cover;
     object-position: center;
 }
 
+/* Body */
+
 .campaign-body {
-    padding: var(--space-4, 16px);
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+    padding: var(--space-4);
 }
 
 .campaign-body h3 {
     display: -webkit-box;
-    height: calc(1.45em * 2);
+    min-height: 2.8em;
     overflow: hidden;
-    margin-bottom: var(--space-2, 8px);
+    margin: 0;
     color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    line-height: 1.45;
+    line-height: 1.4;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
 
-.campaign-body p,
-.list-body p {
+/* Identitas penggalang */
+
+.list-org {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
     margin: 0;
     color: var(--muted);
     font-size: var(--fs-xxs);
-    font-weight: var(--fw-regular);
     line-height: 1.5;
 }
 
-.campaign-body p span,
-.list-body p span {
+.list-org-avatar {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
     color: var(--primary);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
 }
+
+.list-org-name {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Nominal terkumpul */
 
 .campaign-price {
     display: flex;
-    align-items: center;
-    gap: var(--space-3, 12px);
-    margin-top: var(--space-3, 12px);
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px var(--space-2);
+    margin-top: var(--space-2);
+    min-width: 0;
 }
 
-.campaign-price strong,
-.list-body strong {
+.campaign-price strong {
     color: var(--primary);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
+    overflow-wrap: anywhere;
 }
 
 .campaign-price span {
@@ -328,40 +413,135 @@
     font-size: var(--fs-xxs);
 }
 
-.progress {
+/* Progress bar */
+
+.campaign-card .progress,
+.list-card .progress,
+.new-item .progress {
     width: 100%;
     height: 7px;
     overflow: hidden;
-    margin-top: var(--space-2, 8px);
     border-radius: var(--radius-full);
     background: var(--primary-light);
 }
 
-.progress-fill {
+.campaign-card .progress-fill,
+.list-card .progress-fill,
+.new-item .progress-fill {
     height: 100%;
     border-radius: inherit;
     background: var(--primary);
 }
 
+.list-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.list-progress .progress {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+}
+
+.list-percent {
+    min-width: 34px;
+    flex-shrink: 0;
+    color: var(--primary);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    text-align: right;
+}
+
+/* Metadata */
+
 .campaign-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: var(--space-3, 12px);
+    gap: var(--space-2);
+    min-width: 0;
+    margin-top: var(--space-2);
     color: var(--muted);
     font-size: var(--fs-xxs);
 }
 
+.campaign-meta > span {
+    min-width: 0;
+}
+
+/* CTA */
+
+.list-cta {
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+    white-space: nowrap;
+}
+
+.list-cta i {
+    margin-left: 6px;
+    transition: transform .2s ease;
+}
+
+.campaign-card:hover .list-cta i,
+.list-card:hover .list-cta i {
+    transform: translateX(3px);
+}
+
+/* Badge waktu */
+
+.list-badge {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    box-shadow: var(--shadow-soft);
+    color: var(--text);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+.list-badge.is-urgent {
+    background: var(--danger);
+    color: var(--bg);
+}
+
+.list-badge.is-done {
+    background: var(--muted);
+    color: var(--bg);
+}
+
+/* Infinity: ikon saja */
+
+.list-badge .bi-infinity,
+.meta-days .bi-infinity {
+    color: var(--primary);
+    font-size: var(--fs-sm);
+    line-height: 1;
+}
+
 
 /* =========================================================
-   6. NEW CAMPAIGN
-   Desain khusus Yuk, Lihat yang Baru!
+   5. CAMPAIGN BARU
+   Desain khusus "Yuk, Lihat yang Baru!"
+   Tidak menggunakan campaign-card.
 ========================================================= */
 
 .new-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-8, 32px);
+    gap: var(--space-8);
 }
 
 .new-item {
@@ -392,11 +572,11 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: var(--space-5, 20px);
+    padding: var(--space-5);
     background: linear-gradient(
         180deg,
-        transparent 30%,
-        rgba(0, 0, 0, .75) 100%
+        transparent 35%,
+        var(--scrim) 100%
     );
     opacity: 0;
     transition: opacity .3s ease;
@@ -409,8 +589,8 @@
 .new-item-overlay h3 {
     display: -webkit-box;
     overflow: hidden;
-    margin: 0 0 var(--space-1, 4px);
-    color: #fff;
+    margin: 0 0 var(--space-1);
+    color: var(--on-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     line-height: 1.4;
@@ -419,52 +599,50 @@
 }
 
 .new-item-overlay p {
-    margin: 0 0 var(--space-3, 12px);
-    color: rgba(255, 255, 255, .75);
+    margin: 0 0 var(--space-3);
+    color: var(--on-dark-soft);
     font-size: var(--fs-xxs);
 }
 
 .new-item-price {
     display: flex;
     align-items: center;
-    gap: var(--space-2, 8px);
-    margin-bottom: var(--space-2, 8px);
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
 }
 
 .new-item-price strong {
-    color: #fff;
+    color: var(--on-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
 }
 
-.new-item-price span {
-    color: rgba(255, 255, 255, .7);
+.new-item-price span,
+.new-item-meta {
+    color: var(--on-dark-soft);
     font-size: var(--fs-xxs);
-}
-
-.new-item .progress {
-    margin-bottom: var(--space-2, 8px);
-    background: rgba(255, 255, 255, .25);
-}
-
-.new-item .progress-fill {
-    background: var(--bg);
 }
 
 .new-item-meta {
     display: flex;
     justify-content: space-between;
-    color: rgba(255, 255, 255, .75);
-    font-size: var(--fs-xxs);
+}
+
+.new-item .progress {
+    margin-bottom: var(--space-2);
+    background: color-mix(in srgb, var(--bg) 25%, transparent);
+}
+
+.new-item .progress-fill {
+    background: var(--on-dark);
 }
 
 
 /* =========================================================
-   7. TESTIMONIAL 3D CAROUSEL
+   6. TESTIMONIAL
 ========================================================= */
 
 .testimonial {
-    padding: 60px 0;
     background: linear-gradient(
         180deg,
         var(--bg-soft),
@@ -473,23 +651,25 @@
 }
 
 .testimonial-wrapper {
+    --offset: 280px;
+    --side-scale: .82;
+    --side-opacity: .5;
+
     position: relative;
     width: 100%;
     min-height: 240px;
+    margin-top: var(--space-6);
     overflow: hidden;
-    margin-top: var(--space-6, 24px);
 }
 
 .testimonial-item {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform-origin: center center;
     transition:
         transform .6s cubic-bezier(.25, 1, .5, 1),
         opacity .6s ease,
         z-index .6s step-end;
-    will-change: transform, opacity;
 }
 
 .testimonial-item.is-active {
@@ -498,16 +678,24 @@
     opacity: 1;
 }
 
-.testimonial-item.is-prev {
+.testimonial-item.is-prev,
+.testimonial-item.is-next {
     z-index: 2;
-    transform: translate(calc(-50% - 280px), -50%) scale(.82);
-    opacity: .5;
+    opacity: var(--side-opacity);
+}
+
+.testimonial-item.is-prev {
+    transform: translate(
+        calc(-50% - var(--offset)),
+        -50%
+    ) scale(var(--side-scale));
 }
 
 .testimonial-item.is-next {
-    z-index: 2;
-    transform: translate(calc(-50% + 280px), -50%) scale(.82);
-    opacity: .5;
+    transform: translate(
+        calc(-50% + var(--offset)),
+        -50%
+    ) scale(var(--side-scale));
 }
 
 .testimonial-item.is-hidden {
@@ -517,11 +705,11 @@
     pointer-events: none;
 }
 
-/* Testimonial card */
+/* Card */
 
 .testimonial-card {
     width: 240px;
-    padding: var(--space-5, 20px);
+    padding: var(--space-5);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
     background: var(--bg);
@@ -531,25 +719,25 @@
 }
 
 .testimonial-item.is-active .testimonial-card {
-    width: 340px;
-    padding: 45px var(--space-8, 32px) var(--space-8, 32px);
+    width: min(340px, calc(100vw - var(--space-8)));
+    padding: var(--space-12) var(--space-8) var(--space-8);
     border-color: var(--border);
     box-shadow: var(--shadow-hover);
 }
 
-/* Testimonial head */
+/* Head */
 
 .testimonial-head {
     display: flex;
     align-items: center;
-    gap: var(--space-3, 12px);
-    margin-bottom: var(--space-3, 12px);
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
     transition: all .5s ease;
 }
 
 .testimonial-item.is-active .testimonial-head {
     flex-direction: column;
-    margin-bottom: var(--space-4, 16px);
+    margin-bottom: var(--space-4);
     text-align: center;
 }
 
@@ -558,8 +746,8 @@
     height: 44px;
     flex-shrink: 0;
     border-radius: var(--radius-full);
-    object-fit: cover;
     box-shadow: 0 0 0 2px var(--bg);
+    object-fit: cover;
     transition: all .5s ease;
 }
 
@@ -586,16 +774,14 @@
     margin-top: 2px;
     color: var(--muted);
     font-size: var(--fs-xxs);
-    font-weight: var(--fw-regular);
 }
 
-/* Testimonial description */
+/* Deskripsi */
 
 .testimonial-description {
     margin: 0;
     color: var(--muted);
     font-size: var(--fs-xxs);
-    font-weight: var(--fw-regular);
     line-height: 1.6;
     transition: all .5s ease;
 }
@@ -608,14 +794,14 @@
     text-align: center;
 }
 
-/* Testimonial navigation */
+/* Navigasi */
 
 .testimonial-nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-4, 16px);
-    margin-top: var(--space-8, 32px);
+    gap: var(--space-4);
+    margin-top: var(--space-8);
 }
 
 .testimonial-arrow {
@@ -651,7 +837,7 @@
 .testimonial-dots {
     display: flex;
     align-items: center;
-    gap: var(--space-2, 8px);
+    gap: var(--space-2);
 }
 
 .testimonial-dot {
@@ -667,63 +853,126 @@
 }
 
 .testimonial-dot.active {
-    transform: scale(1.4);
     background: var(--primary);
+    transform: scale(1.4);
 }
 
 
 /* =========================================================
-   8. LIST CAMPAIGN
-   Desain khusus Pilih Kategori Favoritmu
+   7. LIST CAMPAIGN
+   Variant list: horizontal di desktop, tablet, dan mobile.
 ========================================================= */
 
 .list-campaign {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6, 24px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
 }
 
 .list-card {
-    display: grid;
-    grid-template-columns: 380px minmax(0, 1fr);
-    gap: var(--space-6, 24px);
-    padding: var(--space-3, 12px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg);
-    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-4);
+    min-width: 0;
+    padding: var(--space-3);
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.list-card img {
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
+/* Thumbnail kiri */
+
+.list-thumb {
+    position: relative;
+    flex: 0 0 190px;
+    min-width: 0;
+    min-height: 150px;
+    overflow: hidden;
     border-radius: var(--radius-md);
-    object-fit: cover;
-    object-position: center;
+    background: var(--bg-soft);
 }
+
+.list-thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .5s ease;
+}
+
+.list-card:hover .list-thumb img {
+    transform: scale(1.06);
+}
+
+/* Konten kanan */
 
 .list-body {
-    padding-top: var(--space-1, 4px);
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
 }
 
 .list-body h3 {
-    margin-bottom: var(--space-1, 4px);
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
     color: var(--text-dark);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
-.list-body strong {
-    display: inline-block;
-    margin-top: var(--space-3, 12px);
+/* Nominal list */
+
+.list-amount {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px var(--space-2);
+    margin-top: auto;
 }
 
-/* ============================
-   DONASI FILTER — 1 baris
-   [ Jenis | Penggalang ]  [ chip kategori → scroll ]  [ ✕ Reset ]
-   ============================ */
+.list-amount strong {
+    color: var(--primary);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.list-amount small {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+}
+
+/* Metadata list */
+
+.list-body .campaign-meta {
+    margin-top: var(--space-1);
+    padding-top: var(--space-2);
+    border-top: 1px dashed var(--border);
+}
+
+.list-body .campaign-meta i {
+    margin-right: 6px;
+    color: var(--primary);
+}
+
+/* Hari ditampilkan di badge pada desktop */
+
+.meta-days {
+    display: none;
+}
+
+
+/* =========================================================
+   8. FILTER DONASI
+========================================================= */
 
 .donasi-filter-section {
     position: sticky;
@@ -731,12 +980,10 @@
     z-index: 50;
     margin-bottom: var(--space-6);
     padding: var(--space-3) 0;
-    background: var(--bg);
     border-bottom: 1px solid var(--border-soft);
+    background: var(--bg);
 }
 
-/* Form jadi satu baris. .donasi-filter-top "dilebur" (display: contents)
-   supaya select & reset bisa diatur urutannya bersama chip. */
 .donasi-filter-form {
     display: flex;
     align-items: center;
@@ -749,34 +996,41 @@
     display: contents;
 }
 
-/* ---------- SELECT (satu pill, dua pilihan) ---------- */
+/* Select */
+
 .donasi-filter-selects {
     order: 1;
     display: flex;
-    align-items: center;
     flex: 0 0 auto;
+    align-items: center;
     min-width: 0;
     border: 1px solid var(--border);
     border-radius: var(--radius-full);
     background: var(--bg-soft);
-    transition: border-color .2s ease, box-shadow .2s ease;
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
 }
 
-.donasi-filter-selects:hover {
+.donasi-filter-selects:hover,
+.donasi-filter-selects:focus-within {
     border-color: var(--primary);
 }
 
 .donasi-filter-selects:focus-within {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+    box-shadow: 0 0 0 3px color-mix(
+        in srgb,
+        var(--primary) 15%,
+        transparent
+    );
 }
 
 .donasi-filter-selects select {
-    appearance: none;
-    -webkit-appearance: none;
     height: 36px;
     min-width: 0;
     padding: 0 var(--space-8) 0 var(--space-4);
+    appearance: none;
+    -webkit-appearance: none;
     border: 0;
     border-radius: var(--radius-full);
     background-color: transparent;
@@ -786,7 +1040,7 @@
     background-position:
         calc(100% - 17px) 50%,
         calc(100% - 12px) 50%;
-    background-size: 5px 5px, 5px 5px;
+    background-size: 5px 5px;
     background-repeat: no-repeat;
     color: var(--text);
     font-size: var(--fs-xxs);
@@ -801,30 +1055,37 @@
     color: var(--primary);
 }
 
-/* garis pemisah antar select */
 .donasi-filter-selects select + select {
     border-left: 1px solid var(--border);
     border-radius: 0 var(--radius-full) var(--radius-full) 0;
 }
 
-/* ---------- CHIPS (di tengah, scroll horizontal) ---------- */
+/* Chip kategori */
+
 .donasi-filter-chips {
     order: 2;
     display: flex;
-    align-items: center;
     flex: 1 1 0;
-    flex-wrap: nowrap;
+    align-items: center;
     gap: var(--space-2);
     min-width: 0;
     margin: 0;
     padding: 2px var(--space-8) 2px var(--space-3);
     overflow-x: auto;
+    border-left: 1px solid var(--border-soft);
     scrollbar-width: none;
     scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
-    border-left: 1px solid var(--border-soft);
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent 100%);
-    mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent 100%);
+    -webkit-mask-image: linear-gradient(
+        to right,
+        #000 calc(100% - 48px),
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to right,
+        #000 calc(100% - 48px),
+        transparent 100%
+    );
 }
 
 .donasi-filter-chips::-webkit-scrollbar {
@@ -833,13 +1094,12 @@
 
 .donasi-filter-chip {
     display: inline-flex;
+    height: 34px;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    flex-shrink: 0;
-    height: 34px;
     padding: 0 var(--space-4);
-    border: 1px solid transparent;
     border-radius: var(--radius-full);
     background: transparent;
     color: var(--muted);
@@ -849,7 +1109,9 @@
     cursor: pointer;
     user-select: none;
     scroll-snap-align: start;
-    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+    transition:
+        background-color .2s ease,
+        color .2s ease;
 }
 
 .donasi-filter-chip input[type="checkbox"] {
@@ -863,26 +1125,26 @@
 
 .donasi-filter-chip.active::before {
     content: "✓";
-    font-size: .95em;
     line-height: 1;
 }
 
 .donasi-filter-chip.active,
 .donasi-filter-chip.active:hover {
     background: var(--primary);
-    color: #fff;
+    color: var(--bg);
     font-weight: var(--fw-bold);
 }
 
-/* ---------- RESET ---------- */
+/* Reset */
+
 .donasi-reset-filter {
     order: 3;
     display: inline-flex;
+    height: 36px;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    flex-shrink: 0;
-    height: 36px;
     padding: 0 var(--space-3);
     border: 0;
     border-radius: var(--radius-full);
@@ -892,7 +1154,9 @@
     font-weight: var(--fw-medium);
     white-space: nowrap;
     cursor: pointer;
-    transition: color .2s ease, background-color .2s ease;
+    transition:
+        color .2s ease,
+        background-color .2s ease;
 }
 
 .donasi-reset-filter::before {
@@ -904,15 +1168,420 @@
 .donasi-reset-filter:hover,
 .donasi-reset-filter:focus-visible {
     outline: none;
+    background: var(--danger-light);
     color: var(--danger);
-    background: color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
-/* ============================
-   MOBILE — semuanya 1 baris yang bisa digeser
-   ============================ */
 
-@media (max-width: 640px) {
+/* =========================================================
+   9. RESPONSIVE TABLET
+   601px – 900px
+========================================================= */
+
+@media (max-width: 900px) {
+
+    /* Section */
+
+    .main .section {
+        padding-block: var(--section-space-sm);
+    }
+
+    /* Hero */
+
+    .hero-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-6);
+    }
+
+    .hero-side-slider {
+        display: none;
+    }
+
+    /* Kategori */
+
+    .category-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--space-5) var(--space-4);
+    }
+
+    /* Default campaign: tetap vertikal */
+
+    .campaign-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-4);
+    }
+
+    .campaign-card .campaign-image-wrapper {
+        aspect-ratio: 16 / 10;
+    }
+
+    .campaign-card .campaign-body {
+        padding: var(--space-3);
+    }
+
+    /* Campaign baru */
+
+    .new-item-overlay {
+        padding: var(--space-3);
+        opacity: 1;
+    }
+
+    .new-item-overlay h3 {
+        margin-bottom: 0;
+        font-size: var(--fs-xxs);
+        -webkit-line-clamp: 2;
+    }
+
+    .new-item-overlay p {
+        display: none;
+    }
+
+    .new-item-price,
+    .new-item-meta {
+        display: none;
+    }
+
+    .new-item .progress {
+        height: 4px;
+        margin: var(--space-1) 0 0;
+    }
+
+    /* List campaign tetap horizontal */
+
+    .list-thumb {
+        flex-basis: 160px;
+        min-height: 130px;
+    }
+}
+
+
+/* =========================================================
+   10. RESPONSIVE MOBILE
+   ≤ 600px
+========================================================= */
+
+@media (max-width: 600px) {
+
+    /* Section */
+
+    .main .section {
+        padding-block: var(--space-10);
+    }
+
+    .main .section-title {
+        margin-bottom: var(--space-6);
+        font-size: var(--fs-sm);
+    }
+
+    /* Hero */
+
+    .hero-section {
+        padding-block: var(--space-6) var(--space-10);
+    }
+
+    .hero-main-slider {
+        min-height: 0;
+        aspect-ratio: 16 / 10;
+        border-radius: var(--radius-md);
+    }
+
+    /* Kategori */
+
+    .category-grid {
+        gap: var(--space-5) var(--space-3);
+    }
+
+    .category-grid-small {
+        margin-bottom: var(--space-8);
+    }
+
+    .category-item {
+        gap: var(--space-2);
+    }
+
+    .category-icon,
+    .category-icon img {
+        width: 52px;
+        height: 52px;
+    }
+
+    .category-item p {
+        font-size: var(--fs-xxs);
+        line-height: 1.3;
+    }
+
+    /* =====================================
+       DEFAULT CAMPAIGN
+       Tetap vertikal, dua kolom
+    ===================================== */
+
+    .campaign-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-3);
+    }
+
+    .campaign-card {
+        border-radius: var(--radius-md);
+    }
+
+    .campaign-card:hover {
+        transform: none;
+    }
+
+    .campaign-card .campaign-image-wrapper {
+        aspect-ratio: 4 / 3;
+    }
+
+    .campaign-card .campaign-body {
+        gap: var(--space-2);
+        padding: var(--space-3);
+    }
+
+    .campaign-card .campaign-body h3 {
+        min-height: 2.8em;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .campaign-card .list-org {
+        gap: 6px;
+        font-size: 10px;
+    }
+
+    .campaign-card .list-org-avatar {
+        width: 19px;
+        height: 19px;
+        font-size: 10px;
+    }
+
+    .campaign-card .list-org-name {
+        font-size: 10px;
+    }
+
+    .campaign-card .campaign-price {
+        gap: 2px 5px;
+        margin-top: var(--space-1);
+    }
+
+    .campaign-card .campaign-price strong {
+        font-size: 12px;
+    }
+
+    .campaign-card .campaign-price span {
+        font-size: 10px;
+    }
+
+    .campaign-card .progress {
+        height: 6px;
+    }
+
+    .campaign-card .list-progress {
+        gap: 6px;
+    }
+
+    .campaign-card .list-percent {
+        min-width: 30px;
+        font-size: 10px;
+    }
+
+    .campaign-card .campaign-meta {
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        font-size: 10px;
+    }
+
+    .campaign-card .campaign-meta > span {
+        white-space: nowrap;
+    }
+
+    .campaign-card .campaign-meta .list-cta {
+        margin-left: auto;
+        font-size: 10px;
+    }
+
+    /* =====================================
+       CAMPAIGN BARU
+       Desain overlay tetap dipertahankan
+    ===================================== */
+
+    .new-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+
+    .new-item {
+        border-radius: var(--radius-md);
+    }
+
+    .new-item-overlay {
+        padding: var(--space-4);
+    }
+
+    .new-item-overlay h3 {
+        font-size: var(--fs-xs);
+    }
+
+    /* =====================================
+       LIST CAMPAIGN
+       Tetap horizontal seperti desktop
+    ===================================== */
+
+    .list-campaign {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .list-card {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        border-radius: var(--radius-md);
+    }
+
+    .list-card:hover {
+        transform: none;
+    }
+
+    /* Thumbnail kiri */
+
+    .list-thumb {
+        position: relative;
+        flex: 0 0 32%;
+        width: 32%;
+        min-width: 0;
+        min-height: auto;
+        align-self: flex-start;
+        aspect-ratio: 1 / 1;
+    }
+
+    /* Body kanan */
+
+    .list-body {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        gap: 6px;
+        width: 0;
+        min-width: 0;
+        padding: 0;
+    }
+
+    .list-body h3 {
+        min-height: 0;
+        font-size: 12px;
+        line-height: 1.4;
+        -webkit-line-clamp: 2;
+    }
+
+    .list-card .list-org {
+        gap: 6px;
+        font-size: 10px;
+    }
+
+    .list-card .list-org-avatar {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+    }
+
+    .list-card .list-org-name {
+        font-size: 10px;
+    }
+
+    /* Nominal */
+
+    .list-amount {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        margin-top: auto;
+    }
+
+    .list-amount strong {
+        font-size: 12px;
+    }
+
+    .list-amount small {
+        font-size: 10px;
+    }
+
+    /* Progress */
+
+    .list-card .progress {
+        height: 6px;
+    }
+
+    .list-card .list-progress {
+        gap: 6px;
+    }
+
+    .list-card .list-percent {
+        min-width: 28px;
+        font-size: 10px;
+    }
+
+    /* Metadata */
+
+    .list-body .campaign-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5px;
+        margin-top: var(--space-1);
+        padding-top: var(--space-2);
+        border-top: 1px dashed var(--border);
+        font-size: 10px;
+    }
+
+    .list-body .campaign-meta i {
+        display: inline;
+        margin-right: 4px;
+    }
+
+    .list-card .list-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 10px;
+    }
+
+    .list-card .list-cta i {
+        margin: 0;
+    }
+
+    /* Badge tetap terlihat */
+
+    .list-card .list-badge {
+        display: inline-flex;
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+
+    .list-card .list-badge .bi-infinity {
+        font-size: 13px;
+    }
+
+    /* =====================================
+       TESTIMONIAL
+    ===================================== */
+
+    .testimonial-wrapper {
+        --offset: 160px;
+        --side-scale: .7;
+        --side-opacity: .2;
+
+        min-height: 320px;
+    }
+
+    /* =====================================
+       FILTER DONASI
+    ===================================== */
 
     .donasi-filter-section {
         z-index: 49;
@@ -931,431 +1600,260 @@
         display: none;
     }
 
-    /* urutan mobile: select → reset → chip */
-    .donasi-filter-selects { order: 1; }
-    .donasi-reset-filter   { order: 2; height: 32px; padding: 0 10px; font-size: 12px; }
-    .donasi-filter-chips   { order: 3; }
-
-    .donasi-filter-selects select {
+    .donasi-reset-filter {
+        order: 2;
         height: 32px;
-        padding: 0 28px 0 12px;
-        font-size: 12px;
-        background-position:
-            calc(100% - 15px) 50%,
-            calc(100% - 10px) 50%;
+        padding: 0 var(--space-3);
+        font-size: var(--fs-xxs);
     }
 
     .donasi-filter-chips {
+        order: 3;
         flex: 0 0 auto;
-        overflow: visible;
         padding: 0 var(--space-4) 0 var(--space-2);
+        overflow: visible;
         -webkit-mask-image: none;
         mask-image: none;
     }
 
+    .donasi-filter-selects select {
+        height: 32px;
+        padding: 0 28px 0 var(--space-3);
+        background-position:
+            calc(100% - 15px) 50%,
+            calc(100% - 10px) 50%;
+        font-size: var(--fs-xxs);
+    }
+
     .donasi-filter-chip {
         height: 32px;
-        padding: 0 12px;
-        font-size: 12px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-    .donasi-filter-selects,
-    .donasi-filter-selects select,
-    .donasi-reset-filter,
-    .donasi-filter-chip {
-        transition: none;
+        padding: 0 var(--space-3);
     }
 }
 
 
 /* =========================================================
-   9. RESPONSIVE TABLET
-   601px - 900px
+   10A. MOBILE KECIL
+   ≤ 420px
 ========================================================= */
 
-@media (max-width: 900px) {
-
-    /* Global */
+@media (max-width: 420px) {
 
     .main .section {
-        padding-block: var(--space-14, 56px);
-    }
-
-    /* Hero */
-
-    .hero-layout {
-        grid-template-columns: 1fr;
-        gap: var(--space-8, 32px);
-    }
-
-    .hero-side-slider {
-        display: none;
-    }
-
-    /* Category */
-
-    .category-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: var(--space-7, 28px) var(--space-6, 24px);
-    }
-
-    /* Standard campaign */
-
-    .campaign-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    /* New campaign */
-
-    .new-item-overlay {
-        padding: var(--space-3, 12px);
-        background: linear-gradient(
-            180deg,
-            transparent 45%,
-            rgba(0, 0, 0, .72) 100%
-        );
-        opacity: 1;
-    }
-
-    .new-item-overlay h3 {
-        margin-bottom: 0;
-        font-size: var(--fs-xxs);
-        -webkit-line-clamp: 1;
-    }
-
-    .new-item-overlay p,
-    .new-item-price,
-    .new-item-meta {
-        display: none;
-    }
-
-    .new-item .progress {
-        height: 4px;
-        margin-top: var(--space-1, 4px);
-        margin-bottom: 0;
-    }
-
-    /* List campaign */
-
-    .list-card {
-        grid-template-columns: 280px minmax(0, 1fr);
-    }
-}
-
-
-/* =========================================================
-   10. RESPONSIVE MOBILE
-   <= 600px
-========================================================= */
-
-@media (max-width: 600px) {
-
-    /* Global */
-
-    .main .section {
-        padding-block: var(--space-11, 44px);
+        padding-block: var(--space-8);
     }
 
     .main .section-title {
-        margin-bottom: var(--space-6, 24px);
-        font-size: var(--fs-sm);
+        margin-bottom: var(--space-4);
     }
 
-    /* Hero */
-
-    .hero-section {
-        padding-top: var(--space-6, 24px);
-        padding-bottom: var(--space-10, 40px);
-    }
-
-    .hero-main-slider {
-        min-height: auto;
-        aspect-ratio: 16 / 10;
-        border-radius: var(--radius-md);
-    }
-
-    .hero-dots {
-        bottom: var(--space-3, 12px);
-    }
-
-    .hero-dot {
-        width: 7px;
-        height: 7px;
-    }
-
-    .hero-dot.active {
-        width: 20px;
-    }
-
-    /* Category */
-
-    .category-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: var(--space-5, 20px) var(--space-3, 12px);
-        overflow: visible;
-        padding-bottom: 0;
-    }
-
-    .category-grid-small,
-    .category-grid.small {
-        margin-bottom: var(--space-8, 32px);
-    }
-
-    .category-item {
-        min-width: 0;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-2, 8px);
-    }
-
-    .category-icon {
-        width: 52px;
-        height: 52px;
-    }
-
+    .category-icon,
     .category-icon img {
-        width: 52px;
-        height: 52px;
+        width: 46px;
+        height: 46px;
     }
-
-    .category-item p {
-        font-size: var(--fs-xxs);
-        line-height: 1.25;
-    }
-
-    /* Standard campaign */
 
     .campaign-grid {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: var(--space-3, 12px);
-        overflow-x: auto;
-        overflow-y: hidden;
-        margin-right: calc(var(--space-4, 16px) * -1);
-        padding-bottom: var(--space-4, 16px);
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
+        gap: var(--space-2);
     }
 
-    .campaign-grid::-webkit-scrollbar {
-        display: none;
+    .campaign-card .campaign-body {
+        padding: 10px;
     }
 
-    .campaign-card {
-        flex: 0 0 calc((100% - var(--space-3, 12px)) / 2);
-        max-width: calc((100% - var(--space-3, 12px)) / 2);
-        border-radius: var(--radius-md);
-        scroll-snap-align: start;
+    .campaign-card .campaign-body h3 {
+        font-size: 11px;
     }
 
-    .campaign-card:hover {
-        transform: none;
+    .campaign-card .list-org-name {
+        font-size: 9px;
     }
 
-    .campaign-image {
-        aspect-ratio: 16 / 10;
+    .campaign-card .campaign-price strong {
+        font-size: 11px;
     }
 
-    .campaign-body {
-        padding: var(--space-3, 12px);
+    .campaign-card .campaign-meta {
+        font-size: 9px;
     }
 
-    .campaign-body h3 {
-        height: calc(1.4em * 2);
-        margin-bottom: var(--space-2, 8px);
-        font-size: var(--fs-xxs);
-        line-height: 1.4;
-        -webkit-line-clamp: 2;
-    }
-
-    .campaign-body p {
-        display: -webkit-box;
-        overflow: hidden;
-        font-size: var(--fs-xxs);
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-    }
-
-    .campaign-price {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-2, 8px);
-        margin-top: var(--space-2, 8px);
-    }
-
-    .campaign-price strong,
-    .campaign-price span {
-        font-size: var(--fs-xxs);
-    }
-
-    .progress {
-        height: 6px;
-    }
-
-    .campaign-meta {
-        gap: var(--space-2, 8px);
-        font-size: var(--fs-xxs);
-    }
-
-    .campaign-meta span:first-child {
-        max-width: 90px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-
-    /* New campaign */
-
-    .new-grid {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: var(--space-4, 16px);
-        overflow-x: auto;
-        overflow-y: hidden;
-        margin-right: calc(var(--space-4, 16px) * -1);
-        padding-bottom: var(--space-4, 16px);
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .new-grid::-webkit-scrollbar {
-        display: none;
-    }
-
-    .new-item {
-        flex: 0 0 82%;
-        max-width: 82%;
-        scroll-snap-align: start;
-    }
-
-    .new-item-overlay {
-        padding: var(--space-3, 12px);
-        background: linear-gradient(
-            180deg,
-            transparent 45%,
-            rgba(0, 0, 0, .72) 100%
-        );
-        opacity: 1;
-    }
-
-    .new-item-overlay h3 {
-        margin-bottom: 0;
-        font-size: var(--fs-xxs);
-        -webkit-line-clamp: 1;
-    }
-
-    .new-item-overlay p,
-    .new-item-price,
-    .new-item-meta {
-        display: none;
-    }
-
-    .new-item .progress {
-        height: 4px;
-        margin-top: var(--space-1, 4px);
-        margin-bottom: 0;
-    }
-
-    /* Testimonial */
-
-    .testimonial-wrapper {
-        min-height: 320px;
-    }
-
-    .testimonial-card {
-        padding: var(--space-6, 24px) var(--space-5, 20px);
-    }
-
-    .testimonial-quote-icon {
-        margin-bottom: var(--space-1, 4px);
-        font-size: 38px;
-    }
-
-    .testimonial-description {
-        margin-bottom: var(--space-5, 20px);
-        font-size: var(--fs-xs);
-    }
-
-    .testimonial-divider {
-        margin-bottom: var(--space-4, 16px);
-    }
-
-    .testimonial-avatar {
-        width: 44px;
-        height: 44px;
-    }
-
-    .testimonial-item.is-prev {
-        transform: translate(calc(-50% - 160px), -50%) scale(.7);
-        opacity: .2;
-    }
-
-    .testimonial-item.is-next {
-        transform: translate(calc(-50% + 160px), -50%) scale(.7);
-        opacity: .2;
-    }
-
-    /* List campaign */
-
-    .list-campaign {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        gap: var(--space-3, 12px);
-        overflow-x: auto;
-        overflow-y: hidden;
-        margin-right: calc(var(--space-4, 16px) * -1);
-        padding-bottom: var(--space-4, 16px);
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .list-campaign::-webkit-scrollbar {
-        display: none;
+    .campaign-card .campaign-meta .list-cta {
+        font-size: 9px;
     }
 
     .list-card {
-        display: block;
-        flex: 0 0 calc((100% - var(--space-3, 12px)) / 2);
-        max-width: calc((100% - var(--space-3, 12px)) / 2);
-        padding: var(--space-3, 12px);
-        border-radius: var(--radius-md);
-        scroll-snap-align: start;
+        gap: var(--space-2);
+        padding: 10px;
     }
 
-    .list-card img {
-        width: 100%;
-        aspect-ratio: 16 / 10;
-        border-radius: var(--radius-md);
+    .list-thumb {
+        flex-basis: 31%;
+        width: 31%;
     }
 
     .list-body {
-        padding: var(--space-3, 12px) 0 0;
+        gap: 5px;
     }
 
     .list-body h3 {
-        display: -webkit-box;
-        overflow: hidden;
-        font-size: var(--fs-xxs);
-        line-height: 1.4;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
+        font-size: 11px;
     }
 
-    .list-body p {
-        overflow: hidden;
-        font-size: var(--fs-xxs);
-        white-space: nowrap;
-        text-overflow: ellipsis;
+    .list-card .list-amount strong {
+        font-size: 11px;
     }
 
-    .list-body strong {
-        margin-top: var(--space-2, 8px);
-        font-size: var(--fs-xxs);
+    .list-card .campaign-meta {
+        font-size: 9px;
+    }
+
+    .list-card .list-cta {
+        font-size: 9px;
+    }
+
+    .testimonial-wrapper {
+        --offset: 125px;
+        min-height: 300px;
+    }
+}
+
+
+/* =========================================================
+   10B. MOBILE SANGAT KECIL
+   ≤ 360px
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .main .container {
+        padding-inline: 12px;
+    }
+
+    .main .section {
+        padding-block: var(--space-6);
+    }
+
+    .category-grid {
+        gap: var(--space-4) var(--space-2);
+    }
+
+    .category-icon,
+    .category-icon img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .category-item p {
+        font-size: 11px;
+    }
+
+    .campaign-grid {
+        gap: var(--space-2);
+    }
+
+    .campaign-card .campaign-body {
+        padding: 8px;
+        gap: 5px;
+    }
+
+    .campaign-card .campaign-body h3 {
+        font-size: 10px;
+    }
+
+    .campaign-card .list-org-avatar {
+        width: 17px;
+        height: 17px;
+        font-size: 9px;
+    }
+
+    .campaign-card .list-org-name {
+        font-size: 9px;
+    }
+
+    .campaign-card .campaign-price strong {
+        font-size: 10px;
+    }
+
+    .campaign-card .campaign-meta {
+        font-size: 8px;
+    }
+
+    .campaign-card .campaign-meta .list-cta {
+        font-size: 8px;
+    }
+
+    .list-card {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .list-thumb {
+        flex-basis: 29%;
+        width: 29%;
+    }
+
+    .list-body h3 {
+        font-size: 10px;
+    }
+
+    .list-card .list-org-name {
+        font-size: 9px;
+    }
+
+    .list-card .list-amount strong {
+        font-size: 10px;
+    }
+
+    .list-card .campaign-meta {
+        font-size: 8px;
+    }
+
+    .list-card .list-cta {
+        font-size: 8px;
+    }
+
+    .testimonial-wrapper {
+        --offset: 105px;
+        min-height: 280px;
+    }
+}
+
+
+/* =========================================================
+   11. AKSESIBILITAS
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .hero-slide,
+    .hero-side-card,
+    .campaign-card,
+    .list-card,
+    .list-thumb img,
+    .list-cta i,
+    .new-item img,
+    .new-item-overlay,
+    .testimonial-item,
+    .testimonial-card,
+    .donasi-filter-selects,
+    .donasi-filter-selects select,
+    .donasi-filter-chip,
+    .donasi-reset-filter {
+        transition: none !important;
+    }
+
+    .campaign-card:hover,
+    .list-card:hover,
+    .list-card:hover .list-thumb img,
+    .campaign-card:hover .list-cta i,
+    .list-card:hover .list-cta i,
+    .new-item:hover img {
+        transform: none !important;
+    }
+
+    .campaign-grid,
+    .new-grid,
+    .list-campaign {
+        scroll-behavior: auto;
     }
 }
