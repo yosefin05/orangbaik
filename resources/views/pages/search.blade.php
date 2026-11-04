@@ -33,7 +33,7 @@
                 'empty' => 'Tidak ada campaign yang cocok dengan kata kunci tersebut.',
             ],
         ];
-
+ 
         $jenisCari = match ($type) {
             'berita' => 'berita',
             'campaign' => 'campaign',

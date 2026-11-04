@@ -34,6 +34,7 @@
         $punyaNomorHalaman = is_object($beritas) && method_exists($beritas, 'lastPage');
     @endphp
 
+    {{-- HEADER UTAMA --}}
     @include('components.header')
 
     <main class="berita-page page-wrapper">
@@ -58,7 +59,8 @@
 
                 </div>
 
-                {{-- DAFTAR BERITA --}}
+
+                {{-- DAFTAR BERITA GRID --}}
                 <div class="berita-grid">
 
                     @forelse ($beritas as $berita)
@@ -66,9 +68,11 @@
                         @php
                             $penerbit = $berita->penggalangDana;
 
-                            $namaPenerbit = $penerbit?->nama_penggalang ?? 'OrangBaik.id';
+                            $namaPenerbit = $penerbit?->nama_penggalang ?? 'Orang Baik';
 
-                            $inisialPenerbit = mb_strtoupper(mb_substr($namaPenerbit, 0, 1));
+                            $inisialPenerbit = mb_strtoupper(
+                                mb_substr($namaPenerbit, 0, 1)
+                            );
 
                             $fotoPenerbit = $penerbit?->foto_profil
                                 ? asset('storage/' . $penerbit->foto_profil)
@@ -136,6 +140,7 @@
 
                 </div>
 
+
                 {{-- PAGINATION --}}
                 @if ($punyaNomorHalaman && $beritas->hasPages())
 
@@ -201,18 +206,25 @@
 
     </main>
 
+
     {{-- FLOATING WHATSAPP BUTTON --}}
     @if (env('ENABLE_WA_FLOATING', true))
+
         <div class="floating-wa-container">
             <a href="https://wa.me/{{ env('WHATSAPP_NUMBER', '6281385002300') }}?text={{ urlencode(env('WHATSAPP_MESSAGE', 'Halo tim OrangBaik.id, saya mau bertanya mengenai...')) }}"
                 target="_blank" rel="noopener noreferrer" class="floating-wa-btn" aria-label="Hubungi Customer Service via WhatsApp">
+
                 <div class="wa-icon-wrapper">
                     <i class="bi bi-whatsapp"></i>
                 </div>
+
                 <span class="wa-tooltip">Hubungi CS</span>
+
             </a>
         </div>
+
     @endif
+
 
     @include('components.footer')
 

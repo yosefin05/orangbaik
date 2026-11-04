@@ -1,9 +1,14 @@
+
 /* ============================================================
    BERITA.CSS
    Halaman Berita OrangBaik.id
-   - Desktop / tablet : card (4 → 3 → 2 kolom)
-   - Mobile (≤ 600px) : list tanpa card, dipisahkan garis tipis
-   Memakai token dari global.css, senada dengan home.css.
+
+   Desktop       : 4 kolom
+   Tablet        : 3 → 2 kolom
+   Mobile ≤600px : horizontal list tanpa card
+   Thumbnail     : selalu 16:9
+
+   Menggunakan token dari global.css
    ============================================================ */
 
 
@@ -11,14 +16,11 @@
    PAGE & HEADER
    ============================================================ */
 
-.berita-page {
+/* Wrapper halaman, bukan tombol pagination */
+.berita-page:not(a) {
     min-height: 100vh;
     overflow-x: hidden;
     background: var(--bg-soft);
-}
-
-.berita-section {
-    padding: var(--space-10) 0 var(--section-space);
 }
 
 .berita-header {
@@ -46,7 +48,7 @@
     line-height: 1.5;
 }
 
-/* tombol tambah berita (admin / penggalang) */
+/* Tombol tambah berita */
 .berita-add {
     display: inline-flex;
     height: 40px;
@@ -86,12 +88,7 @@
 
 
 /* ============================================================
-   CARD (seluruh card bisa diklik)
-   Susunan isi:
-   thumbnail 16:9
-   judul
-   penerbit (avatar + nama)
-   footer: tanggal (kiri) • label "Berita" (kanan)
+   CARD
    ============================================================ */
 
 .berita-card {
@@ -99,13 +96,18 @@
     min-width: 0;
     flex-direction: column;
     overflow: hidden;
+
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg);
     box-shadow: var(--shadow-card);
+
     color: inherit;
     text-decoration: none;
-    transition: transform .2s ease, box-shadow .2s ease;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
 }
 
 .berita-card:hover {
@@ -118,10 +120,12 @@
     outline-offset: 3px;
 }
 
-/* thumbnail — selalu 16:9 */
+
+/* Thumbnail — selalu 16:9 */
 .berita-thumb {
-    flex-shrink: 0;
+    width: 100%;
     aspect-ratio: 16 / 9;
+    flex-shrink: 0;
     overflow: hidden;
     background: var(--bg-soft);
 }
@@ -139,13 +143,14 @@
     transform: scale(1.05);
 }
 
-/* isi */
+
+/* Isi card */
 .berita-body {
     display: flex;
     flex: 1;
+    min-width: 0;
     flex-direction: column;
     gap: var(--space-3);
-    min-width: 0;
     padding: var(--space-4);
 }
 
@@ -154,12 +159,15 @@
     min-height: 2.8em;
     margin: 0;
     overflow: hidden;
+
     color: var(--text-dark);
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     line-height: 1.4;
+
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+
     transition: color .2s ease;
 }
 
@@ -167,13 +175,18 @@
     color: var(--primary);
 }
 
-/* penerbit */
+
+/* ============================================================
+   PUBLISHER
+   ============================================================ */
+
 .berita-publisher {
     display: flex;
     align-items: center;
     gap: var(--space-2);
     min-width: 0;
     margin: 0;
+
     color: var(--text);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-medium);
@@ -188,16 +201,18 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+
     border-radius: var(--radius-full);
     background: var(--primary-light);
     box-shadow: 0 0 0 1px var(--border-soft);
+
     color: var(--primary);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
     line-height: 1;
 }
 
-/* foto menutupi inisial; jika gagal dimuat, inisial tetap terlihat */
+/* Foto menutupi inisial */
 .berita-publisher-avatar img {
     position: absolute;
     inset: 0;
@@ -214,7 +229,11 @@
     white-space: nowrap;
 }
 
-/* tanggal + label */
+
+/* ============================================================
+   FOOTER CARD
+   ============================================================ */
+
 .berita-footer {
     display: flex;
     align-items: center;
@@ -222,6 +241,7 @@
     gap: var(--space-2);
     margin-top: auto;
     padding-top: var(--space-3);
+
     border-top: 1px dashed var(--border);
     color: var(--muted);
     font-size: var(--fs-xxs);
@@ -258,6 +278,7 @@
     justify-content: center;
     gap: var(--space-3);
     padding: var(--space-10) var(--space-8);
+
     border: 1px dashed var(--border);
     border-radius: var(--radius);
     background: var(--bg-soft);
@@ -269,9 +290,11 @@
     width: 52px;
     height: 52px;
     place-items: center;
+
     border-radius: var(--radius-full);
     background: var(--bg);
     box-shadow: var(--shadow-soft);
+
     color: var(--muted-light);
     font-size: var(--fs-md);
 }
@@ -297,7 +320,8 @@
     margin-top: var(--space-10);
 }
 
-.berita-page {
+/* Tombol pagination */
+.berita-pagination .berita-page {
     display: inline-flex;
     min-width: 40px;
     height: 40px;
@@ -305,28 +329,34 @@
     justify-content: center;
     gap: 6px;
     padding: 0 var(--space-3);
+
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg);
+
     color: var(--text);
     font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
     text-decoration: none;
-    transition: background .2s ease, border-color .2s ease, color .2s ease;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease;
 }
 
-a.berita-page:hover {
+.berita-pagination a.berita-page:hover {
     border-color: var(--primary);
     background: var(--primary-light);
     color: var(--primary);
 }
 
-a.berita-page:focus-visible {
+.berita-pagination a.berita-page:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
 
-.berita-page.is-active {
+.berita-pagination .berita-page.is-active {
     border-color: var(--primary);
     background: var(--primary);
     color: var(--bg);
@@ -338,7 +368,7 @@ a.berita-page:focus-visible {
     color: var(--muted);
 }
 
-/* cadangan: jika paginator bukan LengthAwarePaginator, memakai ->links() */
+/* Pagination fallback Laravel */
 .berita-pagination-fallback {
     display: flex;
     justify-content: center;
@@ -362,11 +392,10 @@ a.berita-page:focus-visible {
 
 
 /* ============================================================
-   RESPONSIVE — TABLET (≤ 1024px)
+   TABLET — ≤1024px
    ============================================================ */
 
 @media (max-width: 1024px) {
-
     .berita-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: var(--space-5);
@@ -375,15 +404,10 @@ a.berita-page:focus-visible {
 
 
 /* ============================================================
-   RESPONSIVE — TABLET KECIL (≤ 768px)
+   TABLET KECIL — ≤768px
    ============================================================ */
 
 @media (max-width: 768px) {
-
-    .berita-section {
-        padding: var(--space-8) 0 var(--section-space-sm);
-    }
-
     .berita-heading h1 {
         font-size: var(--fs-md);
     }
@@ -400,16 +424,11 @@ a.berita-page:focus-visible {
 
 
 /* ============================================================
-   RESPONSIVE — MOBILE (≤ 600px)
+   MOBILE — ≤600px
    List tanpa card, dipisahkan garis tipis
    ============================================================ */
 
 @media (max-width: 600px) {
-
-    .berita-section {
-        padding: var(--space-6) 0 var(--space-10);
-    }
-
     .berita-header {
         margin-bottom: var(--space-5);
     }
@@ -420,13 +439,13 @@ a.berita-page:focus-visible {
         gap: 0;
     }
 
-    /* baris: thumbnail 16:9 di kiri, teks di kanan */
     .berita-card {
         flex-direction: row;
         align-items: center;
         gap: var(--space-3);
         padding: var(--space-4) 0;
         overflow: visible;
+
         border: 0;
         border-bottom: 1px solid var(--border-soft);
         border-radius: 0;
@@ -448,12 +467,17 @@ a.berita-page:focus-visible {
         box-shadow: none;
     }
 
+    /* Thumbnail tetap 16:9 */
     .berita-thumb {
+        width: auto;
         flex: 0 0 42%;
+        aspect-ratio: 16 / 9;
         border-radius: var(--radius-md);
     }
 
     .berita-body {
+        flex: 1;
+        min-width: 0;
         gap: var(--space-2);
         justify-content: center;
         padding: 0;
@@ -475,7 +499,6 @@ a.berita-page:focus-visible {
         border-top: 0;
     }
 
-    /* ruang sempit: tanggal & label tanpa ikon */
     .berita-date i,
     .berita-tag i {
         display: none;
@@ -486,13 +509,12 @@ a.berita-page:focus-visible {
         padding: var(--space-8) var(--space-4);
     }
 
-    /* pagination: ikon saja untuk sebelumnya / berikutnya */
     .berita-pagination {
         gap: 6px;
         margin-top: var(--space-8);
     }
 
-    .berita-page {
+    .berita-pagination .berita-page {
         min-width: 36px;
         height: 36px;
         padding: 0 var(--space-2);
@@ -505,11 +527,10 @@ a.berita-page:focus-visible {
 
 
 /* ============================================================
-   RESPONSIVE — MOBILE KECIL (≤ 360px)
+   MOBILE KECIL — ≤360px
    ============================================================ */
 
 @media (max-width: 360px) {
-
     .berita-card {
         gap: var(--space-2);
     }
@@ -520,8 +541,11 @@ a.berita-page:focus-visible {
 }
 
 
-@media (prefers-reduced-motion: reduce) {
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
 
+@media (prefers-reduced-motion: reduce) {
     .berita-add,
     .berita-card,
     .berita-thumb img,
