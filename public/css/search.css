@@ -895,15 +895,6 @@
    Header kategori + jumlah hasil + pembungkus
 ============================================================ */
 
-.search-result-section {
-    width: 100%;
-    padding: var(--space-6);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg);
-    box-shadow: var(--shadow-card);
-}
-
 /* HEADER KATEGORI */
 
 .search-section-heading {
