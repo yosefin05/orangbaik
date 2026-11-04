@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -10,133 +11,278 @@
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/search.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
 
     @php
-        // Hanya untuk tampilan: dua kelompok hasil memakai markup card yang sama
+        /*
+        |--------------------------------------------------------------------------
+        | 1. JENIS PENCARIAN
+        |--------------------------------------------------------------------------
+        | Landing dan donasi : campaign
+        | Halaman berita     : berita
+        */
+
+        $type = request()->query('type', $type ?? 'campaign');
+
+        if (!in_array($type, ['campaign', 'berita'], true)) {
+            $type = 'campaign';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. FILTER CAMPAIGN KADALUWARSA
+        |--------------------------------------------------------------------------
+        | Campaign tanpa tanggal selesai tetap ditampilkan.
+        | Campaign yang sudah melewati tanggal selesai disembunyikan.
+        */
+
+        if ($type === 'campaign') {
+            $campaigns = $campaigns->filter(function ($campaign) {
+                if (!$campaign->tanggal_selesai) {
+                    return true;
+                }
+
+                return \Illuminate\Support\Carbon::parse(
+                    $campaign->tanggal_selesai
+                )->endOfDay()->isFuture();
+
+            })->values();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. DATA HASIL PENCARIAN
+        |--------------------------------------------------------------------------
+        */
+
         $sections = [
             'berita' => [
                 'label' => 'Berita',
                 'icon' => 'bi-newspaper',
-                'route' => 'berita.show',
                 'items' => $berita,
+                'empty_title' => 'Berita belum ditemukan',
                 'empty' => 'Tidak ada berita yang cocok dengan kata kunci tersebut.',
             ],
+
             'campaign' => [
                 'label' => 'Campaign',
                 'icon' => 'bi-heart',
-                'route' => 'campaign.show',
                 'items' => $campaigns,
-                'empty' => 'Tidak ada campaign yang cocok dengan kata kunci tersebut.',
+                'empty_title' => 'Campaign belum ditemukan',
+                'empty' => 'Tidak ada campaign aktif yang cocok dengan kata kunci tersebut.',
             ],
         ];
- 
-        $jenisCari = match ($type) {
-            'berita' => 'berita',
-            'campaign' => 'campaign',
-            default => 'campaign atau berita',
-        };
+
+        $section = $sections[$type];
+
+        $jenisCari = $type === 'berita' ? 'berita' : 'campaign';
     @endphp
 
+    {{-- HEADER --}}
     @include('components.header')
 
     <main class="page-wrapper">
+
         <section class="search-section">
+
             <div class="container">
 
                 @if ($keyword !== '')
 
-                    @foreach ($sections as $key => $section)
+                    <section class="search-result-section">
 
-                        {{-- tampilkan semua kelompok, atau hanya yang dipilih lewat $type --}}
-                        @if (! in_array($type, ['berita', 'campaign']) || $type === $key)
+                        {{-- HEADER HASIL PENCARIAN --}}
+                        <div class="search-section-heading">
 
-                            <section class="search-result-section">
+                            <h2 class="search-subtitle">
+                                {{ $section['label'] }}
+                            </h2>
 
-                                <div class="search-section-heading">
-                                    <h2 class="search-subtitle">{{ $section['label'] }}</h2>
-                                    <span class="search-count">{{ $section['items']->count() }}</span>
-                                </div>
+                            <span class="search-count">
+                                {{ $section['items']->count() }}
+                            </span>
 
-                                @if ($section['items']->isNotEmpty())
+                        </div>
 
-                                    <div class="search-list">
-                                        @foreach ($section['items'] as $item)
-                                            @php
-                                                $publisher = $key === 'berita'
-                                                    ? 'OrangBaik.id'
-                                                    : ($item->penggalangDana?->nama_penggalang ?? 'OrangBaik');
-                                            @endphp
+                        {{-- HASIL PENCARIAN --}}
+                        @if ($section['items']->isNotEmpty())
 
-                                            <a href="{{ route($section['route'], $item->custom_slug ?? $item->slug) }}"
-                                                class="search-card">
+                            <div class="search-list {{ $type === 'berita' ? 'search-news-list' : 'search-campaign-list' }}">
 
-                                                <div class="search-card-image">
-                                                    <img src="{{ asset('storage/' . $item->thumbnail) }}"
-                                                        alt="{{ $item->judul }}" loading="lazy">
+                                @foreach ($section['items'] as $item)
 
-                                                    <span class="search-card-badge">
-                                                        <i class="bi {{ $section['icon'] }}"></i>
-                                                        {{ $section['label'] }}
+                                    @if ($type === 'campaign')
+
+                                        {{-- ==================================================
+                                             CAMPAIGN CARD
+                                             Tetap menggunakan komponen utama
+                                        ================================================== --}}
+
+                                        <x-campaign-card
+                                            :campaign="$item"
+                                            variant="list"
+                                        />
+
+                                    @else
+
+                                        {{-- ==================================================
+                                             BERITA CARD
+                                             Mengikuti desain halaman Berita
+                                        ================================================== --}}
+
+                                        @php
+                                            $penerbit = $item->penggalangDana;
+
+                                            $namaPenerbit = $penerbit?->nama_penggalang
+                                                ?? 'Orang Baik';
+
+                                            $inisialPenerbit = mb_strtoupper(
+                                                mb_substr($namaPenerbit, 0, 1)
+                                            );
+
+                                            $fotoPenerbit = $penerbit?->foto_profil
+                                                ? asset('storage/' . $penerbit->foto_profil)
+                                                : ($penerbit ? null : asset('assets/logo.png'));
+                                        @endphp
+
+                                        <a
+                                            href="{{ route('berita.show', $item->custom_slug ?? $item->slug) }}"
+                                            class="search-card search-news-card"
+                                        >
+
+                                            {{-- THUMBNAIL --}}
+                                            <div class="search-card-thumb">
+
+                                                <img
+                                                    src="{{ asset('storage/' . $item->thumbnail) }}"
+                                                    alt="{{ $item->judul }}"
+                                                    loading="lazy"
+                                                >
+
+                                            </div>
+
+                                            {{-- CARD BODY --}}
+                                            <div class="search-card-body">
+
+                                                {{-- JUDUL --}}
+                                                <h3 class="search-card-title">
+                                                    {{ $item->judul }}
+                                                </h3>
+
+                                                {{-- PUBLISHER --}}
+                                                <div
+                                                    class="search-card-publisher"
+                                                    title="{{ $namaPenerbit }}"
+                                                >
+
+                                                    <span class="search-card-publisher-avatar">
+
+                                                        {{ $inisialPenerbit }}
+
+                                                        @if ($fotoPenerbit)
+                                                            <img
+                                                                src="{{ $fotoPenerbit }}"
+                                                                alt=""
+                                                                loading="lazy"
+                                                                onerror="this.remove()"
+                                                            >
+                                                        @endif
+
                                                     </span>
+
+                                                    <span class="search-card-publisher-name">
+                                                        {{ $namaPenerbit }}
+                                                    </span>
+
                                                 </div>
 
-                                                <div class="search-card-body">
-                                                    <h3 class="search-card-title">{{ $item->judul }}</h3>
+                                                {{-- FOOTER --}}
+                                                <div class="search-card-footer">
 
-                                                    <p class="search-card-publisher">
-                                                        <span class="search-card-avatar">{{ mb_strtoupper(mb_substr($publisher, 0, 1)) }}</span>
-                                                        <span class="search-card-publisher-name">{{ $publisher }}</span>
-                                                    </p>
+                                                    <time
+                                                        class="search-card-date"
+                                                        datetime="{{ optional($item->created_at)->toDateString() }}"
+                                                    >
+                                                        <i class="bi bi-calendar3"></i>
 
-                                                    <div class="search-card-footer">
-                                                        <span class="search-card-date">
-                                                            <i class="bi bi-calendar3"></i>
-                                                            {{ $item->created_at->translatedFormat('d F Y') }}
-                                                        </span>
-                                                        <i class="bi bi-arrow-right search-card-arrow"></i>
-                                                    </div>
+                                                        {{ optional($item->created_at)->translatedFormat('d M Y') }}
+                                                    </time>
+
+                                                    <span class="search-card-tag">
+                                                        <i class="bi bi-newspaper"></i>
+                                                        Berita
+                                                    </span>
+
                                                 </div>
-                                            </a>
-                                        @endforeach
-                                    </div>
 
-                                @else
+                                            </div>
 
-                                    <div class="search-empty">
-                                        <i class="bi {{ $section['icon'] }}"></i>
-                                        <p>{{ $section['empty'] }}</p>
-                                    </div>
+                                        </a>
 
-                                @endif
+                                    @endif
 
-                            </section>
+                                @endforeach
+
+                            </div>
+
+                        @else
+
+                            {{-- EMPTY STATE --}}
+                            <div class="search-empty {{ $type === 'berita' ? 'search-news-empty' : '' }}">
+
+                                <i class="bi {{ $section['icon'] }}"></i>
+
+                                <h3>
+                                    {{ $section['empty_title'] }}
+                                </h3>
+
+                                <p>
+                                    {{ $section['empty'] }}
+                                </p>
+
+                                <span>
+                                    Coba gunakan kata kunci yang berbeda.
+                                </span>
+
+                            </div>
 
                         @endif
 
-                    @endforeach
+                    </section>
 
                 @else
 
+                    {{-- BELUM ADA KATA KUNCI --}}
                     <div class="search-placeholder">
+
                         <i class="bi bi-search"></i>
+
                         <h2>Temukan yang kamu cari</h2>
-                        <p>Masukkan kata kunci untuk mencari {{ $jenisCari }}.</p>
+
+                        <p>
+                            Masukkan kata kunci untuk mencari {{ $jenisCari }}.
+                        </p>
+
                     </div>
 
                 @endif
 
             </div>
+
         </section>
+
     </main>
 
+    {{-- FOOTER --}}
     @include('components.footer')
 
     <script src="{{ asset('js/header.js') }}"></script>
 
 </body>
-
 </html>

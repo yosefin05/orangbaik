@@ -1,25 +1,28 @@
 @php
+    // Deteksi halaman asal
     $isLandingPage = request()->is('/');
-    $isDonationPage = request()->is('donasi');
-    $isNewsPage = request()->is('berita');
+    $isDonationPage = request()->is('donasi', 'donasi/*');
+    $isNewsPage = request()->is('berita', 'berita/*');
 
-    // Header search hanya pada tiga halaman ini.
+    // Header search hanya pada tiga halaman utama
     $showMobileSearch = $isLandingPage
         || $isDonationPage
         || $isNewsPage;
 
-    // Jenis pencarian mobile.
-    $mobileSearchType = $isNewsPage ? 'berita' : 'campaign';
+    // Jenis pencarian berdasarkan halaman asal
+    $searchType = $isNewsPage ? 'berita' : 'campaign';
+
+    $mobileSearchType = $searchType;
 
     $mobileSearchPlaceholder = $isNewsPage
         ? 'Cari berita...'
         : 'Cari program donasi...';
 
-    // Halaman yang menggunakan bottom navigation.
+    // Halaman yang menggunakan bottom navigation
     $showBottomNav = $isLandingPage
-        || request()->is('donasi*')
-        || request()->is('berita*')
-        || request()->is('kalkulator*')
+        || request()->is('donasi/*')
+        || request()->is('berita/*')
+        || request()->is('kalkulator/*')
         || request()->routeIs('profile.user');
 
     $showMobileBack = !$showBottomNav;
@@ -67,7 +70,7 @@
 
         <div class="header-actions">
 
-            {{-- Desktop search tetap mencari campaign + berita --}}
+            {{-- Desktop search --}}
             <form
                 action="{{ route('search') }}"
                 method="GET"
@@ -76,9 +79,15 @@
                 <input
                     type="text"
                     name="q"
-                    placeholder="Cari campaign..."
+                    placeholder="{{ $isNewsPage ? 'Cari berita...' : 'Cari campaign...' }}"
                     value="{{ request('q') }}"
-                    aria-label="Cari campaign atau berita"
+                    aria-label="Cari"
+                >
+
+                <input
+                    type="hidden"
+                    name="type"
+                    value="{{ $searchType }}"
                 >
 
                 <button type="submit" aria-label="Cari">

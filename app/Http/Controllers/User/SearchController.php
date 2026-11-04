@@ -19,14 +19,14 @@ class SearchController extends Controller
         |--------------------------------------------------------------------------
         | campaign = hanya campaign
         | berita   = hanya berita
-        | null     = campaign dan berita
+        | default  = campaign (landing dan donasi)
         */
 
         $requestedType = $request->input('type');
 
         $type = in_array($requestedType, ['campaign', 'berita'], true)
             ? $requestedType
-            : null;
+            : 'campaign';
 
         $campaigns = collect();
         $berita = collect();
@@ -39,7 +39,7 @@ class SearchController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            if ($type !== 'berita') {
+            if ($type === 'campaign') {
 
                 $settlementDonasi = function ($query) {
                     $query->whereHas('pembayaran', function ($paymentQuery) {
@@ -65,11 +65,21 @@ class SearchController extends Controller
                         $query->where('campaign_type', 'regular')
                             ->orWhere('approval_status', 'approved');
                     })
+
+                    // Jangan tampilkan campaign yang sudah melewati tanggal berakhir.
+                    ->where(function ($query) {
+                        $query->whereNull('tanggal_berakhir')
+                            ->orWhereDate(
+                                'tanggal_berakhir',
+                                '>=',
+                                now()->toDateString()
+                            );
+                    })
+
                     ->where('judul', 'LIKE', '%' . $keyword . '%')
                     ->latest()
                     ->get();
             }
-
 
             /*
             |--------------------------------------------------------------------------
@@ -77,7 +87,7 @@ class SearchController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            if ($type !== 'campaign') {
+            if ($type === 'berita') {
 
                 $berita = Berita::where(
                     'judul',

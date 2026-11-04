@@ -1,9 +1,11 @@
+
 /* ============================================================
    SEARCH.CSS
    Halaman Pencarian OrangBaik.id
-   - Desktop / tablet : card (4 → 3 → 2 kolom)
-   - Mobile (≤ 600px) : list tanpa card, dipisahkan garis tipis
-   Memakai token dari global.css, senada dengan home.css.
+
+   Card mengikuti campaign-card.is-list dari home.css.
+   Thumbnail selalu 16:9.
+   Isi: judul, penerbit, tanggal terbit.
    ============================================================ */
 
 
@@ -52,36 +54,43 @@
 
 
 /* ============================================================
-   GRID
+   LIST
    ============================================================ */
 
 .search-list {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
 }
 
 
 /* ============================================================
-   CARD (seluruh card bisa diklik)
+   SEARCH CARD
+   Mengikuti campaign-card.is-list dari home.css.
    ============================================================ */
 
 .search-card {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: stretch;
     min-width: 0;
+    width: 100%;
+    gap: var(--space-4);
+
     overflow: hidden;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg);
     box-shadow: var(--shadow-card);
+
     color: inherit;
     text-decoration: none;
+
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .search-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow);
 }
 
@@ -90,47 +99,73 @@
     outline-offset: 3px;
 }
 
-/* gambar — selalu 16:9 */
-.search-card-image {
+
+/* ============================================================
+   THUMBNAIL
+   Rasio selalu 16:9.
+   ============================================================ */
+
+.search-card-thumb {
     position: relative;
-    flex-shrink: 0;
+    flex: 0 0 240px;
+    width: 240px;
+    min-width: 0;
     aspect-ratio: 16 / 9;
+    align-self: center;
+
     overflow: hidden;
+    border-radius: var(--radius-md);
     background: var(--bg-soft);
 }
 
-.search-card-image img {
+.search-card-thumb img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: transform .4s ease;
 }
 
-.search-card:hover .search-card-image img {
-    transform: scale(1.05);
+.search-card:hover .search-card-thumb img {
+    transform: scale(1.04);
 }
 
-/* isi */
+
+/* ============================================================
+   BODY
+   ============================================================ */
+
 .search-card-body {
     display: flex;
     flex: 1;
-    flex-direction: column;
     min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-2);
+
     padding: var(--space-4);
 }
 
+
+/* ============================================================
+   TITLE
+   ============================================================ */
+
 .search-card-title {
     display: -webkit-box;
-    height: 2.8em;
-    margin: 0 0 var(--space-3);
+    min-width: 0;
+    margin: 0;
+
     overflow: hidden;
     color: var(--text-dark);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
     line-height: 1.4;
+
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+
     transition: color .2s ease;
 }
 
@@ -138,46 +173,42 @@
     color: var(--primary);
 }
 
-.search-card-publisher {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    min-width: 0;
-    margin: 0 0 var(--space-3);
-    color: var(--muted);
-    font-size: var(--fs-xxs);
-}
 
-.search-card-avatar {
-    display: inline-flex;
-    width: 22px;
-    height: 22px;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-full);
-    background: var(--primary-light);
-    color: var(--primary);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
+/* ============================================================
+   PUBLISHER
+   ============================================================ */
+
+.search-card-publisher {
+    display: block;
+    min-width: 0;
+    margin: 0;
+
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
 }
 
 .search-card-publisher-name {
-    min-width: 0;
+    display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* tanggal + panah */
+
+/* ============================================================
+   FOOTER / TANGGAL
+   ============================================================ */
+
 .search-card-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: var(--space-2);
+
     margin-top: auto;
-    padding-top: var(--space-3);
+    padding-top: var(--space-2);
     border-top: 1px dashed var(--border);
+
     color: var(--muted);
     font-size: var(--fs-xxs);
 }
@@ -186,15 +217,6 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-}
-
-.search-card-arrow {
-    color: var(--primary);
-    transition: transform .2s ease;
-}
-
-.search-card:hover .search-card-arrow {
-    transform: translateX(4px);
 }
 
 
@@ -209,6 +231,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-3);
+
     padding: var(--space-8);
     border: 1px dashed var(--border);
     border-radius: var(--radius);
@@ -221,9 +244,11 @@
     width: 52px;
     height: 52px;
     place-items: center;
+
     border-radius: var(--radius-full);
     background: var(--bg);
     box-shadow: var(--shadow-soft);
+
     color: var(--muted-light);
     font-size: var(--fs-md);
 }
@@ -237,7 +262,7 @@
 
 
 /* ============================================================
-   PLACEHOLDER (belum ada kata kunci)
+   PLACEHOLDER
    ============================================================ */
 
 .search-placeholder {
@@ -246,6 +271,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     padding: var(--space-10) var(--space-4);
     text-align: center;
 }
@@ -256,6 +282,7 @@
     height: 72px;
     place-items: center;
     margin-bottom: var(--space-4);
+
     border-radius: var(--radius-full);
     background: var(--primary-light);
     color: var(--primary);
@@ -279,14 +306,43 @@
 
 
 /* ============================================================
+   RESPONSIVE — DESKTOP BESAR
+   ============================================================ */
+
+@media (min-width: 1200px) {
+
+    .search-card-thumb {
+        flex-basis: 320px;
+        width: 320px;
+    }
+
+    .search-card-body {
+        padding: var(--space-5);
+    }
+}
+
+
+/* ============================================================
    RESPONSIVE — TABLET (≤ 1024px)
    ============================================================ */
 
 @media (max-width: 1024px) {
 
+    .search-section {
+        padding: var(--space-6) 0 var(--section-space-sm);
+    }
+
     .search-list {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: var(--space-5);
+        gap: var(--space-4);
+    }
+
+    .search-card-thumb {
+        flex-basis: 240px;
+        width: 240px;
+    }
+
+    .search-card-body {
+        padding: var(--space-4);
     }
 }
 
@@ -297,13 +353,13 @@
 
 @media (max-width: 768px) {
 
-    .search-section {
-        padding: var(--space-6) 0 var(--section-space-sm);
+    .search-card {
+        gap: var(--space-3);
     }
 
-    .search-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: var(--space-4);
+    .search-card-thumb {
+        flex-basis: 200px;
+        width: 200px;
     }
 
     .search-card-body {
@@ -311,14 +367,14 @@
     }
 
     .search-card-title {
-        font-size: var(--fs-xs);
+        font-size: var(--fs-sm);
     }
 }
 
 
 /* ============================================================
    RESPONSIVE — MOBILE (≤ 600px)
-   List tanpa card, dipisahkan garis
+   Tetap horizontal seperti campaign-card.is-list.
    ============================================================ */
 
 @media (max-width: 600px) {
@@ -340,18 +396,16 @@
     }
 
     .search-list {
-        display: flex;
-        flex-direction: column;
         gap: 0;
     }
 
-    /* baris: thumbnail kiri, teks kanan */
     .search-card {
-        flex-direction: row;
         align-items: flex-start;
         gap: var(--space-3);
+
         padding: var(--space-4) 0;
         overflow: visible;
+
         border: 0;
         border-bottom: 1px solid var(--border-soft);
         border-radius: 0;
@@ -373,30 +427,27 @@
         box-shadow: none;
     }
 
-    .search-card-image {
-        flex: 0 0 128px;
+    .search-card-thumb {
+        flex: 0 0 clamp(112px, 35%, 160px);
+        width: auto;
+        aspect-ratio: 16 / 9;
+        align-self: flex-start;
+
         border-radius: var(--radius-md);
     }
 
-    .search-card-badge,
-    .search-card-avatar,
-    .search-card-arrow {
-        display: none;
-    }
-
     .search-card-body {
-        justify-content: center;
+        justify-content: flex-start;
+        gap: var(--space-2);
         padding: 0;
     }
 
     .search-card-title {
-        height: auto;
-        margin-bottom: var(--space-2);
         font-size: var(--fs-xs);
     }
 
     .search-card-publisher {
-        margin-bottom: var(--space-1);
+        font-size: var(--fs-xxs);
     }
 
     .search-card-footer {
@@ -422,24 +473,418 @@
 
 @media (max-width: 360px) {
 
-    .search-card-image {
+    .search-card-thumb {
         flex-basis: 108px;
     }
 }
 
 
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
 @media (prefers-reduced-motion: reduce) {
 
     .search-card,
-    .search-card-image img,
-    .search-card-title,
-    .search-card-arrow {
+    .search-card-thumb img,
+    .search-card-title {
         transition: none;
     }
 
     .search-card:hover,
-    .search-card:hover .search-card-image img,
-    .search-card:hover .search-card-arrow {
+    .search-card:hover .search-card-thumb img {
         transform: none;
     }
+}
+
+
+/* ============================================================
+   SEARCH NEWS CARD
+   Mengikuti desain card halaman Berita OrangBaik.id
+
+   Desktop       : 4 kolom
+   Tablet        : 3 kolom -> 2 kolom
+   Mobile <=600  : horizontal list
+============================================================ */
+
+
+/* ============================================================
+   DESKTOP — 4 KOLOM
+============================================================ */
+
+.search-news-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: var(--space-6);
+}
+
+.search-news-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    box-shadow: var(--shadow-card);
+
+    color: inherit;
+    text-decoration: none;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.search-news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+
+.search-news-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+
+/* THUMBNAIL */
+
+.search-news-card .search-card-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    flex: none;
+    overflow: hidden;
+
+    border-radius: 0;
+    background: var(--bg-soft);
+}
+
+.search-news-card .search-card-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+
+    transition: transform .5s ease;
+}
+
+.search-news-card:hover .search-card-thumb img {
+    transform: scale(1.05);
+}
+
+
+/* CARD BODY */
+
+.search-news-card .search-card-body {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--space-3);
+
+    padding: var(--space-4);
+}
+
+
+/* JUDUL BERITA */
+
+.search-news-card .search-card-title {
+    display: -webkit-box;
+    min-height: 2.8em;
+    margin: 0;
+    overflow: hidden;
+
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.4;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    transition: color .2s ease;
+}
+
+.search-news-card:hover .search-card-title {
+    color: var(--primary);
+}
+
+
+/* PUBLISHER */
+
+.search-news-card .search-card-publisher {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+
+    color: var(--text);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+}
+
+.search-news-card .search-card-publisher-avatar {
+    position: relative;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    box-shadow: 0 0 0 1px var(--border-soft);
+
+    color: var(--primary);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+}
+
+.search-news-card .search-card-publisher-avatar img {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    background: var(--bg);
+}
+
+.search-news-card .search-card-publisher-name {
+    min-width: 0;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* FOOTER CARD */
+
+.search-news-card .search-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+
+    margin-top: auto;
+    padding-top: var(--space-3);
+
+    border-top: 1px dashed var(--border);
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+}
+
+.search-news-card .search-card-date,
+.search-news-card .search-card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.search-news-card .search-card-date i {
+    color: var(--primary);
+}
+
+.search-news-card .search-card-tag {
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+}
+
+
+/* ============================================================
+   TABLET — <=1024px
+   3 KOLOM
+============================================================ */
+
+@media (max-width: 1024px) {
+
+    .search-news-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-5);
+    }
+
+}
+
+
+/* ============================================================
+   TABLET KECIL — <=768px
+   2 KOLOM
+============================================================ */
+
+@media (max-width: 768px) {
+
+    .search-news-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-4);
+    }
+
+    .search-news-card .search-card-body {
+        padding: var(--space-3);
+    }
+
+}
+
+
+/* ============================================================
+   MOBILE — <=600px
+   HORIZONTAL LIST TANPA CARD
+============================================================ */
+
+@media (max-width: 600px) {
+
+    .search-news-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .search-news-card {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-3);
+
+        padding: var(--space-4) 0;
+        overflow: visible;
+
+        border: 0;
+        border-bottom: 1px solid var(--border-soft);
+        border-radius: 0;
+
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .search-news-card:first-child {
+        padding-top: 0;
+    }
+
+    .search-news-card:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+    }
+
+    .search-news-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Thumbnail */
+
+    .search-news-card .search-card-thumb {
+        width: auto;
+        flex: 0 0 42%;
+        aspect-ratio: 16 / 9;
+
+        border-radius: var(--radius-md);
+    }
+
+    .search-news-card .search-card-thumb img {
+        border-radius: var(--radius-md);
+    }
+
+    .search-news-card:hover .search-card-thumb img {
+        transform: none;
+    }
+
+    /* Body */
+
+    .search-news-card .search-card-body {
+        flex: 1;
+        min-width: 0;
+        gap: var(--space-2);
+        justify-content: center;
+
+        padding: 0;
+    }
+
+    /* Judul */
+
+    .search-news-card .search-card-title {
+        min-height: 0;
+        font-size: var(--fs-xs);
+    }
+
+    /* Publisher */
+
+    .search-news-card .search-card-publisher-avatar {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Footer */
+
+    .search-news-card .search-card-footer {
+        margin-top: 0;
+        padding-top: 0;
+
+        border-top: 0;
+    }
+
+    .search-news-card .search-card-date i,
+    .search-news-card .search-card-tag i {
+        display: none;
+    }
+
+    .search-news-card .search-card-footer {
+        font-size: var(--fs-xxs);
+    }
+
+}
+
+
+/* ============================================================
+   MOBILE KECIL — <=360px
+============================================================ */
+
+@media (max-width: 360px) {
+
+    .search-news-card {
+        gap: var(--space-2);
+    }
+
+    .search-news-card .search-card-thumb {
+        flex-basis: 40%;
+    }
+
+}
+
+
+/* ============================================================
+   EMPTY STATE BERITA
+============================================================ */
+
+.search-news-empty {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .search-news-card,
+    .search-news-card .search-card-thumb img,
+    .search-news-card .search-card-title {
+        transition: none;
+    }
+
+    .search-news-card:hover,
+    .search-news-card:hover .search-card-thumb img {
+        transform: none;
+    }
+
 }
