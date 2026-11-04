@@ -1,190 +1,537 @@
+/* ============================================================
+   BERITA.CSS
+   Halaman Berita OrangBaik.id
+   - Desktop / tablet : card (4 → 3 → 2 kolom)
+   - Mobile (≤ 600px) : list tanpa card, dipisahkan garis tipis
+   Memakai token dari global.css, senada dengan home.css.
+   ============================================================ */
+
+
+/* ============================================================
+   PAGE & HEADER
+   ============================================================ */
+
 .berita-page {
-    padding-top: var(--space-16, 64px);
     min-height: 100vh;
     overflow-x: hidden;
     background: var(--bg-soft);
 }
 
-/* SECTION */
-.berita .section {
-        padding-top: var(--space-16, 64px);
-        padding-bottom: var(--space-16, 64px);
-    } 
+.berita-section {
+    padding: var(--space-10) 0 var(--section-space);
+}
 
-/* GRID */
+.berita-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.berita-heading h1 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    line-height: 1.25;
+    letter-spacing: -.02em;
+}
+
+.berita-heading p {
+    margin: var(--space-1) 0 0;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+}
+
+/* tombol tambah berita (admin / penggalang) */
+.berita-add {
+    display: inline-flex;
+    height: 40px;
+    align-items: center;
+    gap: 6px;
+    padding: 0 var(--space-5);
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    box-shadow: var(--shadow-soft);
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    text-decoration: none;
+    transition: background .2s ease, transform .2s ease;
+}
+
+.berita-add:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.berita-add:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+
+/* ============================================================
+   GRID
+   ============================================================ */
+
 .berita-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 26px 28px;
+    gap: var(--space-6);
 }
 
-/* CARD */
+
+/* ============================================================
+   CARD (seluruh card bisa diklik)
+   Susunan isi:
+   thumbnail 16:9
+   judul
+   penerbit (avatar + nama)
+   footer: tanggal (kiri) • label "Berita" (kanan)
+   ============================================================ */
+
 .berita-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
     overflow: hidden;
-    background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
+    background: var(--bg);
     box-shadow: var(--shadow-card);
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease,
-        border-color .2s ease;
+    color: inherit;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .berita-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(51, 101, 175, .25);
     box-shadow: var(--shadow);
 }
 
-.berita-card a {
-    display: block;
-
-    height: 100%;
-
-    color: inherit;
-    text-decoration: none;
+.berita-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
 }
 
-.berita-image {
-    width: 100%;
+/* thumbnail — selalu 16:9 */
+.berita-thumb {
+    flex-shrink: 0;
     aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--bg-soft);
+}
 
+.berita-thumb img {
     display: block;
-
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: center;
+    transition: transform .5s ease;
 }
 
+.berita-card:hover .berita-thumb img {
+    transform: scale(1.05);
+}
+
+/* isi */
 .berita-body {
-    padding: var(--space-4, 14px) var(--space-4, 16px) var(--space-3, 12px);
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-width: 0;
+    padding: var(--space-4);
 }
 
-.berita-body h2 {
-    margin-bottom: var(--space-2, 8px);
-
-    color: var(--text-dark, var(--text));
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    line-height: 1.3;
-
+.berita-title {
     display: -webkit-box;
+    min-height: 2.8em;
+    margin: 0;
     overflow: hidden;
-
-    -webkit-line-clamp: 3;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.4;
     -webkit-box-orient: vertical;
-    line-clamp: 3;
+    -webkit-line-clamp: 2;
+    transition: color .2s ease;
 }
 
-.berita-body p {
-    margin: 0;
+.berita-card:hover .berita-title {
+    color: var(--primary);
+}
 
-    color: var(--muted);
+/* penerbit */
+.berita-publisher {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+    margin: 0;
+    color: var(--text);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-medium);
-    line-height: 1.4;
 }
 
-/* EMPTY */
-.berita-empty {
-    grid-column: 1 / -1;
+.berita-publisher-avatar {
+    position: relative;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    box-shadow: 0 0 0 1px var(--border-soft);
+    color: var(--primary);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+}
 
-    padding: var(--space-8, 32px);
-
-    text-align: center;
-
+/* foto menutupi inisial; jika gagal dimuat, inisial tetap terlihat */
+.berita-publisher-avatar img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     background: var(--bg);
-    border: 1px solid var(--border);
+}
+
+.berita-publisher-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* tanggal + label */
+.berita-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--border);
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+}
+
+.berita-date,
+.berita-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.berita-date i {
+    color: var(--primary);
+}
+
+.berita-tag {
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.berita-empty {
+    display: flex;
+    grid-column: 1 / -1;
+    min-height: 200px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-10) var(--space-8);
+    border: 1px dashed var(--border);
     border-radius: var(--radius);
-    box-shadow: var(--shadow-card);
+    background: var(--bg-soft);
+    text-align: center;
+}
+
+.berita-empty i {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    place-items: center;
+    border-radius: var(--radius-full);
+    background: var(--bg);
+    box-shadow: var(--shadow-soft);
+    color: var(--muted-light);
+    font-size: var(--fs-md);
 }
 
 .berita-empty p {
     margin: 0;
-
     color: var(--muted);
     font-size: var(--fs-sm);
     font-weight: var(--fw-medium);
 }
 
-/* PAGINATION */
-.pagination-wrapper {
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.berita-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-10);
+}
+
+.berita-page {
+    display: inline-flex;
+    min-width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    text-decoration: none;
+    transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+a.berita-page:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+a.berita-page:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.berita-page.is-active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--bg);
+    font-weight: var(--fw-bold);
+}
+
+.berita-page-gap {
+    padding: 0 var(--space-1);
+    color: var(--muted);
+}
+
+/* cadangan: jika paginator bukan LengthAwarePaginator, memakai ->links() */
+.berita-pagination-fallback {
     display: flex;
     justify-content: center;
-
-    margin-top: var(--space-8, 32px);
-}
-
-.pagination-wrapper nav {
-    width: 100%;
-}
-
-.pagination-wrapper p,
-.pagination-wrapper span,
-.pagination-wrapper a {
+    margin-top: var(--space-10);
     font-size: var(--fs-xs);
 }
 
-.pagination-wrapper a {
+.berita-pagination-fallback nav {
+    width: 100%;
+}
+
+.berita-pagination-fallback a {
     color: var(--primary);
     text-decoration: none;
 }
 
-.pagination-wrapper svg {
+.berita-pagination-fallback svg {
     width: 18px;
     height: 18px;
 }
 
-/* TABLET */
-@media (max-width: 1000px) {
-    .berita-section {
-        padding: var(--section-space-sm, 52px) 0;
-    }
+
+/* ============================================================
+   RESPONSIVE — TABLET (≤ 1024px)
+   ============================================================ */
+
+@media (max-width: 1024px) {
 
     .berita-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: var(--space-5, 20px);
+        gap: var(--space-5);
     }
 }
 
-/* MOBILE */
-@media (max-width: 640px) {
+
+/* ============================================================
+   RESPONSIVE — TABLET KECIL (≤ 768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+
     .berita-section {
-        padding: var(--space-7, 28px) 0 var(--space-8, 34px);
+        padding: var(--space-8) 0 var(--section-space-sm);
+    }
+
+    .berita-heading h1 {
+        font-size: var(--fs-md);
     }
 
     .berita-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: var(--space-3, 12px);
+        gap: var(--space-4);
     }
 
+    .berita-body {
+        padding: var(--space-3);
+    }
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE (≤ 600px)
+   List tanpa card, dipisahkan garis tipis
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .berita-section {
+        padding: var(--space-6) 0 var(--space-10);
+    }
+
+    .berita-header {
+        margin-bottom: var(--space-5);
+    }
+
+    .berita-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    /* baris: thumbnail 16:9 di kiri, teks di kanan */
     .berita-card {
-        border-radius: var(--radius-sm);
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-4) 0;
+        overflow: visible;
+        border: 0;
+        border-bottom: 1px solid var(--border-soft);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .berita-card:first-child {
+        padding-top: 0;
+    }
+
+    .berita-card:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
     }
 
     .berita-card:hover {
         transform: none;
+        box-shadow: none;
+    }
+
+    .berita-thumb {
+        flex: 0 0 42%;
+        border-radius: var(--radius-md);
     }
 
     .berita-body {
-        padding: var(--space-2, 10px);
+        gap: var(--space-2);
+        justify-content: center;
+        padding: 0;
     }
 
-    .berita-body h2 {
-        margin-bottom: var(--space-1, 6px);
-
-        font-size: 10px;
-        line-height: 1.35;
-
-        -webkit-line-clamp: 3;
-        line-clamp: 3;
+    .berita-title {
+        min-height: 0;
+        font-size: var(--fs-xs);
     }
 
-    .berita-body p {
-        font-size: 9px;
+    .berita-publisher-avatar {
+        width: 20px;
+        height: 20px;
     }
 
-    .pagination-wrapper {
-        margin-top: var(--space-6, 24px);
+    .berita-footer {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    /* ruang sempit: tanggal & label tanpa ikon */
+    .berita-date i,
+    .berita-tag i {
+        display: none;
+    }
+
+    .berita-empty {
+        min-height: 160px;
+        padding: var(--space-8) var(--space-4);
+    }
+
+    /* pagination: ikon saja untuk sebelumnya / berikutnya */
+    .berita-pagination {
+        gap: 6px;
+        margin-top: var(--space-8);
+    }
+
+    .berita-page {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 var(--space-2);
+    }
+
+    .berita-page-label {
+        display: none;
+    }
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE KECIL (≤ 360px)
+   ============================================================ */
+
+@media (max-width: 360px) {
+
+    .berita-card {
+        gap: var(--space-2);
+    }
+
+    .berita-thumb {
+        flex-basis: 40%;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .berita-add,
+    .berita-card,
+    .berita-thumb img,
+    .berita-title {
+        transition: none;
+    }
+
+    .berita-card:hover,
+    .berita-card:hover .berita-thumb img,
+    .berita-add:hover {
+        transform: none;
     }
 }

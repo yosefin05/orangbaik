@@ -4,126 +4,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil Pencarian - OrangBaik.id</title>
+
+    <title>Pencarian - OrangBaik.id</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/search.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
 
+    @php
+        // Hanya untuk tampilan: dua kelompok hasil memakai markup card yang sama
+        $sections = [
+            'berita' => [
+                'label' => 'Berita',
+                'icon' => 'bi-newspaper',
+                'route' => 'berita.show',
+                'items' => $berita,
+                'empty' => 'Tidak ada berita yang cocok dengan kata kunci tersebut.',
+            ],
+            'campaign' => [
+                'label' => 'Campaign',
+                'icon' => 'bi-heart',
+                'route' => 'campaign.show',
+                'items' => $campaigns,
+                'empty' => 'Tidak ada campaign yang cocok dengan kata kunci tersebut.',
+            ],
+        ];
+
+        $jenisCari = match ($type) {
+            'berita' => 'berita',
+            'campaign' => 'campaign',
+            default => 'campaign atau berita',
+        };
+    @endphp
+
     @include('components.header')
 
     <main class="page-wrapper">
-
         <section class="search-section">
             <div class="container">
-                @if($keyword)
-                    <h2 class="search-title">
-                        Hasil Pencarian untuk "<strong>{{ $keyword }}</strong>"
-                    </h2>
 
-                    {{-- ===================== --}}
-                    {{-- 1. BERITA (Horizontal Scroll) --}}
-                    {{-- ===================== --}}
-                    <div class="search-result-section">
-                        <div class="search-subtitle">
-                            Berita <span>{{ $berita->count() }}</span>
-                        </div>
+                @if ($keyword !== '')
 
-                        @if($berita->count() > 0)
-                            <div class="berita-scroll-wrapper">
-                                <div class="berita-scroll">
-                                    @foreach ($berita as $news)
-                                        <article class="berita-card">
-                                            <a href="{{ route('berita.show', $news->custom_slug ?? $news->slug) }}">
-                                                <img src="{{ asset('storage/' . $news->thumbnail) }}" alt="{{ $news->judul }}"
-                                                    loading="lazy">
-                                                <div class="berita-body">
-                                                    <h4>
-                                                        {!! str_ireplace($keyword, '<strong>' . $keyword . '</strong>', $news->judul) !!}
-                                                    </h4>
-                                                    <p>{{ Str::limit($news->deskripsi ?? '', 80) }}</p>
-                                                    <span class="berita-date">
-                                                        {{ $news->created_at->translatedFormat('d F Y') }}
+                    @foreach ($sections as $key => $section)
+
+                        {{-- tampilkan semua kelompok, atau hanya yang dipilih lewat $type --}}
+                        @if (! in_array($type, ['berita', 'campaign']) || $type === $key)
+
+                            <section class="search-result-section">
+
+                                <div class="search-section-heading">
+                                    <h2 class="search-subtitle">{{ $section['label'] }}</h2>
+                                    <span class="search-count">{{ $section['items']->count() }}</span>
+                                </div>
+
+                                @if ($section['items']->isNotEmpty())
+
+                                    <div class="search-list">
+                                        @foreach ($section['items'] as $item)
+                                            @php
+                                                $publisher = $key === 'berita'
+                                                    ? 'OrangBaik.id'
+                                                    : ($item->penggalangDana?->nama_penggalang ?? 'OrangBaik');
+                                            @endphp
+
+                                            <a href="{{ route($section['route'], $item->custom_slug ?? $item->slug) }}"
+                                                class="search-card">
+
+                                                <div class="search-card-image">
+                                                    <img src="{{ asset('storage/' . $item->thumbnail) }}"
+                                                        alt="{{ $item->judul }}" loading="lazy">
+
+                                                    <span class="search-card-badge">
+                                                        <i class="bi {{ $section['icon'] }}"></i>
+                                                        {{ $section['label'] }}
                                                     </span>
                                                 </div>
+
+                                                <div class="search-card-body">
+                                                    <h3 class="search-card-title">{{ $item->judul }}</h3>
+
+                                                    <p class="search-card-publisher">
+                                                        <span class="search-card-avatar">{{ mb_strtoupper(mb_substr($publisher, 0, 1)) }}</span>
+                                                        <span class="search-card-publisher-name">{{ $publisher }}</span>
+                                                    </p>
+
+                                                    <div class="search-card-footer">
+                                                        <span class="search-card-date">
+                                                            <i class="bi bi-calendar3"></i>
+                                                            {{ $item->created_at->translatedFormat('d F Y') }}
+                                                        </span>
+                                                        <i class="bi bi-arrow-right search-card-arrow"></i>
+                                                    </div>
+                                                </div>
                                             </a>
-                                        </article>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @else
-                            <p class="empty-result">Tidak ada berita yang cocok.</p>
+                                        @endforeach
+                                    </div>
+
+                                @else
+
+                                    <div class="search-empty">
+                                        <i class="bi {{ $section['icon'] }}"></i>
+                                        <p>{{ $section['empty'] }}</p>
+                                    </div>
+
+                                @endif
+
+                            </section>
+
                         @endif
-                    </div>
 
-                    {{-- ===================== --}}
-                    {{-- 2. CAMPAIGN (Grid 4 kolom) --}}
-                    {{-- ===================== --}}
-                    <div class="search-result-section" style="margin-top: 3rem;">
-                        <div class="search-subtitle">
-                            Campaign <span>{{ $campaigns->count() }}</span>
-                        </div>
-
-                        @if($campaigns->count() > 0)
-                            <div class="campaign-grid-search">
-                                @foreach ($campaigns as $campaign)
-                                    @php
-                                        $terkumpul = $campaign->donasi->sum('nominal');
-                                        $persen = $campaign->target_donasi
-                                            ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                            : 0;
-                                        $hari = $campaign->tanggal_berakhir === null
-                                            ? null
-                                            : max(0, (int) now()->diffInDays($campaign->tanggal_berakhir, false));
-                                    @endphp
-
-                                    <article class="campaign-card">
-                                        <a href="{{ route('campaign.show', $campaign->slug) }}">
-                                            <img class="campaign-image" src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                                                alt="{{ $campaign->judul }}" loading="lazy">
-                                        </a>
-                                        <div class="campaign-body">
-                                            <h3>
-                                                {!! str_ireplace($keyword, '<strong>' . $keyword . '</strong>', $campaign->judul) !!}
-                                            </h3>
-                                            <p>
-                                                {{ $campaign->penggalangDana->nama_penggalang }}
-                                                <span>●</span>
-                                            </p>
-                                            <div class="campaign-price">
-                                                <strong>
-                                                    Rp {{ number_format($terkumpul, 0, ',', '.') }}
-                                                </strong>
-                                                <span>Terkumpul</span>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="progress-fill" style="width: {{ $persen }}%;"></div>
-                                            </div>
-                                            <div class="campaign-meta">
-                                                <span>{{ $campaign->donasi->count() }} Donatur</span>
-                                                <span>{{ $hari }} Hari</span>
-                                            </div>
-                                        </div>
-                                    </article>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="empty-result">Tidak ada campaign yang cocok.</p>
-                        @endif
-                    </div>
+                    @endforeach
 
                 @else
+
                     <div class="search-placeholder">
-                        <p>🔍 Masukkan kata kunci untuk mencari campaign atau berita.</p>
+                        <i class="bi bi-search"></i>
+                        <h2>Temukan yang kamu cari</h2>
+                        <p>Masukkan kata kunci untuk mencari {{ $jenisCari }}.</p>
                     </div>
+
                 @endif
 
             </div>
         </section>
-
     </main>
 
     @include('components.footer')

@@ -1,10 +1,9 @@
-
 /* =========================================================
    HOME PAGE
    Dipakai oleh:
    - home.blade.php
    - Halaman donasi
-   - components.campaign-card
+   - components.campaign-card (variant default & list)
 
    Seluruh nilai mengacu pada token global.css.
 
@@ -12,10 +11,10 @@
    1. Global
    2. Hero
    3. Kategori
-   4. Campaign card
+   4. Campaign card (default vertikal & list horizontal)
    5. Campaign baru
    6. Testimonial
-   7. List campaign
+   7. List campaign (wrapper)
    8. Filter donasi
    9. Responsive tablet
    10. Responsive mobile
@@ -43,7 +42,7 @@
 .main .section-title {
     margin-bottom: var(--space-8);
     color: var(--text-dark);
-    font-size: var(--fs-md);
+    font-size: var(--fs-lg);
     font-weight: var(--fw-bold);
     line-height: 1.25;
     letter-spacing: -.02em;
@@ -177,9 +176,9 @@
 .hero-side-body h3 {
     margin: 0;
     color: var(--on-dark);
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
-    line-height: 1.45;
+    line-height: 1.4;
 }
 
 /* Dots slider */
@@ -269,7 +268,18 @@
 
 /* =========================================================
    4. CAMPAIGN CARD
-   Variant default: vertikal
+   Satu struktur untuk dua variant:
+   - default  : vertikal  (.campaign-grid)
+   - .is-list : horizontal (.list-campaign)
+
+   Thumbnail selalu 16:9.
+
+   Susunan isi:
+   thumbnail + badge sisa hari
+   judul
+   nominal terkumpul
+   progress + persen
+   footer: donatur (kiri) • penggalang (kanan)
 ========================================================= */
 
 .campaign-grid {
@@ -278,44 +288,36 @@
     gap: var(--space-6);
 }
 
-/* Dasar kartu */
-
-.campaign-card,
-.list-card {
+.campaign-card {
+    display: flex;
+    height: 100%;
     min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg);
     box-shadow: var(--shadow-card);
+    color: inherit;
+    text-decoration: none;
     transition:
         transform .2s ease,
         box-shadow .2s ease;
 }
 
-.campaign-card {
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-    overflow: hidden;
-    color: inherit;
-    text-decoration: none;
-}
-
-.campaign-card:hover,
-.list-card:hover {
+.campaign-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow);
 }
 
-.campaign-card:focus-visible,
-.list-card:focus-visible {
+.campaign-card:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 3px;
 }
 
-/* Thumbnail */
+/* Thumbnail — selalu 16:9 */
 
-.campaign-image-wrapper {
+.campaign-thumb {
     position: relative;
     flex-shrink: 0;
     overflow: hidden;
@@ -323,176 +325,22 @@
     background: var(--bg-soft);
 }
 
-.campaign-image {
+.campaign-thumb img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
+    transition: transform .5s ease;
 }
 
-/* Body */
-
-.campaign-body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: var(--space-2);
-    min-width: 0;
-    padding: var(--space-4);
+.campaign-card:hover .campaign-thumb img {
+    transform: scale(1.05);
 }
 
-.campaign-body h3 {
-    display: -webkit-box;
-    min-height: 2.8em;
-    overflow: hidden;
-    margin: 0;
-    color: var(--text-dark);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    line-height: 1.4;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
+/* Badge sisa hari */
 
-/* Identitas penggalang */
-
-.list-org {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    margin: 0;
-    color: var(--muted);
-    font-size: var(--fs-xxs);
-    line-height: 1.5;
-}
-
-.list-org-avatar {
-    display: inline-flex;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-full);
-    background: var(--primary-light);
-    color: var(--primary);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
-}
-
-.list-org-name {
-    min-width: 0;
-    overflow: hidden;
-    color: var(--muted);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Nominal terkumpul */
-
-.campaign-price {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 2px var(--space-2);
-    margin-top: var(--space-2);
-    min-width: 0;
-}
-
-.campaign-price strong {
-    color: var(--primary);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    overflow-wrap: anywhere;
-}
-
-.campaign-price span {
-    color: var(--muted);
-    font-size: var(--fs-xxs);
-}
-
-/* Progress bar */
-
-.campaign-card .progress,
-.list-card .progress,
-.new-item .progress {
-    width: 100%;
-    height: 7px;
-    overflow: hidden;
-    border-radius: var(--radius-full);
-    background: var(--primary-light);
-}
-
-.campaign-card .progress-fill,
-.list-card .progress-fill,
-.new-item .progress-fill {
-    height: 100%;
-    border-radius: inherit;
-    background: var(--primary);
-}
-
-.list-progress {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    min-width: 0;
-}
-
-.list-progress .progress {
-    flex: 1;
-    min-width: 0;
-    margin: 0;
-}
-
-.list-percent {
-    min-width: 34px;
-    flex-shrink: 0;
-    color: var(--primary);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-bold);
-    text-align: right;
-}
-
-/* Metadata */
-
-.campaign-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2);
-    min-width: 0;
-    margin-top: var(--space-2);
-    color: var(--muted);
-    font-size: var(--fs-xxs);
-}
-
-.campaign-meta > span {
-    min-width: 0;
-}
-
-/* CTA */
-
-.list-cta {
-    color: var(--primary);
-    font-weight: var(--fw-bold);
-    white-space: nowrap;
-}
-
-.list-cta i {
-    margin-left: 6px;
-    transition: transform .2s ease;
-}
-
-.campaign-card:hover .list-cta i,
-.list-card:hover .list-cta i {
-    transform: translateX(3px);
-}
-
-/* Badge waktu */
-
-.list-badge {
+.campaign-badge {
     position: absolute;
     top: var(--space-2);
     left: var(--space-2);
@@ -512,23 +360,272 @@
     backdrop-filter: blur(6px);
 }
 
-.list-badge.is-urgent {
+.campaign-badge.is-urgent {
     background: var(--danger);
     color: var(--bg);
 }
 
-.list-badge.is-done {
+.campaign-badge.is-done {
     background: var(--muted);
     color: var(--bg);
 }
 
-/* Infinity: ikon saja */
-
-.list-badge .bi-infinity,
-.meta-days .bi-infinity {
+.campaign-badge .bi-infinity {
     color: var(--primary);
     font-size: var(--fs-sm);
     line-height: 1;
+}
+
+/* Isi */
+
+.campaign-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+    padding: var(--space-4);
+}
+
+.campaign-title {
+    display: -webkit-box;
+    min-height: 2.8em;
+    margin: 0;
+    overflow: hidden;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    transition: color .2s ease;
+}
+
+.campaign-card:hover .campaign-title {
+    color: var(--primary);
+}
+
+/* Nominal */
+
+.campaign-amount {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: var(--space-1);
+}
+
+.campaign-amount strong {
+    color: var(--primary);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.campaign-amount small {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.4;
+}
+
+/* Progress */
+
+.campaign-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.campaign-card .progress,
+.new-item .progress {
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+}
+
+.campaign-card .progress-fill,
+.new-item .progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--primary);
+}
+
+.campaign-progress .progress {
+    flex: 1;
+    min-width: 0;
+}
+
+.campaign-percent {
+    min-width: 32px;
+    flex-shrink: 0;
+    color: var(--primary);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    text-align: right;
+}
+
+/* Target tercapai */
+
+.campaign-progress.is-complete .progress-fill {
+    background: var(--success);
+}
+
+.campaign-progress.is-complete .campaign-percent {
+    color: var(--success);
+}
+
+/* Footer: donatur (kiri) • penggalang (kanan) */
+
+.campaign-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-width: 0;
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--border);
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+}
+
+.campaign-donors {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.campaign-donors i {
+    color: var(--primary);
+}
+
+.campaign-donors b {
+    color: var(--text-dark);
+    font-weight: var(--fw-bold);
+}
+
+.campaign-org {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+.campaign-org-avatar {
+    position: relative;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    box-shadow: 0 0 0 1px var(--border-soft);
+    color: var(--primary);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+}
+
+/* foto menutupi inisial; jika gagal dimuat, inisial tetap terlihat */
+.campaign-org-avatar img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: var(--bg);
+}
+
+.campaign-org-name {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-weight: var(--fw-medium);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------- Variant list (horizontal, full width) ---------- */
+
+.campaign-card.is-list {
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--space-4);
+    padding: var(--space-3);
+}
+
+/* thumbnail tetap 16:9, berada di tengah (tidak menempel di atas) */
+.campaign-card.is-list .campaign-thumb {
+    flex: 0 0 240px;
+    align-self: center;
+    border-radius: var(--radius-md);
+}
+
+.campaign-card.is-list .campaign-body {
+    flex: 1 1 0;
+    padding: 0;
+}
+
+.campaign-card.is-list .campaign-title {
+    min-height: 0;
+}
+
+.campaign-card.is-list .campaign-amount {
+    margin-top: auto;
+}
+
+.campaign-card.is-list .campaign-footer {
+    margin-top: var(--space-1);
+}
+
+/* list di desktop: lebih lega & huruf lebih besar */
+@media (min-width: 901px) {
+
+    .campaign-card.is-list {
+        gap: var(--space-6);
+        padding: var(--space-4);
+    }
+
+    .campaign-card.is-list .campaign-thumb {
+        flex-basis: 320px;
+    }
+
+    .campaign-card.is-list .campaign-body {
+        gap: var(--space-3);
+    }
+
+    .campaign-card.is-list .campaign-title,
+    .campaign-card.is-list .campaign-amount strong {
+        font-size: var(--fs-md);
+    }
+
+    .campaign-card.is-list .campaign-amount small,
+    .campaign-card.is-list .campaign-footer {
+        font-size: var(--fs-xs);
+    }
+
+    .campaign-card.is-list .campaign-percent {
+        font-size: var(--fs-xs);
+    }
+
+    .campaign-card.is-list .progress {
+        height: 8px;
+    }
+
+    .campaign-card.is-list .campaign-org-avatar {
+        width: 28px;
+        height: 28px;
+    }
 }
 
 
@@ -591,7 +688,7 @@
     overflow: hidden;
     margin: 0 0 var(--space-1);
     color: var(--on-dark);
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     line-height: 1.4;
     -webkit-box-orient: vertical;
@@ -859,114 +956,15 @@
 
 
 /* =========================================================
-   7. LIST CAMPAIGN
-   Variant list: horizontal di desktop, tablet, dan mobile.
+   7. LIST CAMPAIGN (wrapper)
+   Satu kolom penuh di semua ukuran layar.
+   Isi card diatur di bagian 4 (.campaign-card.is-list).
 ========================================================= */
 
 .list-campaign {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-4);
-}
-
-.list-card {
-    display: flex;
-    align-items: stretch;
-    gap: var(--space-4);
-    min-width: 0;
-    padding: var(--space-3);
-    color: inherit;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Thumbnail kiri */
-
-.list-thumb {
-    position: relative;
-    flex: 0 0 190px;
-    min-width: 0;
-    min-height: 150px;
-    overflow: hidden;
-    border-radius: var(--radius-md);
-    background: var(--bg-soft);
-}
-
-.list-thumb img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform .5s ease;
-}
-
-.list-card:hover .list-thumb img {
-    transform: scale(1.06);
-}
-
-/* Konten kanan */
-
-.list-body {
-    display: flex;
-    flex: 1 1 0;
-    flex-direction: column;
-    gap: var(--space-2);
-    min-width: 0;
-}
-
-.list-body h3 {
-    display: -webkit-box;
-    overflow: hidden;
-    margin: 0;
-    color: var(--text-dark);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    line-height: 1.4;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
-
-/* Nominal list */
-
-.list-amount {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 2px var(--space-2);
-    margin-top: auto;
-}
-
-.list-amount strong {
-    color: var(--primary);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    line-height: 1.2;
-    overflow-wrap: anywhere;
-}
-
-.list-amount small {
-    color: var(--muted);
-    font-size: var(--fs-xxs);
-}
-
-/* Metadata list */
-
-.list-body .campaign-meta {
-    margin-top: var(--space-1);
-    padding-top: var(--space-2);
-    border-top: 1px dashed var(--border);
-}
-
-.list-body .campaign-meta i {
-    margin-right: 6px;
-    color: var(--primary);
-}
-
-/* Hari ditampilkan di badge pada desktop */
-
-.meta-days {
-    display: none;
+    gap: var(--space-5);
 }
 
 
@@ -1175,7 +1173,7 @@
 
 /* =========================================================
    9. RESPONSIVE TABLET
-   601px – 900px
+   ≤ 900px
 ========================================================= */
 
 @media (max-width: 900px) {
@@ -1184,6 +1182,10 @@
 
     .main .section {
         padding-block: var(--section-space-sm);
+    }
+
+    .main .section-title {
+        font-size: var(--fs-md);
     }
 
     /* Hero */
@@ -1204,22 +1206,18 @@
         gap: var(--space-5) var(--space-4);
     }
 
-    /* Default campaign: tetap vertikal */
+    /* Campaign card vertikal */
 
     .campaign-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: var(--space-4);
     }
 
-    .campaign-card .campaign-image-wrapper {
-        aspect-ratio: 16 / 10;
-    }
-
-    .campaign-card .campaign-body {
+    .campaign-card:not(.is-list) .campaign-body {
         padding: var(--space-3);
     }
 
-    /* Campaign baru */
+    /* Campaign baru: overlay selalu tampil & ringkas (tanpa hover) */
 
     .new-item-overlay {
         padding: var(--space-3);
@@ -1228,14 +1226,10 @@
 
     .new-item-overlay h3 {
         margin-bottom: 0;
-        font-size: var(--fs-xxs);
-        -webkit-line-clamp: 2;
+        font-size: var(--fs-xs);
     }
 
-    .new-item-overlay p {
-        display: none;
-    }
-
+    .new-item-overlay p,
     .new-item-price,
     .new-item-meta {
         display: none;
@@ -1244,13 +1238,6 @@
     .new-item .progress {
         height: 4px;
         margin: var(--space-1) 0 0;
-    }
-
-    /* List campaign tetap horizontal */
-
-    .list-thumb {
-        flex-basis: 160px;
-        min-height: 130px;
     }
 }
 
@@ -1270,7 +1257,6 @@
 
     .main .section-title {
         margin-bottom: var(--space-6);
-        font-size: var(--fs-sm);
     }
 
     /* Hero */
@@ -1281,7 +1267,6 @@
 
     .hero-main-slider {
         min-height: 0;
-        aspect-ratio: 16 / 10;
         border-radius: var(--radius-md);
     }
 
@@ -1311,14 +1296,54 @@
     }
 
     /* =====================================
-       DEFAULT CAMPAIGN
-       Tetap vertikal, dua kolom
+       SCROLL HORIZONTAL
+       - Campaign default (Darurat, Pemberdayaan, Lainnya)
+       - Campaign baru
     ===================================== */
 
-    .campaign-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .campaign-grid,
+    .new-grid {
+        display: flex;
+        flex-wrap: nowrap;
         gap: var(--space-3);
+        margin-right: calc(var(--space-4) * -1);
+        padding-block: var(--space-1) var(--space-4);
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
     }
+
+    .campaign-grid::-webkit-scrollbar,
+    .new-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* satu card terlihat penuh + sedikit card berikutnya */
+    .campaign-grid .campaign-card {
+        height: auto;
+        flex: 0 0 min(78%, 300px);
+        scroll-snap-align: start;
+    }
+
+    .new-item {
+        flex: 0 0 82%;
+        border-radius: var(--radius-md);
+        scroll-snap-align: start;
+    }
+
+    .new-item-overlay {
+        padding: var(--space-4);
+    }
+
+    .new-item-overlay h3 {
+        font-size: var(--fs-sm);
+    }
+
+    /* =====================================
+       CAMPAIGN CARD — SEMUA VARIANT
+    ===================================== */
 
     .campaign-card {
         border-radius: var(--radius-md);
@@ -1328,243 +1353,128 @@
         transform: none;
     }
 
-    .campaign-card .campaign-image-wrapper {
-        aspect-ratio: 4 / 3;
+    .campaign-badge {
+        padding: 5px var(--space-3);
     }
 
-    .campaign-card .campaign-body {
+    .campaign-body {
         gap: var(--space-2);
-        padding: var(--space-3);
     }
 
-    .campaign-card .campaign-body h3 {
-        min-height: 2.8em;
-        font-size: 12px;
-        line-height: 1.4;
+    .campaign-title {
+        font-size: var(--fs-sm);
     }
 
-    .campaign-card .list-org {
-        gap: 6px;
-        font-size: 10px;
+    .campaign-footer {
+        gap: var(--space-2);
+        padding-top: var(--space-2);
     }
 
-    .campaign-card .list-org-avatar {
-        width: 19px;
-        height: 19px;
-        font-size: 10px;
-    }
-
-    .campaign-card .list-org-name {
-        font-size: 10px;
-    }
-
-    .campaign-card .campaign-price {
-        gap: 2px 5px;
-        margin-top: var(--space-1);
-    }
-
-    .campaign-card .campaign-price strong {
-        font-size: 12px;
-    }
-
-    .campaign-card .campaign-price span {
-        font-size: 10px;
-    }
-
-    .campaign-card .progress {
-        height: 6px;
-    }
-
-    .campaign-card .list-progress {
+    .campaign-org {
         gap: 6px;
     }
 
-    .campaign-card .list-percent {
-        min-width: 30px;
-        font-size: 10px;
-    }
-
-    .campaign-card .campaign-meta {
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 6px;
-        font-size: 10px;
-    }
-
-    .campaign-card .campaign-meta > span {
-        white-space: nowrap;
-    }
-
-    .campaign-card .campaign-meta .list-cta {
-        margin-left: auto;
-        font-size: 10px;
+    .campaign-org-avatar {
+        width: 22px;
+        height: 22px;
     }
 
     /* =====================================
-       CAMPAIGN BARU
-       Desain overlay tetap dipertahankan
+       VARIANT LIST (horizontal, full width)
     ===================================== */
 
-    .new-grid {
-        grid-template-columns: 1fr;
-        gap: var(--space-4);
-    }
-
-    .new-item {
-        border-radius: var(--radius-md);
-    }
-
-    .new-item-overlay {
-        padding: var(--space-4);
-    }
-
-    .new-item-overlay h3 {
-        font-size: var(--fs-xs);
-    }
-
-    /* =====================================
-       LIST CAMPAIGN
-       Tetap horizontal seperti desktop
-    ===================================== */
+    /* tanpa card: item dipisahkan garis tipis */
 
     .list-campaign {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-3);
+        gap: 0;
     }
 
-    .list-card {
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        gap: var(--space-3);
-        padding: var(--space-3);
-        border-radius: var(--radius-md);
+    .campaign-card.is-list {
+        display: grid;
+        grid-template-columns: 45% minmax(0, 1fr) auto;
+        column-gap: var(--space-3);
+        row-gap: var(--space-1);
+        align-items: start;
+        height: auto;
+        padding: var(--space-4) 0;
+        overflow: visible;
+        border: 0;
+        border-bottom: 1px solid var(--border-soft);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
     }
 
-    .list-card:hover {
-        transform: none;
+    .campaign-card.is-list:first-child {
+        padding-top: 0;
     }
 
-    /* Thumbnail kiri */
-
-    .list-thumb {
-        position: relative;
-        flex: 0 0 32%;
-        width: 32%;
-        min-width: 0;
-        min-height: auto;
-        align-self: flex-start;
-        aspect-ratio: 1 / 1;
+    .campaign-card.is-list:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
     }
 
-    /* Body kanan */
-
-    .list-body {
-        display: flex;
-        flex: 1 1 0;
-        flex-direction: column;
-        gap: 6px;
-        width: 0;
-        min-width: 0;
-        padding: 0;
+    /* isi card & footer ikut menjadi bagian grid agar bisa diatur per baris */
+    .campaign-card.is-list .campaign-body,
+    .campaign-card.is-list .campaign-footer {
+        display: contents;
     }
 
-    .list-body h3 {
-        min-height: 0;
-        font-size: 12px;
-        line-height: 1.4;
-        -webkit-line-clamp: 2;
+    /* kiri: thumbnail 16:9 */
+    .campaign-card.is-list .campaign-thumb {
+        grid-column: 1;
+        grid-row: 1 / span 4;
+        align-self: center;
     }
 
-    .list-card .list-org {
-        gap: 6px;
-        font-size: 10px;
+    /* kanan: judul → penggalang + donatur → progress → nominal */
+    .campaign-card.is-list .campaign-title {
+        grid-column: 2 / -1;
+        grid-row: 1;
     }
 
-    .list-card .list-org-avatar {
-        width: 18px;
-        height: 18px;
-        font-size: 9px;
+    .campaign-card.is-list .campaign-org {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: center;
+        justify-content: flex-start;
     }
 
-    .list-card .list-org-name {
-        font-size: 10px;
+    .campaign-card.is-list .campaign-donors {
+        grid-column: 3;
+        grid-row: 2;
+        align-self: center;
     }
 
-    /* Nominal */
-
-    .list-amount {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-        margin-top: auto;
+    .campaign-card.is-list .campaign-donors-label {
+        display: none;
     }
 
-    .list-amount strong {
-        font-size: 12px;
+    .campaign-card.is-list .campaign-progress {
+        grid-column: 2 / -1;
+        grid-row: 3;
+        margin-block: var(--space-1);
     }
 
-    .list-amount small {
-        font-size: 10px;
-    }
-
-    /* Progress */
-
-    .list-card .progress {
-        height: 6px;
-    }
-
-    .list-card .list-progress {
-        gap: 6px;
-    }
-
-    .list-card .list-percent {
-        min-width: 28px;
-        font-size: 10px;
-    }
-
-    /* Metadata */
-
-    .list-body .campaign-meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 5px;
-        margin-top: var(--space-1);
-        padding-top: var(--space-2);
-        border-top: 1px dashed var(--border);
-        font-size: 10px;
-    }
-
-    .list-body .campaign-meta i {
-        display: inline;
-        margin-right: 4px;
-    }
-
-    .list-card .list-cta {
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        font-size: 10px;
-    }
-
-    .list-card .list-cta i {
+    /* label "Terkumpul" di atas, nominal di bawah */
+    .campaign-card.is-list .campaign-amount {
+        grid-column: 2 / -1;
+        grid-row: 4;
+        flex-direction: column-reverse;
+        gap: 0;
         margin: 0;
     }
 
-    /* Badge tetap terlihat */
-
-    .list-card .list-badge {
-        display: inline-flex;
-        padding: 5px 8px;
-        font-size: 10px;
+    .campaign-card.is-list .campaign-amount small::first-letter {
+        text-transform: uppercase;
     }
 
-    .list-card .list-badge .bi-infinity {
-        font-size: 13px;
+    .campaign-card.is-list .campaign-target {
+        display: none;
+    }
+
+    .campaign-card.is-list .campaign-amount strong {
+        font-size: var(--fs-sm);
     }
 
     /* =====================================
@@ -1604,7 +1514,6 @@
         order: 2;
         height: 32px;
         padding: 0 var(--space-3);
-        font-size: var(--fs-xxs);
     }
 
     .donasi-filter-chips {
@@ -1622,7 +1531,6 @@
         background-position:
             calc(100% - 15px) 50%,
             calc(100% - 10px) 50%;
-        font-size: var(--fs-xxs);
     }
 
     .donasi-filter-chip {
@@ -1653,66 +1561,17 @@
         height: 46px;
     }
 
-    .campaign-grid {
-        gap: var(--space-2);
+    .campaign-grid .campaign-card {
+        flex-basis: min(82%, 300px);
     }
 
-    .campaign-card .campaign-body {
-        padding: 10px;
-    }
-
-    .campaign-card .campaign-body h3 {
-        font-size: 11px;
-    }
-
-    .campaign-card .list-org-name {
-        font-size: 9px;
-    }
-
-    .campaign-card .campaign-price strong {
-        font-size: 11px;
-    }
-
-    .campaign-card .campaign-meta {
-        font-size: 9px;
-    }
-
-    .campaign-card .campaign-meta .list-cta {
-        font-size: 9px;
-    }
-
-    .list-card {
-        gap: var(--space-2);
-        padding: 10px;
-    }
-
-    .list-thumb {
-        flex-basis: 31%;
-        width: 31%;
-    }
-
-    .list-body {
-        gap: 5px;
-    }
-
-    .list-body h3 {
-        font-size: 11px;
-    }
-
-    .list-card .list-amount strong {
-        font-size: 11px;
-    }
-
-    .list-card .campaign-meta {
-        font-size: 9px;
-    }
-
-    .list-card .list-cta {
-        font-size: 9px;
+    .campaign-card.is-list {
+        grid-template-columns: 44% minmax(0, 1fr) auto;
     }
 
     .testimonial-wrapper {
         --offset: 125px;
+
         min-height: 300px;
     }
 }
@@ -1726,11 +1585,16 @@
 @media (max-width: 360px) {
 
     .main .container {
-        padding-inline: 12px;
+        padding-inline: var(--space-3);
     }
 
     .main .section {
         padding-block: var(--space-6);
+    }
+
+    .campaign-grid,
+    .new-grid {
+        margin-right: calc(var(--space-3) * -1);
     }
 
     .category-grid {
@@ -1747,73 +1611,14 @@
         font-size: 11px;
     }
 
-    .campaign-grid {
-        gap: var(--space-2);
-    }
-
-    .campaign-card .campaign-body {
-        padding: 8px;
-        gap: 5px;
-    }
-
-    .campaign-card .campaign-body h3 {
-        font-size: 10px;
-    }
-
-    .campaign-card .list-org-avatar {
-        width: 17px;
-        height: 17px;
-        font-size: 9px;
-    }
-
-    .campaign-card .list-org-name {
-        font-size: 9px;
-    }
-
-    .campaign-card .campaign-price strong {
-        font-size: 10px;
-    }
-
-    .campaign-card .campaign-meta {
-        font-size: 8px;
-    }
-
-    .campaign-card .campaign-meta .list-cta {
-        font-size: 8px;
-    }
-
-    .list-card {
-        gap: 8px;
-        padding: 8px;
-    }
-
-    .list-thumb {
-        flex-basis: 29%;
-        width: 29%;
-    }
-
-    .list-body h3 {
-        font-size: 10px;
-    }
-
-    .list-card .list-org-name {
-        font-size: 9px;
-    }
-
-    .list-card .list-amount strong {
-        font-size: 10px;
-    }
-
-    .list-card .campaign-meta {
-        font-size: 8px;
-    }
-
-    .list-card .list-cta {
-        font-size: 8px;
+    .campaign-card.is-list {
+        grid-template-columns: 42% minmax(0, 1fr) auto;
+        column-gap: var(--space-2);
     }
 
     .testimonial-wrapper {
         --offset: 105px;
+
         min-height: 280px;
     }
 }
@@ -1828,9 +1633,8 @@
     .hero-slide,
     .hero-side-card,
     .campaign-card,
-    .list-card,
-    .list-thumb img,
-    .list-cta i,
+    .campaign-thumb img,
+    .campaign-title,
     .new-item img,
     .new-item-overlay,
     .testimonial-item,
@@ -1843,17 +1647,8 @@
     }
 
     .campaign-card:hover,
-    .list-card:hover,
-    .list-card:hover .list-thumb img,
-    .campaign-card:hover .list-cta i,
-    .list-card:hover .list-cta i,
+    .campaign-card:hover .campaign-thumb img,
     .new-item:hover img {
         transform: none !important;
-    }
-
-    .campaign-grid,
-    .new-grid,
-    .list-campaign {
-        scroll-behavior: auto;
     }
 }

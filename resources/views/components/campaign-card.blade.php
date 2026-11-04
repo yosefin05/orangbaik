@@ -5,7 +5,7 @@
 
 @php
     // ========================================
-    // STATISTIK DONASI
+    // STATISTIK DONASI (hanya status settlement)
     // ========================================
 
     $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
@@ -19,6 +19,8 @@
     $persen = $campaign->target_donasi
         ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
         : 0;
+
+    $tercapai = $persen >= 100;
 
     // ========================================
     // SISA WAKTU CAMPAIGN
@@ -47,215 +49,99 @@
     };
 
     // ========================================
-    // INFORMASI PENGGALANG
+    // PENGGALANG DANA
+    // Foto profil dipakai bila ada, jika tidak tampil inisial.
+    // Sesuaikan nama kolom foto di bawah bila berbeda.
     // ========================================
 
-    $namaPenggalang = $campaign->penggalangDana->nama_penggalang;
+    $penggalang = $campaign->penggalangDana;
+    $namaPenggalang = $penggalang?->nama_penggalang ?? 'OrangBaik';
+    $fotoPenggalang = $penggalang?->foto_profil;
     $inisialPenggalang = mb_strtoupper(mb_substr($namaPenggalang, 0, 1));
 
     // ========================================
-    // URL CAMPAIGN
+    // URL & VARIANT
     // ========================================
 
     $campaignUrl = route(
         'campaign.show',
         $campaign->custom_slug ?? $campaign->slug
     );
+
+    $isList = $variant === 'list';
 @endphp
 
+{{-- Satu struktur untuk dua variant:
+     default = card vertikal, list = card horizontal (.is-list) --}}
+<a
+    class="campaign-card {{ $isList ? 'is-list' : '' }}"
+    href="{{ $campaignUrl }}"
+    aria-label="{{ $campaign->judul }}"
+>
+    {{-- THUMBNAIL --}}
+    <div class="campaign-thumb">
+        <img
+            src="{{ asset('storage/' . $campaign->thumbnail) }}"
+            alt="{{ $campaign->judul }}"
+            loading="lazy"
+        >
 
-@if ($variant === 'list')
+        <span class="campaign-badge {{ $badgeClass }}">
+            @if ($diff === null)
+                <i class="bi bi-infinity" title="Tanpa batas" aria-label="Tanpa batas"></i>
+            @else
+                <i class="bi bi-clock"></i>
+                {{ $labelHari }}
+            @endif
+        </span>
+    </div>
 
-    {{-- ========================================
-        LIST CARD (HORIZONTAL)
-    ======================================== --}}
+    {{-- ISI --}}
+    <div class="campaign-body">
+        <h3 class="campaign-title">{{ $campaign->judul }}</h3>
 
-    <a
-        class="list-card"
-        href="{{ $campaignUrl }}"
-        aria-label="{{ $campaign->judul }}"
-    >
-        <div class="list-thumb">
-            <img
-                src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                alt="{{ $campaign->judul }}"
-                loading="lazy"
-            >
+        <div class="campaign-amount">
+            <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
 
-            <span class="list-badge {{ $badgeClass }}">
-                @if ($diff === null)
-                    <i
-                        class="bi bi-infinity"
-                        aria-label="Tanpa batas"
-                    ></i>
-                @else
-                    <i class="bi bi-clock"></i>
-                    {{ $labelHari }}
-                @endif
-            </span>
+            <small>
+                terkumpul{{ $campaign->target_donasi
+                    ? ' dari Rp ' . number_format($campaign->target_donasi, 0, ',', '.')
+                    : ''
+                }}
+            </small>
         </div>
 
-        <div class="list-body">
-            <h3>{{ $campaign->judul }}</h3>
+        <div class="campaign-progress {{ $tercapai ? 'is-complete' : '' }}">
+            <div class="progress">
+                <div class="progress-fill" style="width: {{ $persen }}%;"></div>
+            </div>
 
-            <p class="list-org">
-                <span class="list-org-avatar">
+            <span class="campaign-percent">{{ floor($persen) }}%</span>
+        </div>
+
+        {{-- FOOTER: donatur (kiri) • penggalang (kanan) --}}
+        <div class="campaign-footer">
+            <span class="campaign-donors" title="{{ $totalDonatur }} donatur">
+                <i class="bi bi-people-fill"></i>
+                <b>{{ $totalDonatur }}</b>
+                <span class="campaign-donors-label">Donatur</span>
+            </span>
+
+            <span class="campaign-org" title="{{ $namaPenggalang }}">
+                <span class="campaign-org-avatar">
                     {{ $inisialPenggalang }}
-                </span>
-
-                <span class="list-org-name">
-                    {{ $namaPenggalang }}
-                </span>
-            </p>
-
-            <div class="list-amount">
-                <strong>
-                    Rp {{ number_format($terkumpul, 0, ',', '.') }}
-                </strong>
-
-                <small>
-                    terkumpul{{ $campaign->target_donasi
-                        ? ' dari Rp ' . number_format($campaign->target_donasi, 0, ',', '.')
-                        : ''
-                    }}
-                </small>
-            </div>
-
-            <div class="list-progress">
-                <div class="progress">
-                    <div
-                        class="progress-fill"
-                        style="width: {{ $persen }}%;"
-                    ></div>
-                </div>
-
-                <span class="list-percent">
-                    {{ floor($persen) }}%
-                </span>
-            </div>
-
-            <div class="campaign-meta">
-                <span>
-                    <i class="bi bi-people-fill"></i>
-                    {{ $totalDonatur }} Donatur
-                </span>
-
-                <span class="meta-days">
-                    @if ($diff === null)
-                        <i
-                            class="bi bi-infinity"
-                            aria-label="Tanpa batas"
-                            title="Tanpa batas"
-                        ></i>
-                    @else
-                        {{ $labelHari }}
+                    @if ($fotoPenggalang)
+                        <img
+                            src="{{ asset('storage/' . $fotoPenggalang) }}"
+                            alt=""
+                            loading="lazy"
+                            onerror="this.remove()"
+                        >
                     @endif
                 </span>
 
-                <span class="list-cta">
-                    Lihat detail
-                    <i class="bi bi-arrow-right"></i>
-                </span>
-            </div>
-        </div>
-    </a>
-
-@else
-
-    {{-- ========================================
-        DEFAULT CARD (VERTICAL)
-    ======================================== --}}
-
-    <a
-        class="campaign-card"
-        href="{{ $campaignUrl }}"
-        aria-label="{{ $campaign->judul }}"
-    >
-        <div class="campaign-image-wrapper">
-            <img
-                class="campaign-image"
-                src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                alt="{{ $campaign->judul }}"
-                loading="lazy"
-            >
-
-            <span class="list-badge {{ $badgeClass }}">
-                @if ($diff === null)
-                    <i
-                        class="bi bi-infinity"
-                        aria-label="Tanpa batas"
-                        title="Tanpa batas"
-                    ></i>
-                @else
-                    <i class="bi bi-clock"></i>
-                    {{ $labelHari }}
-                @endif
+                <span class="campaign-org-name">{{ $namaPenggalang }}</span>
             </span>
         </div>
-
-        <div class="campaign-body">
-            <h3>{{ $campaign->judul }}</h3>
-
-            <p class="list-org">
-                <span class="list-org-avatar">
-                    {{ $inisialPenggalang }}
-                </span>
-
-                <span class="list-org-name">
-                    {{ $namaPenggalang }}
-                </span>
-            </p>
-
-            <div class="campaign-price">
-                <strong>
-                    Rp {{ number_format($terkumpul, 0, ',', '.') }}
-                </strong>
-
-                <span>
-                    terkumpul{{ $campaign->target_donasi
-                        ? ' dari Rp ' . number_format($campaign->target_donasi, 0, ',', '.')
-                        : ''
-                    }}
-                </span>
-            </div>
-
-            <div class="list-progress">
-                <div class="progress">
-                    <div
-                        class="progress-fill"
-                        style="width: {{ $persen }}%;"
-                    ></div>
-                </div>
-
-                <span class="list-percent">
-                    {{ floor($persen) }}%
-                </span>
-            </div>
-
-            <div class="campaign-meta">
-                <span>
-                    <i class="bi bi-people-fill"></i>
-                    {{ $totalDonatur }} Donatur
-                </span>
-
-                <span class="meta-days">
-                    @if ($diff === null)
-                        <i
-                            class="bi bi-infinity"
-                            aria-label="Tanpa batas"
-                            title="Tanpa batas"
-                        ></i>
-                    @else
-                        {{ $labelHari }}
-                    @endif
-                </span>
-
-                <span class="list-cta">
-                    Lihat detail
-                    <i class="bi bi-arrow-right"></i>
-                </span>
-            </div>
-        </div>
-    </a>
-
-@endif
+    </div>
+</a>
