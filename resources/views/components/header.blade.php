@@ -11,11 +11,16 @@
     $isLandingPage = request()->is('/');
     $isDonationPage = request()->is('donasi', 'donasi/*');
     $isNewsPage = request()->is('berita', 'berita/*');
+    $isCalculatorPage = request()->is('kalkulator', 'kalkulator/*');
+    $isProfilePage = request()->routeIs('profile.user');
 
-    // Header search hanya pada tiga halaman utama
+
+    // Header search pada halaman utama
     $showMobileSearch = $isLandingPage
         || $isDonationPage
-        || $isNewsPage;
+        || $isNewsPage
+        || $isCalculatorPage
+        || $isProfilePage;
 
     // Jenis pencarian berdasarkan halaman asal
     $searchType = $isNewsPage ? 'berita' : 'campaign';
@@ -29,11 +34,16 @@
     // Halaman utama (setara): Beranda, Donasi, Kalkulator, Berita, Profil.
     // Semuanya memakai header + bottom navigation dan TANPA tombol back.
     $showBottomNav = request()->is(
-            '/',
-            'donasi', 'donasi/*',
-            'berita', 'berita/*',
-            'kalkulator', 'kalkulator/*'
-        )
+        '/',
+        'donasi',
+        'donasi/*',
+        'berita',
+        'berita/*',
+        'kalkulator',
+        'kalkulator/*',
+        'profil',
+        'profil/*'
+    )
         || request()->routeIs('profile.user');
 
     // Tombol back hanya untuk halaman di luar halaman utama (detail, form, dll.)
@@ -42,13 +52,10 @@
 
 <x-logout-modal />
 
-<header
-    class="site-header {{ $showMobileSearch ? 'has-mobile-search' : '' }}"
-    id="siteHeader"
->
+<header class="site-header {{ $showMobileSearch ? 'has-mobile-search' : '' }}" id="siteHeader">
 
     {{-- ==========================================
-         DESKTOP HEADER
+    DESKTOP HEADER
     =========================================== --}}
     <div class="container header-inner desktop-header">
 
@@ -59,23 +66,19 @@
         </a>
 
         <nav class="nav-menu">
-            <a href="{{ route('home') }}"
-                class="{{ request()->is('/') ? 'active' : '' }}">
+            <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}">
                 Beranda
             </a>
 
-            <a href="{{ url('donasi') }}"
-                class="{{ request()->is('donasi*') ? 'active' : '' }}">
+            <a href="{{ url('donasi') }}" class="{{ request()->is('donasi*') ? 'active' : '' }}">
                 Donasi
             </a>
 
-            <a href="{{ url('kalkulator') }}"
-                class="{{ request()->is('kalkulator*') ? 'active' : '' }}">
+            <a href="{{ url('kalkulator') }}" class="{{ request()->is('kalkulator*') ? 'active' : '' }}">
                 Kalkulator
             </a>
 
-            <a href="{{ url('berita') }}"
-                class="{{ request()->is('berita*') ? 'active' : '' }}">
+            <a href="{{ url('berita') }}" class="{{ request()->is('berita*') ? 'active' : '' }}">
                 Berita
             </a>
         </nav>
@@ -83,24 +86,11 @@
         <div class="header-actions">
 
             {{-- Desktop search --}}
-            <form
-                action="{{ route('search') }}"
-                method="GET"
-                class="desktop-search-form"
-            >
-                <input
-                    type="text"
-                    name="q"
-                    placeholder="{{ $isNewsPage ? 'Cari berita...' : 'Cari campaign...' }}"
-                    value="{{ request('q') }}"
-                    aria-label="Cari"
-                >
+            <form action="{{ route('search') }}" method="GET" class="desktop-search-form">
+                <input type="text" name="q" placeholder="{{ $isNewsPage ? 'Cari berita...' : 'Cari campaign...' }}"
+                    value="{{ request('q') }}" aria-label="Cari">
 
-                <input
-                    type="hidden"
-                    name="type"
-                    value="{{ $searchType }}"
-                >
+                <input type="hidden" name="type" value="{{ $searchType }}">
 
                 <button type="submit" aria-label="Cari">
                     <i class="bi bi-search"></i>
@@ -125,10 +115,8 @@
                     <button class="header-user-button" type="button">
                         <span class="header-user-avatar">
                             @if (!empty(auth()->user()->foto_profil))
-                                <img
-                                    src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
-                                    alt="{{ auth()->user()->name }}"
-                                >
+                                <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
+                                    alt="{{ auth()->user()->name }}">
                             @else
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             @endif
@@ -174,11 +162,7 @@
                         <form id="logoutForm" action="{{ route('logout') }}" method="POST">
                             @csrf
 
-                            <button
-                                type="button"
-                                id="logoutButton"
-                                class="logout-trigger"
-                            >
+                            <button type="button" id="logoutButton" class="logout-trigger">
                                 <i class="bi bi-box-arrow-right"></i>
                                 Logout
                             </button>
@@ -192,20 +176,16 @@
     </div>
 
     {{-- ==========================================
-         MOBILE HEADER
-         - Default            : search bar
-         - Kategori dipilih   : [← back] [Kategori / Nama] [ikon]
+    MOBILE HEADER
+    - Default : search bar
+    - Kategori dipilih : [← back] [Kategori / Nama] [ikon]
     =========================================== --}}
     @if ($showMobileSearch)
         <div class="container mobile-header-inner {{ $headerTitle ? 'is-category' : '' }}">
 
             @if ($headerTitle)
 
-                <a
-                    href="{{ route('donasi') }}"
-                    class="mobile-header-back"
-                    aria-label="Kembali ke semua kategori"
-                >
+                <a href="{{ route('donasi') }}" class="mobile-header-back" aria-label="Kembali ke semua kategori">
                     <i class="bi bi-arrow-left"></i>
                 </a>
 
@@ -220,28 +200,15 @@
 
             @else
 
-                <form
-                    action="{{ route('search') }}"
-                    method="GET"
-                    class="mobile-search-form"
-                >
+                <form action="{{ route('search') }}" method="GET" class="mobile-search-form">
                     <button type="submit" aria-label="Cari">
                         <i class="bi bi-search"></i>
                     </button>
 
-                    <input
-                        type="search"
-                        name="q"
-                        value="{{ request('q') }}"
-                        placeholder="{{ $mobileSearchPlaceholder }}"
-                        aria-label="{{ $mobileSearchPlaceholder }}"
-                    >
+                    <input type="search" name="q" value="{{ request('q') }}" placeholder="{{ $mobileSearchPlaceholder }}"
+                        aria-label="{{ $mobileSearchPlaceholder }}">
 
-                    <input
-                        type="hidden"
-                        name="type"
-                        value="{{ $mobileSearchType }}"
-                    >
+                    <input type="hidden" name="type" value="{{ $mobileSearchType }}">
                 </form>
 
             @endif
@@ -253,68 +220,45 @@
 
 
 {{-- ==========================================
-     MOBILE BACK BUTTON
-     Hanya untuk halaman di luar halaman utama.
+MOBILE BACK BUTTON
+Hanya untuk halaman di luar halaman utama.
 =========================================== --}}
 @if ($showMobileBack)
-    <a
-        href="{{ route('home') }}"
-        class="mobile-page-back"
-        data-mobile-back
-        aria-label="Kembali"
-    >
+    <a href="{{ route('home') }}" class="mobile-page-back" data-mobile-back aria-label="Kembali">
         <i class="bi bi-arrow-left"></i>
     </a>
 @endif
 
 
 {{-- ==========================================
-     MOBILE BOTTOM NAVIGATION
+MOBILE BOTTOM NAVIGATION
 =========================================== --}}
 @if ($showBottomNav)
     <nav class="mobile-bottom-nav" aria-label="Navigasi utama">
 
-        <a
-            href="{{ route('home') }}"
-            class="{{ request()->is('/') ? 'active' : '' }}"
-            aria-label="Beranda"
-        >
+        <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}" aria-label="Beranda">
             <i class="bi bi-house"></i>
             <span>Beranda</span>
         </a>
 
-        <a
-            href="{{ url('donasi') }}"
-            class="{{ request()->is('donasi*') ? 'active' : '' }}"
-            aria-label="Donasi"
-        >
+        <a href="{{ url('donasi') }}" class="{{ request()->is('donasi*') ? 'active' : '' }}" aria-label="Donasi">
             <i class="bi bi-heart"></i>
             <span>Donasi</span>
         </a>
 
-        <a
-            href="{{ url('kalkulator') }}"
-            class="{{ request()->is('kalkulator*') ? 'active' : '' }}"
-            aria-label="Kalkulator"
-        >
+        <a href="{{ url('kalkulator') }}" class="{{ request()->is('kalkulator*') ? 'active' : '' }}"
+            aria-label="Kalkulator">
             <i class="bi bi-calculator"></i>
             <span>Kalkulator</span>
         </a>
 
-        <a
-            href="{{ url('berita') }}"
-            class="{{ request()->is('berita*') ? 'active' : '' }}"
-            aria-label="Berita"
-        >
+        <a href="{{ url('berita') }}" class="{{ request()->is('berita*') ? 'active' : '' }}" aria-label="Berita">
             <i class="bi bi-newspaper"></i>
             <span>Berita</span>
         </a>
 
-        <a
-            href="{{ auth()->check() ? route('profile.user') : route('login') }}"
-            class="{{ request()->routeIs('profile.user') ? 'active' : '' }}"
-            aria-label="Profil"
-        >
+        <a href="{{ auth()->check() ? route('profile.user') : route('login') }}"
+            class="{{ request()->routeIs('profile.user') ? 'active' : '' }}" aria-label="Profil">
             <i class="bi bi-person"></i>
             <span>Profil</span>
         </a>

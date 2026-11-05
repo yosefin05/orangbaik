@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         penghasilan: {
             title: "Zakat Penghasilan",
             percent: 2.5,
-            nisab: "Nishab zakat penghasilan 2024: Rp6.859.394/bulan (setara 85 gram emas/tahun).",
+            nisabMode: "bulan",
             note: "Zakat penghasilan dihitung dari pendapatan bersih.",
             law: "Zakat penghasilan umumnya dihitung sebesar 2,5% dari pendapatan bersih yang telah mencapai nisab.",
             fields: [
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         emas: {
             title: "Zakat Emas",
             percent: 2.5,
-            nisab: "Nishab zakat penghasilan 2024: Rp6.859.394/bulan (setara 85 gram emas/tahun).",
+            nisabMode: "tahun",
             note: "Zakat emas dihitung dari total nilai emas yang dimiliki.",
             law: "Zakat emas dikenakan apabila emas yang dimiliki telah mencapai nisab dan memenuhi ketentuan haul.",
             fields: [
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
         tabungan: {
             title: "Zakat Tabungan",
             percent: 2.5,
-            nisab: "Nishab zakat penghasilan 2024: Rp6.859.394/bulan (setara 85 gram emas/tahun).",
+            nisabMode: "tahun",
             note: "Zakat tabungan dihitung dari total simpanan bersih.",
             law: "Zakat tabungan dikenakan apabila simpanan telah mencapai nisab dan memenuhi ketentuan haul.",
             fields: [
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         perdagangan: {
             title: "Zakat Perniagaan",
             percent: 2.5,
-            nisab: "Nishab zakat penghasilan 2024: Rp6.859.394/bulan (setara 85 gram emas/tahun).",
+            nisabMode: "tahun",
             note: "Zakat perniagaan dihitung dari aset usaha bersih.",
             law: "Zakat perniagaan dihitung dari harta usaha bersih seperti kas, stok barang, dan piutang lancar setelah dikurangi hutang.",
             fields: [
@@ -205,6 +205,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const clean = onlyNumber(input.value);
 
         input.value = clean ? formatNumber(Number(clean)) : "";
+    }
+
+    function getNisabText(config) {
+        return config.nisabMode === "bulan"
+            ? formatRupiah(NISAB_BULANAN) + " / bulan"
+            : formatRupiah(NISAB_TAHUNAN) + " / tahun";
     }
 
     function createField(field) {
@@ -328,7 +334,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateLivePreview() {
-        const config = zakatData[currentType];
         const result = getCalculation();
 
         if (liveZakatAmount) {
@@ -345,11 +350,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (result.wajib) {
             liveZakatNote.textContent =
-                "✅ Harta telah mencapai nisab. Estimasi zakat sebesar " +
-                formatRupiah(result.zakat);
+                "Harta telah mencapai nisab. Estimasi zakat sebesar " +
+                formatRupiah(result.zakat) +
+                ".";
         } else {
             liveZakatNote.textContent =
-                "💙 Harta belum mencapai nisab sehingga belum wajib zakat. Namun Anda tetap dapat bersedekah.";
+                "Harta belum mencapai nisab sehingga belum wajib zakat. Namun Anda tetap dapat bersedekah.";
         }
     }
 
@@ -382,21 +388,23 @@ document.addEventListener("DOMContentLoaded", function () {
         if (resultStatus) {
             if (result.wajib) {
                 resultStatus.innerHTML = `
-            <span class="badge-success">
-                ✅ Wajib Zakat
-            </span>
-        `;
+                    <span class="badge-success">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Wajib Zakat
+                    </span>
+                `;
             } else {
                 resultStatus.innerHTML = `
-            <span class="badge-warning">
-                💙 Belum Wajib Zakat
-            </span>
-            <p style="margin-top:8px">
-                Harta Anda belum mencapai nisab.
-                Anda belum berkewajiban membayar zakat,
-                namun tetap dianjurkan untuk bersedekah.
-            </p>
-        `;
+                    <span class="badge-warning">
+                        <i class="bi bi-info-circle-fill"></i>
+                        Belum Wajib Zakat
+                    </span>
+                    <p class="zakat-result-status-note">
+                        Harta Anda belum mencapai nisab. Anda belum
+                        berkewajiban membayar zakat, namun tetap
+                        dianjurkan untuk bersedekah.
+                    </p>
+                `;
             }
         }
 
@@ -443,7 +451,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (nisabInfo) {
-            nisabInfo.textContent = zakatData[currentType].nisab;
+            nisabInfo.textContent = getNisabText(zakatData[currentType]);
         }
 
         tabs.forEach(function (tab) {
@@ -499,14 +507,25 @@ document.addEventListener("DOMContentLoaded", function () {
     setActiveType(currentType);
 });
 
+/*
+    Di bawah ini sisa fitur "alasan verifikasi" yang elemennya tidak ada
+    di halaman kalkulator. Diberi pengaman null agar tidak error di console.
+    Kalau memang tidak dipakai di sini, dua blok ini boleh dihapus.
+*/
 const checkboxLainnya = document.getElementById("lainnya");
 const textareaLainnya = document.getElementById("lainnyaText");
 
-checkboxLainnya.addEventListener("change", function () {
-    textareaLainnya.style.display = this.checked ? "block" : "none";
-});
+if (checkboxLainnya && textareaLainnya) {
+    checkboxLainnya.addEventListener("change", function () {
+        textareaLainnya.style.display = this.checked ? "block" : "none";
+    });
+}
 
 function gabungkanAlasan() {
+    const catatan = document.getElementById("catatan_verifikasi");
+
+    if (!checkboxLainnya || !textareaLainnya || !catatan) return;
+
     let alasan = [];
 
     document.querySelectorAll(".alasan-check").forEach(function (item) {
@@ -523,7 +542,5 @@ function gabungkanAlasan() {
         }
     }
 
-    document.getElementById("catatan_verifikasi").value = alasan.length
-        ? "• " + alasan.join("\n• ")
-        : "";
+    catatan.value = alasan.length ? "• " + alasan.join("\n• ") : "";
 }

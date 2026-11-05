@@ -21,60 +21,68 @@
 
     <main class="zakat-page">
 
-        {{-- HERO --}}
+               {{-- ==========================================
+            1. HERO
+        =========================================== --}}
         <section class="z-hero">
             <div class="container z-hero-grid">
 
                 <div class="z-hero-copy">
-                    <h1>Zakat itu hitungan pasti,<br>bukan tebakan.</h1>
+
+                    <span class="z-eyebrow">
+                        <i class="bi bi-calculator"></i>
+                        Kalkulator Zakat
+                    </span>
+
+                    <h1>Zakat itu hitungan pasti, bukan tebakan.</h1>
+
                     <p>
-                        Masukkan penghasilan, emas, tabungan, atau aset niaga Anda —
-                        kalkulator ini menghitung nisab dan besaran zakat sesuai
+                        Masukkan penghasilan, emas, tabungan, atau aset niaga Anda.
+                        Kalkulator ini menghitung nisab dan besaran zakat sesuai
                         ketentuan yang berlaku, lengkap dengan rinciannya.
                     </p>
+
                     <a href="#zakatCalculator" class="z-cta">Mulai Hitung</a>
+
                 </div>
 
-                <div class="z-hero-receipt" aria-hidden="true">
-                    <div class="z-receipt-row">
-                        <span>Jenis</span>
-                        <strong>Zakat Penghasilan</strong>
-                    </div>
-                    <div class="z-receipt-row">
-                        <span>Penghasilan/bln</span>
-                        <strong>Rp 8.000.000</strong>
-                    </div>
-                    <div class="z-receipt-row">
-                        <span>Nisab</span>
-                        <strong>Rp 6.245.900</strong>
-                    </div>
-                    <div class="z-receipt-divider"></div>
-                    <div class="z-receipt-row z-receipt-total">
-                        <span>Zakat (2.5%)</span>
-                        <strong>Rp 200.000</strong>
-                    </div>
-                </div>
+                <ul class="z-hero-facts">
+                    <li class="z-fact">
+                        <span class="z-fact-icon"><i class="bi bi-percent"></i></span>
+                        <span class="z-fact-text">
+                            <strong>2,5%</strong>
+                            <small>Tarif zakat</small>
+                        </span>
+                    </li>
+
+                    <li class="z-fact">
+                        <span class="z-fact-icon"><i class="bi bi-gem"></i></span>
+                        <span class="z-fact-text">
+                            <strong>85 gram</strong>
+                            <small>Nisab emas</small>
+                        </span>
+                    </li>
+
+                    <li class="z-fact">
+                        <span class="z-fact-icon"><i class="bi bi-calendar-check"></i></span>
+                        <span class="z-fact-text">
+                            <strong>1 tahun</strong>
+                            <small>Haul</small>
+                        </span>
+                    </li>
+                </ul>
 
             </div>
         </section>
 
-        {{-- INFO --}}
-        <section class="z-note-section">
-            <div class="container">
-                <p class="z-note">
-                    <i class="bi bi-info-circle-fill"></i>
-                    Perhitungan ini bersifat estimasi. Untuk kepastian, cocokkan dengan
-                    <a href="https://baznas.go.id/assets/pdf/ppid/tentang%20zakat/SK_01_2024.pdf" target="_blank" rel="noopener noreferrer">panduan BAZNAS</a>
-                    atau ustadz tepercaya.
-                </p>
-            </div>
-        </section>
 
-        {{-- CALCULATOR --}}
+        {{-- ==========================================
+            2. KALKULATOR
+        =========================================== --}}
         <section class="zakat-calculator-section" id="zakatCalculator">
             <div class="container zakat-calculator-layout">
 
-                {{-- LEFT: LEDGER --}}
+                {{-- KIRI: FORM --}}
                 <div class="zakat-panel z-ledger">
 
                     <div class="z-ledger-header">
@@ -85,34 +93,22 @@
                     <div class="z-tabbar" role="tablist" aria-label="Jenis zakat">
                         <button type="button" class="zakat-tab active" data-zakat="penghasilan">
                             <i class="bi bi-briefcase-fill"></i>
-                            <span class="zakat-tab-content">
-                                <strong>Penghasilan</strong>
-                                <small>Gaji &amp; pendapatan rutin</small>
-                            </span>
+                            <span class="zakat-tab-content"><strong>Penghasilan</strong></span>
                         </button>
 
                         <button type="button" class="zakat-tab" data-zakat="emas">
                             <i class="bi bi-gem"></i>
-                            <span class="zakat-tab-content">
-                                <strong>Emas</strong>
-                                <small>Kepemilikan mencapai nisab</small>
-                            </span>
+                            <span class="zakat-tab-content"><strong>Emas</strong></span>
                         </button>
 
                         <button type="button" class="zakat-tab" data-zakat="tabungan">
                             <i class="bi bi-bank2"></i>
-                            <span class="zakat-tab-content">
-                                <strong>Tabungan</strong>
-                                <small>Simpanan &amp; deposito</small>
-                            </span>
+                            <span class="zakat-tab-content"><strong>Tabungan</strong></span>
                         </button>
 
                         <button type="button" class="zakat-tab" data-zakat="perdagangan">
                             <i class="bi bi-bar-chart-fill"></i>
-                            <span class="zakat-tab-content">
-                                <strong>Perniagaan</strong>
-                                <small>Aset &amp; keuntungan usaha</small>
-                            </span>
+                            <span class="zakat-tab-content"><strong>Perniagaan</strong></span>
                         </button>
                     </div>
 
@@ -126,6 +122,7 @@
 
                         <div class="z-form-head">
                             <h3 id="formTitle">Zakat Penghasilan</h3>
+
                             <div class="z-nisab">
                                 <span>Nisab saat ini</span>
                                 <strong id="nisabInfo">-</strong>
@@ -139,6 +136,7 @@
                                 <span>Estimasi zakat</span>
                                 <strong id="liveZakatAmount">Rp0</strong>
                             </div>
+
                             <p id="liveZakatNote">
                                 Isi data untuk melihat estimasi sebelum dihitung sistem.
                             </p>
@@ -150,9 +148,18 @@
                         </button>
                     </form>
 
+                    <p class="z-note">
+                        <i class="bi bi-info-circle"></i>
+                        <span>
+                            Perhitungan ini bersifat estimasi. Untuk kepastian, cocokkan dengan
+                            <a href="https://baznas.go.id/assets/pdf/ppid/tentang%20zakat/SK_01_2024.pdf" target="_blank" rel="noopener noreferrer">panduan BAZNAS</a>
+                            atau ustadz tepercaya.
+                        </span>
+                    </p>
+
                 </div>
 
-                {{-- RIGHT: RECEIPT RESULT --}}
+                {{-- KANAN: HASIL --}}
                 <aside class="zakat-result-area">
 
                     <div class="zakat-result-card is-empty" id="zakatResultCard">
@@ -164,7 +171,7 @@
 
                         <div class="zakat-empty-state" id="zakatResultEmpty">
                             <i class="bi bi-receipt"></i>
-                            <p>Isi form di sebelah kiri untuk melihat rincian zakat Anda di sini.</p>
+                            <p>Isi form untuk melihat rincian zakat Anda di sini.</p>
                         </div>
 
                         <div class="zakat-result-content" id="zakatResultContent" hidden>
@@ -227,7 +234,10 @@
             </div>
         </section>
 
-        {{-- SYARAT --}}
+
+        {{-- ==========================================
+            3. SYARAT WAJIB ZAKAT
+        =========================================== --}}
         <section class="z-terms-section">
             <div class="container">
 
@@ -244,6 +254,7 @@
                             <p>Harta telah mencapai batas minimum yang ditentukan.</p>
                         </div>
                     </div>
+
                     <div class="z-term-row">
                         <i class="bi bi-check2"></i>
                         <div>
@@ -251,6 +262,7 @@
                             <p>Harta tertentu telah dimiliki selama satu tahun penuh.</p>
                         </div>
                     </div>
+
                     <div class="z-term-row">
                         <i class="bi bi-check2"></i>
                         <div>
@@ -258,6 +270,7 @@
                             <p>Harta memiliki potensi berkembang atau menghasilkan.</p>
                         </div>
                     </div>
+
                     <div class="z-term-row">
                         <i class="bi bi-check2"></i>
                         <div>
@@ -272,8 +285,8 @@
 
     </main>
 
-     <!-- FLOATING WHATSAPP BUTTON -->
-    @if(env('ENABLE_WA_FLOATING', true))
+    {{-- FLOATING WHATSAPP BUTTON --}}
+    @if (env('ENABLE_WA_FLOATING', true))
         <div class="floating-wa-container">
             <a href="https://wa.me/{{ env('WHATSAPP_NUMBER', '6281385002300') }}?text={{ urlencode(env('WHATSAPP_MESSAGE', 'Halo tim OrangBaik.id, saya mau bertanya mengenai...')) }}"
                 target="_blank" rel="noopener noreferrer" class="floating-wa-btn"
@@ -290,7 +303,7 @@
 
     <script>
         window.selectedZakat = @json($selectedZakat);
-    window.zakatOldInput = @json(old());
+        window.zakatOldInput = @json(old());
     </script>
     <script src="{{ asset('js/header.js') }}"></script>
     <script src="{{ asset('js/kalkulator.js') }}"></script>
