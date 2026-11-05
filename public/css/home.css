@@ -1692,16 +1692,6 @@ body.filter-open .floating-wa-container {
         padding-block: var(--space-3);
     }
 
-    .main .new-title {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0 0 0 0);
-        white-space: nowrap;
-    }
-
     .new-item {
         flex: 0 0 90%;
         border-radius: var(--radius-md);
