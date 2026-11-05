@@ -37,6 +37,7 @@
     --on-dark-soft: color-mix(in srgb, var(--bg) 75%, transparent);
 
     overflow-x: hidden;
+    overflow-x: clip; /* clip (bukan hidden) agar elemen sticky di dalam .main tetap berfungsi */
     background: var(--bg-soft);
 }
 
@@ -963,204 +964,536 @@
 
 /* =========================================================
    8. FILTER DONASI
+   Bar tiga tombol: Kategori (pilih satu) • Jenis penggalang
+   (pilih satu) • Filter (checklist).
+   Desktop : panel dropdown di bawah tombol.
+   Mobile  : bottom sheet (≤ 768px, sama dengan bottom nav).
+   Semua input berada di satu <form>; tombol "Terapkan" mengirimnya.
 ========================================================= */
 
 .donasi-filter-section {
     position: sticky;
-    top: 0;
+    top: 75px; /* tepat di bawah header desktop (74px + border) */
     z-index: 50;
     margin-bottom: var(--space-4);
-    padding: var(--space-3) 0;
+    padding: var(--space-2) 0;
     border-bottom: 1px solid var(--border-soft);
     background: var(--bg);
 }
 
-.donasi-filter-form {
+/* saat panel terbuka, naik di atas header (100) dan bottom nav (250) */
+.donasi-filter-section.is-open {
+    z-index: 300;
+}
+
+.filter-bar {
     display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    width: 100%;
-    min-width: 0;
-}
-
-.donasi-filter-top {
-    display: contents;
-}
-
-/* Select */
-
-.donasi-filter-selects {
-    order: 1;
-    display: flex;
-    flex: 0 0 auto;
-    align-items: center;
-    min-width: 0;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-full);
-    background: var(--bg-soft);
-    transition:
-        border-color .2s ease,
-        box-shadow .2s ease;
-}
-
-.donasi-filter-selects:hover,
-.donasi-filter-selects:focus-within {
-    border-color: var(--primary);
-}
-
-.donasi-filter-selects:focus-within {
-    box-shadow: 0 0 0 3px color-mix(
-        in srgb,
-        var(--primary) 15%,
-        transparent
-    );
-}
-
-.donasi-filter-selects select {
-    height: 36px;
-    min-width: 0;
-    padding: 0 var(--space-8) 0 var(--space-4);
-    appearance: none;
-    -webkit-appearance: none;
-    border: 0;
-    border-radius: var(--radius-full);
-    background-color: transparent;
-    background-image:
-        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-    background-position:
-        calc(100% - 17px) 50%,
-        calc(100% - 12px) 50%;
-    background-size: 5px 5px;
-    background-repeat: no-repeat;
-    color: var(--text);
-    font-size: var(--fs-xxs);
-    font-weight: var(--fw-medium);
-    text-overflow: ellipsis;
-    outline: none;
-    cursor: pointer;
-    transition: color .2s ease;
-}
-
-.donasi-filter-selects select:hover {
-    color: var(--primary);
-}
-
-.donasi-filter-selects select + select {
-    border-left: 1px solid var(--border);
-    border-radius: 0 var(--radius-full) var(--radius-full) 0;
-}
-
-/* Chip kategori */
-
-.donasi-filter-chips {
-    order: 2;
-    display: flex;
-    flex: 1 1 0;
     align-items: center;
     gap: var(--space-2);
     min-width: 0;
-    margin: 0;
-    padding: 2px var(--space-8) 2px var(--space-3);
-    overflow-x: auto;
-    border-left: 1px solid var(--border-soft);
-    scrollbar-width: none;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    -webkit-mask-image: linear-gradient(
-        to right,
-        #000 calc(100% - 48px),
-        transparent 100%
-    );
-    mask-image: linear-gradient(
-        to right,
-        #000 calc(100% - 48px),
-        transparent 100%
-    );
 }
 
-.donasi-filter-chips::-webkit-scrollbar {
-    display: none;
+.filter-item {
+    position: relative;
+    min-width: 0;
 }
 
-.donasi-filter-chip {
+/* Tombol pemicu */
+
+.filter-trigger {
     display: inline-flex;
-    height: 34px;
-    flex-shrink: 0;
+    height: 40px;
+    max-width: 100%;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
+    gap: var(--space-2);
     padding: 0 var(--space-4);
+    border: 1px solid var(--border);
     border-radius: var(--radius-full);
-    background: transparent;
+    background: var(--bg);
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+
+.filter-trigger:hover {
+    border-color: var(--primary);
+    background: var(--bg-soft);
+    color: var(--primary);
+}
+
+.filter-trigger.is-active,
+.filter-trigger[aria-expanded="true"] {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+}
+
+.filter-trigger-icon {
+    flex-shrink: 0;
+    color: var(--primary);
+    font-size: var(--fs-sm);
+    line-height: 1;
+}
+
+.filter-trigger-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.filter-trigger-caret {
+    flex-shrink: 0;
     color: var(--muted);
     font-size: var(--fs-xxs);
+    transition: transform .2s ease;
+}
+
+.filter-trigger[aria-expanded="true"] .filter-trigger-caret {
+    color: var(--primary);
+    transform: rotate(180deg);
+}
+
+.filter-trigger-count {
+    display: inline-grid;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    place-items: center;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: var(--bg);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+}
+
+/* Hapus semua */
+
+.filter-reset {
+    display: inline-flex;
+    height: 40px;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-1);
+    margin-left: auto;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-full);
+    color: var(--muted);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
     white-space: nowrap;
-    cursor: pointer;
-    user-select: none;
-    scroll-snap-align: start;
     transition:
         background-color .2s ease,
         color .2s ease;
 }
 
-.donasi-filter-chip input[type="checkbox"] {
-    display: none;
+.filter-reset i {
+    font-size: var(--fs-xxs);
 }
 
-.donasi-filter-chip:hover {
-    background: var(--primary-light);
-    color: var(--primary);
+.filter-reset:hover,
+.filter-reset:focus-visible {
+    background: var(--danger-light);
+    color: var(--danger);
 }
 
-.donasi-filter-chip.active::before {
-    content: "✓";
-    line-height: 1;
+/* Backdrop (transparan di desktop: hanya penangkap klik luar) */
+
+.filter-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    visibility: hidden;
+    opacity: 0;
+    background: transparent;
+    transition:
+        opacity .25s ease,
+        visibility .25s ease;
 }
 
-.donasi-filter-chip.active,
-.donasi-filter-chip.active:hover {
-    background: var(--primary);
-    color: var(--bg);
-    font-weight: var(--fw-bold);
+.donasi-filter-section.is-open .filter-backdrop {
+    visibility: visible;
+    opacity: 1;
 }
 
-/* Reset */
+/* Panel */
 
-.donasi-reset-filter {
-    order: 3;
-    display: inline-flex;
-    height: 36px;
-    flex-shrink: 0;
+.filter-panel {
+    position: absolute;
+    z-index: 2;
+    top: calc(100% + var(--space-2));
+    left: 0;
+    display: flex;
+    width: 320px;
+    max-height: min(70vh, 480px);
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    box-shadow: var(--shadow-hover);
+    outline: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition:
+        opacity .2s ease,
+        transform .2s ease,
+        visibility .2s ease;
+}
+
+.filter-item.is-open .filter-panel {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.filter-panel-head {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 0 var(--space-3);
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.filter-panel-head h2 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.25;
+    letter-spacing: -.01em;
+}
+
+.filter-close {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    place-items: center;
     border: 0;
     border-radius: var(--radius-full);
     background: transparent;
     color: var(--muted);
-    font-size: var(--fs-xxs);
+    font-size: var(--fs-xs);
+    transition:
+        background-color .2s ease,
+        color .2s ease;
+}
+
+.filter-close:hover {
+    background: var(--bg-soft);
+    color: var(--text-dark);
+}
+
+.filter-panel-body {
+    flex: 1;
+    min-height: 0;
+    padding: var(--space-2);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.filter-empty {
+    padding: var(--space-4);
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    text-align: center;
+}
+
+.filter-panel-foot {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--border-soft);
+    background: var(--bg);
+}
+
+/* lebar tombol global (100% di ≤576px) tidak dipakai di footer panel */
+.filter-panel-foot .btn {
+    width: auto;
+}
+
+.filter-panel-foot .btn-primary {
+    flex: 1;
+}
+
+/* Opsi (radio = pilih satu, checkbox = checklist) */
+
+.filter-option {
+    position: relative;
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
-    white-space: nowrap;
     cursor: pointer;
     transition:
-        color .2s ease,
-        background-color .2s ease;
+        background-color .15s ease,
+        color .15s ease;
 }
 
-.donasi-reset-filter::before {
-    content: "✕";
-    font-size: .85em;
-    line-height: 1;
+.filter-option:hover {
+    background: var(--bg-soft);
 }
 
-.donasi-reset-filter:hover,
-.donasi-reset-filter:focus-visible {
-    outline: none;
-    background: var(--danger-light);
-    color: var(--danger);
+.filter-option:has(input:checked) {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+}
+
+.filter-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.filter-option-main {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.filter-option-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.filter-option-glyph {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    place-items: center;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: var(--fs-xs);
+    transition: background-color .15s ease;
+}
+
+.filter-option:has(input:checked) .filter-option-glyph {
+    background: var(--bg);
+}
+
+/* Penanda pilihan (radio bulat / checkbox kotak) */
+
+.filter-option-mark {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg);
+    transition:
+        background-color .15s ease,
+        border-color .15s ease;
+}
+
+.filter-option-mark::after {
+    position: absolute;
+    inset: 3px;
+    border-radius: inherit;
+    background: var(--primary);
+    content: "";
+    transform: scale(0);
+    transition: transform .15s ease;
+}
+
+.filter-option input:checked ~ .filter-option-mark {
+    border-color: var(--primary);
+}
+
+.filter-option input:checked ~ .filter-option-mark::after {
+    transform: scale(1);
+}
+
+.filter-option input:focus-visible ~ .filter-option-mark {
+    outline: 3px solid color-mix(in srgb, var(--primary) 25%, transparent);
+    outline-offset: 2px;
+}
+
+/* checkbox */
+
+.filter-option-mark.is-check {
+    border-radius: 6px;
+}
+
+.filter-option-mark.is-check::after {
+    inset: auto;
+    top: 0;
+    left: 4px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--bg);
+    border-width: 0 2px 2px 0;
+    border-radius: 0;
+    background: transparent;
+    transform: rotate(45deg) scale(0);
+}
+
+.filter-option input:checked ~ .filter-option-mark.is-check {
+    background: var(--primary);
+}
+
+.filter-option input:checked ~ .filter-option-mark.is-check::after {
+    transform: rotate(45deg) scale(1);
+}
+
+/* saat panel terbuka, floating WhatsApp disembunyikan agar tidak menutupi */
+body.filter-open .floating-wa-container {
+    display: none;
+}
+
+/* ---------- Mobile: bottom sheet ---------- */
+
+@media (max-width: 768px) {
+
+    .donasi-filter-section {
+        top: 67px; /* tepat di bawah header mobile (66px + border) */
+    }
+
+    .filter-item {
+        flex: 1 1 0;
+    }
+
+    .filter-trigger {
+        width: 100%;
+        height: 38px;
+        justify-content: center;
+        gap: var(--space-1);
+        padding: 0 var(--space-2);
+    }
+
+    .filter-trigger-caret {
+        display: none;
+    }
+
+    .filter-reset {
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        justify-content: center;
+        margin-left: 0;
+        padding: 0;
+        border: 1px solid var(--border);
+    }
+
+    .filter-reset span {
+        display: none;
+    }
+
+    .filter-backdrop {
+        background: var(--scrim);
+    }
+
+    .filter-panel {
+        position: fixed;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: auto;
+        max-height: 82vh;
+        max-height: 82dvh;
+        border-width: 1px 0 0;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        box-shadow: 0 -12px 40px color-mix(in srgb, var(--text-dark) 18%, transparent);
+        transform: translateY(100%);
+        transition:
+            transform .3s cubic-bezier(.25, 1, .5, 1),
+            opacity .2s ease,
+            visibility .3s ease;
+    }
+
+    .filter-item.is-open .filter-panel {
+        transform: translateY(0);
+    }
+
+    /* garis pegangan sheet */
+    .filter-panel-head {
+        position: relative;
+        padding: var(--space-5) var(--space-3) var(--space-3) var(--space-4);
+    }
+
+    .filter-panel-head::before {
+        position: absolute;
+        top: var(--space-2);
+        left: 50%;
+        width: 36px;
+        height: 4px;
+        border-radius: var(--radius-full);
+        background: var(--border);
+        content: "";
+        transform: translateX(-50%);
+    }
+
+    .filter-panel-foot {
+        padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.filter-open {
+        overflow: hidden;
+    }
+}
+
+
+/* Judul kategori terpilih (halaman donasi).
+   Menggantikan baris ikon kategori; di mobile disembunyikan karena
+   nama kategori sudah tampil di header. */
+
+.donasi-kategori-bar {
+    padding-bottom: var(--space-1);
+}
+
+.donasi-kategori-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.donasi-kategori-title h1 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    letter-spacing: -.02em;
+}
+
+.donasi-kategori-title a {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--primary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+}
+
+.donasi-kategori-title a:hover {
+    text-decoration: underline;
 }
 
 
@@ -1242,7 +1575,6 @@
 
     .main .section-title {
         margin-bottom: var(--space-3);
-            font-size: var(--fs-sm);
     }
 
     /* Hero: full-width (edge-to-edge), menempel di bawah header.
@@ -1532,53 +1864,9 @@
         margin-top: var(--space-3);
     }
 
-    /* =====================================
-       FILTER DONASI
-    ===================================== */
-
-    .donasi-filter-section {
-        z-index: 49;
-        margin-bottom: var(--space-3);
-        padding: var(--space-2) 0;
-    }
-
-    .donasi-filter-form {
-        gap: var(--space-2);
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .donasi-filter-form::-webkit-scrollbar {
+    /* nama kategori sudah ada di header (mobile) */
+    .donasi-kategori-bar {
         display: none;
-    }
-
-    .donasi-reset-filter {
-        order: 2;
-        height: 32px;
-        padding: 0 var(--space-3);
-    }
-
-    .donasi-filter-chips {
-        order: 3;
-        flex: 0 0 auto;
-        padding: 0 var(--space-4) 0 var(--space-2);
-        overflow: visible;
-        -webkit-mask-image: none;
-        mask-image: none;
-    }
-
-    .donasi-filter-selects select {
-        height: 32px;
-        padding: 0 28px 0 var(--space-3);
-        background-position:
-            calc(100% - 15px) 50%,
-            calc(100% - 10px) 50%;
-    }
-
-    .donasi-filter-chip {
-        height: 32px;
-        padding: 0 var(--space-3);
     }
 }
 
@@ -1657,10 +1945,13 @@
     .new-item-overlay,
     .testimonial-item,
     .testimonial-card,
-    .donasi-filter-selects,
-    .donasi-filter-selects select,
-    .donasi-filter-chip,
-    .donasi-reset-filter {
+    .filter-trigger,
+    .filter-trigger-caret,
+    .filter-backdrop,
+    .filter-panel,
+    .filter-option,
+    .filter-option-mark,
+    .filter-option-mark::after {
         transition: none !important;
     }
 

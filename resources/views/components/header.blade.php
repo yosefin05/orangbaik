@@ -1,4 +1,7 @@
 @php
+    // Judul kategori (opsional). Dikirim dari halaman donasi saat sebuah
+    $headerTitle = $headerTitle ?? null;
+
     // Deteksi halaman asal
     $isLandingPage = request()->is('/');
     $isDonationPage = request()->is('donasi', 'donasi/*');
@@ -18,13 +21,19 @@
         ? 'Cari berita...'
         : 'Cari program donasi...';
 
-    // Halaman yang menggunakan bottom navigation
-    $showBottomNav = $isLandingPage
-        || request()->is('donasi/*')
-        || request()->is('berita/*')
-        || request()->is('kalkulator/*')
+    // Halaman utama (setara): Beranda, Donasi, Kalkulator, Berita, Profil.
+    // Semuanya memakai header + bottom navigation dan TANPA tombol back.
+    // Pola tanpa wildcard (mis. "donasi") sebelumnya tidak ikut terdaftar,
+    // sehingga /donasi, /berita, dan /kalkulator salah menampilkan back.
+    $showBottomNav = request()->is(
+            '/',
+            'donasi', 'donasi/*',
+            'berita', 'berita/*',
+            'kalkulator', 'kalkulator/*'
+        )
         || request()->routeIs('profile.user');
 
+    // Tombol back hanya untuk halaman di luar halaman utama (detail, form, dll.)
     $showMobileBack = !$showBottomNav;
 @endphp
 
@@ -180,34 +189,44 @@
     </div>
 
     {{-- ==========================================
-         MOBILE HEADER SEARCH
+         MOBILE HEADER
+         - Default            : search bar
+         - Kategori dipilih   : nama kategori menggantikan search bar
     =========================================== --}}
     @if ($showMobileSearch)
         <div class="container mobile-header-inner">
 
-            <form
-                action="{{ route('search') }}"
-                method="GET"
-                class="mobile-search-form"
-            >
-                <button type="submit" aria-label="Cari">
-                    <i class="bi bi-search"></i>
-                </button>
+            @if ($headerTitle)
 
-                <input
-                    type="search"
-                    name="q"
-                    value="{{ request('q') }}"
-                    placeholder="{{ $mobileSearchPlaceholder }}"
-                    aria-label="{{ $mobileSearchPlaceholder }}"
-                >
+                <h1 class="mobile-header-title">{{ $headerTitle }}</h1>
 
-                <input
-                    type="hidden"
-                    name="type"
-                    value="{{ $mobileSearchType }}"
+            @else
+
+                <form
+                    action="{{ route('search') }}"
+                    method="GET"
+                    class="mobile-search-form"
                 >
-            </form>
+                    <button type="submit" aria-label="Cari">
+                        <i class="bi bi-search"></i>
+                    </button>
+
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ request('q') }}"
+                        placeholder="{{ $mobileSearchPlaceholder }}"
+                        aria-label="{{ $mobileSearchPlaceholder }}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="type"
+                        value="{{ $mobileSearchType }}"
+                    >
+                </form>
+
+            @endif
 
         </div>
     @endif
@@ -217,6 +236,7 @@
 
 {{-- ==========================================
      MOBILE BACK BUTTON
+     Hanya untuk halaman di luar halaman utama.
 =========================================== --}}
 @if ($showMobileBack)
     <a
