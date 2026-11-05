@@ -1575,6 +1575,7 @@ body.filter-open .floating-wa-container {
 
     .main .section-title {
         margin-bottom: var(--space-3);
+        font-size: var(--fs-sm);
     }
 
     /* Hero: full-width (edge-to-edge), menempel di bawah header.
