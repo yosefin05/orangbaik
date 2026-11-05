@@ -1,6 +1,11 @@
 @php
     // Judul kategori (opsional). Dikirim dari halaman donasi saat sebuah
+    // kategori dipilih; bila terisi, header mobile menampilkan nama
+    // kategori menggantikan search bar.
     $headerTitle = $headerTitle ?? null;
+
+    // Ikon kategori (opsional), dikirim bersama $headerTitle.
+    $headerIcon = $headerIcon ?? 'assets/lainnya.svg';
 
     // Deteksi halaman asal
     $isLandingPage = request()->is('/');
@@ -23,8 +28,6 @@
 
     // Halaman utama (setara): Beranda, Donasi, Kalkulator, Berita, Profil.
     // Semuanya memakai header + bottom navigation dan TANPA tombol back.
-    // Pola tanpa wildcard (mis. "donasi") sebelumnya tidak ikut terdaftar,
-    // sehingga /donasi, /berita, dan /kalkulator salah menampilkan back.
     $showBottomNav = request()->is(
             '/',
             'donasi', 'donasi/*',
@@ -191,14 +194,29 @@
     {{-- ==========================================
          MOBILE HEADER
          - Default            : search bar
-         - Kategori dipilih   : nama kategori menggantikan search bar
+         - Kategori dipilih   : [← back] [Kategori / Nama] [ikon]
     =========================================== --}}
     @if ($showMobileSearch)
-        <div class="container mobile-header-inner">
+        <div class="container mobile-header-inner {{ $headerTitle ? 'is-category' : '' }}">
 
             @if ($headerTitle)
 
-                <h1 class="mobile-header-title">{{ $headerTitle }}</h1>
+                <a
+                    href="{{ route('donasi') }}"
+                    class="mobile-header-back"
+                    aria-label="Kembali ke semua kategori"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+
+                <div class="mobile-header-heading">
+                    <span class="mobile-header-eyebrow">Kategori</span>
+                    <h1 class="mobile-header-title">{{ $headerTitle }}</h1>
+                </div>
+
+                <span class="mobile-header-badge" aria-hidden="true">
+                    <img src="{{ asset($headerIcon) }}" alt="">
+                </span>
 
             @else
 

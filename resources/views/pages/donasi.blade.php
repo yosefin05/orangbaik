@@ -55,8 +55,12 @@
 
     {{-- headerTitle: bila terisi, header (mobile) menampilkan nama kategori
          menggantikan search bar --}}
-    @include('components.header', ['headerTitle' => $kategoriAktif?->nama_kategori])
-
+@include('components.header', [
+    'headerTitle' => $kategoriAktif?->nama_kategori,
+    'headerIcon'  => $kategoriAktif
+        ? ($kategoriIcons[strtolower($kategoriAktif->nama_kategori)] ?? 'assets/lainnya.svg')
+        : null,
+])
     <main class="main donasi-page">
 
         {{-- ==========================================
@@ -571,7 +575,5 @@
 
     <script src="{{ asset('js/header.js') }}"></script>
     <script src="{{ asset('js/donasi.js') }}"></script>
-    <script src="{{ asset('js/donasi-filter.js') }}"></script>
-
 </body>
 </html>
