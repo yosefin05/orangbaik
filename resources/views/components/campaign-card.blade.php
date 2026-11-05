@@ -72,19 +72,11 @@
 @endphp
 
 {{-- Satu struktur untuk dua variant:
-     default = card vertikal, list = card horizontal (.is-list) --}}
-<a
-    class="campaign-card {{ $isList ? 'is-list' : '' }}"
-    href="{{ $campaignUrl }}"
-    aria-label="{{ $campaign->judul }}"
->
+default = card vertikal, list = card horizontal (.is-list) --}}
+<a class="campaign-card {{ $isList ? 'is-list' : '' }}" href="{{ $campaignUrl }}" aria-label="{{ $campaign->judul }}">
     {{-- THUMBNAIL --}}
     <div class="campaign-thumb">
-        <img
-            src="{{ asset('storage/' . $campaign->thumbnail) }}"
-            alt="{{ $campaign->judul }}"
-            loading="lazy"
-        >
+        <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}" loading="lazy">
 
         <span class="campaign-badge {{ $badgeClass }}">
             @if ($diff === null)
@@ -104,10 +96,10 @@
             <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
 
             <small>
-                terkumpul{{ $campaign->target_donasi
-                    ? ' dari Rp ' . number_format($campaign->target_donasi, 0, ',', '.')
-                    : ''
-                }}
+                terkumpul<span class="campaign-target">{{ $campaign->target_donasi
+    ? ' dari Rp ' . number_format($campaign->target_donasi, 0, ',', '.')
+    : ''
+    }}</span>
             </small>
         </div>
 
@@ -131,12 +123,7 @@
                 <span class="campaign-org-avatar">
                     {{ $inisialPenggalang }}
                     @if ($fotoPenggalang)
-                        <img
-                            src="{{ asset('storage/' . $fotoPenggalang) }}"
-                            alt=""
-                            loading="lazy"
-                            onerror="this.remove()"
-                        >
+                        <img src="{{ asset('storage/' . $fotoPenggalang) }}" alt="" loading="lazy" onerror="this.remove()">
                     @endif
                 </span>
 

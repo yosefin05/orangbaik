@@ -119,9 +119,9 @@
         </section>
 
         {{-- YANG BARU --}}
-        <section class="section">
-            <div class="container">
-                <h2 class="section-title">Yuk, Lihat yang Baru!</h2>
+        <section class="section section-new">
+    <div class="container">
+        <h2 class="section-title new-title">Yuk, Lihat yang Baru!</h2>
 
                 <div class="new-grid">
                     @forelse ($campaignTerbaru as $campaign)

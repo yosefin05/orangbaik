@@ -224,9 +224,9 @@
             4. CAMPAIGN TERBARU
             Menggunakan variant new dari komponen Home
         =========================================== --}}
-         <section class="section">
-            <div class="container">
-                <h2 class="section-title">Yuk, Lihat yang Baru!</h2>
+         <section class="section section-new">
+    <div class="container">
+        <h2 class="section-title new-title">Yuk, Lihat yang Baru!</h2>
                 <div class="new-grid">
                     @forelse ($campaignTerbaru as $campaign)
                         @php
@@ -310,18 +310,15 @@
                 <h2 class="section-title">
                     Campaign Lainnya
                 </h2>
+@if ($campaigns->isNotEmpty())
 
-                @if ($campaigns->isNotEmpty())
+    <div class="list-campaign">
+        @foreach ($campaigns as $campaign)
+            <x-campaign-card :campaign="$campaign" variant="list" />
+        @endforeach
+    </div>
 
-                    <div class="campaign-grid">
-
-                        @foreach ($campaigns as $campaign)
-                            <x-campaign-card :campaign="$campaign" />
-                        @endforeach
-
-                    </div>
-
-                @else
+@else
 
                     <p class="donasi-empty">
                         Belum ada campaign lainnya.

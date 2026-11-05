@@ -7,6 +7,11 @@
 
    Seluruh nilai mengacu pada token global.css.
 
+   Prinsip tampilan: padat & minimalis.
+   - Jarak antar section & di dalam card dikecilkan.
+   - Desktop: card boleh banyak agar konten terlihat berkelompok.
+   - Mobile : minim card bertumpuk (list tanpa card, scroll horizontal).
+
    DAFTAR ISI
    1. Global
    2. Hero
@@ -35,14 +40,13 @@
     background: var(--bg-soft);
 }
 
-/* jarak section memakai token responsif global.css (48 → 40 → 32px),
-   tidak perlu override per breakpoint */
+/* jarak section dipadatkan: 32px desktop → 24px tablet → 20px mobile */
 .main .section {
-    padding-block: var(--section-space-sm);
+    padding-block: var(--space-8);
 }
 
-/* margin-bottom judul section mengikuti .section-title di global.css */
 .main .section-title {
+    margin-bottom: var(--space-4);
     color: var(--text-dark);
     font-size: var(--fs-md);
     font-weight: var(--fw-bold);
@@ -62,13 +66,13 @@
 
 /* tanpa padding bawah: jarak ke section berikutnya sudah dari .section */
 .hero-section {
-    padding-block: var(--space-6) 0;
+    padding-block: var(--space-4) 0;
 }
 
 .hero-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 340px;
-    gap: var(--space-12);
+    gap: var(--space-6);
     align-items: stretch;
 }
 
@@ -229,12 +233,12 @@
 .category-grid {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: var(--space-8);
+    gap: var(--space-5);
     align-items: start;
 }
 
 .category-grid-small {
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-4);
 }
 
 .category-item {
@@ -242,21 +246,21 @@
     min-width: 0;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
     text-align: center;
 }
 
 .category-icon {
     display: grid;
-    width: 74px;
-    height: 74px;
+    width: 64px;
+    height: 64px;
     place-items: center;
 }
 
 .category-icon img {
     display: block;
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
 }
 
@@ -294,7 +298,7 @@
 .campaign-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-6);
+    gap: var(--space-4);
 }
 
 .campaign-card {
@@ -393,7 +397,7 @@
     flex-direction: column;
     gap: var(--space-2);
     min-width: 0;
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-3);
 }
 
 .campaign-title {
@@ -596,10 +600,6 @@
 /* desktop: thumbnail lebih besar karena card lebar */
 @media (min-width: 901px) {
 
-    .campaign-card.is-list {
-        gap: var(--space-4);
-    }
-
     .campaign-card.is-list .campaign-thumb {
         flex-basis: 280px;
     }
@@ -610,12 +610,14 @@
    5. CAMPAIGN BARU
    Desain khusus "Yuk, Lihat yang Baru!"
    Tidak menggunakan campaign-card.
+   Di mobile: hanya thumbnail (judul section disembunyikan
+   secara visual, overlay dimatikan).
 ========================================================= */
 
 .new-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-8);
+    gap: var(--space-4);
 }
 
 .new-item {
@@ -646,7 +648,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: var(--space-5);
+    padding: var(--space-4);
     background: linear-gradient(
         180deg,
         transparent 35%,
@@ -673,7 +675,7 @@
 }
 
 .new-item-overlay p {
-    margin: 0 0 var(--space-3);
+    margin: 0 0 var(--space-2);
     color: var(--on-dark-soft);
     font-size: var(--fs-xxs);
 }
@@ -729,17 +731,21 @@
     --side-scale: .82;
     --side-opacity: .5;
 
-    position: relative;
+    /* Semua item ditumpuk di satu sel grid (bukan position: absolute),
+       sehingga tinggi wrapper otomatis mengikuti kartu aktif dan teks
+       panjang tidak pernah terpotong. Padding atas memberi ruang untuk
+       avatar yang menjulur keluar dari kartu aktif. */
+    display: grid;
+    align-items: center;
+    justify-items: center;
     width: 100%;
-    min-height: 240px;
-    margin-top: var(--space-6);
-    overflow: hidden;
+    margin-top: var(--space-2);
+    padding: var(--space-6) 0 var(--space-4);
+    overflow-x: clip;
 }
 
 .testimonial-item {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    grid-area: 1 / 1;
     transition:
         transform .6s cubic-bezier(.25, 1, .5, 1),
         opacity .6s ease,
@@ -748,7 +754,7 @@
 
 .testimonial-item.is-active {
     z-index: 3;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translateX(0) scale(1);
     opacity: 1;
 }
 
@@ -759,22 +765,16 @@
 }
 
 .testimonial-item.is-prev {
-    transform: translate(
-        calc(-50% - var(--offset)),
-        -50%
-    ) scale(var(--side-scale));
+    transform: translateX(calc(var(--offset) * -1)) scale(var(--side-scale));
 }
 
 .testimonial-item.is-next {
-    transform: translate(
-        calc(-50% + var(--offset)),
-        -50%
-    ) scale(var(--side-scale));
+    transform: translateX(var(--offset)) scale(var(--side-scale));
 }
 
 .testimonial-item.is-hidden {
     z-index: 1;
-    transform: translate(-50%, -50%) scale(.6);
+    transform: translateX(0) scale(.6);
     opacity: 0;
     pointer-events: none;
 }
@@ -783,7 +783,7 @@
 
 .testimonial-card {
     width: 240px;
-    padding: var(--space-5);
+    padding: var(--space-4);
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
     background: var(--bg);
@@ -794,7 +794,7 @@
 
 .testimonial-item.is-active .testimonial-card {
     width: min(340px, calc(100vw - var(--space-8)));
-    padding: var(--space-12) var(--space-8) var(--space-8);
+    padding: var(--space-10) var(--space-6) var(--space-6);
     border-color: var(--border);
     box-shadow: var(--shadow-hover);
 }
@@ -805,13 +805,13 @@
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
     transition: all .5s ease;
 }
 
 .testimonial-item.is-active .testimonial-head {
     flex-direction: column;
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-3);
     text-align: center;
 }
 
@@ -826,9 +826,9 @@
 }
 
 .testimonial-item.is-active .testimonial-avatar {
-    width: 76px;
-    height: 76px;
-    margin-top: -70px;
+    width: 72px;
+    height: 72px;
+    margin-top: -58px;
     box-shadow: 0 0 0 4px var(--bg), var(--shadow-soft);
 }
 
@@ -860,11 +860,25 @@
     transition: all .5s ease;
 }
 
+.testimonial-description,
+.testimonial-person-info h3 {
+    overflow-wrap: anywhere;
+}
+
+/* kartu samping hanya preview: dibatasi 4 baris agar tidak menambah
+   tinggi wrapper; kartu aktif selalu tampil penuh */
+.testimonial-item:not(.is-active) .testimonial-description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+}
+
 .testimonial-item.is-active .testimonial-description {
     color: var(--text);
     font-size: var(--fs-sm);
     font-weight: var(--fw-medium);
-    line-height: 1.7;
+    line-height: 1.6;
     text-align: center;
 }
 
@@ -875,7 +889,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-4);
-    margin-top: var(--space-8);
+    margin-top: var(--space-4);
 }
 
 .testimonial-arrow {
@@ -936,12 +950,14 @@
    7. LIST CAMPAIGN (wrapper)
    Satu kolom penuh di semua ukuran layar.
    Isi card diatur di bagian 4 (.campaign-card.is-list).
+   Dipakai di: Home (Pilih Kategori Favoritmu) dan
+   halaman Donasi (Campaign Lainnya).
 ========================================================= */
 
 .list-campaign {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-4);
+    gap: var(--space-3);
 }
 
 
@@ -953,7 +969,7 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-4);
     padding: var(--space-3) 0;
     border-bottom: 1px solid var(--border-soft);
     background: var(--bg);
@@ -1155,11 +1171,15 @@
 
 @media (max-width: 900px) {
 
+    .main .section {
+        padding-block: var(--space-6);
+    }
+
     /* Hero */
 
     .hero-layout {
         grid-template-columns: minmax(0, 1fr);
-        gap: var(--space-6);
+        gap: var(--space-4);
     }
 
     .hero-side-slider {
@@ -1170,21 +1190,21 @@
 
     .category-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: var(--space-5) var(--space-4);
+        gap: var(--space-4);
     }
 
     /* Campaign card vertikal */
 
     .campaign-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: var(--space-4);
-    }
-
-    .campaign-card:not(.is-list) .campaign-body {
-        padding: var(--space-3);
+        gap: var(--space-3);
     }
 
     /* Campaign baru: overlay selalu tampil & ringkas (tanpa hover) */
+
+    .new-grid {
+        gap: var(--space-3);
+    }
 
     .new-item-overlay {
         padding: var(--space-3);
@@ -1216,6 +1236,14 @@
 
 @media (max-width: 600px) {
 
+    .main .section {
+        padding-block: var(--space-5);
+    }
+
+    .main .section-title {
+        margin-bottom: var(--space-3);
+    }
+
     /* Hero: full-width (edge-to-edge), menempel di bawah header.
        Hanya hero yang dilepas dari gutter container; section lain tetap. */
 
@@ -1237,26 +1265,50 @@
     /* Kategori */
 
     .category-grid {
-        gap: var(--space-5) var(--space-3);
-    }
-
-    .category-grid-small {
-        margin-bottom: var(--space-5);
+        gap: var(--space-4) var(--space-3);
     }
 
     .category-item {
-        gap: var(--space-2);
+        gap: var(--space-1);
     }
 
     .category-icon,
     .category-icon img {
-        width: 52px;
-        height: 52px;
+        width: 48px;
+        height: 48px;
     }
 
     .category-item p {
         font-size: var(--fs-xxs);
         line-height: 1.3;
+    }
+
+    /* Kategori bawah ("Pilih Kategori Favoritmu"):
+       satu baris, scroll ke samping (bukan grid 4 kolom) */
+
+    .category-grid-small {
+        --bleed: calc((100vw - 100%) / 2);
+
+        display: flex;
+        flex-wrap: nowrap;
+        gap: var(--space-4);
+        margin-right: calc(var(--bleed) * -1);
+        margin-bottom: var(--space-3);
+        padding: 0 var(--bleed) var(--space-1) 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .category-grid-small::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-grid-small .category-item {
+        flex: 0 0 68px;
+        scroll-snap-align: start;
     }
 
     /* =====================================
@@ -1274,9 +1326,9 @@
 
         display: flex;
         flex-wrap: nowrap;
-        gap: var(--space-3);
+        gap: var(--space-2);
         margin-right: calc(var(--bleed) * -1);
-        padding: var(--space-1) var(--bleed) var(--space-3) 0;
+        padding: var(--space-1) var(--bleed) var(--space-2) 0;
         overflow-x: auto;
         overflow-y: hidden;
         scroll-snap-type: x mandatory;
@@ -1289,25 +1341,42 @@
         display: none;
     }
 
-    /* satu card terlihat penuh + sedikit card berikutnya */
+    /* ± 3/4 lebar layar, card berikutnya mengintip sebagai petunjuk scroll */
     .campaign-grid .campaign-card {
         height: auto;
-        flex: 0 0 min(78%, 300px);
+        flex: 0 0 min(72vw, 280px);
         scroll-snap-align: start;
     }
 
+    /* =====================================
+       CAMPAIGN BARU (mobile)
+       Hanya thumbnail: judul section disembunyikan secara visual
+       (tetap ada untuk screen reader), overlay dimatikan.
+    ===================================== */
+
+    .main .section.section-new {
+        padding-block: var(--space-3);
+    }
+
+    .main .new-title {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+
     .new-item {
-        flex: 0 0 82%;
+        flex: 0 0 90%;
         border-radius: var(--radius-md);
+        box-shadow: var(--shadow-card);
         scroll-snap-align: start;
     }
 
     .new-item-overlay {
-        padding: var(--space-4);
-    }
-
-    .new-item-overlay h3 {
-        font-size: var(--fs-sm);
+        display: none;
     }
 
     /* =====================================
@@ -1326,12 +1395,18 @@
         padding: 5px var(--space-3);
     }
 
+    .campaign-card:not(.is-list) .campaign-body {
+        gap: var(--space-1);
+        padding: var(--space-2) var(--space-3) var(--space-3);
+    }
+
     .campaign-title {
         font-size: var(--fs-xs);
     }
 
     .campaign-footer {
         gap: var(--space-2);
+        padding-top: var(--space-1);
     }
 
     .campaign-org {
@@ -1339,15 +1414,17 @@
     }
 
     .campaign-org-avatar {
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
     }
 
     /* =====================================
-       VARIANT LIST (tanpa card)
+       VARIANT LIST (tanpa card, compact)
        KIRI  : thumbnail 16:9 + badge
        KANAN : judul → penggalang & donatur → progress → nominal
        Item dipisahkan garis tipis.
+       Semua kolom min-width: 0 agar teks panjang terpotong,
+       bukan meluber keluar layar.
     ===================================== */
 
     .list-campaign {
@@ -1356,12 +1433,13 @@
 
     .campaign-card.is-list {
         display: grid;
-        grid-template-columns: 45% minmax(0, 1fr) auto;
+        grid-template-columns: 38% minmax(0, 1fr) auto;
         column-gap: var(--space-3);
-        row-gap: var(--space-2);
+        row-gap: var(--space-1);
         align-items: start;
+        width: 100%;
         height: auto;
-        padding: var(--space-3) 0;
+        padding: var(--space-2) 0;
         overflow: visible;
         border: 0;
         border-bottom: 1px solid var(--border-soft);
@@ -1396,6 +1474,7 @@
     .campaign-card.is-list .campaign-title {
         grid-column: 2 / -1;
         grid-row: 1;
+        min-width: 0;
     }
 
     /* baris 2: penggalang (kiri) • donatur (kanan) */
@@ -1420,19 +1499,18 @@
     .campaign-card.is-list .campaign-progress {
         grid-column: 2 / -1;
         grid-row: 3;
+        min-width: 0;
     }
 
-    /* baris 4: label "Terkumpul" di atas, nominal di bawah */
+    /* baris 4: nominal + "terkumpul" dalam satu baris (target disembunyikan) */
     .campaign-card.is-list .campaign-amount {
         grid-column: 2 / -1;
         grid-row: 4;
-        flex-direction: column-reverse;
-        gap: 0;
+        flex-direction: row;
+        align-items: baseline;
+        gap: var(--space-1);
+        min-width: 0;
         margin: 0;
-    }
-
-    .campaign-card.is-list .campaign-amount small::first-letter {
-        text-transform: uppercase;
     }
 
     .campaign-card.is-list .campaign-target {
@@ -1447,8 +1525,10 @@
         --offset: 160px;
         --side-scale: .7;
         --side-opacity: .2;
+    }
 
-        min-height: 320px;
+    .testimonial-nav {
+        margin-top: var(--space-3);
     }
 
     /* =====================================
@@ -1457,7 +1537,7 @@
 
     .donasi-filter-section {
         z-index: 49;
-        margin-bottom: var(--space-4);
+        margin-bottom: var(--space-3);
         padding: var(--space-2) 0;
     }
 
@@ -1511,22 +1591,20 @@
 
     .category-icon,
     .category-icon img {
-        width: 46px;
-        height: 46px;
+        width: 44px;
+        height: 44px;
     }
 
-    .campaign-grid .campaign-card {
-        flex-basis: min(82%, 300px);
+    .category-grid-small .category-item {
+        flex-basis: 64px;
     }
 
     .campaign-card.is-list {
-        grid-template-columns: 44% minmax(0, 1fr) auto;
+        grid-template-columns: 36% minmax(0, 1fr) auto;
     }
 
     .testimonial-wrapper {
         --offset: 125px;
-
-        min-height: 300px;
     }
 }
 
@@ -1539,7 +1617,7 @@
 @media (max-width: 360px) {
 
     .category-grid {
-        gap: var(--space-4) var(--space-2);
+        gap: var(--space-3) var(--space-2);
     }
 
     .category-icon,
@@ -1553,14 +1631,12 @@
     }
 
     .campaign-card.is-list {
-        grid-template-columns: 42% minmax(0, 1fr) auto;
+        grid-template-columns: 35% minmax(0, 1fr) auto;
         column-gap: var(--space-2);
     }
 
     .testimonial-wrapper {
         --offset: 105px;
-
-        min-height: 280px;
     }
 }
 
