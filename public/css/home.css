@@ -879,7 +879,7 @@
     color: var(--text);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-regular);
-    line-height: 1.2;
+    line-height: 1.5;
     text-align: center;
 }
 
@@ -2265,8 +2265,8 @@ body.filter-open .floating-wa-container {
         overflow: visible;
         color: var(--text-dark);
         font-size: var(--fs-xxs);
-        font-weight: var(--fw-medium);
-        line-height: 1.2;
+        font-weight: var(--fw-semibold);
+        line-height: 1.5;
         text-align: left;
         transition: none;
     }
