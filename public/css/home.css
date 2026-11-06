@@ -430,7 +430,7 @@
 
 .campaign-amount strong {
     color: var(--primary);
-    font-size: var(--fs-xxs);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     line-height: 1.2;
     overflow-wrap: anywhere;
