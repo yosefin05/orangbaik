@@ -2265,7 +2265,7 @@ body.filter-open .floating-wa-container {
         margin: 0 0 var(--space-4);
         overflow: visible;
         color: var(--text-dark);
-        font-size: var(--fs-xxs);
+        font-size: var(--fs-xs);
         font-weight: var(--fw-semibold);
         line-height: 1.5;
         text-align: left;
