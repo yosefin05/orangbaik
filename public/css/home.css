@@ -408,7 +408,7 @@
     overflow: hidden;
     color: var(--text-dark);
     font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
+    font-weight: var(--fw-semibold);
     line-height: 1.4;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -1997,7 +1997,7 @@ body.filter-open .floating-wa-container {
     }
 
     .campaign-title {
-        font-size: var(--fs-xs);
+        font-size: var(--fs-xxs);
     }
 
     .campaign-footer {
