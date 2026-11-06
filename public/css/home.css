@@ -1678,7 +1678,7 @@ body.filter-open .floating-wa-container {
     /* ± 3/4 lebar layar, card berikutnya mengintip sebagai petunjuk scroll */
     .campaign-grid .campaign-card {
         height: auto;
-        flex: 0 0 min(58vw, 220px);
+        flex: 0 0 min(64vw, 240px);
         scroll-snap-align: start;
     }
 
