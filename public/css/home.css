@@ -408,7 +408,7 @@
     overflow: hidden;
     color: var(--text-dark);
     font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-bold);
     line-height: 1.4;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
