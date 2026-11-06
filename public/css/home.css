@@ -1998,6 +1998,7 @@ body.filter-open .floating-wa-container {
 
     .campaign-title {
         font-size: var(--fs-xs);
+        font-weight: var(--fw-semibold);
     }
 
     .campaign-footer {
