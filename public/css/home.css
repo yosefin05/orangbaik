@@ -2056,7 +2056,7 @@ body.filter-open .floating-wa-container {
 
     /* kiri: thumbnail 16:9 + badge, rata atas */
     .campaign-card.is-list .campaign-thumb {
-        flex: 0 0 36%;
+        flex: 0 0 45%;
         align-self: flex-center;
         border-radius: var(--radius-sm);
     }
