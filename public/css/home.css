@@ -2073,7 +2073,7 @@ body.filter-open .floating-wa-container {
 
     /* 1. judul */
     .campaign-card.is-list .campaign-title {
-        order: 1;
+        order: 0;
         min-height: 0;
     }
 
