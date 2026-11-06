@@ -104,7 +104,7 @@
         </section>
 
         {{-- DARURAT --}}
-        <section class="section section-border tone-danger">
+        <section class="section section-band section-tone tone-danger donasi-campaign-section">
             <div class="container">
                 <h2 class="section-title">Darurat! Bantu Sekarang</h2>
 
@@ -135,7 +135,7 @@
         </section>
 
         {{-- YANG BARU --}}
-        <section class="section section-new tone-secondary">
+        <section class="section section-new section-tone tone-secondary">
             <div class="container">
                 <h2 class="section-title new-title">Yuk, Lihat yang Baru!</h2>
 
@@ -190,7 +190,7 @@
         </section>
 
         {{-- PEMBERDAYAAN --}}
-        <section class="section section-border tone-success">
+        <section class="section section-band section-tone tone-success donasi-campaign-section">
             <div class="container">
                 <h2 class="section-title">Pemberdayaan Berkelanjutan</h2>
 
@@ -221,7 +221,7 @@
         </section>
 
         {{-- CAMPAIGN LAINNYA --}}
-        <section class="section section-border tone-primary">
+        <section class="section section-band section-tone tone-primary donasi-campaign-section">
             <div class="container">
                 <h2 class="section-title">Campaign Lainnya</h2>
 
