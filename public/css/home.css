@@ -2056,7 +2056,7 @@ body.filter-open .floating-wa-container {
 
     /* kiri: thumbnail 16:9 + badge, rata atas */
     .campaign-card.is-list .campaign-thumb {
-        flex: 0 0 50%;
+        flex: 0 0 47%;
         align-self: flex-center;
         border-radius: var(--radius-sm);
     }
@@ -2072,11 +2072,10 @@ body.filter-open .floating-wa-container {
     }
 
     /* 1. Judul */
-.campaign-card.is-list .campaign-title {
-    order: 1;
-    min-height: 0;
-
-}
+    .campaign-card.is-list .campaign-title {
+        order: 1;
+        min-height: 0;
+    }
 
     /* 2. penggalang (kiri) • donatur (kanan) */
     .campaign-card.is-list .campaign-footer {
