@@ -2071,11 +2071,14 @@ body.filter-open .floating-wa-container {
         padding: 0;
     }
 
-    /* 1. judul */
-    .campaign-card.is-list .campaign-title {
-        order: 1;
-        min-height: 0;
-    }
+    /* 1. Judul */
+.campaign-card.is-list .campaign-title {
+    order: 1;
+    min-height: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
     /* 2. penggalang (kiri) • donatur (kanan) */
     .campaign-card.is-list .campaign-footer {
