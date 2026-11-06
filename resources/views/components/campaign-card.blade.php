@@ -96,8 +96,8 @@ default = card vertikal, list = card horizontal (.is-list) --}}
             <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
 
             <small>
-                terkumpul<span class="campaign-target">{{ $campaign->target_donasi
-    ? ' dari Rp ' . number_format($campaign->target_donasi, 0, ',', '.')
+                <span class="campaign-target">{{ $campaign->target_donasi
+    ? '  dari Rp ' . number_format($campaign->target_donasi, 0, ',', '.')
     : ''
     }}</span>
             </small>

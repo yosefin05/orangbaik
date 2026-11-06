@@ -419,13 +419,13 @@
     color: var(--primary);
 }
 
-/* Nominal */
-
 .campaign-amount {
     display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 4px;
     min-width: 0;
-    flex-direction: column;
-    gap: 2px;
+    margin-top: auto;
 }
 
 .campaign-amount strong {
@@ -440,8 +440,8 @@
     color: var(--muted);
     font-size: var(--fs-xxs);
     line-height: 1.4;
+    align-self: flex-end;
 }
-
 /* Progress */
 
 .campaign-progress {
@@ -1678,7 +1678,7 @@ body.filter-open .floating-wa-container {
     /* ± 3/4 lebar layar, card berikutnya mengintip sebagai petunjuk scroll */
     .campaign-grid .campaign-card {
         height: auto;
-        flex: 0 0 min(72vw, 280px);
+        flex: 0 0 min(58vw, 220px);
         scroll-snap-align: start;
     }
 
