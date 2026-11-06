@@ -186,18 +186,13 @@
             @if ($headerTitle)
 
                 <a href="{{ route('donasi') }}" class="mobile-header-back" aria-label="Kembali ke semua kategori">
-                    <i class="bi bi-arrow-left"></i>
+                    <i class="bi bi-chevron-left"></i>
                 </a>
 
                 <div class="mobile-header-heading">
                     <span class="mobile-header-eyebrow">Kategori</span>
                     <h1 class="mobile-header-title">{{ $headerTitle }}</h1>
                 </div>
-
-                <span class="mobile-header-badge" aria-hidden="true">
-                    <img src="{{ asset($headerIcon) }}" alt="">
-                </span>
-
             @else
 
                 <form action="{{ route('search') }}" method="GET" class="mobile-search-form">
@@ -225,7 +220,7 @@ Hanya untuk halaman di luar halaman utama.
 =========================================== --}}
 @if ($showMobileBack)
     <a href="{{ route('home') }}" class="mobile-page-back" data-mobile-back aria-label="Kembali">
-        <i class="bi bi-arrow-left"></i>
+        <i class="bi bi-chevron-left"></i>
     </a>
 @endif
 

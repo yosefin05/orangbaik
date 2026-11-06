@@ -586,25 +586,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
-.mobile-header-badge {
-    width: 40px;
-    height: 40px;
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    padding: 6px;
-    border-radius: var(--radius-md);
-    background: var(--bg-blue-soft);
-    box-shadow: var(--shadow-soft);
-}
-
-.mobile-header-badge img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
 /* Wrapper mode kategori: susun back, judul, dan ikon dalam satu baris */
 .mobile-header-inner.is-category {
     display: flex;

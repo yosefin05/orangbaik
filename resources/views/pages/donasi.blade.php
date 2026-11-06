@@ -398,10 +398,10 @@
         @endif
 
 
-        {{-- ==========================================
+        {        {{-- ==========================================
             3. CAMPAIGN DARURAT
         =========================================== --}}
-        <section class="section donasi-campaign-section">
+        <section class="section section-band section-tone tone-danger donasi-campaign-section">
             <div class="container">
 
                 <h2 class="section-title">
@@ -420,9 +420,25 @@
 
                 @else
 
-                    <p class="donasi-empty">
-                        Belum ada campaign darurat saat ini.
-                    </p>
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-lightning-charge"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada campaign darurat</h3>
+
+                        <p class="empty-state-text">
+                            {{ $adaFilter
+                                ? 'Tidak ada hasil untuk filter yang dipilih.'
+                                : 'Saat ini belum ada penggalangan yang bersifat mendesak.' }}
+                        </p>
+
+                        @if ($adaFilter)
+                            <div class="empty-state-action">
+                                <a href="{{ route('donasi') }}" class="btn btn-outline btn-sm">Hapus filter</a>
+                            </div>
+                        @endif
+                    </div>
 
                 @endif
 
@@ -434,55 +450,79 @@
             4. CAMPAIGN TERBARU
             Di mobile: hanya thumbnail (judul disembunyikan secara visual)
         =========================================== --}}
-        <section class="section section-new">
+        <section class="section section-new section-tone tone-secondary">
             <div class="container">
 
                 <h2 class="section-title new-title">Yuk, Lihat yang Baru!</h2>
 
-                <div class="new-grid">
-                    @forelse ($campaignTerbaru as $campaign)
-                        @php
-                            // HANYA donasi dengan status SETTLEMENT
-                            $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
-                                return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
-                            });
-                            $terkumpul = $donasiSettlement->sum('nominal');
-                            $totalDonatur = $donasiSettlement->count();
-                            $persen = $campaign->target_donasi
-                                ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
-                                : 0;
-                        @endphp
+                @if ($campaignTerbaru->isNotEmpty())
 
-                        <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
-                            <img
-                                src="{{ asset('storage/' . $campaign->thumbnail) }}"
-                                alt="{{ $campaign->judul }}"
-                                loading="lazy"
-                            >
+                    <div class="new-grid">
+                        @foreach ($campaignTerbaru as $campaign)
+                            @php
+                                // HANYA donasi dengan status SETTLEMENT
+                                $donasiSettlement = $campaign->donasi->filter(function ($donasi) {
+                                    return $donasi->pembayaran && $donasi->pembayaran->transaction_status === 'settlement';
+                                });
+                                $terkumpul = $donasiSettlement->sum('nominal');
+                                $totalDonatur = $donasiSettlement->count();
+                                $persen = $campaign->target_donasi
+                                    ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
+                                    : 0;
+                            @endphp
 
-                            <div class="new-item-overlay">
-                                <h3>{{ $campaign->judul }}</h3>
-                                <p>{{ $campaign->penggalangDana->nama_penggalang }}</p>
+                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
+                                <img
+                                    src="{{ asset('storage/' . $campaign->thumbnail) }}"
+                                    alt="{{ $campaign->judul }}"
+                                    loading="lazy"
+                                >
 
-                                <div class="new-item-price">
-                                    <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
-                                    <span>Terkumpul</span>
+                                <div class="new-item-overlay">
+                                    <h3>{{ $campaign->judul }}</h3>
+                                    <p>{{ $campaign->penggalangDana->nama_penggalang }}</p>
+
+                                    <div class="new-item-price">
+                                        <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
+                                        <span>Terkumpul</span>
+                                    </div>
+
+                                    <div class="progress">
+                                        <div class="progress-fill" style="width: {{ $persen }}%;"></div>
+                                    </div>
+
+                                    <div class="new-item-meta">
+                                        <span>{{ $totalDonatur }} Donatur</span>
+                                        <span>{{ round($persen) }}%</span>
+                                    </div>
                                 </div>
+                            </a>
+                        @endforeach
+                    </div>
 
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
-                                </div>
+                @else
 
-                                <div class="new-item-meta">
-                                    <span>{{ $totalDonatur }} Donatur</span>
-                                    <span>{{ round($persen) }}%</span>
-                                </div>
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-clock-history"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada campaign terbaru</h3>
+
+                        <p class="empty-state-text">
+                            {{ $adaFilter
+                                ? 'Tidak ada hasil untuk filter yang dipilih.'
+                                : 'Campaign yang baru dibuat akan muncul di sini.' }}
+                        </p>
+
+                        @if ($adaFilter)
+                            <div class="empty-state-action">
+                                <a href="{{ route('donasi') }}" class="btn btn-outline btn-sm">Hapus filter</a>
                             </div>
-                        </a>
-                    @empty
-                        <p>Belum ada campaign terbaru.</p>
-                    @endforelse
-                </div>
+                        @endif
+                    </div>
+
+                @endif
 
             </div>
         </section>
@@ -491,7 +531,7 @@
         {{-- ==========================================
             5. PEMBERDAYAAN BERKELANJUTAN
         =========================================== --}}
-        <section class="section donasi-campaign-section">
+        <section class="section section-band section-tone tone-success donasi-campaign-section">
             <div class="container">
 
                 <h2 class="section-title">
@@ -510,9 +550,25 @@
 
                 @else
 
-                    <p class="donasi-empty">
-                        Belum ada campaign pemberdayaan berkelanjutan.
-                    </p>
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-graph-up"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada program pemberdayaan</h3>
+
+                        <p class="empty-state-text">
+                            {{ $adaFilter
+                                ? 'Tidak ada hasil untuk filter yang dipilih.'
+                                : 'Program pemberdayaan berkelanjutan akan tampil di sini.' }}
+                        </p>
+
+                        @if ($adaFilter)
+                            <div class="empty-state-action">
+                                <a href="{{ route('donasi') }}" class="btn btn-outline btn-sm">Hapus filter</a>
+                            </div>
+                        @endif
+                    </div>
 
                 @endif
 
@@ -524,7 +580,7 @@
             6. CAMPAIGN LAINNYA
             Model list (sama seperti "Pilih Kategori Favoritmu" di landing)
         =========================================== --}}
-        <section class="section donasi-campaign-section">
+        <section class="section section-tone tone-primary donasi-campaign-section">
             <div class="container">
 
                 <h2 class="section-title">
@@ -543,9 +599,25 @@
 
                 @else
 
-                    <p class="donasi-empty">
-                        Belum ada campaign lainnya.
-                    </p>
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-collection"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada campaign lainnya</h3>
+
+                        <p class="empty-state-text">
+                            {{ $adaFilter
+                                ? 'Tidak ada hasil untuk filter yang dipilih.'
+                                : 'Campaign lain akan muncul di sini.' }}
+                        </p>
+
+                        @if ($adaFilter)
+                            <div class="empty-state-action">
+                                <a href="{{ route('donasi') }}" class="btn btn-outline btn-sm">Hapus filter</a>
+                            </div>
+                        @endif
+                    </div>
 
                 @endif
 
