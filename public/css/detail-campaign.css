@@ -1,17 +1,31 @@
 /* ============================================================
    CAMPAIGN SHOW - ORANGBAIK.ID
-   ============================================================ */
+   Daftar isi:
+   1.  Global & alert
+   2.  Layout
+   3.  Hero
+   4.  Rich text
+   5.  Section header & aksi
+   6.  Kabar terbaru (update)
+   7.  Ikon ilustrasi & kondisi kosong
+   8.  Pesan & doa donatur
+   9.  Ringkasan donasi
+   10. Penggalang dana & daftar donasi terbaru
+   11. Fundraiser (gabung & referral)
+   12. Lightbox
+   13. Modal fundraiser & modal QR
+   14. Toast
+   15. Responsive (tablet & mobile)
+============================================================ */
+
 
 /* ============================================================
-   GLOBAL OVERFLOW PROTECTION
+   1. GLOBAL & ALERT
 ============================================================ */
 body {
     overflow-x: hidden;
 }
 
-/* ============================================================
-   ALERT
-============================================================ */
 .alert-success {
     background: var(--success-light);
     color: #15803d;
@@ -29,8 +43,9 @@ body {
     border: 1px solid rgba(239, 68, 68, .18);
 }
 
+
 /* ============================================================
-   LAYOUT — pakai .container dari global.css untuk padding
+   2. LAYOUT — pakai .container dari global.css untuk padding
 ============================================================ */
 .detail-container {
     /* width & margin & padding-inline sudah dihandle .container */
@@ -60,6 +75,11 @@ body {
     top: 100px;
     min-width: 0;
 }
+
+
+/* ============================================================
+   3. HERO
+============================================================ */
 .hero-wrapper {
     position: relative;
     border-radius: var(--radius);
@@ -67,7 +87,7 @@ body {
 }
 .campaign-hero-image {
     width: 100%;
-    aspect-ratio: 16 / 9;    
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: var(--radius);
     border: 1px solid var(--border);
@@ -92,18 +112,9 @@ body {
 .hero-status-badge.is-urgent {
     background: linear-gradient(135deg, var(--danger), #dc2626);
 }
-.hero-status-badge.is-ongoing {
-    background: color-mix(in srgb, var(--bg) 92%, transparent);
-}
-.hero-status-badge.is-upcoming {
-    background: color-mix(in srgb, var(--bg) 92%, transparent       );
-}
-.hero-status-badge.is-ended {
-    background: color-mix(in srgb, var(--bg) 92%, transparent           );
-}
 .description-section h1 {
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-extrabold);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
     color: var(--text-dark);
     margin-top: var(--space-4);
     margin-bottom: var(--space-3);
@@ -111,8 +122,9 @@ body {
     word-break: break-word;
 }
 
+
 /* ============================================================
-   RICH TEXT OUTPUT
+   4. RICH TEXT OUTPUT
 ============================================================ */
 .rich-text-output {
     text-align: justify;
@@ -153,54 +165,34 @@ body {
     font-weight: var(--fw-bold);
 }
 
-/* Bold dari rich text */
 .rich-text-output strong,
 .rich-text-output b {
     font-weight: var(--fw-bold);
 }
-
-/* Italic */
 .rich-text-output em,
 .rich-text-output i {
     font-style: italic;
 }
-
-/* Underline */
 .rich-text-output u {
     text-decoration: underline;
 }
-
-/* Paragraf */
 .rich-text-output p {
     margin: 0 0 var(--space-4);
 }
-
-/* List */
 .rich-text-output ul,
 .rich-text-output ol {
     margin: 0 0 var(--space-4);
     padding-left: var(--space-6);
 }
-
-/* Blockquote */
 .rich-text-output blockquote {
     margin: var(--space-4) 0;
 }
-
-/* Link */
 .rich-text-output a {
     color: var(--primary);
     text-decoration: underline;
 }
 
-/* Gambar dari rich text */
-.rich-text-output img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: var(--space-4) auto;
-}
-
+/* Gambar dari rich text (bisa diklik → lightbox) */
 .rich-text-output img {
     display: block;
     width: auto;
@@ -217,8 +209,9 @@ body {
     opacity: 0.92;
 }
 
+
 /* ============================================================
-   SECTION HEADER
+   5. SECTION HEADER & AKSI
 ============================================================ */
 .section-header {
     display: flex;
@@ -315,8 +308,9 @@ body {
     color: var(--primary);
 }
 
+
 /* ============================================================
-   UPDATE CARD
+   6. KABAR TERBARU (UPDATE)
 ============================================================ */
 .updates-list {
     display: flex;
@@ -392,9 +386,7 @@ body {
     word-break: break-word;
 }
 
-/* ============================================================
-   BUTTON READ MORE
-============================================================ */
+/* ---------- Tombol baca selengkapnya (versi tombol) ---------- */
 .btn-read-more {
     display: inline-flex;
     align-items: center;
@@ -420,27 +412,16 @@ body {
     transform: rotate(180deg);
 }
 
-
-/* ============================================================
-   UPDATE DETAIL (EXPAND / COLLAPSE)
-============================================================ */
-
-/* Container detail */
+/* ---------- Detail update (expand / collapse dengan <details>) ---------- */
 .update-detail-wrapper {
     margin-top: 12px;
     animation: updateFadeIn 0.3s ease;
 }
-
-/* Garis pemisah konten */
 .update-detail-content {
     margin-top: var(--space-3, 12px);
     padding-top: var(--space-3, 12px);
     border-top: 1px solid var(--border-soft, #e5e7eb);
 }
-
-/* ============================================================
-   TOMBOL BACA SELENGKAPNYA
-============================================================ */
 
 .update-readmore {
     width: 100%;
@@ -455,12 +436,9 @@ body {
     user-select: none;
     outline: none;
 }
-
-/* Hilangkan marker default browser */
 .update-readmore summary::-webkit-details-marker {
     display: none;
 }
-
 .update-readmore summary::marker {
     content: "";
 }
@@ -472,11 +450,12 @@ body {
     line-height: 1.7;
 }
 
+/* Sembunyikan preview ketika detail dibuka */
+.update-readmore[open] .update-preview-text {
+    display: none !important;
+}
 
-/* ============================================================
-   READ MORE BUTTON
-============================================================ */
-
+/* Tombol "Baca Selengkapnya" */
 .update-readmore .readmore-text {
     display: inline-flex;
     align-items: center;
@@ -487,18 +466,25 @@ body {
     font-weight: 500;
     transition: color 0.2s ease;
 }
-
-/* Tulisan tombol */
 .update-readmore .readmore-text::before {
     content: "Baca Selengkapnya";
 }
-
-/* Ketika detail dibuka */
 .update-readmore[open] .readmore-text::before {
     content: "Tutup Selengkapnya";
 }
+.update-readmore[open] .readmore-text {
+    display: inline-flex;
+}
+.update-readmore summary:hover .readmore-text {
+    color: #244d8a;
+}
+.update-readmore summary:focus-visible {
+    outline: 2px solid #3365af;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
 
-/* Chevron rounded */
+/* Chevron */
 .update-readmore .update-chevron {
     display: inline-block;
     width: 9px;
@@ -510,47 +496,25 @@ body {
     margin-top: -5px;
     transition: transform 0.25s ease;
 }
-
-/* Chevron menghadap atas */
 .update-readmore[open] .update-chevron {
     transform: rotate(225deg);
     margin-top: 5px;
 }
 
-/* Hover */
-.update-readmore summary:hover .readmore-text {
-    color: #244d8a;
-}
-
-/* Fokus keyboard */
-.update-readmore summary:focus-visible {
-    outline: 2px solid #3365af;
-    outline-offset: 4px;
-    border-radius: 4px;
-}
-
-
-/* ============================================================
-   ISI PARAGRAF DETAIL
-============================================================ */
-
+/* ---------- Isi detail ---------- */
 .update-full-body {
     color: #344054;
     line-height: 1.8;
     overflow-wrap: anywhere;
     word-break: normal;
 }
-
 .update-full-body p {
     margin-top: 0;
     margin-bottom: 12px;
 }
-
 .update-full-body p:last-child {
     margin-bottom: 0;
 }
-
-/* Heading dalam konten */
 .update-full-body h1,
 .update-full-body h2,
 .update-full-body h3,
@@ -560,29 +524,21 @@ body {
     line-height: 1.4;
     color: var(--text-primary, #1d2939);
 }
-
-/* List dalam konten */
 .update-full-body ul,
 .update-full-body ol {
     padding-left: 24px;
     margin-bottom: 12px;
 }
-
 .update-full-body li {
     margin-bottom: 6px;
 }
-
-/* Link dalam konten */
 .update-full-body a {
     color: #3365af;
     text-decoration: underline;
     overflow-wrap: anywhere;
 }
 
-/* ============================================================
-   GAMBAR DALAM DETAIL
-============================================================ */
-
+/* Gambar dalam detail (bisa diklik → lightbox) */
 .update-full-body img {
     display: block;
     width: auto;
@@ -595,24 +551,16 @@ body {
     cursor: zoom-in;
     transition: opacity 0.2s ease;
 }
-
 .update-full-body img:hover {
     opacity: 0.92;
 }
 
-/* ============================================================
-   GALERI DETAIL
-============================================================ */
-
+/* Galeri detail */
 .update-detail-gallery {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fill,
-        minmax(120px, 1fr)
-    );
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: var(--space-2, 8px);
 }
-
 .update-detail-gallery-item {
     position: relative;
     aspect-ratio: 1 / 1;
@@ -622,20 +570,16 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .update-detail-gallery-item:hover {
     transform: scale(1.03);
     box-shadow: var(--shadow-soft, 0 4px 12px rgba(0, 0, 0, 0.1));
 }
-
 .update-detail-gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
-
-/* Overlay gambar */
 .update-detail-gallery-item .zoom-overlay {
     position: absolute;
     inset: 0;
@@ -648,60 +592,12 @@ body {
     opacity: 0;
     transition: all 0.2s ease;
 }
-
 .update-detail-gallery-item:hover .zoom-overlay {
     background: rgba(0, 0, 0, 0.35);
     opacity: 1;
 }
 
-/* Sembunyikan preview ketika detail dibuka */
-.update-readmore[open] .update-preview-text {
-    display: none !important;
-}
-
-/* Pastikan tombol tetap terlihat */
-.update-readmore[open] .readmore-text {
-    display: inline-flex;
-}
-
-/* ============================================================
-   ANIMASI
-============================================================ */
-
-@keyframes updateFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ============================================================
-   RESPONSIVE
-============================================================ */
-
-@media (max-width: 576px) {
-    .update-full-body img {
-        max-width: 100%;
-        max-height: 260px;
-    }
-
-    .update-detail-gallery {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .update-readmore .readmore-text {
-        font-size: 13px;
-    }
-}
-
-/* ============================================================
-   UPDATE FOOTER
-============================================================ */
+/* ---------- Footer update (khusus pemilik) ---------- */
 .update-footer {
     margin-top: var(--space-3);
     padding-top: var(--space-2);
@@ -748,9 +644,33 @@ body {
     color: #fff;
 }
 
+@keyframes updateFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
 /* ============================================================
-   EMPTY UPDATES
+   7. IKON ILUSTRASI & KONDISI KOSONG
+   Teks mengalir alami; padding kiri-kanan membuatnya tetap
+   di tengah dan turun baris sendiri bila kepanjangan.
 ============================================================ */
+.icon-section {
+    display: block;
+    width: 144px;
+    height: 144px;
+    max-width: 144px;
+    object-fit: contain;
+    margin: 0 auto var(--space-5);
+    opacity: 0.9;
+}
+
 .empty-updates {
     text-align: center;
     padding: var(--space-8) var(--space-4);
@@ -765,16 +685,46 @@ body {
     margin-bottom: var(--space-3);
 }
 .empty-updates p {
+    margin: 0 0 var(--space-3);
+    padding-inline: var(--space-4);
     color: var(--muted);
     font-size: var(--fs-sm);
+}
+
+.empty-pesan-doa {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+}
+.empty-pesan-doa i {
+    font-size: 48px;
+    color: var(--muted-light);
+    display: block;
     margin-bottom: var(--space-3);
 }
+.empty-pesan-doa p {
+    margin: 0 0 var(--space-1);
+    padding-inline: var(--space-4);
+    color: var(--muted);
+    font-size: var(--fs-sm);
+}
+.empty-pesan-doa small {
+    color: var(--muted-light);
+    font-size: var(--fs-xs);
+}
+
+/* Tombol outline ("Buat Update Pertama"):
+   ukuran luar sama dengan tombol "Gabung Jadi Fundraiser"
+   (border 1px + padding dikurangi 1px) */
 .btn-outline {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-6);
-    border: 2px solid var(--primary);
+    padding: calc(var(--space-2) - 1px) calc(var(--space-5) - 1px);
+    border: 1px solid var(--primary);
     border-radius: var(--radius-full);
     color: var(--primary);
     font-weight: var(--fw-bold);
@@ -788,8 +738,14 @@ body {
     transform: translateY(-2px);
 }
 
+/* di kondisi kosong: seukuran isinya, bukan selebar kartu */
+.empty-updates .btn-outline {
+    width: auto;
+}
+
+
 /* ============================================================
-   PESAN & DOA DONATUR
+   8. PESAN & DOA DONATUR
 ============================================================ */
 .pesan-doa-section {
     margin-top: var(--space-2);
@@ -946,31 +902,9 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
-.empty-pesan-doa {
-    text-align: center;
-    padding: var(--space-8) var(--space-4);
-    background: var(--bg-soft);
-    border-radius: var(--radius);
-    border: 1px dashed var(--border);
-}
-.empty-pesan-doa i {
-    font-size: 48px;
-    color: var(--muted-light);
-    display: block;
-    margin-bottom: var(--space-3);
-}
-.empty-pesan-doa p {
-    color: var(--muted);
-    font-size: var(--fs-sm);
-    margin-bottom: var(--space-1);
-}
-.empty-pesan-doa small {
-    color: var(--muted-light);
-    font-size: var(--fs-xs);
-}
 
 /* ============================================================
-   DONATION SUMMARY
+   9. RINGKASAN DONASI
 ============================================================ */
 .donation-summary-card {
     background: var(--bg);
@@ -988,24 +922,36 @@ body {
     overflow-wrap: break-word;
     word-break: break-word;
 }
+
+/* nominal & "Terkumpul dari…" sejajar, rata tengah vertikal;
+   bila tidak muat, keterangan turun ke baris bawah */
 .summary-amount {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
     margin-bottom: var(--space-3);
 }
 .summary-amount strong {
-    display: block;
-    font-size: var(--fs-md);
-    font-weight: var(--fw-extrabold);
     color: var(--primary);
-    overflow-wrap: break-word;
-    word-break: break-word;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
 }
 .summary-amount span {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
     color: var(--muted);
     font-size: var(--fs-xs);
+    line-height: 1.3;
 }
 .summary-amount span b {
     color: var(--text-dark);
 }
+
 .summary-progress {
     height: 8px;
     background: var(--bg-soft);
@@ -1053,8 +999,9 @@ body {
     box-shadow: var(--shadow);
 }
 
+
 /* ============================================================
-   FUNDRAISER INFO
+   10. PENGGALANG DANA & DONASI TERBARU
 ============================================================ */
 .fundraiser-info-card {
     background: var(--bg);
@@ -1092,9 +1039,6 @@ body {
     word-break: break-word;
 }
 
-/* ============================================================
-   SIDE LIST
-============================================================ */
 .side-list-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
@@ -1172,13 +1116,18 @@ body {
     padding: var(--space-2) 0;
     text-align: center;
 }
+/* teks "Belum ada donasi…": padding kiri-kanan agar tetap di tengah */
+.side-list-card .text-muted {
+    padding-inline: var(--space-4);
+}
 .side-list-card .empty-side-list {
     text-align: center;
     padding: var(--space-4) 0;
 }
 
+
 /* ============================================================
-   FUNDRAISER JOIN CARD
+   11. FUNDRAISER (GABUNG & REFERRAL)
 ============================================================ */
 .fundraiser-join-card {
     background: var(--bg);
@@ -1196,19 +1145,23 @@ body {
     margin-bottom: var(--space-2);
 }
 .fundraiser-join-card p {
+    margin: 0 0 var(--space-3);
+    padding-inline: var(--space-3);
     color: var(--muted);
     font-size: var(--fs-xs);
-    margin-bottom: var(--space-3);
 }
 .fundraiser-join-card.joined {
     border-color: var(--success);
     background: var(--success-light);
 }
+
+/* tombol seukuran isinya (tidak selebar kartu) */
 .btn-fundraiser-join {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-6);
+    padding: var(--space-2) var(--space-5);
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     color: #fff;
     border: none;
@@ -1225,8 +1178,9 @@ body {
 .btn-fundraiser-leave {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-6);
+    padding: var(--space-2) var(--space-5);
     background: var(--danger-light);
     color: var(--danger);
     border: none;
@@ -1243,8 +1197,9 @@ body {
 .btn-fundraiser-login {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-6);
+    padding: var(--space-2) var(--space-5);
     background: var(--bg-soft);
     color: var(--text);
     border: 1px solid var(--border);
@@ -1258,9 +1213,7 @@ body {
     background: var(--border);
 }
 
-/* ============================================================
-   FUNDRAISER REFERRAL CARD
-============================================================ */
+/* ---------- Referral ---------- */
 .fundraiser-referral-card {
     background: var(--bg);
     border: 1px solid var(--border-soft);
@@ -1370,8 +1323,9 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
+
 /* ============================================================
-   LIGHTBOX
+   12. LIGHTBOX
 ============================================================ */
 .lightbox-overlay {
     position: fixed;
@@ -1491,46 +1445,10 @@ body {
     background: rgba(255, 255, 255, 0.5);
 }
 
-.icon-section {
-    display: block;
-    width: 120px;
-    height: 120px;
-    max-width: 120px;
-    object-fit: contain;
-    margin: 0 auto var(--space-5);
-    opacity: 0.9;
-}
 
 /* ============================================================
-   MODAL POP-UP FUNDRAISER
+   13. MODAL FUNDRAISER & MODAL QR
 ============================================================ */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    justify-content: center;
-    align-items: center;
-    background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(6px);
-    z-index: 9999;
-    animation: fadeIn 0.25s ease;
-}
-
-.modal-overlay.active {
-    display: flex;
-}
-
-.modal-content {
-    width: 92%;
-    max-width: 440px;
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--bg);
-    border-radius: var(--radius-lg, 20px);
-    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
-    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -1547,6 +1465,33 @@ body {
     }
 }
 
+/* ---------- Modal fundraiser ---------- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    justify-content: center;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    animation: fadeIn 0.25s ease;
+}
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 92%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--bg);
+    border-radius: var(--radius-lg, 20px);
+    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
+    animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 .modal-header {
     position: relative;
     padding: var(--space-7, 28px) var(--space-7, 28px) var(--space-6, 24px);
@@ -1554,7 +1499,6 @@ body {
     border-radius: var(--radius-lg, 20px) var(--radius-lg, 20px) 0 0;
     text-align: center;
 }
-
 .modal-logo {
     display: flex;
     align-items: center;
@@ -1562,19 +1506,16 @@ body {
     gap: var(--space-2, 8px);
     margin-bottom: var(--space-4, 16px);
 }
-
 .modal-logo img {
     height: 28px;
     width: auto;
 }
-
 .modal-logo span {
     color: rgba(255, 255, 255, 0.9);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     letter-spacing: -0.2px;
 }
-
 .modal-header h2 {
     margin: 0;
     color: #fff;
@@ -1582,13 +1523,11 @@ body {
     font-weight: var(--fw-extrabold, 800);
     letter-spacing: -0.02em;
 }
-
 .modal-header .subtitle {
     margin-top: var(--space-1, 4px);
     color: rgba(255, 255, 255, 0.85);
     font-size: var(--fs-xs);
 }
-
 .modal-close {
     position: absolute;
     top: var(--space-4, 16px);
@@ -1606,7 +1545,6 @@ body {
     cursor: pointer;
     transition: 0.2s ease;
 }
-
 .modal-close:hover {
     background: rgba(255, 255, 255, 0.28);
     transform: rotate(90deg);
@@ -1632,7 +1570,6 @@ body {
     position: relative;
     width: fit-content;
 }
-
 .success-badge i {
     font-size: 15px;
 }
@@ -1647,7 +1584,6 @@ body {
     border: 1px solid var(--border-soft);
     border-radius: var(--radius-md);
 }
-
 .fundraiser-avatar-modal {
     width: 44px;
     height: 44px;
@@ -1657,14 +1593,12 @@ body {
     box-shadow: 0 0 0 2px var(--primary);
     object-fit: cover;
 }
-
 .fundraiser-name-modal {
     color: var(--text-dark);
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
     line-height: 1.3;
 }
-
 .fundraiser-name-modal small {
     display: block;
     margin-top: 2px;
@@ -1688,7 +1622,6 @@ body {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
 }
-
 .referral-section-title i {
     color: var(--primary);
     font-size: var(--fs-sm);
@@ -1704,7 +1637,6 @@ body {
     border: 1px solid var(--border-soft);
     border-radius: var(--radius-md);
 }
-
 .referral-link-box-modal input {
     flex: 1;
     min-width: 0;
@@ -1716,7 +1648,6 @@ body {
     font-family: 'Courier New', monospace;
     font-size: var(--fs-xxs);
 }
-
 .btn-copy-link-modal {
     display: inline-flex;
     align-items: center;
@@ -1732,7 +1663,6 @@ body {
     cursor: pointer;
     transition: 0.2s ease;
 }
-
 .btn-copy-link-modal:hover {
     background: var(--primary-hover);
     transform: scale(1.05);
@@ -1748,7 +1678,6 @@ body {
     border: 1px dashed var(--border);
     border-radius: var(--radius-md);
 }
-
 .referral-code-box .code-label {
     color: var(--muted);
     font-size: 10px;
@@ -1756,7 +1685,6 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.6px;
 }
-
 .referral-code-box .code-value {
     flex: 1;
     color: var(--primary);
@@ -1765,7 +1693,6 @@ body {
     font-weight: var(--fw-extrabold, 800);
     letter-spacing: 1px;
 }
-
 .btn-copy-code {
     display: inline-flex;
     align-items: center;
@@ -1780,7 +1707,6 @@ body {
     cursor: pointer;
     transition: 0.2s ease;
 }
-
 .btn-copy-code:hover {
     background: var(--primary-hover);
     transform: scale(1.05);
@@ -1798,16 +1724,13 @@ body {
     cursor: pointer;
     transition: 0.2s ease;
 }
-
 .modal-qr-wrapper:hover {
     border-color: var(--primary);
     transform: translateY(-2px);
 }
-
 .modal-qr-wrapper:active {
     transform: scale(0.97);
 }
-
 .modal-qr-wrapper svg {
     max-width: 150px;
     height: auto;
@@ -1815,7 +1738,6 @@ body {
     background: #fff;
     border-radius: var(--radius-sm);
 }
-
 .modal-qr-label {
     margin-top: var(--space-3, 12px);
     color: var(--muted);
@@ -1828,7 +1750,6 @@ body {
     gap: var(--space-3, 12px);
     margin-top: var(--space-6, 24px);
 }
-
 .modal-actions .btn-modal-primary,
 .modal-actions .btn-modal-secondary {
     flex: 1;
@@ -1843,33 +1764,27 @@ body {
     cursor: pointer;
     transition: 0.2s ease;
 }
-
 .modal-actions .btn-modal-primary {
     background: var(--primary);
     border: none;
     color: #fff;
 }
-
 .modal-actions .btn-modal-primary:hover {
     background: var(--primary-hover);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.25);
 }
-
 .modal-actions .btn-modal-secondary {
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
 }
-
 .modal-actions .btn-modal-secondary:hover {
     background: var(--bg-soft);
     border-color: var(--muted);
 }
 
-/* ============================================================
-   MODAL QR FULLSCREEN
-============================================================ */
+/* ---------- Modal QR fullscreen ---------- */
 .modal-qr-overlay {
     display: none;
     position: fixed;
@@ -1881,7 +1796,6 @@ body {
     z-index: 10000;
     animation: fadeIn 0.25s ease;
 }
-
 .modal-qr-overlay.active {
     display: flex;
 }
@@ -1898,7 +1812,6 @@ body {
     box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.4);
     animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
 .modal-qr-close {
     position: absolute;
     top: var(--space-4, 16px);
@@ -1916,22 +1829,18 @@ body {
     cursor: pointer;
     transition: 0.2s ease;
 }
-
 .modal-qr-close:hover {
     background: var(--border-soft);
     transform: rotate(90deg);
 }
-
 .modal-qr-fullscreen-content {
     text-align: center;
 }
-
 .modal-qr-fullscreen-content #qrFullscreenContainer {
     display: flex;
     justify-content: center;
     margin-bottom: var(--space-5, 20px);
 }
-
 .modal-qr-fullscreen-content #qrFullscreenContainer svg {
     max-width: 240px;
     height: auto;
@@ -1940,26 +1849,22 @@ body {
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-card);
 }
-
 .modal-qr-fullscreen-content h3 {
     margin-bottom: var(--space-2, 8px);
     color: var(--text-dark);
     font-size: var(--fs-md);
     font-weight: var(--fw-extrabold, 800);
 }
-
 .modal-qr-fullscreen-content p {
     margin-bottom: var(--space-5, 20px);
     color: var(--muted);
     font-size: var(--fs-xs);
 }
-
 .modal-qr-actions {
     display: flex;
     gap: var(--space-3, 12px);
     justify-content: center;
 }
-
 .btn-download-qr-modal,
 .btn-share-qr-modal {
     display: flex;
@@ -1972,32 +1877,29 @@ body {
     cursor: pointer;
     transition: 0.2s ease;
 }
-
 .btn-download-qr-modal {
     background: var(--primary);
     border: none;
     color: #fff;
 }
-
 .btn-download-qr-modal:hover {
     background: var(--primary-hover);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.25);
 }
-
 .btn-share-qr-modal {
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
 }
-
 .btn-share-qr-modal:hover {
     background: var(--bg-soft);
     border-color: var(--muted);
 }
 
+
 /* ============================================================
-   TOAST NOTIFICATION
+   14. TOAST NOTIFICATION
 ============================================================ */
 .toast-notification {
     position: fixed;
@@ -2027,387 +1929,704 @@ body {
     color: var(--success);
 }
 
+
 /* ============================================================
-   RESPONSIVE
+   15. RESPONSIVE
+   - Tablet (≤ 992px): satu kolom.
+   - Mobile (≤ 768px): tampilan minimalis, hero full-bleed, topbar
+     (tombol kembali + judul) yang jadi solid setelah scroll,
+     blok datar dipisah garis tipis (tanpa kartu).
+   Memakai token global.css saja.
 ============================================================ */
 
+/* topbar & CTA mobile hanya dipakai di mobile */
+.campaign-topbar,
+.mobile-sticky-cta {
+    display: none;
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 992px) {
+
+    .detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-main,
+    .detail-sidebar {
+        position: static;
+    }
+}
+
+/* ---------- Mobile ---------- */
 @media (max-width: 768px) {
+
+    /* ----- Header: topbar menggantikan header situs & tombol back global ----- */
+
+    body:has(.campaign-topbar) .site-header,
+    body:has(.campaign-topbar) .mobile-page-back {
+        display: none !important;
+    }
+
+    .campaign-topbar {
+        position: fixed;
+        z-index: 200;
+        top: 0;
+        right: 0;
+        left: 0;
+
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+
+        height: calc(56px + env(safe-area-inset-top, 0px));
+        padding: env(safe-area-inset-top, 0px) var(--space-4) 0;
+
+        border-bottom: 1px solid transparent;
+        background-color: transparent;
+
+        transition:
+            background-color .25s ease,
+            border-color .25s ease;
+    }
+
+    /* bayangan tipis di atas hero agar tombol back terbaca */
+    .campaign-topbar::before {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--text-dark) 45%, transparent),
+            transparent
+        );
+        content: "";
+        pointer-events: none;
+        transition: opacity .25s ease;
+    }
+
+    .campaign-topbar.is-solid {
+        border-bottom-color: var(--border-soft);
+        background-color: var(--bg);
+    }
+
+    .campaign-topbar.is-solid::before {
+        opacity: 0;
+    }
+
+    .campaign-topbar-back {
+        position: relative;
+        z-index: 1;
+
+        width: 40px;
+        height: 40px;
+
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+
+        border-radius: var(--radius-full);
+        background: color-mix(in srgb, var(--text-dark) 35%, transparent);
+
+        color: var(--bg);
+        font-size: var(--fs-md);
+        line-height: 1;
+
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        -webkit-tap-highlight-color: transparent;
+
+        transition:
+            background-color .25s ease,
+            color .25s ease,
+            transform .2s ease;
+    }
+
+    .campaign-topbar-back:active {
+        transform: scale(.94);
+    }
+
+    .campaign-topbar.is-solid .campaign-topbar-back {
+        background: var(--bg-soft);
+        color: var(--text-dark);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    .campaign-topbar-title {
+        position: relative;
+        z-index: 1;
+
+        min-width: 0;
+        flex: 1;
+        margin: 0;
+        overflow: hidden;
+
+        color: var(--text-dark);
+        font-size: var(--fs-sm);
+        font-weight: var(--fw-bold);
+        line-height: 1.3;
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        opacity: 0;
+        transform: translateY(6px);
+
+        transition:
+            opacity .25s ease,
+            transform .25s ease;
+    }
+
+    .campaign-topbar.is-solid .campaign-topbar-title {
+        opacity: 1;
+        transform: none;
+    }
+
+    /* ----- Kerangka halaman ----- */
+
+    .campaign-detail-page {
+        /* ruang untuk CTA bawah */
+        padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* alert tidak tertutup topbar */
+    .alert-success,
+    .alert-error {
+        margin: calc(56px + var(--space-3)) var(--space-4) var(--space-3);
+    }
+
+    .detail-container {
+        padding-block: 0;
+    }
+
     .detail-layout {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 0;
         width: 100%;
         min-width: 0;
     }
 
-    /* Gabungkan isi kedua kolom agar bisa diurutkan */
+    /* gabungkan isi kedua kolom agar bisa diurutkan */
     .detail-main,
     .detail-sidebar {
         display: contents;
     }
 
-    /* Urutan elemen mobile */
-    .detail-main > .hero-wrapper {
-        order: 1;
-    }
-
-    .detail-sidebar > .donation-summary-card {
-        order: 2;
-    }
-
-    .detail-main > .description-section {
-        order: 3;
-    }
-
-    .detail-sidebar > .fundraiser-info-card {
-        order: 4;
-    }
-
-    .detail-main > .latest-news-section {
-        order: 5;
-    }
-
-    .detail-main > .pesan-doa-section {
-        order: 6;
-    }
-
-    .detail-sidebar > .side-list-card {
-        order: 7;
-    }
-
+    /* urutan mobile */
+    .detail-main > .hero-wrapper { order: 1; }
+    .detail-sidebar > .donation-summary-card { order: 2; }
+    .detail-sidebar > .fundraiser-info-card { order: 3; }
+    .detail-main > .description-section { order: 4; }
+    .detail-main > .latest-news-section { order: 5; }
+    .detail-main > .pesan-doa-section { order: 6; }
+    .detail-sidebar > .side-list-card { order: 7; }
     .detail-sidebar > .fundraiser-join-card,
-    .detail-sidebar > .fundraiser-referral-card {
-        order: 8;
-    }
+    .detail-sidebar > .fundraiser-referral-card { order: 8; }
 
-    /* Reset sticky pada tampilan mobile */
-    .detail-main,
-    .detail-sidebar {
-        position: static;
-    }
-
-    /* Pastikan setiap section memenuhi lebar layar */
-    .detail-main > *,
+    /* semua blok = datar, dipisah garis tipis (bukan kartu) */
+    .detail-main > *:not(.hero-wrapper),
     .detail-sidebar > * {
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+        margin: 0;
+        padding: var(--space-4) 0;
+        border: 0;
+        border-top: 1px solid var(--border-soft);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
     }
 
-    /* Hilangkan tombol Donasi Sekarang hanya di card aksi donasi */
+    /* ----- Hero: full-bleed 16:9 seperti hero landing ----- */
+
+    .detail-main > .hero-wrapper {
+        width: 100vw;
+        margin-inline: calc(50% - 50vw);
+        border-radius: 0;
+    }
+
+    .campaign-hero-image {
+        height: auto;
+        aspect-ratio: 16 / 9;
+        border: 0;
+        border-radius: 0;
+    }
+
+    .hero-status-badge {
+        top: auto;
+        right: auto;
+        bottom: var(--space-3);
+        left: var(--space-4);
+        padding: var(--space-1) var(--space-3);
+        font-size: var(--fs-xxs);
+        box-shadow: var(--shadow-soft);
+    }
+
+    /* ----- Ringkasan donasi ----- */
+
+    .detail-sidebar > .donation-summary-card {
+        border-top: 0;
+    }
+
+    .donation-summary-card h2 {
+        margin: 0 0 var(--space-3);
+        font-size: var(--fs-rg);
+        line-height: 1.3;
+    }
+
+    .summary-amount {
+        margin-bottom: var(--space-2);
+    }
+
+    .summary-amount strong {
+        font-size: var(--fs-md);
+    }
+
+    .summary-progress {
+        height: 6px;
+        margin-bottom: var(--space-2);
+    }
+
+    .summary-meta {
+        font-size: var(--fs-xs);
+    }
+
+    /* tombol donasi ada di CTA bawah */
+    .donate-button-wrapper,
     .donation-summary-card .btn-donate,
     .donation-summary-card .donate-button {
         display: none !important;
     }
 
+    /* ----- Deskripsi ----- */
+
+    /* judul sudah tampil di ringkasan */
     .description-section h1 {
-        display: none !important;
+        display: none;
     }
 
-    .campaign-detail-page {
-        padding-bottom: 90px;
+    .rich-text-output {
+        text-align: left;
     }
-}
 
-/* Tablet */
-@media (max-width: 992px) {
-    .detail-layout {
-        grid-template-columns: 1fr;
+    .rich-text-output p {
+        margin-bottom: var(--space-3);
     }
-    .detail-main,
-    .detail-sidebar {
-        position: static;
-    }
-}
 
-/* HP besar */
-@media (max-width: 768px) {
-    .detail-container {
-        padding-block: var(--space-5);
+    .rich-text-output img {
+        max-width: 100%;
+        max-height: 260px;
+        margin: var(--space-3) auto;
     }
-    .campaign-hero-image {
-        height: 220px;
+
+    /* ----- Penggalang dana ----- */
+
+    .fundraiser-info-card h3 {
+        margin: 0 0 var(--space-2);
+        color: var(--muted);
+        font-size: var(--fs-xxs);
+        font-weight: var(--fw-semibold);
+        letter-spacing: .04em;
+        text-transform: uppercase;
     }
-    .description-section h1 {
-        font-size: var(--fs-md);
+
+    .fundraiser-profile img {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
     }
-    .update-card {
-        gap: var(--space-3);
-        padding: var(--space-3);
+
+    /* ----- Judul section & aksi ----- */
+
+    .section-header {
+        gap: var(--space-2);
+        margin-bottom: var(--space-3);
     }
-    .update-icon-badge {
+
+    .section-header h2 {
+        font-size: var(--fs-sm);
+        font-weight: var(--fw-bold);
+    }
+
+    .section-actions {
+        gap: var(--space-2);
+    }
+
+    .btn-icon-action {
         width: 36px;
         height: 36px;
-        flex: 0 0 36px;
+    }
+
+    .btn-icon-action:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* ----- Kabar terbaru: daftar datar ----- */
+
+    .updates-list {
+        gap: 0;
+    }
+
+    .update-card {
+        gap: var(--space-3);
+        padding: var(--space-3) 0;
+        border: 0;
+        border-top: 1px solid var(--border-soft);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .update-card:first-child {
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    .update-card:hover {
+        border-color: var(--border-soft);
+        box-shadow: none;
+    }
+
+    .update-icon-badge {
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+        background: var(--primary-light);
+        box-shadow: none;
+        color: var(--primary);
         font-size: var(--fs-xs);
     }
+
     .update-title {
         font-size: var(--fs-xs);
     }
-    .summary-amount strong {
-        font-size: var(--fs-lg);
-    }
-    .update-detail-gallery {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-2);
-    }
-    .pesan-doa-grid {
-        grid-template-columns: 1fr;
-    }
-    .lightbox-prev,
-    .lightbox-next {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
-    .lightbox-prev {
-        left: 10px;
-    }
-    .lightbox-next {
-        right: 10px;
-    }
-    .lightbox-image-wrapper img {
-        max-height: 70vh;
-    }
-    .modal-content {
-        max-width: 95%;
-    }
-    .modal-body {
-        padding: var(--space-5);
-    }
-    .modal-header {
-        padding: var(--space-5) var(--space-5) var(--space-4);
-    }
-    .modal-logo img {
-        height: 32px;
-    }
-    .modal-logo span {
-        font-size: var(--fs-sm);
-    }
-    .modal-header h2 {
-        font-size: var(--fs-md);
-    }
-    .modal-qr-fullscreen {
-        padding: var(--space-5);
-    }
-    .modal-qr-fullscreen-content #qrFullscreenContainer svg {
-        max-width: 200px;
-    }
-    .modal-actions {
-        flex-direction: column;
-    }
-}
 
-/* HP */
-@media (max-width: 576px) {
-    .detail-container {
-        padding-block: var(--space-4);
-    }
-    .campaign-hero-image {
-        height: 180px;
-    }
-    .description-section h1 {
-        font-size: var(--fs-sm);
-    }
-    .description-section p {
+    .update-preview-text,
+    .update-full-body {
         font-size: var(--fs-xs);
     }
-    .section-header {
-        flex-wrap: wrap;
+
+    .update-readmore .readmore-text {
+        font-size: 13px;
     }
-    .section-actions {
-        justify-content: flex-end;
-    }
-    .update-preview-text {
-        font-size: var(--fs-xxs);
-    }
-    .update-detail-gallery {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-1);
-    }
-    .update-full-body {
-        font-size: var(--fs-xxs);
-    }
+
     .update-full-body img {
         max-width: 100%;
         max-height: 220px;
     }
-    .summary-amount strong {
+
+    .update-detail-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-2);
+    }
+
+    /* ----- Kondisi kosong ----- */
+
+    .empty-updates,
+    .empty-pesan-doa {
+        padding: var(--space-4) 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .empty-updates p,
+    .empty-pesan-doa p {
+        margin-bottom: var(--space-2);
+        font-size: var(--fs-xs);
+    }
+
+    .icon-section {
+        width: 72px;
+        height: 72px;
+        max-width: 72px;
+        margin: 0 auto var(--space-2);
+    }
+
+    /* ----- Pesan & doa: daftar datar ----- */
+
+    .badge-doa-count {
+        padding: 2px var(--space-3);
+        font-size: var(--fs-xxs);
+    }
+
+    .pesan-doa-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .pesan-doa-card {
+        gap: var(--space-2);
+        padding: var(--space-3) 0;
+        border: 0;
+        border-top: 1px solid var(--border-soft);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .pesan-doa-card:first-child {
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    .pesan-doa-card:hover {
+        transform: none;
+        border-color: var(--border-soft);
+        box-shadow: none;
+    }
+
+    .pesan-doa-avatar {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    .pesan-doa-footer {
+        margin-top: var(--space-3);
+    }
+
+    /* ----- Donasi terbaru ----- */
+
+    .side-list-card h3 {
+        margin-bottom: var(--space-2);
+        font-size: var(--fs-sm);
+    }
+
+    .side-list-item {
+        padding: var(--space-2) 0;
+    }
+
+    .side-list-item .avatar-circle {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    /* ----- Fundraiser ----- */
+
+    .fundraiser-join-card .icon-section {
+        width: 56px;
+        height: 56px;
+        max-width: 56px;
+    }
+
+    /* kartu hijau "Anda Fundraiser" tetap berupa kotak lembut */
+    .fundraiser-join-card.joined {
+        margin-top: var(--space-4);
+        padding: var(--space-4);
+        border: 1px solid var(--success);
+        border-radius: var(--radius-md);
+    }
+
+    /* ----- CTA donasi (bawah) ----- */
+
+    .mobile-sticky-cta {
+        position: fixed;
+        z-index: 250;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+
+        padding:
+            var(--space-3)
+            var(--space-4)
+            calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+
+        border-top: 1px solid var(--border-soft);
+        background: var(--bg);
+    }
+
+    .mobile-cta-info {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .mobile-cta-label {
+        color: var(--muted);
+        font-size: var(--fs-xxs);
+        font-weight: var(--fw-medium);
+    }
+
+    .mobile-cta-val {
+        overflow: hidden;
+
+        color: var(--primary);
+        font-size: var(--fs-md);
+        font-weight: var(--fw-bold);
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .btn-mobile-donate {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        flex-shrink: 0;
+
+        padding: var(--space-3) var(--space-5);
+
+        border-radius: var(--radius-full);
+        background: var(--primary);
+
+        color: var(--bg);
+        font-size: var(--fs-sm);
+        font-weight: var(--fw-bold);
+        text-decoration: none;
+
+        transition:
+            background-color .2s ease,
+            transform .15s ease;
+    }
+
+    .btn-mobile-donate:active {
+        background: var(--primary-hover);
+        transform: scale(.98);
+    }
+
+    /* halaman ini punya CTA sendiri: bottom-nav & tombol donasi global disembunyikan */
+    body:has(.mobile-sticky-cta) .mobile-bottom-nav,
+    body:has(.mobile-sticky-cta) .floating-donate-btn {
+        display: none !important;
+    }
+
+    /* ----- Toast (di atas CTA) ----- */
+
+    .toast-notification {
+        bottom: calc(var(--space-16) + env(safe-area-inset-bottom, 0px));
+        max-width: 90%;
+        padding: var(--space-2) var(--space-4);
+        font-size: var(--fs-xxs);
+    }
+
+    /* ----- Lightbox ----- */
+
+    .lightbox-overlay {
+        padding: var(--space-4);
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+        width: 36px;
+        height: 36px;
         font-size: var(--fs-md);
     }
-    .donation-summary-card,
-    .side-list-card,
-    .fundraiser-info-card,
-    .fundraiser-join-card {
-        padding: var(--space-3);
+
+    .lightbox-prev {
+        left: var(--space-2);
     }
-    .btn-fundraiser-join,
-    .btn-fundraiser-leave,
-    .btn-fundraiser-login {
-        width: 100%;
-        justify-content: center;
+
+    .lightbox-next {
+        right: var(--space-2);
     }
-    .referral-link-box {
-        flex-wrap: wrap;
+
+    .lightbox-close {
+        top: var(--space-4);
+        right: var(--space-4);
     }
-    .referral-link-box input {
-        width: 100%;
+
+    .lightbox-image-wrapper img {
+        max-height: 65vh;
     }
-    .btn-copy-link {
-        width: 100%;
-        justify-content: center;
+
+    .lightbox-footer {
+        bottom: var(--space-4);
     }
+
+    .lightbox-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .lightbox-dot.active {
+        width: 18px;
+    }
+
+    /* ----- Modal fundraiser ----- */
+
+    .modal-content {
+        max-width: 95%;
+    }
+
+    .modal-header {
+        padding: var(--space-5) var(--space-5) var(--space-4);
+    }
+
+    .modal-body {
+        padding: var(--space-5);
+    }
+
+    .modal-logo img {
+        height: 28px;
+    }
+
+    .modal-header h2 {
+        font-size: var(--fs-md);
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
     .referral-link-box-modal {
         flex-wrap: wrap;
         padding: var(--space-2);
     }
+
     .referral-link-box-modal input {
         width: 100%;
-        font-size: var(--fs-xxs);
     }
+
     .btn-copy-link-modal {
         width: 100%;
-        justify-content: center;
     }
+
     .referral-code-box {
         flex-wrap: wrap;
         gap: var(--space-1);
         padding: var(--space-2);
     }
+
     .referral-code-box .code-value {
         width: 100%;
         text-align: center;
-        font-size: var(--fs-sm);
     }
+
     .btn-copy-code {
         width: 100%;
         justify-content: center;
     }
+
     .modal-qr-wrapper svg {
         max-width: 140px;
     }
-    .lightbox-prev,
-    .lightbox-next {
-        width: 34px;
-        height: 34px;
-        font-size: 16px;
+
+    .modal-qr-fullscreen {
+        padding: var(--space-5);
     }
-    .lightbox-prev {
-        left: 6px;
+
+    .modal-qr-fullscreen-content #qrFullscreenContainer svg {
+        max-width: 200px;
     }
-    .lightbox-next {
-        right: 6px;
-    }
-    .lightbox-image-wrapper img {
-        max-height: 60vh;
-    }
-    .lightbox-footer {
-        bottom: 16px;
-    }
-    .lightbox-dot {
-        width: 8px;
-        height: 8px;
-    }
-    .lightbox-dot.active {
-        width: 18px;
-    }
-    .modal-actions .btn-modal-primary,
-    .modal-actions .btn-modal-secondary {
-        padding: var(--space-2);
-        font-size: var(--fs-xs);
-    }
+
     .modal-qr-actions {
         flex-direction: column;
     }
+
     .btn-download-qr-modal,
     .btn-share-qr-modal {
-        justify-content: center;
         width: 100%;
-    }
-    .toast-notification {
-        max-width: 90%;
-        font-size: var(--fs-xxs);
-        padding: var(--space-2) var(--space-4);
-        bottom: var(--space-4);
-    }
-    .icon-section {
-        width: 64px;
-        height: 64px;
-        max-width: 64px;
-        margin: 0 auto var(--space-3);
-    }
-    .pesan-doa-avatar {
-        width: 38px;
-        height: 38px;
-        flex-basis: 38px;
-    }
-
-    /* ============================
-       Mobile Sticky Donation CTA
-    ============================ */
-    .mobile-sticky-cta {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #ffffff;
-        padding: 0.75rem 1.25rem;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        z-index: 998;
-        border-top: 1px solid var(--border-soft);
-    }
-    .mobile-cta-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-    .mobile-cta-label {
-        font-size: 0.75rem;
-        color: var(--muted);
-        font-weight: 500;
-    }
-    .mobile-cta-val {
-        font-size: 1.05rem;
-        color: var(--primary);
-        font-weight: 800;
-    }
-    .btn-mobile-donate {
-        background: var(--primary);
-        color: #ffffff;
-        padding: 0.7rem 1.35rem;
-        border-radius: 10px;
-        font-size: 0.875rem;
-        font-weight: 700;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 4px 12px rgba(51, 101, 175, 0.28);
-        transition: transform 0.15s ease, background 0.15s ease;
-    }
-    .btn-mobile-donate:active {
-        transform: scale(0.98);
-        background: var(--primary-hover);
-    }
-}
-
-/* Desktop only: sembunyikan sticky CTA */
-@media (min-width: 769px) {
-    .mobile-sticky-cta {
-        display: none !important;
-    }
-}
-
-/* ============================================================
-   Halaman ini punya CTA donasi sendiri (.mobile-sticky-cta),
-   jadi bottom-nav & floating-donate-btn global disembunyikan
-============================================================ */
-@media (max-width: 600px) {
-    body:has(.mobile-sticky-cta) .mobile-bottom-nav,
-    body:has(.mobile-sticky-cta) .floating-donate-btn {
-        display: none !important;
+        justify-content: center;
     }
 }

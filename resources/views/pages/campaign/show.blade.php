@@ -15,6 +15,15 @@
 
     @include('components.header')
 
+    {{-- Header mobile: transparan di atas hero; setelah scroll jadi solid
+         berisi tombol kembali + judul campaign. Hanya tampil di ≤ 768px. --}}
+    <div class="campaign-topbar" id="campaignTopbar">
+        <a href="{{ route('home') }}" class="campaign-topbar-back" data-mobile-back aria-label="Kembali">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <p class="campaign-topbar-title">{{ $campaign->judul }}</p>
+    </div>
+
     <main class="campaign-detail-page">
 
         @if (session('success'))
@@ -60,7 +69,7 @@
                         <span class="hero-status-badge {{ $statusHariClass }}">
                             <i class="bi bi-clock-fill"></i> {{ $statusHari }}
                         </span>
-                    </div> 
+                    </div>
                     <section class="description-section">
                         <h1>{{ $campaign->judul }}</h1>
                         <div class="rich-text-output">{!! $campaign->deskripsi !!}</div>
@@ -447,7 +456,7 @@
         <div class="mobile-sticky-cta">
             <div class="mobile-cta-info">
                 <span class="mobile-cta-label">Terkumpul</span>
-                <strong class="mobile-cta-val">Rp {{ number_format($totalTerkumpul ?? 0, 0, ',', '.') }}</strong>
+                <strong class="mobile-cta-val">Rp {{ number_format($totalTerkumpul ?? $campaign->terkumpul ?? 0, 0, ',', '.') }}</strong>
             </div>
             <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}" class="btn-mobile-donate">
                 <span>Donasi Sekarang</span>
@@ -611,6 +620,36 @@
     </script>
 
     <script src="{{ asset('js/campaign-show.js') }}" defer></script>
+
+    {{-- Header mobile: jadi solid (dengan judul) setelah scroll melewati hero --}}
+    <script>
+        (function () {
+            var bar = document.getElementById('campaignTopbar');
+            var hero = document.querySelector('.hero-wrapper');
+            if (!bar) return;
+
+            var ticking = false;
+
+            function update() {
+                ticking = false;
+
+                // di desktop topbar disembunyikan lewat CSS: tidak perlu dihitung
+                if (window.getComputedStyle(bar).display === 'none') return;
+
+                var limit = (hero ? hero.offsetHeight : 160) - bar.offsetHeight;
+                bar.classList.toggle('is-solid', window.scrollY > Math.max(limit, 0));
+            }
+
+            window.addEventListener('scroll', function () {
+                if (ticking) return;
+                ticking = true;
+                window.requestAnimationFrame(update);
+            }, { passive: true });
+
+            window.addEventListener('resize', update);
+            update();
+        })();
+    </script>
 
 </body>
 
