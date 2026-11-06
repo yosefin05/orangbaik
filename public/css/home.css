@@ -2264,9 +2264,9 @@ body.filter-open .floating-wa-container {
         margin: 0 0 var(--space-4);
         overflow: visible;
         color: var(--text-dark);
-        font-size: var(--fs-sm);
+        font-size: var(--fs-xxs);
         font-weight: var(--fw-medium);
-        line-height: 1.7;
+        line-height: 1.2;
         text-align: left;
         transition: none;
     }
@@ -2298,7 +2298,7 @@ body.filter-open .floating-wa-container {
     }
 
     .testimonial .testimonial-item .testimonial-person-info h3 {
-        font-size: var(--fs-xs);
+        font-size: var(--fs-xxs);
     }
 
     .testimonial .testimonial-item .testimonial-person-info span {
