@@ -104,86 +104,150 @@
         </section>
 
         {{-- DARURAT --}}
-        <section class="section section-border">
+        <section class="section section-border tone-danger">
             <div class="container">
                 <h2 class="section-title">Darurat! Bantu Sekarang</h2>
 
-                <div class="campaign-grid">
-                    @forelse ($darurat as $campaign)
-                        <x-campaign-card :campaign="$campaign" />
-                    @empty
-                        <p>Belum ada campaign darurat.</p>
-                    @endforelse
-                </div>
+                @if (count($darurat) > 0)
+
+                    <div class="campaign-grid">
+                        @foreach ($darurat as $campaign)
+                            <x-campaign-card :campaign="$campaign" />
+                        @endforeach
+                    </div>
+
+                @else
+
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-lightning-charge"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada campaign darurat</h3>
+
+                        <p class="empty-state-text">
+                            Saat ini belum ada penggalangan yang bersifat mendesak.
+                        </p>
+                    </div>
+
+                @endif
             </div>
         </section>
 
         {{-- YANG BARU --}}
-        <section class="section section-new">
-    <div class="container">
-        <h2 class="section-title new-title">Yuk, Lihat yang Baru!</h2>
+        <section class="section section-new tone-secondary">
+            <div class="container">
+                <h2 class="section-title new-title">Yuk, Lihat yang Baru!</h2>
 
-                <div class="new-grid">
-                    @forelse ($campaignTerbaru as $campaign)
-                        @php [$terkumpul, $totalDonatur, $persen] = $statistik($campaign); @endphp
+                @if (count($campaignTerbaru) > 0)
 
-                        <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
-                            <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
-                                loading="lazy">
+                    <div class="new-grid">
+                        @foreach ($campaignTerbaru as $campaign)
+                            @php [$terkumpul, $totalDonatur, $persen] = $statistik($campaign); @endphp
 
-                            <div class="new-item-overlay">
-                                <h3>{{ $campaign->judul }}</h3>
-                                <p>{{ $campaign->penggalangDana->nama_penggalang }}</p>
+                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
+                                <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
+                                    loading="lazy">
 
-                                <div class="new-item-price">
-                                    <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
-                                    <span>Terkumpul</span>
+                                <div class="new-item-overlay">
+                                    <h3>{{ $campaign->judul }}</h3>
+                                    <p>{{ $campaign->penggalangDana->nama_penggalang }}</p>
+
+                                    <div class="new-item-price">
+                                        <strong>Rp {{ number_format($terkumpul, 0, ',', '.') }}</strong>
+                                        <span>Terkumpul</span>
+                                    </div>
+
+                                    <div class="progress">
+                                        <div class="progress-fill" style="width: {{ $persen }}%;"></div>
+                                    </div>
+
+                                    <div class="new-item-meta">
+                                        <span>{{ $totalDonatur }} Donatur</span>
+                                        <span>{{ round($persen) }}%</span>
+                                    </div>
                                 </div>
+                            </a>
+                        @endforeach
+                    </div>
 
-                                <div class="progress">
-                                    <div class="progress-fill" style="width: {{ $persen }}%;"></div>
-                                </div>
+                @else
 
-                                <div class="new-item-meta">
-                                    <span>{{ $totalDonatur }} Donatur</span>
-                                    <span>{{ round($persen) }}%</span>
-                                </div>
-                            </div>
-                        </a>
-                    @empty
-                        <p>Belum ada campaign terbaru.</p>
-                    @endforelse
-                </div>
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-clock-history"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada campaign terbaru</h3>
+
+                        <p class="empty-state-text">
+                            Campaign yang baru dibuat akan muncul di sini.
+                        </p>
+                    </div>
+
+                @endif
             </div>
         </section>
 
         {{-- PEMBERDAYAAN --}}
-        <section class="section section-border">
+        <section class="section section-border tone-success">
             <div class="container">
                 <h2 class="section-title">Pemberdayaan Berkelanjutan</h2>
 
-                <div class="campaign-grid">
-                    @forelse ($pemberdayaan as $campaign)
-                        <x-campaign-card :campaign="$campaign" />
-                    @empty
-                        <p>Belum ada campaign berkelanjutan.</p>
-                    @endforelse
-                </div>
+                @if (count($pemberdayaan) > 0)
+
+                    <div class="campaign-grid">
+                        @foreach ($pemberdayaan as $campaign)
+                            <x-campaign-card :campaign="$campaign" />
+                        @endforeach
+                    </div>
+
+                @else
+
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-graph-up"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada program pemberdayaan</h3>
+
+                        <p class="empty-state-text">
+                            Program pemberdayaan berkelanjutan akan tampil di sini.
+                        </p>
+                    </div>
+
+                @endif
             </div>
         </section>
 
         {{-- CAMPAIGN LAINNYA --}}
-        <section class="section section-border">
+        <section class="section section-border tone-primary">
             <div class="container">
                 <h2 class="section-title">Campaign Lainnya</h2>
 
-                <div class="campaign-grid">
-                    @forelse ($campaigns as $campaign)
-                        <x-campaign-card :campaign="$campaign" />
-                    @empty
-                        <p>Belum ada campaign lainnya.</p>
-                    @endforelse
-                </div>
+                @if (count($campaigns) > 0)
+
+                    <div class="campaign-grid">
+                        @foreach ($campaigns as $campaign)
+                            <x-campaign-card :campaign="$campaign" />
+                        @endforeach
+                    </div>
+
+                @else
+
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-collection"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada campaign lainnya</h3>
+
+                        <p class="empty-state-text">
+                            Campaign lain akan muncul di sini.
+                        </p>
+                    </div>
+
+                @endif
             </div>
         </section>
 
@@ -253,7 +317,7 @@
         </section>
 
         {{-- KATEGORI FAVORIT --}}
-        <section class="section" id="kategori-favorit">
+        <section class="section tone-primary" id="kategori-favorit">
             <div class="container">
                 <h2 class="section-title">Pilih Kategori Favoritmu</h2>
 
@@ -278,13 +342,31 @@
                     </a>
                 </div>
 
-                <div class="list-campaign">
-                    @forelse ($campaigns as $campaign)
-                        <x-campaign-card :campaign="$campaign" variant="list" />
-                    @empty
-                        <p>Belum ada campaign aktif.</p>
-                    @endforelse
-                </div>
+                @if (count($campaigns) > 0)
+
+                    <div class="list-campaign">
+                        @foreach ($campaigns as $campaign)
+                            <x-campaign-card :campaign="$campaign" variant="list" />
+                        @endforeach
+                    </div>
+
+                @else
+
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">
+                            <i class="bi bi-collection"></i>
+                        </span>
+
+                        <h3 class="empty-state-title">Belum ada campaign aktif</h3>
+
+                        <p class="empty-state-text">
+                            {{ request()->filled('kategori')
+                                ? 'Belum ada campaign pada kategori ini.'
+                                : 'Campaign yang sedang berjalan akan muncul di sini.' }}
+                        </p>
+                    </div>
+
+                @endif
             </div>
         </section>
 

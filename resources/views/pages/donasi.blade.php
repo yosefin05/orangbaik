@@ -55,20 +55,23 @@
 
     {{-- headerTitle: bila terisi, header (mobile) menampilkan nama kategori
          menggantikan search bar --}}
-@include('components.header', [
-    'headerTitle' => $kategoriAktif?->nama_kategori,
-    'headerIcon'  => $kategoriAktif
-        ? ($kategoriIcons[strtolower($kategoriAktif->nama_kategori)] ?? 'assets/lainnya.svg')
-        : null,
-])
+    @include('components.header', [
+        'headerTitle' => $kategoriAktif?->nama_kategori,
+        'headerIcon'  => $kategoriAktif
+            ? ($kategoriIcons[strtolower($kategoriAktif->nama_kategori)] ?? 'assets/lainnya.svg')
+            : null,
+    ])
+
     <main class="main donasi-page">
 
         {{-- ==========================================
             1. FILTER DONASI
             Bar: Kategori (pilih satu) • Jenis penggalang (pilih satu)
                  • Filter (checklist)
-            Desktop: dropdown di bawah tombol. Mobile: bottom sheet.
-            Semua input satu <form>; "Terapkan" mengirim semuanya.
+            Desktop: Kategori & Jenis = dropdown di bawah tombol;
+                     Filter = chip pilihan inline (tanpa dropdown).
+            Mobile : ketiganya bottom sheet.
+            Semua input satu <form>.
         =========================================== --}}
         <section class="donasi-filter-section" id="donasiFilter">
             <div class="container">
@@ -233,8 +236,16 @@
 
                         </div>
 
-                        {{-- ---------- FILTER (checklist) ---------- --}}
-                        <div class="filter-item" data-filter-item>
+                        {{-- ---------- FILTER (checklist) ----------
+                             Mobile : tombol + bottom sheet.
+                             Desktop: tombol disembunyikan, pilihan tampil
+                                      langsung sebagai chip (lihat .is-inline). --}}
+                        <div class="filter-item is-inline" data-filter-item data-filter-inline>
+
+                            <span class="filter-inline-label">
+                                <i class="bi bi-funnel"></i>
+                                Filter
+                            </span>
 
                             <button
                                 type="button"
@@ -398,7 +409,7 @@
         @endif
 
 
-        {        {{-- ==========================================
+        {{-- ==========================================
             3. CAMPAIGN DARURAT
         =========================================== --}}
         <section class="section section-band section-tone tone-danger donasi-campaign-section">
@@ -647,5 +658,28 @@
 
     <script src="{{ asset('js/header.js') }}"></script>
     <script src="{{ asset('js/donasi.js') }}"></script>
+
+    {{-- Desktop: chip filter langsung diterapkan saat dicentang.
+         Di mobile (bottom sheet) tetap memakai tombol "Terapkan". --}}
+    <script>
+        (function () {
+            var form = document.getElementById('filterForm');
+            if (!form) return;
+
+            var desktop = window.matchMedia('(min-width: 769px)');
+
+            form.querySelectorAll('[data-filter-inline] input[type="checkbox"]').forEach(function (input) {
+                input.addEventListener('change', function () {
+                    if (!desktop.matches) return;
+
+                    if (form.requestSubmit) {
+                        form.requestSubmit();
+                    } else {
+                        form.submit();
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>
