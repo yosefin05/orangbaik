@@ -1920,6 +1920,143 @@ body.filter-open .floating-wa-container {
     }
 }
 
+/* =========================================================
+   10C. TESTIMONIAL (MOBILE, ≤ 600px)
+   Satu kartu bersih per layar. Kelas is-active / is-prev / is-next /
+   is-hidden tetap diatur JS; di sini hanya tampilannya yang diganti:
+   hanya kartu aktif yang terlihat, berganti dengan fade.
+   Desktop & tablet tidak terpengaruh.
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .testimonial {
+        background: transparent;
+    }
+
+    .testimonial .testimonial-wrapper {
+        align-items: start;
+        justify-items: stretch;
+        margin-top: 0;
+        padding: 0;
+    }
+
+    /* semua kartu tersembunyi, kecuali yang aktif */
+    .testimonial .testimonial-item {
+        transform: translateY(var(--space-2));
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition:
+            opacity .35s ease,
+            transform .35s ease,
+            visibility .35s ease;
+    }
+
+    .testimonial .testimonial-item.is-active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    /* Kartu */
+
+    .testimonial .testimonial-item .testimonial-card {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: var(--space-5);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--bg);
+        box-shadow: none;
+        transition: none;
+    }
+
+    /* tanda kutip dekoratif */
+    .testimonial .testimonial-card::before {
+        content: "\201C";
+        display: block;
+        margin-bottom: var(--space-2);
+        color: var(--primary);
+        font-size: var(--fs-xxl);
+        font-weight: var(--fw-bold);
+        line-height: .8;
+    }
+
+    /* Kutipan = fokus utama */
+
+    .testimonial .testimonial-item .testimonial-description {
+        display: block;
+        order: 1;
+        margin: 0 0 var(--space-4);
+        overflow: visible;
+        color: var(--text-dark);
+        font-size: var(--fs-sm);
+        font-weight: var(--fw-medium);
+        line-height: 1.7;
+        text-align: left;
+        transition: none;
+    }
+
+    /* Identitas: avatar kecil + nama + jabatan, di bawah kutipan */
+
+    .testimonial .testimonial-item .testimonial-head {
+        order: 2;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-3);
+        margin: 0;
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--border-soft);
+        text-align: left;
+        transition: none;
+    }
+
+    .testimonial .testimonial-item .testimonial-avatar {
+        width: 40px;
+        height: 40px;
+        margin-top: 0;
+        box-shadow: 0 0 0 1px var(--border-soft);
+        transition: none;
+    }
+
+    .testimonial .testimonial-item .testimonial-person-info {
+        min-width: 0;
+    }
+
+    .testimonial .testimonial-item .testimonial-person-info h3 {
+        font-size: var(--fs-xs);
+    }
+
+    .testimonial .testimonial-item .testimonial-person-info span {
+        font-size: var(--fs-xxs);
+    }
+
+    /* Navigasi */
+
+    .testimonial .testimonial-nav {
+        gap: var(--space-3);
+        margin-top: var(--space-4);
+    }
+
+    .testimonial .testimonial-arrow {
+        width: 32px;
+        height: 32px;
+    }
+
+    .testimonial .testimonial-dot {
+        transition:
+            width .3s ease,
+            background .3s ease;
+    }
+
+    .testimonial .testimonial-dot.active {
+        width: 20px;
+        transform: none;
+    }
+}
 
 /* =========================================================
    11. AKSESIBILITAS
