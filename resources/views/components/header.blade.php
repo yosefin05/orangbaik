@@ -233,34 +233,59 @@ Hanya untuk halaman di luar halaman utama.
 {{-- ==========================================
 MOBILE BOTTOM NAVIGATION
 =========================================== --}}
+{{-- ==========================================
+MOBILE BOTTOM NAVIGATION
+=========================================== --}}
 @if ($showBottomNav)
+    @php
+        $navHomeActive = request()->is('/');
+        $navDonasiActive = request()->is('donasi*');
+        $navKalkulatorActive = request()->is('kalkulator*');
+        $navBeritaActive = request()->is('berita*');
+        $navProfilActive = request()->routeIs('profile.user');
+    @endphp
+
     <nav class="mobile-bottom-nav" aria-label="Navigasi utama">
 
-        <a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}" aria-label="Beranda">
-            <i class="bi bi-house"></i>
-            <span>Beranda</span>
+        <a href="{{ route('home') }}" class="{{ $navHomeActive ? 'active' : '' }}" aria-label="Beranda"
+            @if ($navHomeActive) aria-current="page" @endif>
+            <span class="nav-icon">
+                <i class="bi {{ $navHomeActive ? 'bi-house-door-fill' : 'bi-house-door' }}"></i>
+            </span>
+            <span class="nav-label">Beranda</span>
         </a>
 
-        <a href="{{ url('donasi') }}" class="{{ request()->is('donasi*') ? 'active' : '' }}" aria-label="Donasi">
-            <i class="bi bi-heart"></i>
-            <span>Donasi</span>
+        <a href="{{ url('donasi') }}" class="{{ $navDonasiActive ? 'active' : '' }}" aria-label="Donasi"
+            @if ($navDonasiActive) aria-current="page" @endif>
+            <span class="nav-icon">
+                <i class="bi {{ $navDonasiActive ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+            </span>
+            <span class="nav-label">Donasi</span>
         </a>
 
-        <a href="{{ url('kalkulator') }}" class="{{ request()->is('kalkulator*') ? 'active' : '' }}"
-            aria-label="Kalkulator">
-            <i class="bi bi-calculator"></i>
-            <span>Kalkulator</span>
+        <a href="{{ url('kalkulator') }}" class="{{ $navKalkulatorActive ? 'active' : '' }}" aria-label="Kalkulator"
+            @if ($navKalkulatorActive) aria-current="page" @endif>
+            <span class="nav-icon">
+                <i class="bi {{ $navKalkulatorActive ? 'bi-calculator-fill' : 'bi-calculator' }}"></i>
+            </span>
+            <span class="nav-label">Kalkulator</span>
         </a>
 
-        <a href="{{ url('berita') }}" class="{{ request()->is('berita*') ? 'active' : '' }}" aria-label="Berita">
-            <i class="bi bi-newspaper"></i>
-            <span>Berita</span>
+        <a href="{{ url('berita') }}" class="{{ $navBeritaActive ? 'active' : '' }}" aria-label="Berita"
+            @if ($navBeritaActive) aria-current="page" @endif>
+            <span class="nav-icon">
+                <i class="bi {{ $navBeritaActive ? 'bi-newspaper' : 'bi-newspaper' }}"></i>
+            </span>
+            <span class="nav-label">Berita</span>
         </a>
 
         <a href="{{ auth()->check() ? route('profile.user') : route('login') }}"
-            class="{{ request()->routeIs('profile.user') ? 'active' : '' }}" aria-label="Profil">
-            <i class="bi bi-person"></i>
-            <span>Profil</span>
+            class="{{ $navProfilActive ? 'active' : '' }}" aria-label="Profil"
+            @if ($navProfilActive) aria-current="page" @endif>
+            <span class="nav-icon">
+                <i class="bi {{ $navProfilActive ? 'bi-person-circle' : 'bi-person-circle' }}"></i>
+            </span>
+            <span class="nav-label">Profil</span>
         </a>
 
     </nav>

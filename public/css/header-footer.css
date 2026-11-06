@@ -988,7 +988,6 @@
         right: 0;
         bottom: 0;
         z-index: 250;
-
         min-height: calc(64px + env(safe-area-inset-bottom, 0px));
         padding:
             var(--space-1)
@@ -999,7 +998,7 @@
         align-items: center;
         justify-content: space-between;
 
-        background: var(--bg);
+        background: var(--bg-soft);
         border-top: 1px solid var(--border);
         box-shadow: 0 -8px 24px rgba(15, 23, 42, .08);
 
