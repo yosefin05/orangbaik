@@ -2056,7 +2056,7 @@ body.filter-open .floating-wa-container {
 
     /* kiri: thumbnail 16:9 + badge, rata atas */
     .campaign-card.is-list .campaign-thumb {
-        flex: 0 0 45%;
+        flex: 0 0 50%;
         align-self: flex-center;
         border-radius: var(--radius-sm);
     }
@@ -2075,9 +2075,7 @@ body.filter-open .floating-wa-container {
 .campaign-card.is-list .campaign-title {
     order: 1;
     min-height: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
 }
 
     /* 2. penggalang (kiri) • donatur (kanan) */
