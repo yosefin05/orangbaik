@@ -15,7 +15,7 @@
 <header class="payment-topbar" id="paymentTopbar">
     <div class="container payment-topbar-inner">
         <button class="payment-topbar-back" type="button" id="backButton" aria-label="Kembali">
-            <i class="bi bi-arrow-left" aria-hidden="true"></i>
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
         </button>
 
         <div class="payment-topbar-text">
@@ -357,7 +357,7 @@
                         <span>Total Bayar</span>
                         <strong id="total-donasi">Rp0</strong>
                     </div>
-                    
+
                     <button class="pay-button js-pay" type="button" id="payButton">
                         Lanjutkan Pembayaran
                     </button>
