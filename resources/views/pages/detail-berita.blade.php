@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{{ $berita->judul ?? 'Detail Berita' }} - OrangBaik.id</title>
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
@@ -12,14 +12,25 @@
 
 <body>
     @include('components.header')
+
+    {{-- TOPBAR MOBILE (sama seperti campaign show): transparan di atas hero, solid saat scroll --}}
+    <header class="news-topbar {{ $berita->thumbnail ? '' : 'is-solid' }}" id="newsTopbar">
+        <button type="button" class="news-topbar-back" id="newsBack" aria-label="Kembali">
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <p class="news-topbar-title">{{ $berita->judul }}</p>
+    </header>
+
     <main class="detail-news-page">
         <div class="container detail-news-container">
             <div class="detail-news-layout">
                 {{-- MAIN CONTENT --}}
-                <article class="news-detail-main">
+                <article class="news-detail-main {{ $berita->thumbnail ? '' : 'is-no-hero' }}">
                     @if ($berita->thumbnail)
-                        <img src="{{ asset('storage/' . $berita->thumbnail) }}" alt="{{ $berita->judul }}"
-                            class="news-hero-image">
+                        <div class="news-hero-wrapper" id="newsHero">
+                            <img src="{{ asset('storage/' . $berita->thumbnail) }}" alt="{{ $berita->judul }}"
+                                class="news-hero-image">
+                        </div>
                     @endif
                     <h1>{{ $berita->judul }}</h1>
                     <div class="news-meta-row">
@@ -131,6 +142,36 @@
         </div>
     </main>
     @include('components.footer')
+
+    <script>
+        (function () {
+            var topbar = document.getElementById('newsTopbar');
+            var hero = document.getElementById('newsHero');
+            var back = document.getElementById('newsBack');
+            var fallback = @json(\Illuminate\Support\Facades\Route::has('berita.index') ? route('berita.index') : url('/'));
+
+            if (back) {
+                back.addEventListener('click', function () {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.location.href = fallback;
+                    }
+                });
+            }
+
+            if (!topbar) return;
+
+            function sync() {
+                var solid = !hero || window.scrollY > hero.offsetHeight - 56;
+                topbar.classList.toggle('is-solid', solid);
+            }
+
+            window.addEventListener('scroll', sync, { passive: true });
+            window.addEventListener('resize', sync);
+            sync();
+        })();
+    </script>
     <script src="{{ asset('js/detail-berita.js') }}"></script>
 </body>
 

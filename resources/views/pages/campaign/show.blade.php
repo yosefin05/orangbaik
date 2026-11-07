@@ -199,11 +199,9 @@
                     <section class="pesan-doa-section">
                         <div class="section-header">
                             <h2>
-                                <i class="bi bi-chat-heart-fill" style="color: var(--primary); margin-right: 7px;"></i>
                                 Pesan & Doa Donatur
                             </h2>
                             <span class="badge-doa-count">
-                                <i class="bi bi-heart-fill" style="font-size: 10px;"></i>
                                 {{ $pesanDoa->count() }} pesan
                             </span>
                         </div>
@@ -461,7 +459,6 @@
             </div>
             <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}" class="btn-mobile-donate">
                 <span>Donasi Sekarang</span>
-                <i class="bi bi-heart-fill"></i>
             </a>
 
         </div>
