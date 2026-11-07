@@ -209,6 +209,12 @@ body {
     opacity: 0.92;
 }
 
+/* Tombol "Lihat selengkapnya" (dibuat oleh campaign-show.js).
+   Disembunyikan di desktop; ditampilkan di bagian 15 (mobile). */
+.rich-toggle {
+    display: none;
+}
+
 
 /* ============================================================
    5. SECTION HEADER & AKSI
@@ -2219,34 +2225,102 @@ body {
         display: none;
     }
 
-    /* justify seperti desktop, tapi aman di layar sempit:
-       kata hanya dipotong bila benar-benar tidak muat (bukan di setiap
-       kata panjang), hyphenation membantu menutup celah antar kata */
+    /* "Lihat lebih sedikit" berhenti tepat di bawah topbar */
+    .description-section {
+        scroll-margin-top: calc(56px + var(--space-3));
+    }
+
+    /* Ukuran teks isi diatur dari SATU variabel.
+       Ganti --rt-size ke var(--fs-sm) bila ingin 16px seperti desktop. */
     .rich-text-output {
+        --rt-size: var(--fs-xs);
+        --rt-leading: 1.75;
+
+        color: var(--text);
+        font-family: inherit;
+        font-size: var(--rt-size);
+        line-height: var(--rt-leading);
         text-align: justify;
         text-justify: inter-word;
         word-break: normal;
         overflow-wrap: break-word;
-        -webkit-hyphens: auto;
-        hyphens: auto;
-        line-height: 1.75;
+    }
+
+    /* Teks biasa: SEMUA elemen disamakan. !important dipakai karena
+       editor (Word/Docs/Quill) menyisipkan style inline — font, ukuran,
+       line-height, latar putih, word-break — yang membuat teks tidak rata. */
+    .rich-text-output :where(
+        p, div, span, li, a, blockquote, td, th, font,
+        em, strong, b, i, u, small, sup, sub
+    ) {
+        background: transparent !important;
+        font-family: inherit !important;
+        font-size: var(--rt-size) !important;
+        letter-spacing: normal !important;
+        line-height: var(--rt-leading) !important;
+        white-space: normal !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+    }
+
+    /* Judul di dalam konten: satu ukuran, tebal, rata kiri */
+    .rich-text-output :where(h1, h2, h3, h4, h5, h6) {
+        margin: var(--space-4) 0 var(--space-2);
+        color: var(--text-dark);
+        font-family: inherit !important;
+        font-size: var(--fs-sm) !important;
+        font-weight: var(--fw-bold) !important;
+        letter-spacing: -.01em !important;
+        line-height: 1.4 !important;
+        text-align: left;
+    }
+
+    /* span/strong di dalam judul ikut ukuran judul (bukan ukuran teks biasa) */
+    .rich-text-output :where(h1, h2, h3, h4, h5, h6)
+    :where(span, strong, b, em, i, u, a, font) {
+        font-size: inherit !important;
+        line-height: inherit !important;
+    }
+
+    .rich-text-output > :first-child {
+        margin-top: 0;
     }
 
     .rich-text-output p {
-        margin-bottom: var(--space-3);
-        font-size: var(--fs-xs);
+        margin: 0 0 var(--space-3);
+    }
+
+    /* paragraf kosong dari editor (<p><br></p>) tidak menambah jarak ekstra */
+    .rich-text-output p:empty,
+    .rich-text-output p:has(> br:only-child) {
+        display: none;
     }
 
     .rich-text-output ul,
     .rich-text-output ol {
+        margin: 0 0 var(--space-3);
         padding-left: var(--space-5);
     }
 
-    /* URL / link panjang: boleh patah di mana saja, tanpa celah lebar */
+    .rich-text-output li {
+        margin-bottom: var(--space-1);
+    }
+
+    .rich-text-output li > p {
+        margin: 0;
+    }
+
+    .rich-text-output blockquote {
+        margin: var(--space-3) 0;
+        padding-left: var(--space-3);
+        border-left: 3px solid var(--primary-light);
+    }
+
+    /* URL / link panjang: boleh patah di mana saja */
     .rich-text-output a {
-        overflow-wrap: anywhere;
-        word-break: break-word;
-        text-align: left;
+        color: var(--primary) !important;
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
     }
 
     /* konten hasil editor tidak boleh melebihi lebar layar */
@@ -2256,6 +2330,7 @@ body {
     }
 
     .rich-text-output img {
+        display: block;
         max-width: 100%;
         max-height: 260px;
         margin: var(--space-3) auto;
@@ -2282,6 +2357,61 @@ body {
         overflow-x: auto;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
+    }
+
+    /* ----- Preview: dibatasi ± 7 baris + efek pudar di bawah -----
+       Kelas .is-collapsed dipasang oleh campaign-show.js, hanya bila
+       teks memang lebih panjang dari batas. Teks pendek tampil utuh. */
+
+    .rich-text-output.is-collapsed {
+        max-height: calc(var(--rt-size) * var(--rt-leading) * 7);
+        overflow: hidden;
+        -webkit-mask-image: linear-gradient(
+            to bottom,
+            #000 calc(100% - var(--space-12)),
+            transparent 100%
+        );
+        mask-image: linear-gradient(
+            to bottom,
+            #000 calc(100% - var(--space-12)),
+            transparent 100%
+        );
+    }
+
+    /* "Lihat selengkapnya": hanya teks + panah kecil (tanpa tampilan tombol).
+       background/border/padding di-reset karena elemennya <button>. */
+    .rich-toggle {
+        display: flex;
+        width: fit-content;
+        align-items: center;
+        gap: var(--space-1);
+        margin: var(--space-3) auto 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--primary);
+        font-size: var(--fs-xs);
+        font-weight: var(--fw-bold);
+        line-height: 1.2;
+        -webkit-tap-highlight-color: transparent;
+        transition: opacity .15s ease;
+    }
+
+    .rich-toggle:active {
+        opacity: .6;
+    }
+
+    .rich-toggle[hidden] {
+        display: none !important;
+    }
+
+    .rich-toggle i {
+        font-size: var(--fs-xxs);
+        transition: transform .25s ease;
+    }
+
+    .rich-toggle[aria-expanded="true"] i {
+        transform: rotate(180deg);
     }
 
     /* ----- Penggalang dana ----- */
@@ -2534,7 +2664,6 @@ body {
         right: 0;
         bottom: 0;
         left: 0;
-
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -2543,10 +2672,9 @@ body {
         padding:
             var(--space-4)
             var(--space-4)
-            calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
-
+            calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
         border-top: 1px solid var(--border-soft);
-        background: var(--bg);
+        background: var(--bg-soft);
     }
 
     .mobile-cta-info {

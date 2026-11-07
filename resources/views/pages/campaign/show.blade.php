@@ -620,37 +620,7 @@
         };
     </script>
 
-    <script src="{{ asset('js/campaign-show.js') }}" defer></script>
-
-    {{-- Header mobile: jadi solid (dengan judul) setelah scroll melewati hero --}}
-    <script>
-        (function () {
-            var bar = document.getElementById('campaignTopbar');
-            var hero = document.querySelector('.hero-wrapper');
-            if (!bar) return;
-
-            var ticking = false;
-
-            function update() {
-                ticking = false;
-
-                // di desktop topbar disembunyikan lewat CSS: tidak perlu dihitung
-                if (window.getComputedStyle(bar).display === 'none') return;
-
-                var limit = (hero ? hero.offsetHeight : 160) - bar.offsetHeight;
-                bar.classList.toggle('is-solid', window.scrollY > Math.max(limit, 0));
-            }
-
-            window.addEventListener('scroll', function () {
-                if (ticking) return;
-                ticking = true;
-                window.requestAnimationFrame(update);
-            }, { passive: true });
-
-            window.addEventListener('resize', update);
-            update();
-        })();
-    </script>
+    <script src="{{ asset('js/campaign-show.js') }}" defer></script>  
 
 </body>
 
