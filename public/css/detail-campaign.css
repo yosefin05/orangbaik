@@ -128,7 +128,7 @@ body {
 ============================================================ */
 .rich-text-output {
     text-align: justify;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-regular);
     line-height: 1.7;
     overflow-wrap: break-word;
@@ -2062,7 +2062,7 @@ body {
         margin: 0;
         overflow: hidden;
         color: var(--text-dark);
-        font-size: var(--fs-sm);
+        font-size: var(--fs-xs);
         font-weight: var(--fw-semibold);
         line-height: 1.3;
         text-overflow: ellipsis;
@@ -2149,7 +2149,7 @@ body {
 
     .detail-main > *:not(.hero-wrapper),
     .detail-sidebar > * {
-        border-top-color: color-mix(in srgb, var(--accent, var(--border-soft)) 45%, var(--bg));
+        border-top-color: var(--muted-light);
     }
 
     /* ----- Hero: full-bleed 16:9 seperti hero landing ----- */
@@ -2228,6 +2228,8 @@ body {
 
     .rich-text-output p {
         margin-bottom: var(--space-3);
+        font-size: var(--fs-xs);
+        line-height: 1.5;
     }
 
     .rich-text-output img {
@@ -2247,11 +2249,18 @@ body {
         text-transform: uppercase;
     }
 
+    .fundraiser-info-card h4 {
+        margin: 0 0 var(--space-2);
+        color: var(--text-dark);
+        font-size: var(--fs-xs);
+        font-weight: var(--fw-semibold);
+        letter-spacing: .04em;
+    }
+
     .fundraiser-profile img {
         width: 40px;
         height: 40px;
         flex-basis: 40px;
-        border-color: var(--primary);
     }
 
     /* ----- Judul section & aksi ----- */
@@ -2484,14 +2493,13 @@ body {
         right: 0;
         bottom: 0;
         left: 0;
-
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: var(--space-3);
 
         padding:
-            var(--space-2)
+            var(--space-4)
             var(--space-4)
             calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
 
