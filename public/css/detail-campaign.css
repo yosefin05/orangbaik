@@ -352,7 +352,7 @@ body {
 }
 .update-title {
     font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
+    font-weight: var(--fw-semibold);
     color: var(--text-dark);
     margin: 0 0 var(--space-1);
     line-height: 1.3;
@@ -1935,7 +1935,9 @@ body {
    - Tablet (≤ 992px): satu kolom.
    - Mobile (≤ 768px): tampilan minimalis, hero full-bleed, topbar
      (tombol kembali + judul) yang jadi solid setelah scroll,
-     blok datar dipisah garis tipis (tanpa kartu).
+     blok datar dipisah garis tipis (tanpa kartu), dengan aksen
+     warna pada garis pemisah. Teks tetap hitam.
+     Hanya bagian fundraiser yang berupa kartu.
    Memakai token global.css saja.
 ============================================================ */
 
@@ -2055,17 +2057,14 @@ body {
     .campaign-topbar-title {
         position: relative;
         z-index: 1;
-
         min-width: 0;
         flex: 1;
         margin: 0;
         overflow: hidden;
-
         color: var(--text-dark);
         font-size: var(--fs-sm);
-        font-weight: var(--fw-bold);
+        font-weight: var(--fw-semibold);
         line-height: 1.3;
-
         text-overflow: ellipsis;
         white-space: nowrap;
 
@@ -2085,8 +2084,9 @@ body {
     /* ----- Kerangka halaman ----- */
 
     .campaign-detail-page {
+        background: var(--bg-soft);
         /* ruang untuk CTA bawah */
-        padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
     }
 
     /* alert tidak tertutup topbar */
@@ -2139,6 +2139,19 @@ body {
         box-shadow: none;
     }
 
+    /* ----- Aksen warna garis pemisah per section (hanya garis) ----- */
+
+    .detail-sidebar > .fundraiser-info-card { --accent: var(--primary); }
+    .detail-main > .description-section { --accent: var(--secondary-hover); }
+    .detail-main > .latest-news-section { --accent: var(--primary); }
+    .detail-main > .pesan-doa-section { --accent: var(--success); }
+    .detail-sidebar > .side-list-card { --accent: var(--secondary-hover); }
+
+    .detail-main > *:not(.hero-wrapper),
+    .detail-sidebar > * {
+        border-top-color: color-mix(in srgb, var(--accent, var(--border-soft)) 45%, var(--bg));
+    }
+
     /* ----- Hero: full-bleed 16:9 seperti hero landing ----- */
 
     .detail-main > .hero-wrapper {
@@ -2181,12 +2194,13 @@ body {
     }
 
     .summary-amount strong {
-        font-size: var(--fs-md);
+        font-size: var(--fs-rg);
     }
 
     .summary-progress {
         height: 6px;
         margin-bottom: var(--space-2);
+        background: var(--primary-light);
     }
 
     .summary-meta {
@@ -2207,8 +2221,9 @@ body {
         display: none;
     }
 
+    /* justify seperti desktop */
     .rich-text-output {
-        text-align: left;
+        text-align: justify;
     }
 
     .rich-text-output p {
@@ -2225,7 +2240,7 @@ body {
 
     .fundraiser-info-card h3 {
         margin: 0 0 var(--space-2);
-        color: var(--muted);
+        color: var(--text-dark);
         font-size: var(--fs-xxs);
         font-weight: var(--fw-semibold);
         letter-spacing: .04em;
@@ -2236,6 +2251,7 @@ body {
         width: 40px;
         height: 40px;
         flex-basis: 40px;
+        border-color: var(--primary);
     }
 
     /* ----- Judul section & aksi ----- */
@@ -2246,6 +2262,7 @@ body {
     }
 
     .section-header h2 {
+        color: var(--text-dark);
         font-size: var(--fs-sm);
         font-weight: var(--fw-bold);
     }
@@ -2257,6 +2274,9 @@ body {
     .btn-icon-action {
         width: 36px;
         height: 36px;
+        background: var(--primary-light);
+        border-color: var(--primary-light);
+        color: var(--primary);
     }
 
     .btn-icon-action:hover {
@@ -2290,13 +2310,12 @@ body {
         box-shadow: none;
     }
 
+    /* warna gradasi biru dari desktop dipakai kembali */
     .update-icon-badge {
         width: 32px;
         height: 32px;
         flex: 0 0 32px;
-        background: var(--primary-light);
         box-shadow: none;
-        color: var(--primary);
         font-size: var(--fs-xs);
     }
 
@@ -2339,17 +2358,22 @@ body {
         font-size: var(--fs-xs);
     }
 
+    /* semua ikon ilustrasi = 100px */
     .icon-section {
-        width: 72px;
-        height: 72px;
-        max-width: 72px;
+        width: 100px;
+        height: 100px;
+        max-width: 100px;
         margin: 0 auto var(--space-2);
     }
 
     /* ----- Pesan & doa: daftar datar ----- */
 
+    /* jumlah pesan: tanpa latar/tombol, langsung melayang sejajar judul */
     .badge-doa-count {
-        padding: 2px var(--space-3);
+        padding: 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--text-dark);
         font-size: var(--fs-xxs);
     }
 
@@ -2383,6 +2407,17 @@ body {
         width: 36px;
         height: 36px;
         flex-basis: 36px;
+        background: var(--success-light);
+        color: var(--text-dark);
+    }
+
+    .pesan-doa-nominal {
+        background: var(--success-light);
+        color: var(--text-dark);
+    }
+
+    .pesan-doa-body {
+        border-left-color: var(--success);
     }
 
     .pesan-doa-footer {
@@ -2393,6 +2428,7 @@ body {
 
     .side-list-card h3 {
         margin-bottom: var(--space-2);
+        color: var(--text-dark);
         font-size: var(--fs-sm);
     }
 
@@ -2404,25 +2440,43 @@ body {
         width: 36px;
         height: 36px;
         flex-basis: 36px;
+        background: var(--secondary-light);
+        color: var(--text-dark);
     }
 
-    /* ----- Fundraiser ----- */
-
-    .fundraiser-join-card .icon-section {
-        width: 56px;
-        height: 56px;
-        max-width: 56px;
+    .side-list-item p b {
+        color: var(--text-dark);
     }
 
-    /* kartu hijau "Anda Fundraiser" tetap berupa kotak lembut */
-    .fundraiser-join-card.joined {
+    /* ----- Fundraiser: berupa kartu ----- */
+
+    .detail-sidebar > .fundraiser-join-card,
+    .detail-sidebar > .fundraiser-referral-card {
         margin-top: var(--space-4);
         padding: var(--space-4);
-        border: 1px solid var(--success);
-        border-radius: var(--radius-md);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
     }
 
-    /* ----- CTA donasi (bawah) ----- */
+    /* ajakan: gradasi biru muda → emas muda */
+    .detail-sidebar > .fundraiser-join-card:not(.joined) {
+        background: linear-gradient(135deg, var(--primary-light), var(--secondary-light));
+    }
+
+    /* referral: kartu putih */
+    .detail-sidebar > .fundraiser-referral-card {
+        border-color: var(--primary-light);
+        background: var(--bg);
+    }
+
+    /* sudah jadi fundraiser: kartu hijau lembut */
+    .detail-sidebar > .fundraiser-join-card.joined {
+        border: 1px solid var(--success);
+        background: var(--success-light);
+    }
+
+    /* ----- CTA donasi (bawah): ramping ----- */
 
     .mobile-sticky-cta {
         position: fixed;
@@ -2437,9 +2491,9 @@ body {
         gap: var(--space-3);
 
         padding:
-            var(--space-3)
+            var(--space-2)
             var(--space-4)
-            calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+            calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
 
         border-top: 1px solid var(--border-soft);
         background: var(--bg);
@@ -2449,21 +2503,23 @@ body {
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 1px;
     }
 
     .mobile-cta-label {
         color: var(--muted);
         font-size: var(--fs-xxs);
         font-weight: var(--fw-medium);
+        line-height: 1.2;
     }
 
     .mobile-cta-val {
         overflow: hidden;
 
         color: var(--primary);
-        font-size: var(--fs-md);
+        font-size: var(--fs-sm);
         font-weight: var(--fw-bold);
+        line-height: 1.2;
 
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -2472,27 +2528,29 @@ body {
     .btn-mobile-donate {
         display: inline-flex;
         align-items: center;
-        gap: var(--space-2);
+        gap: var(--space-1);
         flex-shrink: 0;
 
-        padding: var(--space-3) var(--space-5);
+        padding: var(--space-2) var(--space-4);
 
         border-radius: var(--radius-full);
-        background: var(--primary);
+        background: linear-gradient(135deg, var(--primary), var(--primary-hover));
 
         color: var(--bg);
-        font-size: var(--fs-sm);
+        font-size: var(--fs-xs);
         font-weight: var(--fw-bold);
+        line-height: 1.2;
         text-decoration: none;
 
-        transition:
-            background-color .2s ease,
-            transform .15s ease;
+        transition: transform .15s ease;
+    }
+
+    .btn-mobile-donate i {
+        font-size: var(--fs-xxs);
     }
 
     .btn-mobile-donate:active {
-        background: var(--primary-hover);
-        transform: scale(.98);
+        transform: scale(.97);
     }
 
     /* halaman ini punya CTA sendiri: bottom-nav & tombol donasi global disembunyikan */
