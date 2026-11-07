@@ -1,280 +1,458 @@
 /* ============================================================
-   DONASI BAYAR — Payment / Checkout Page
+   DONASI BAYAR — Halaman pembayaran donasi
    OrangBaik.id
-   ============================================================ */
 
-/* ------------------------------------------------------------
-   1. PAGE / LAYOUT
-   ------------------------------------------------------------ */
+   Konsisten dengan halaman campaign show:
+   - Topbar (tombol kembali + judul) = topbar mobile halaman show,
+     dipakai di desktop & mobile (di sini langsung solid, tanpa hero).
+   - Desktop (> 768px): kartu bergaris tipis + kolom ringkasan sticky.
+   - Mobile (≤ 768px): blok datar dipisah garis tipis (tanpa kartu
+     bertumpuk) + CTA bayar menempel di bawah.
+   Seluruh nilai memakai token global.css. Kontainer memakai .container.
 
-.payment-page {
+   Daftar isi:
+   1.  Topbar
+   2.  Page & layout
+   3.  Permukaan kartu & judul section
+   4.  Campaign mini
+   5.  Nominal
+   6.  Metode pembayaran (accordion)
+   7.  Data donatur
+   8.  Switch
+   9.  Pesan & doa
+   10. Ringkasan pembayaran (sidebar)
+   11. CTA bawah (mobile)
+   12. Responsive tablet & mobile
+   13. Halaman input nominal (dipakai halaman lain)
+   14. Aksesibilitas
+============================================================ */
+
+
+/* ============================================================
+   1. TOPBAR
+============================================================ */
+
+.payment-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    border-bottom: 1px solid var(--border-soft);
+    background: var(--bg);
+
+    transition: box-shadow .25s ease;
+}
+
+.payment-topbar.is-scrolled {
+    box-shadow: var(--shadow-soft);
+}
+
+.payment-topbar-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    height: calc(56px + env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+}
+
+.payment-topbar-back {
+    width: 40px;
+    height: 40px;
+
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    border: 0;
+    border-radius: var(--radius-full);
     background: var(--bg-soft);
+
     color: var(--text-dark);
-    min-height: 100vh;
-    padding: var(--space-8) var(--page-padding) var(--space-20);
+    font-size: var(--fs-md);
+    line-height: 1;
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        transform .2s ease;
 }
 
-.payment-container {
-    max-width: var(--container-form);
-    margin: 0 auto;
+.payment-topbar-back:hover {
+    background: var(--primary-light);
+    color: var(--primary);
 }
 
-.back-button {
+.payment-topbar-back:active {
+    transform: scale(.94);
+}
+
+.payment-topbar-text {
+    min-width: 0;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.payment-topbar-title {
+    margin: 0;
+
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+}
+
+.payment-topbar-sub {
+    margin: 0;
+    overflow: hidden;
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.payment-topbar-secure {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-medium);
-    padding: var(--space-2) var(--space-4);
+    gap: var(--space-1);
+    flex-shrink: 0;
+
+    padding: var(--space-1) var(--space-3);
+
     border-radius: var(--radius-full);
-    cursor: pointer;
-    margin-bottom: var(--space-6);
-    transition: border-color .15s ease, color .15s ease, box-shadow .15s ease;
+    background: var(--success-light);
+
+    color: #15803d;
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+    line-height: 1.2;
 }
 
-.back-button svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    stroke-width: 2.25;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
 
-.back-button:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    box-shadow: var(--shadow-soft);
+/* ============================================================
+   2. PAGE & LAYOUT
+============================================================ */
+
+.payment-page {
+    padding-block: var(--space-6) var(--space-16);
 }
 
 .payment-layout {
     display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: var(--page-gap);
-    align-items: flex-start;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: var(--space-8);
+    align-items: start;
+    min-width: 0;
 }
 
 .payment-left {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-5);
     min-width: 0;
 }
 
 .payment-right {
     position: sticky;
-    top: var(--space-8);
+    top: calc(56px + var(--space-6));
+    min-width: 0;
 }
 
-/* ------------------------------------------------------------
-   2. SHARED CARD SURFACE
-   ------------------------------------------------------------ */
+
+/* ============================================================
+   3. PERMUKAAN KARTU & JUDUL SECTION
+   Langkah 1–4 (nominal → pesan & doa) berada dalam SATU kartu
+   (.payment-steps), dipisah garis tipis, supaya terbaca sebagai
+   satu alur. Semua kontrol di dalamnya memakai tinggi, radius,
+   border, fokus, dan state "terpilih" yang sama.
+============================================================ */
 
 .campaign-mini-card,
-.nominal-section,
-.donor-card,
-.message-card,
-.payment-method-card,
-.payment-channels-section {
+.payment-steps,
+.payment-method-card {
+    min-width: 0;
+
     background: var(--bg);
     border: 1px solid var(--border-soft);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius);
     box-shadow: var(--shadow-card);
 }
 
-.nominal-section,
-.donor-card,
-.message-card,
-.payment-method-card,
-.payment-channels-section {
-    padding: var(--card-padding-lg);
+.payment-method-card {
+    padding: var(--space-5);
 }
 
-.nominal-section h2,
-.message-card h2,
-.payment-channels-section h2,
-.donor-card h2 {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    color: var(--text-dark);
-    margin: 0;
+.payment-steps {
+    /* tinggi seragam untuk chip, input, dan header accordion */
+    --control-h: 48px;
+
+    overflow: hidden;
+}
+
+.pay-step {
+    min-width: 0;
+    padding: var(--space-5);
+}
+
+.pay-step + .pay-step {
+    border-top: 1px solid var(--border-soft);
 }
 
 .section-heading {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-4);
+}
+
+.section-heading h2,
+.payment-method-card h2 {
+    margin: 0;
+
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.3;
 }
 
 .section-number {
+    width: 24px;
+    height: 24px;
+
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
+
+    border-radius: var(--radius-full);
     background: var(--primary-light);
+
     color: var(--primary);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-bold);
+    line-height: 1;
 }
 
-/* ------------------------------------------------------------
-   3. CAMPAIGN MINI CARD
-   ------------------------------------------------------------ */
+.error-text {
+    margin-top: var(--space-1);
+
+    color: var(--danger);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+    line-height: 1.4;
+}
+
+
+/* ============================================================
+   4. CAMPAIGN MINI
+   Thumbnail 16:9 (sama seperti campaign & berita lain).
+   Baris atas: thumbnail + judul. Baris bawah: statistik penuh.
+============================================================ */
 
 .campaign-mini-card {
     display: flex;
-    gap: var(--space-4);
+    flex-direction: column;
+    gap: var(--space-3);
     padding: var(--space-4);
     overflow: hidden;
 }
 
-.campaign-mini-card img {
-    width: 108px;
-    height: 108px;
-    border-radius: var(--radius-md);
-    object-fit: cover;
+.campaign-mini-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+.campaign-mini-head img {
+    width: 144px;
+    height: auto;
+    aspect-ratio: 16 / 9;
     flex-shrink: 0;
+
+    border-radius: var(--radius-md);
     background: var(--bg-soft);
+    object-fit: cover;
 }
 
 .campaign-mini-body {
-    display: flex;
-    flex-direction: column;
     min-width: 0;
     flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
 }
 
-.campaign-mini-body h1 {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
-    color: var(--text-dark);
-    line-height: 1.35;
-    margin: 0 0 var(--space-1);
+.campaign-mini-body h2 {
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    margin: 0;
     overflow: hidden;
+
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.35;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow-wrap: break-word;
     word-break: break-word;
 }
 
 .campaign-mini-body > p {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    font-size: var(--fs-xxs);
-    color: var(--muted);
-    margin: 0 0 var(--space-3);
-}
+    gap: var(--space-1);
+    margin: 0;
 
-.campaign-mini-body > p span {
-    color: var(--muted-light);
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.4;
 }
 
 .campaign-mini-body > p i {
     color: var(--primary);
 }
 
+.campaign-mini-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
 .mini-amount {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    gap: var(--space-2);
-    margin-bottom: var(--space-2);
+    gap: var(--space-1) var(--space-2);
 }
 
 .mini-amount strong {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
     color: var(--primary);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
 }
 
 .mini-amount span {
-    font-size: var(--fs-xxs);
     color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.3;
 }
 
 .mini-progress {
     width: 100%;
-    height: 6px;
-    border-radius: var(--radius-full);
-    background: var(--border-soft);
+    height: 8px;
     overflow: hidden;
-    margin-bottom: var(--space-2);
+
+    border-radius: var(--radius-full);
+    background: var(--bg-soft);
 }
 
 .mini-progress div {
     height: 100%;
-    background: var(--primary);
+
     border-radius: var(--radius-full);
-    transition: width .3s ease;
+    background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+
+    transition: width .5s ease;
 }
 
 .mini-meta {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    font-size: var(--fs-xxs);
+    gap: var(--space-1) var(--space-3);
+
     color: var(--muted);
+    font-size: var(--fs-xxs);
 }
 
-/* ------------------------------------------------------------
-   4. NOMINAL SECTION
-   ------------------------------------------------------------ */
+.mini-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+
+/* ============================================================
+   5. NOMINAL
+   Bahasa "terpilih" di seluruh langkah: border biru + latar
+   biru muda + teks biru (chip nominal & baris metode bayar).
+============================================================ */
 
 .amount-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-3);
-    margin-bottom: var(--space-5);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
 }
 
 .amount-chip {
     position: relative;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-4) var(--space-2);
-    border: 1.5px solid var(--border);
+
+    min-height: var(--control-h);
+    padding: 0 var(--space-2);
+
+    border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg);
-    cursor: pointer;
+
     text-align: center;
-    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease, color .15s ease;
+    cursor: pointer;
+
+    transition:
+        background-color .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
 }
 
 .amount-chip input {
     position: absolute;
-    opacity: 0;
     width: 0;
     height: 0;
+    opacity: 0;
 }
 
 .amount-chip span {
+    color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    color: var(--text-dark);
+    line-height: 1.2;
     white-space: nowrap;
+
+    transition: color .15s ease;
 }
 
 .amount-chip:hover {
     border-color: var(--primary);
-    background: var(--primary-light);
 }
 
 .amount-chip:has(input:checked) {
     border-color: var(--primary);
-    background: var(--primary);
-    box-shadow: 0 6px 16px -6px rgba(51, 101, 175, .45);
+    background: var(--primary-light);
+    box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 .amount-chip:has(input:checked) span {
-    color: #fff;
+    color: var(--primary);
 }
 
 .amount-chip:has(input:focus-visible) {
@@ -286,10 +464,11 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    margin: 0 0 var(--space-2);
+
+    color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
-    color: var(--text-dark);
-    margin-bottom: var(--space-2);
 }
 
 .custom-amount-label i {
@@ -300,11 +479,17 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
+
+    min-height: var(--control-h);
     padding: 0 var(--space-4);
-    transition: border-color .15s ease, box-shadow .15s ease;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease;
 }
 
 .custom-input-wrap:focus-within {
@@ -313,21 +498,35 @@
 }
 
 .custom-input-wrap span {
-    font-size: var(--fs-md);
-    font-weight: var(--fw-bold);
     color: var(--muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
 }
 
 .custom-input-wrap input {
+    min-width: 0;
     flex: 1;
+    padding: var(--space-3) 0;
+
     border: none;
     outline: none;
     background: transparent;
-    font-size: var(--fs-md);
-    font-weight: var(--fw-bold);
+
     color: var(--text-dark);
-    padding: var(--space-3) 0;
-    min-width: 0;
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.4;
+    scroll-margin-top: calc(56px + var(--space-6));
+
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.custom-input-wrap input::-webkit-outer-spin-button,
+.custom-input-wrap input::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
 }
 
 .custom-input-wrap input::placeholder {
@@ -336,257 +535,48 @@
 }
 
 .custom-amount-hint {
-    font-size: var(--fs-xxs);
-    color: var(--muted);
     margin: var(--space-2) 0 0;
-}
 
-/* ------------------------------------------------------------
-   5. DONOR CARD
-   ------------------------------------------------------------ */
-
-.donor-title {
-    font-size: var(--fs-xs);
-    color: var(--text);
-    margin: 0 0 var(--space-4);
-}
-
-.donor-title strong {
-    color: var(--text-dark);
-    font-weight: var(--fw-semibold);
-}
-
-.donor-title a {
-    color: var(--primary);
-    font-weight: var(--fw-semibold);
-    text-decoration: none;
-}
-
-.donor-title a:hover {
-    text-decoration: underline;
-}
-
-.donor-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    margin-bottom: var(--space-4);
-}
-
-.field-label {
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
-    color: var(--text-dark);
-    margin-bottom: var(--space-1);
-    display: block;
-}
-
-.required-mark {
-    color: var(--danger);
-}
-
-.donor-input-group input[type="text"] {
-    width: 100%;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: var(--space-3) var(--space-4);
-    font-size: var(--fs-xs);
-    color: var(--text-dark);
-    background: var(--bg);
-    transition: border-color .15s ease, box-shadow .15s ease;
-}
-
-.donor-input-group input[type="text"]::placeholder {
-    color: var(--muted-light);
-}
-
-.donor-input-group input[type="text"]:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-light);
-}
-
-.donor-input-group input[type="text"]:read-only {
-    background: var(--bg-soft);
     color: var(--muted);
-    cursor: not-allowed;
-}
-
-.input-note {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-2);
     font-size: var(--fs-xxs);
-    color: var(--muted);
-    background: var(--info-light);
-    border-radius: var(--radius-sm);
-    padding: var(--space-3) var(--space-4);
-    margin: 0 0 var(--space-5);
-}
-
-.input-note span {
-    color: var(--info);
-    font-size: var(--fs-sm);
-    line-height: 1;
-    flex-shrink: 0;
-}
-
-/* ------------------------------------------------------------
-   6. SWITCH / TOGGLE ROW
-   ------------------------------------------------------------ */
-
-.switch-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-    margin-top: var(--space-4);
-    cursor: pointer;
-}
-
-.switch-row span {
-    font-size: var(--fs-xxs);
-    color: var(--text);
-}
-
-.switch-row input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.switch-row i {
-    position: relative;
-    flex-shrink: 0;
-    width: 40px;
-    height: 22px;
-    border-radius: var(--radius-full);
-    background: var(--border);
-    transition: background-color .2s ease;
-}
-
-.switch-row i::before {
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--bg);
-    box-shadow: var(--shadow-soft);
-    transition: transform .2s ease;
-}
-
-.switch-row input:checked + i {
-    background: var(--primary);
-}
-
-.switch-row input:checked + i::before {
-    transform: translateX(18px);
-}
-
-.switch-row input:focus-visible + i {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
-/* ------------------------------------------------------------
-   7. MESSAGE CARD
-   ------------------------------------------------------------ */
-
-.textarea-wrap {
-    position: relative;
-}
-
-.textarea-wrap textarea {
-    width: 100%;
-    min-height: 110px;
-    resize: vertical;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: var(--space-4);
-    padding-bottom: var(--space-8);
-    font-size: var(--fs-xs);
-    font-family: inherit;
-    color: var(--text-dark);
-    background: var(--bg);
     line-height: 1.5;
-    transition: border-color .15s ease, box-shadow .15s ease;
 }
 
-.textarea-wrap textarea::placeholder {
-    color: var(--muted-light);
-}
 
-.textarea-wrap textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-light);
-}
+/* ============================================================
+   6. METODE PEMBAYARAN (accordion native <details>)
+============================================================ */
 
-.textarea-wrap #charCount {
-    position: absolute;
-    right: var(--space-4);
-    bottom: var(--space-3);
-    font-size: var(--fs-xxs);
-    color: var(--muted-light);
-    transition: color .15s ease;
-}
-
-.textarea-wrap #charCount.char-limit-warning {
-    color: var(--danger);
-    font-weight: var(--fw-semibold);
-}
-
-/* ------------------------------------------------------------
-   8. ERROR TEXT
-   ------------------------------------------------------------ */
-
-.error-text {
-    font-size: var(--fs-xxs);
-    color: var(--danger);
-    font-weight: var(--fw-medium);
-    margin-top: var(--space-1);
-}
-
-/* ------------------------------------------------------------
-   9. PAYMENT CHANNEL SELECTOR (accordion / dropdown per gateway)
-   ------------------------------------------------------------ */
-
-.payment-channels-section #error-payment_channel_id {
-    margin-bottom: var(--space-3);
+.pay-step #error-payment_channel_id {
+    margin: 0 0 var(--space-3);
 }
 
 .channel-groups-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-2);
 }
 
-/* Each gateway group is a native <details> element = zero-JS collapse/expand */
 .channel-group {
-    border: 1px solid var(--border-soft);
-    border-radius: var(--radius-md);
     overflow: hidden;
-    background: var(--bg);
-    transition: border-color .15s ease, box-shadow .15s ease;
-}
 
-.channel-group[open] {
-    border-color: var(--primary-light);
-    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
 }
 
 .channel-group summary {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-4);
-    cursor: pointer;
+
+    min-height: var(--control-h);
+    padding: var(--space-2) var(--space-4);
+
     list-style: none;
+    cursor: pointer;
     user-select: none;
+
     transition: background-color .15s ease;
 }
 
@@ -600,42 +590,47 @@
     background: var(--bg-soft);
 }
 
+.channel-group summary:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+}
+
 .group-heading-icon {
+    width: 32px;
+    height: 32px;
+
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--primary-light);
-    color: var(--primary);
-    font-size: var(--fs-sm);
-    transition: background-color .15s ease, color .15s ease;
-}
 
-.channel-group[open] .group-heading-icon {
-    background: var(--primary);
-    color: #fff;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+
+    color: var(--primary);
+    font-size: var(--fs-xs);
 }
 
 .group-heading-text {
-    flex: 1;
     min-width: 0;
+    flex: 1;
+
+    color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    color: var(--text-dark);
 }
 
 .group-heading-selected {
+    max-width: 130px;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    color: var(--primary);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-semibold);
-    color: var(--primary);
-    max-width: 140px;
-    overflow: hidden;
+
     text-overflow: ellipsis;
     white-space: nowrap;
-    flex-shrink: 0;
 }
 
 .group-heading-selected:empty {
@@ -644,9 +639,13 @@
 
 .group-heading-chevron {
     flex-shrink: 0;
+
     color: var(--muted);
-    font-size: var(--fs-sm);
-    transition: transform .2s ease, color .2s ease;
+    font-size: var(--fs-xs);
+
+    transition:
+        transform .2s ease,
+        color .2s ease;
 }
 
 .channel-group[open] .group-heading-chevron {
@@ -654,31 +653,26 @@
     transform: rotate(180deg);
 }
 
-.channel-group .channel-row-list {
+.channel-row-list {
     display: flex;
     flex-direction: column;
-    border: none;
     border-top: 1px solid var(--border-soft);
-    border-radius: 0;
-    overflow: hidden;
 }
 
 .channel-row {
     position: relative;
+
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-4);
-    cursor: pointer;
+
+    padding: var(--space-3) var(--space-4);
+
     background: var(--bg);
+    cursor: pointer;
+
     transition: background-color .15s ease;
 }
-
-.channel-row-icon img {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
-}   
 
 .channel-row + .channel-row {
     border-top: 1px solid var(--border-soft);
@@ -699,42 +693,53 @@
 
 .channel-row input[type="radio"] {
     position: absolute;
-    opacity: 0;
     width: 0;
     height: 0;
+    opacity: 0;
 }
 
 .channel-row-icon {
+    width: 36px;
+    height: 36px;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
     flex-shrink: 0;
-    border-radius: 50%;
+
+    border-radius: var(--radius-full);
     background: var(--bg-soft);
+
     color: var(--primary);
-    font-size: var(--fs-sm);
-    transition: background-color .15s ease, color .15s ease;
+    font-size: var(--fs-xs);
+
+    transition: background-color .15s ease;
 }
 
 .channel-row:has(input:checked) .channel-row-icon {
     background: var(--bg);
-    color: #fff;
+}
+
+.channel-row-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 
 .channel-row-info {
-    flex: 1;
     min-width: 0;
+    flex: 1;
+
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
 .channel-row-info strong {
+    color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
-    color: var(--text-dark);
+    line-height: 1.3;
 }
 
 .channel-row:has(input:checked) .channel-row-info strong {
@@ -742,44 +747,314 @@
 }
 
 .channel-row-info small {
-    font-size: var(--fs-xxs);
     color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.3;
 }
 
-.channel-row-check {
-    flex-shrink: 0;
+/* penanda pilihan (radio bulat) */
+.channel-row-mark {
+    position: relative;
+
     width: 20px;
     height: 20px;
-    font-size: 20px;
-    line-height: 1;
-    color: var(--border);
+    flex-shrink: 0;
+
+    border: 2px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg);
+
+    transition: border-color .15s ease;
 }
 
-.channel-row:has(input:checked) .channel-row-check {
-    color: var(--primary);
+.channel-row-mark::after {
+    position: absolute;
+    inset: 3px;
+
+    border-radius: inherit;
+    background: var(--primary);
+
+    content: "";
+    transform: scale(0);
+    transition: transform .15s ease;
+}
+
+.channel-row:has(input:checked) .channel-row-mark {
+    border-color: var(--primary);
+}
+
+.channel-row:has(input:checked) .channel-row-mark::after {
+    transform: scale(1);
 }
 
 .channel-empty-text {
+    margin: 0;
+
     color: var(--muted);
     font-size: var(--fs-xs);
 }
 
-/* ------------------------------------------------------------
-   10. PAYMENT SUMMARY (RIGHT SIDEBAR)
-   ------------------------------------------------------------ */
+
+/* ============================================================
+   7. DATA DONATUR
+   Input 16px (--fs-sm) agar iOS tidak zoom saat fokus.
+   Nama & nomor HP berdampingan di layar lebar.
+============================================================ */
+
+.donor-title {
+    margin: 0 0 var(--space-4);
+
+    color: var(--text);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+}
+
+.donor-title strong {
+    color: var(--text-dark);
+    font-weight: var(--fw-semibold);
+}
+
+.donor-title a {
+    color: var(--primary);
+    font-weight: var(--fw-semibold);
+}
+
+.donor-title a:hover {
+    text-decoration: underline;
+}
+
+.donor-input-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.donor-input-group > div {
+    min-width: 0;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: var(--space-2);
+
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.required-mark {
+    color: var(--danger);
+}
+
+.field-input {
+    width: 100%;
+    min-height: var(--control-h);
+    padding: var(--space-3) var(--space-4);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+
+    color: var(--text-dark);
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+    scroll-margin-top: calc(56px + var(--space-6));
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
+
+.field-input::placeholder {
+    color: var(--muted-light);
+}
+
+.field-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.field-input:read-only {
+    background: var(--bg-soft);
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+.input-note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+
+    border-radius: var(--radius-md);
+    background: var(--info-light);
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.5;
+}
+
+.input-note i {
+    flex-shrink: 0;
+
+    color: var(--info);
+    font-size: var(--fs-xs);
+    line-height: 1.3;
+}
+
+
+/* ============================================================
+   8. SWITCH
+   Baris kapsul lembut (sama bentuk dengan .input-note).
+============================================================ */
+
+.switch-row {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+
+    cursor: pointer;
+}
+
+.switch-row span {
+    color: var(--text);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+}
+
+.switch-row input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.switch-row i {
+    position: relative;
+
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+
+    border-radius: var(--radius-full);
+    background: var(--border);
+
+    transition: background-color .2s ease;
+}
+
+.switch-row i::before {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+
+    width: 18px;
+    height: 18px;
+
+    border-radius: var(--radius-full);
+    background: var(--bg);
+    box-shadow: var(--shadow-soft);
+
+    content: "";
+    transition: transform .2s ease;
+}
+
+.switch-row input:checked + i {
+    background: var(--primary);
+}
+
+.switch-row input:checked + i::before {
+    transform: translateX(18px);
+}
+
+.switch-row input:focus-visible + i {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   9. PESAN & DOA
+============================================================ */
+
+.textarea-wrap {
+    position: relative;
+}
+
+.textarea-wrap textarea {
+    width: 100%;
+    min-height: 104px;
+    padding: var(--space-3) var(--space-4) var(--space-8);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+
+    color: var(--text-dark);
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+    scroll-margin-top: calc(56px + var(--space-6));
+
+    resize: vertical;
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
+
+.textarea-wrap textarea::placeholder {
+    color: var(--muted-light);
+}
+
+.textarea-wrap textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.textarea-wrap #charCount {
+    position: absolute;
+    right: var(--space-4);
+    bottom: var(--space-3);
+
+    color: var(--muted-light);
+    font-size: var(--fs-xxs);
+
+    transition: color .15s ease;
+}
+
+.textarea-wrap #charCount.char-limit-warning {
+    color: var(--danger);
+    font-weight: var(--fw-semibold);
+}
+
+
+/* ============================================================
+   10. RINGKASAN PEMBAYARAN (SIDEBAR)
+============================================================ */
 
 .payment-method-card h2 {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    color: var(--text-dark);
-    margin: 0 0 var(--space-5);
+    margin-bottom: var(--space-4);
 }
 
 .payment-summary-list {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-3);
 }
 
 .summary-row {
@@ -787,7 +1062,9 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
-    font-size: var(--fs-xxs);
+
+    font-size: var(--fs-xs);
+    line-height: 1.4;
 }
 
 .summary-row span {
@@ -795,50 +1072,60 @@
 }
 
 .summary-row strong {
+    min-width: 0;
+
     color: var(--text-dark);
     font-weight: var(--fw-semibold);
     text-align: right;
+    overflow-wrap: anywhere;
 }
 
 .payment-total {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--space-5);
-    padding: var(--space-4) 0 var(--space-5);
-    border-top: 1px dashed var(--border-soft);
+    gap: var(--space-3);
+
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) 0;
+
+    border-top: 1px dashed var(--border);
     border-bottom: 1px solid var(--border-soft);
 }
 
 .payment-total span {
+    color: var(--text);
     font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
-    color: var(--text);
 }
 
 .payment-total strong {
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-bold);
-    color: var(--secondary);
+    color: var(--primary);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.2;
 }
 
 .payment-method-info {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    background: var(--info-light);
+
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+
     border-radius: var(--radius-md);
-    padding: var(--space-4);
-    margin-bottom: var(--space-5);
+    background: var(--info-light);
 }
 
 .payment-method-info strong {
     display: flex;
     align-items: center;
     gap: var(--space-2);
+
+    color: var(--text-dark);
     font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
-    color: var(--text-dark);
 }
 
 .payment-method-info strong i {
@@ -846,60 +1133,289 @@
 }
 
 .payment-method-info p {
-    font-size: var(--fs-xxs);
-    color: var(--info);
     margin: 0;
-}
 
-.payment-method-info small {
-    font-size: var(--fs-xxs);
     color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.5;
 }
 
+/* tombol bayar: teks saja, tanpa ikon */
 .pay-button {
     width: 100%;
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-md);
-    padding: var(--space-4);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
-    cursor: pointer;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
+
+    min-height: var(--control-h, 48px);
+    padding: var(--space-3) var(--space-5);
+
+    border: none;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     box-shadow: var(--shadow-soft);
-    transition: background-color .15s ease, box-shadow .15s ease, transform .1s ease;
+
+    color: var(--bg);
+    font-family: inherit;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+    cursor: pointer;
+
+    transition:
+        box-shadow .15s ease,
+        transform .15s ease;
 }
 
 .pay-button:hover:not(:disabled) {
-    background: var(--primary-hover);
-    box-shadow: var(--shadow-hover);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
 }
 
 .pay-button:active:not(:disabled) {
-    transform: translateY(1px);
+    transform: translateY(0);
 }
 
 .pay-button:disabled {
     background: var(--muted-light);
-    cursor: not-allowed;
     box-shadow: none;
+    cursor: not-allowed;
 }
 
 #loading-text {
-    text-align: center;
-    margin-top: var(--space-4);
+    margin-top: var(--space-3);
+
     color: var(--primary);
     font-size: var(--fs-xxs);
     font-weight: var(--fw-semibold);
+    text-align: center;
 }
 
-/* ------------------------------------------------------------
-   11. NOMINAL INPUT PAGE (pilih nominal sebelum bayar)
-   ------------------------------------------------------------ */
+#loading-text[hidden] {
+    display: none;
+}
+
+
+/* ============================================================
+   11. CTA BAWAH (hanya mobile)
+============================================================ */
+
+.payment-sticky-cta {
+    display: none;
+}
+
+
+/* ============================================================
+   12. RESPONSIVE
+   - Tablet (≤ 992px): satu kolom, tetap berupa kartu.
+   - Mobile (≤ 768px): blok datar + CTA bawah (sama seperti show).
+   - ≤ 560px: nama & nomor HP bertumpuk.
+============================================================ */
+
+@media (max-width: 992px) {
+
+    .payment-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-5);
+    }
+
+    .payment-right {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .payment-page {
+        background: var(--bg-soft);
+        /* ruang untuk CTA bawah */
+        padding-block: 0 calc(96px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .payment-layout {
+        gap: 0;
+    }
+
+    .payment-left {
+        gap: 0;
+    }
+
+    /* semua blok = datar, dipisah garis tipis (bukan kartu),
+       sama seperti halaman show di mobile */
+    .campaign-mini-card,
+    .payment-steps,
+    .payment-method-card {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .campaign-mini-card {
+        padding: var(--space-4) 0;
+    }
+
+    .payment-steps {
+        overflow: visible;
+        border-top: 1px solid var(--muted-light);
+    }
+
+    .pay-step {
+        padding: var(--space-4) 0;
+    }
+
+    .pay-step + .pay-step {
+        border-top-color: var(--muted-light);
+    }
+
+    .payment-right > .payment-method-card {
+        padding: var(--space-4) 0;
+        border-top: 1px solid var(--muted-light);
+    }
+
+    /* kapsul switch tetap terlihat di atas latar lembut halaman */
+    .switch-row {
+        background: var(--bg);
+    }
+
+    /* campaign mini: lebih ringkas */
+    .campaign-mini-head {
+        gap: var(--space-3);
+    }
+
+    .campaign-mini-head img {
+        width: 112px;
+    }
+
+    .mini-progress {
+        height: 6px;
+        background: var(--primary-light);
+    }
+
+    .section-heading {
+        margin-bottom: var(--space-3);
+    }
+
+    .payment-method-card h2 {
+        margin-bottom: var(--space-3);
+    }
+
+    /* tombol bayar & teks loading pindah ke CTA bawah */
+    .pay-button,
+    #loading-text {
+        display: none;
+    }
+
+    .payment-sticky-cta {
+        position: fixed;
+        z-index: 90;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+
+        padding:
+            var(--space-4)
+            var(--space-4)
+            calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+
+        border-top: 1px solid var(--border-soft);
+        background: var(--bg-soft);
+    }
+
+    .payment-cta-info {
+        min-width: 0;
+
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .payment-cta-label {
+        color: var(--muted);
+        font-size: var(--fs-xxs);
+        font-weight: var(--fw-medium);
+        line-height: 1.2;
+    }
+
+    .payment-cta-val {
+        overflow: hidden;
+
+        color: var(--primary);
+        font-size: var(--fs-sm);
+        font-weight: var(--fw-bold);
+        line-height: 1.2;
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .btn-pay-mobile {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        padding: var(--space-2) var(--space-5);
+
+        border: 0;
+        border-radius: var(--radius-full);
+        background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+
+        color: var(--bg);
+        font-family: inherit;
+        font-size: var(--fs-xs);
+        font-weight: var(--fw-bold);
+        line-height: 1.2;
+        cursor: pointer;
+
+        transition: transform .15s ease;
+    }
+
+    .btn-pay-mobile:active:not(:disabled) {
+        transform: scale(.97);
+    }
+
+    .btn-pay-mobile:disabled {
+        background: var(--muted-light);
+        cursor: not-allowed;
+    }
+
+    /* halaman ini punya CTA sendiri: bottom-nav & tombol donasi global disembunyikan */
+    body:has(.payment-sticky-cta) .mobile-bottom-nav,
+    body:has(.payment-sticky-cta) .floating-donate-btn {
+        display: none !important;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .donor-input-group {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 360px) {
+
+    .group-heading-selected {
+        display: none;
+    }
+
+    .payment-topbar-secure span {
+        display: none;
+    }
+}
+
+
+/* ============================================================
+   13. HALAMAN INPUT NOMINAL
+   (dipakai halaman "pilih nominal" — dibiarkan sama seperti sebelumnya)
+============================================================ */
 
 .nominal-page {
     background: var(--bg-soft);
@@ -1063,69 +1579,7 @@
     transform: translateY(0);
 }
 
-/* ------------------------------------------------------------
-   12. RESPONSIVE
-   ------------------------------------------------------------ */
-
-@media (max-width: 960px) {
-    .payment-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .payment-right {
-        position: static;
-    }
-}
-
 @media (max-width: 560px) {
-    .payment-page {
-        padding: var(--space-5) var(--space-4) var(--space-16);
-    }
-
-    .nominal-list {
-        grid-template-columns: 1fr 1fr;
-        gap: var(--space-2);
-    }
-
-    .campaign-mini-card {
-        flex-direction: column;
-    }
-
-    .campaign-mini-card img {
-        width: 100%;
-        height: 160px;
-    }
-
-    .nominal-section,
-    .donor-card,
-    .message-card,
-    .payment-method-card,
-    .payment-channels-section {
-        padding: var(--card-padding);
-    }
-
-    .channel-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .channel-group summary {
-        padding: var(--space-3);
-        gap: var(--space-2);
-    }
-
-    .group-heading-icon {
-        width: 32px;
-        height: 32px;
-        font-size: var(--fs-xs);
-    }
-
-    .group-heading-selected {
-        display: none;
-    }
-
-    .channel-row {
-        padding: var(--space-3);
-    }
 
     .nominal-page {
         padding: var(--space-5) var(--space-4) calc(var(--space-16) + 64px);
@@ -1144,7 +1598,20 @@
     }
 }
 
+
+/* ============================================================
+   14. AKSESIBILITAS
+============================================================ */
+
+.payment-topbar-back:focus-visible,
+.pay-button:focus-visible,
+.btn-pay-mobile:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
+
     * {
         transition: none !important;
     }
