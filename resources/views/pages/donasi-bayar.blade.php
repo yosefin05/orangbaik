@@ -22,11 +22,6 @@
             <h1 class="payment-topbar-title">Donasi</h1>
             <p class="payment-topbar-sub">{{ $campaign->judul }}</p>
         </div>
-
-        <span class="payment-topbar-secure">
-            <i class="bi bi-shield-check" aria-hidden="true"></i>
-            <span>Aman</span>
-        </span>
     </div>
 </header>
 
@@ -362,12 +357,7 @@
                         <span>Total Bayar</span>
                         <strong id="total-donasi">Rp0</strong>
                     </div>
-
-                    <div class="payment-method-info">
-                        <strong><i class="bi bi-shield-check" aria-hidden="true"></i> Transaksi Aman &amp; Terenkripsi</strong>
-                        <p>Pembayaran Anda diproses secara otomatis dengan keamanan standar perbankan.</p>
-                    </div>
-
+                    
                     <button class="pay-button js-pay" type="button" id="payButton">
                         Lanjutkan Pembayaran
                     </button>
@@ -388,7 +378,7 @@
         <strong class="payment-cta-val" id="cta-total">Rp0</strong>
     </div>
     <button class="btn-pay-mobile js-pay" type="button">
-        Bayar
+        Bayar Sekarang
     </button>
 </div>
 
