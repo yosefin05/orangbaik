@@ -1928,8 +1928,6 @@ body {
     font-size: 20px;
     color: var(--success);
 }
-
-
 /* ============================================================
    15. RESPONSIVE
    - Tablet (≤ 992px): satu kolom.
@@ -2062,7 +2060,7 @@ body {
         margin: 0;
         overflow: hidden;
         color: var(--text-dark);
-        font-size: var(--fs-xs);
+        font-size: var(--fs-sm);
         font-weight: var(--fw-semibold);
         line-height: 1.3;
         text-overflow: ellipsis;
@@ -2149,7 +2147,7 @@ body {
 
     .detail-main > *:not(.hero-wrapper),
     .detail-sidebar > * {
-        border-top-color: var(--muted-light);
+        border-top-color: color-mix(in srgb, var(--accent, var(--border-soft)) 45%, var(--bg));
     }
 
     /* ----- Hero: full-bleed 16:9 seperti hero landing ----- */
@@ -2214,28 +2212,75 @@ body {
         display: none !important;
     }
 
-    /* ----- Deskripsi ----- */
+    /* ----- Deskripsi (rich text dari editor) ----- */
 
     /* judul sudah tampil di ringkasan */
     .description-section h1 {
         display: none;
     }
 
-    /* justify seperti desktop */
+    /* justify seperti desktop, tapi aman di layar sempit:
+       kata hanya dipotong bila benar-benar tidak muat (bukan di setiap
+       kata panjang), hyphenation membantu menutup celah antar kata */
     .rich-text-output {
         text-align: justify;
+        text-justify: inter-word;
+        word-break: normal;
+        overflow-wrap: break-word;
+        -webkit-hyphens: auto;
+        hyphens: auto;
+        line-height: 1.75;
     }
 
     .rich-text-output p {
         margin-bottom: var(--space-3);
-        font-size: var(--fs-xs);
-        line-height: 1.5;
+    }
+
+    .rich-text-output ul,
+    .rich-text-output ol {
+        padding-left: var(--space-5);
+    }
+
+    /* URL / link panjang: boleh patah di mana saja, tanpa celah lebar */
+    .rich-text-output a {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        text-align: left;
+    }
+
+    /* konten hasil editor tidak boleh melebihi lebar layar */
+    .rich-text-output * {
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .rich-text-output img {
         max-width: 100%;
         max-height: 260px;
         margin: var(--space-3) auto;
+        /* editor kadang menyisipkan height inline yang membuat gambar gepeng */
+        height: auto !important;
+    }
+
+    .rich-text-output table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .rich-text-output iframe,
+    .rich-text-output video,
+    .rich-text-output embed {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        border: 0;
+    }
+
+    .rich-text-output pre {
+        overflow-x: auto;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
     }
 
     /* ----- Penggalang dana ----- */
@@ -2249,18 +2294,11 @@ body {
         text-transform: uppercase;
     }
 
-    .fundraiser-info-card h4 {
-        margin: 0 0 var(--space-2);
-        color: var(--text-dark);
-        font-size: var(--fs-xs);
-        font-weight: var(--fw-semibold);
-        letter-spacing: .04em;
-    }
-
     .fundraiser-profile img {
         width: 40px;
         height: 40px;
         flex-basis: 40px;
+        border-color: var(--primary);
     }
 
     /* ----- Judul section & aksi ----- */
@@ -2367,12 +2405,14 @@ body {
         font-size: var(--fs-xs);
     }
 
-    /* semua ikon ilustrasi = 100px */
+    /* semua ikon ilustrasi (termasuk fundraiser) = 140px */
     .icon-section {
-        width: 100px;
-        height: 100px;
-        max-width: 100px;
+        display: block;
+        width: 140px;
+        height: 140px;
+        max-width: 140px;
         margin: 0 auto var(--space-2);
+        object-fit: contain;
     }
 
     /* ----- Pesan & doa: daftar datar ----- */
@@ -2493,13 +2533,14 @@ body {
         right: 0;
         bottom: 0;
         left: 0;
+
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: var(--space-3);
 
         padding:
-            var(--space-4)
+            var(--space-2)
             var(--space-4)
             calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
 

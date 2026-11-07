@@ -439,9 +439,10 @@
                         @endif
                     @endauth
 
-                    @guest
+                                        @guest
                         <div class="fundraiser-join-card">
                             <h3>Jadi Fundraiser</h3>
+                            <img src="{{ asset('assets/fundraiser.png') }}" alt="Fundraiser" class="icon-section">
                             <p>Login terlebih dahulu untuk menjadi fundraiser.</p>
                             <a href="{{ route('login') }}" class="btn-fundraiser-login">Login</a>
                         </div>
