@@ -1080,7 +1080,7 @@
 .payment-total strong {
     color: var(--primary);
     font-size: var(--fs-rg);
-    font-weight: var(--fw-extrabold);
+    font-weight: var(--fw-bold);
     line-height: 1.2;
 }
 
