@@ -43,7 +43,7 @@ class ManualTransferService
 
     /**
      * Simpan file bukti transfer yang diupload donatur.
-     * File disimpan di storage/app/public/bukti-transfer/.
+     * File disimpan di private storage (storage/app/private/bukti-transfer/).
      *
      * @param  Pembayaran     $pembayaran
      * @param  UploadedFile   $file
@@ -56,17 +56,21 @@ class ManualTransferService
             throw new \Exception('Pembayaran sudah terverifikasi. Bukti transfer tidak dapat diubah.');
         }
 
-        // Hapus file lama jika ada
-        if ($pembayaran->bukti_transfer && Storage::disk('public')->exists($pembayaran->bukti_transfer)) {
-            Storage::disk('public')->delete($pembayaran->bukti_transfer);
+        // Hapus file lama jika ada (cek disk private dan public untuk data migrasi)
+        if ($pembayaran->bukti_transfer) {
+            if (Storage::disk('private')->exists($pembayaran->bukti_transfer)) {
+                Storage::disk('private')->delete($pembayaran->bukti_transfer);
+            } elseif (Storage::disk('public')->exists($pembayaran->bukti_transfer)) {
+                Storage::disk('public')->delete($pembayaran->bukti_transfer);
+            }
         }
 
-        // Simpan file baru
-        $path = $file->store('bukti-transfer', 'public');
+        // Simpan file baru di private storage (tidak dapat diakses publik langsung)
+        $path = $file->store('bukti-transfer', 'private');
 
         $pembayaran->update(['bukti_transfer' => $path]);
 
-        Log::info('Bukti transfer uploaded', [
+        Log::info('Bukti transfer uploaded securely to private storage', [
             'order_id' => $pembayaran->order_id,
             'path'     => $path,
         ]);

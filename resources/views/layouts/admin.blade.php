@@ -224,7 +224,7 @@
                                 <i class="bi bi-people-fill"></i>
                                 <span>Profil Penggalang</span>
                             </a>
-                            <a href="{{ route('campaign.create', $penggalang->id) }}">
+                            <a href="{{ route('campaign.create') }}">
                                 <i class="bi bi-megaphone-fill"></i>
                                 <span>Tambah Campaign</span>
                             </a>

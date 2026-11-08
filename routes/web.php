@@ -21,7 +21,8 @@ use App\Http\Controllers\User\{
 };
 use App\Http\Controllers\{
     MidtransController,
-    FlipController
+    FlipController,
+    DokumenPenggalangController
 };
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -84,6 +85,7 @@ Route::get('/campaign/{slug}/donasi', [DonasiController::class, 'create'])->name
 Route::post('/campaign/{slug}/donasi', [DonasiController::class, 'store'])->name('donasi.store');
 Route::get('/donasi/instruksi/{pembayaran}', [DonasiController::class, 'instruksi'])->name('donasi.bayar.instruksi');
 Route::post('/donasi/instruksi/{pembayaran}/upload-bukti', [DonasiController::class, 'uploadBukti'])->name('donasi.bayar.upload_bukti');
+Route::get('/donasi/instruksi/{pembayaran}/bukti-transfer', [DonasiController::class, 'viewBuktiTransfer'])->name('donasi.bayar.bukti_transfer');
 Route::get('/donasi/status/{status}', [DonasiController::class, 'status'])->name('donasi.status');
 
 // Static pages
@@ -93,6 +95,7 @@ Route::get('/pusat-bantuan', [PageController::class, 'pusatBantuan'])->name('pus
 
 // Penggalang Dana (Public)
 Route::get('/profil-penggalang/{id}', [PenggalangDanaController::class, 'profile'])->name('profil.penggalang');
+Route::get('/dokumen-penggalang/{id}', [DokumenPenggalangController::class, 'show'])->name('dokumen.show');
 
 // ============================================================
 // AUTHENTICATED ROUTES (BUTUH LOGIN, TAPI BELUM TENTU VERIFIED)

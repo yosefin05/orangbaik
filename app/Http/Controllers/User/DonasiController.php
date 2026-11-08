@@ -299,6 +299,61 @@ return response()->json(array_merge([
     }
 
     /**
+     * Endpoint aman untuk melihat file bukti transfer.
+     * Hanya Admin, Pemilik donasi (user_id), atau Guest dengan payment_token valid yang dapat mengakses.
+     */
+    public function viewBuktiTransfer(Request $request, Pembayaran $pembayaran)
+    {
+        $pembayaran->load('donasi');
+        $donasi = $pembayaran->donasi;
+
+        if (!$donasi || empty($pembayaran->bukti_transfer)) {
+            abort(404, 'Bukti transfer tidak ditemukan.');
+        }
+
+        // Authorization check
+        if (auth()->check()) {
+            if ($donasi->user_id !== null && (int) auth()->id() !== (int) $donasi->user_id && !auth()->user()?->isAdmin()) {
+                abort(403, 'Anda tidak memiliki akses untuk melihat bukti transfer ini.');
+            }
+            if ($donasi->user_id === null && !auth()->user()?->isAdmin()) {
+                $token = $request->query('token');
+                if (!$pembayaran->isValidGuestToken($token)) {
+                    abort(403, 'Akses tidak diizinkan. Token pembayaran guest tidak valid.');
+                }
+            }
+        } else {
+            if ($donasi->user_id !== null) {
+                abort(403, 'Silakan login terlebih dahulu untuk mengakses bukti transfer ini.');
+            }
+            $token = $request->query('token');
+            if (!$pembayaran->isValidGuestToken($token)) {
+                abort(403, 'Akses tidak diizinkan. Token pembayaran guest tidak valid.');
+            }
+        }
+
+        $filePath = $pembayaran->bukti_transfer;
+        $disk = 'private';
+        if (!\Illuminate\Support\Facades\Storage::disk('private')->exists($filePath)) {
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($filePath)) {
+                $disk = 'public';
+            } else {
+                abort(404, 'File bukti transfer fisik tidak ditemukan di disk penyimpanan.');
+            }
+        }
+
+        $fullPath = \Illuminate\Support\Facades\Storage::disk($disk)->path($filePath);
+        $mimeType = \Illuminate\Support\Facades\Storage::disk($disk)->mimeType($filePath) ?: 'image/jpeg';
+
+        return response()->file($fullPath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="bukti-transfer-' . $pembayaran->order_id . '.' . pathinfo($fullPath, PATHINFO_EXTENSION) . '"',
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, no-cache, must-revalidate',
+        ]);
+    }
+
+    /**
      * Resume / Lanjutkan pembayaran pending yang sudah ada (Authenticated User).
      * TIDAK membuat donasi baru dan TIDAK membuat pembayaran baru.
      */

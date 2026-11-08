@@ -164,8 +164,8 @@
                                     <span class="upload-existing-label">
                                         <i class="bi bi-check-circle-fill"></i> Bukti transfer sudah diunggah
                                     </span>
-                                    <a href="{{ asset('storage/' . $pembayaran->bukti_transfer) }}" target="_blank">
-                                        <img src="{{ asset('storage/' . $pembayaran->bukti_transfer) }}" alt="Bukti Transfer" class="upload-preview">
+                                    <a href="{{ route('donasi.bayar.bukti_transfer', ['pembayaran' => $pembayaran->id, 'token' => request()->query('token')]) }}" target="_blank" rel="noopener noreferrer">
+                                        <img src="{{ route('donasi.bayar.bukti_transfer', ['pembayaran' => $pembayaran->id, 'token' => request()->query('token')]) }}" alt="Bukti Transfer" class="upload-preview">
                                     </a>
                                     @if ($pembayaran->transaction_status === 'pending')
                                         <p class="upload-hint">Ingin mengganti bukti transfer? Pilih file baru di bawah dan klik upload ulang.</p>

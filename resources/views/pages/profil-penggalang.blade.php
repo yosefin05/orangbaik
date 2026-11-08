@@ -302,28 +302,33 @@
                             </div>
                         </details>
 
-                        <details class="info-card" open>
-                            <summary>
-                                <span>Informasi Legalitas</span>
-                                <b><i class="bi bi-chevron-down"></i></b>
-                            </summary>
-                            @if($penggalang->penggalangDanaDokumen->isNotEmpty())
-                                <div class="info-table">
-                                    @foreach($penggalang->penggalangDanaDokumen as $dokumen)
-                                        <div class="info-row">
-                                            <strong class="info-label">{{ $dokumen->nama_dokumen }}</strong>
-                                            <p class="info-value">
-                                                <a href="{{ $dokumen->file_dokumen }}" target="_blank" rel="noopener">
-                                                    <i class="bi bi-file-earmark-text"></i> Lihat Dokumen
-                                                </a>
-                                            </p>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <p class="info-empty">Belum ada dokumen legalitas.</p>
-                            @endif
-                        </details>
+                        @php
+                            $docsToShow = $legalitasDokumen ?? $penggalang->penggalangDanaDokumen;
+                        @endphp
+                        @if(($penggalang->jenis_penggalang === 'organisasi' && $docsToShow->isNotEmpty()) || $isOwner)
+                            <details class="info-card" open>
+                                <summary>
+                                    <span>Informasi Legalitas {{ $penggalang->jenis_penggalang === 'organisasi' ? 'Organisasi' : '(Privat Pemilik)' }}</span>
+                                    <b><i class="bi bi-chevron-down"></i></b>
+                                </summary>
+                                @if($docsToShow->isNotEmpty())
+                                    <div class="info-table">
+                                        @foreach($docsToShow as $dokumen)
+                                            <div class="info-row">
+                                                <strong class="info-label">{{ $dokumen->nama_dokumen }}</strong>
+                                                <p class="info-value">
+                                                    <a href="{{ route('dokumen.show', $dokumen->id) }}" target="_blank" rel="noopener noreferrer">
+                                                        <i class="bi bi-file-earmark-text"></i> Lihat Dokumen
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="info-empty">Belum ada dokumen legalitas.</p>
+                                @endif
+                            </details>
+                        @endif
 
                         <details class="info-card" open>
                             <summary>

@@ -374,8 +374,12 @@ class CampaignController extends Controller
 
     public function edit(Campaign $campaign)
     {
-        if ($campaign->penggalang_dana_id !== auth()->user()->penggalangDana->id) {
-            abort(403);
+        $penggalang = auth()->user()->penggalangDana;
+        $isOwner = $penggalang && (int) $campaign->penggalang_dana_id === (int) $penggalang->id;
+        $isAdmin = auth()->user()->isAdmin();
+
+        if (!$isOwner && !$isAdmin) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah campaign ini.');
         }
 
         $kategori = Kategori::all();
@@ -399,6 +403,14 @@ class CampaignController extends Controller
 
     public function update(Request $request, Campaign $campaign)
     {
+        $penggalang = auth()->user()->penggalangDana;
+        $isOwner = $penggalang && (int) $campaign->penggalang_dana_id === (int) $penggalang->id;
+        $isAdmin = auth()->user()->isAdmin();
+
+        if (!$isOwner && !$isAdmin) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah campaign ini.');
+        }
+
         // ============================================================
         // CLEAN MONEY INPUTS
         // ============================================================
@@ -781,8 +793,12 @@ class CampaignController extends Controller
 
     public function destroy(Campaign $campaign)
     {
-        if ($campaign->penggalang_dana_id !== auth()->user()->penggalangDana->id) {
-            abort(403);
+        $penggalang = auth()->user()->penggalangDana;
+        $isOwner = $penggalang && (int) $campaign->penggalang_dana_id === (int) $penggalang->id;
+        $isAdmin = auth()->user()->isAdmin();
+
+        if (!$isOwner && !$isAdmin) {
+            abort(403, 'Anda tidak memiliki hak akses untuk menghapus campaign ini.');
         }
 
         $campaign->delete();

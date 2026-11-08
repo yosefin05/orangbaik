@@ -13,11 +13,11 @@ class MidtransService
 {
     public function __construct()
     {
-        Config::$serverKey    = config('midtrans.serverKey');
-        Config::$clientKey    = config('midtrans.clientKey');
-        Config::$isProduction = config('midtrans.isProduction');
-        Config::$isSanitized  = config('midtrans.isSanitized');
-        Config::$is3ds        = config('midtrans.is3ds');
+        Config::$serverKey    = config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
+        Config::$clientKey    = config('midtrans.clientKey') ?: config('payment.midtrans.client_key');
+        Config::$isProduction = config('midtrans.isProduction') ?? config('payment.midtrans.is_production', false);
+        Config::$isSanitized  = config('midtrans.isSanitized') ?? config('payment.midtrans.is_sanitized', true);
+        Config::$is3ds        = config('midtrans.is3ds') ?? config('payment.midtrans.is_3ds', true);
     }
 
     /**
@@ -75,7 +75,7 @@ class MidtransService
      */
     public function isConfigured(): bool
     {
-        return !empty(config('midtrans.serverKey'));
+        return !empty(config('midtrans.serverKey')) || !empty(config('payment.midtrans.server_key'));
     }
 
     /**
@@ -97,10 +97,15 @@ class MidtransService
 
         /*
          * =====================================================
-         * 1. VERIFIKASI SIGNATURE MIDTRANS
+         * 1. VERIFIKASI SIGNATURE MIDTRANS (FAIL-CLOSED)
          * =====================================================
          */
-        $serverKey = config('midtrans.serverKey');
+        $serverKey = config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
+        if (empty($serverKey)) {
+            Log::critical('Midtrans webhook ditolak: MIDTRANS_SERVER_KEY belum dikonfigurasi (fail-closed).');
+            return false;
+        }
+
         $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
 
         if (!hash_equals($expectedSignature, $signatureKey)) {

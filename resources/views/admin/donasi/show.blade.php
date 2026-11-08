@@ -192,8 +192,8 @@
 
                                 @if ($donasi->pembayaran->bukti_transfer)
                                     <div class="mb-3">
-                                        <a href="{{ asset('storage/' . $donasi->pembayaran->bukti_transfer) }}" target="_blank">
-                                            <img src="{{ asset('storage/' . $donasi->pembayaran->bukti_transfer) }}"
+                                        <a href="{{ route('donasi.bayar.bukti_transfer', $donasi->pembayaran->id) }}" target="_blank" rel="noopener noreferrer">
+                                            <img src="{{ route('donasi.bayar.bukti_transfer', $donasi->pembayaran->id) }}"
                                                 alt="Bukti Transfer"
                                                 class="img-fluid rounded border"
                                                 style="max-height: 220px; object-fit: contain; background: #fff;">

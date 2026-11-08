@@ -309,19 +309,20 @@ class FlipService
     {
         /*
          * =====================================================
-         * 1. VERIFIKASI TOKEN
+         * 1. VERIFIKASI TOKEN (FAIL-CLOSED)
          * =====================================================
          */
         $expectedToken = config('payment.flip.webhook_token');
 
-        if (!empty($expectedToken)) {
-            $receivedToken = !empty($token) ? $token : ($payload['token'] ?? '');
-            if (!hash_equals($expectedToken, (string) $receivedToken)) {
-                Log::warning('Flip webhook: token tidak valid', [
-                    'expected' => substr($expectedToken, 0, 4) . '***',
-                ]);
-                return false;
-            }
+        if (empty($expectedToken)) {
+            Log::critical('Flip webhook ditolak: FLIP_WEBHOOK_TOKEN belum dikonfigurasi (fail-closed).');
+            return false;
+        }
+
+        $receivedToken = !empty($token) ? $token : ($payload['token'] ?? '');
+        if (empty($receivedToken) || !hash_equals($expectedToken, (string) $receivedToken)) {
+            Log::warning('Flip webhook ditolak: token tidak cocok atau tidak disertakan.');
+            return false;
         }
 
         /*

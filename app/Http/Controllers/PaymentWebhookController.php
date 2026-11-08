@@ -27,9 +27,11 @@ class PaymentWebhookController extends Controller
                 return response()->json(['success' => false, 'message' => 'Gateway not found'], 404);
             }
 
+            // Catat metadata webhook tanpa mengekspos header otentikasi atau data sensitif
             Log::info("Payment webhook received for gateway: {$gateway}", [
-                'headers' => $request->headers->all(),
-                'body'    => $request->all(),
+                'ip'           => $request->ip(),
+                'gateway'      => $gateway,
+                'payload_keys' => array_keys($request->all()),
             ]);
 
             $driver = $this->manager->driver($gatewayModel);

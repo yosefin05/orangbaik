@@ -42,9 +42,7 @@ class CampaignUpdateController extends Controller
 
     public function store(Request $request, $slug)
     {
-        $campaign = Campaign::where('slug', $slug)
-            ->where('penggalang_dana_id', Auth::user()->penggalangDana->id ?? 0)
-            ->firstOrFail();
+        $campaign = $this->authorizedCampaign($slug);
 
         $request->validate([
             'judul_update' => 'required|string|max:255',
@@ -71,12 +69,16 @@ class CampaignUpdateController extends Controller
      */
     public function edit($slug, $id)
     {
-        $campaign = Campaign::where('slug', $slug)->firstOrFail();
+        $campaign = $this->authorizedCampaign($slug);
 
-        $update = Campaign_Update::where('campaign_id', $campaign->id)
-            ->where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $query = Campaign_Update::where('campaign_id', $campaign->id)
+            ->where('id', $id);
+
+        if (!Auth::user()->isAdmin()) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $update = $query->firstOrFail();
 
         return view('pages.campaign.update.edit', compact('campaign', 'update'));
     }
@@ -86,12 +88,16 @@ class CampaignUpdateController extends Controller
      */
     public function update(Request $request, $slug, $id)
     {
-        $campaign = Campaign::where('slug', $slug)->firstOrFail();
+        $campaign = $this->authorizedCampaign($slug);
 
-        $update = Campaign_Update::where('campaign_id', $campaign->id)
-            ->where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $query = Campaign_Update::where('campaign_id', $campaign->id)
+            ->where('id', $id);
+
+        if (!Auth::user()->isAdmin()) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $update = $query->firstOrFail();
 
         $request->validate([
             'judul_update' => 'required|string|max:255',
@@ -185,12 +191,16 @@ class CampaignUpdateController extends Controller
 
     public function destroy($slug, $id)
     {
-        $campaign = Campaign::where('slug', $slug)->firstOrFail();
+        $campaign = $this->authorizedCampaign($slug);
 
-        $update = Campaign_Update::where('campaign_id', $campaign->id)
-            ->where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $query = Campaign_Update::where('campaign_id', $campaign->id)
+            ->where('id', $id);
+
+        if (!Auth::user()->isAdmin()) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $update = $query->firstOrFail();
 
         $update->delete();
 

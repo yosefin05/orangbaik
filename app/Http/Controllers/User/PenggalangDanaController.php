@@ -72,6 +72,8 @@ class PenggalangDanaController extends Controller
                     'penggalang_dana_id' => $penggalangDana->id,
                     'nama_dokumen'       => $namaDokumen,
                     'file_dokumen'       => $request->file_dokumen[$index],
+                    'is_public'          => false,
+                    'storage_disk'       => 'private',
                 ]);
             }
 
@@ -144,6 +146,8 @@ class PenggalangDanaController extends Controller
                     'penggalang_dana_id' => $penggalangDana->id,
                     'nama_dokumen'       => $nama,
                     'file_dokumen'       => $request->file_dokumen[$i],
+                    'is_public'          => false,
+                    'storage_disk'       => 'private',
                 ]);
             }
 
@@ -163,25 +167,40 @@ class PenggalangDanaController extends Controller
     /**
      * PUBLIC profile penggalang berdasarkan {id} param.
      * Guest dapat membuka. Owner detection terpisah dari pengambilan data.
+     * HARDENED: Dokumen identitas privat (KTP individu) tidak boleh dimuat ke publik.
      */
     public function profile($id)
     {
-        // FIX: Gunakan ID dari param, BUKAN dari auth()->user()
         $penggalang = Penggalang_Dana::with([
-            'penggalangDanaDokumen',
             'campaign',
-            'user',
+            'user' => fn($q) => $q->select('id', 'name'),
         ])->findOrFail($id);
 
-        // Owner detection: cek apakah user yang sedang login adalah pemilik profil ini
-        $isOwner = auth()->check() && auth()->user()->id === $penggalang->user_id;
+        $isOwner = auth()->check() && (int) auth()->id() === (int) $penggalang->user_id;
+        $isAdmin = auth()->check() && method_exists(auth()->user(), 'isAdmin') && auth()->user()->isAdmin();
+
+        // Dokumen handling:
+        // - Owner atau Admin: dapat melihat seluruh dokumen
+        // - Publik: jika organisasi, hanya dokumen publik. Jika individu, KOSONG (0 dokumen di-load).
+        if ($isOwner || $isAdmin) {
+            $penggalang->load('penggalangDanaDokumen');
+        } elseif ($penggalang->jenis_penggalang === 'organisasi') {
+            $penggalang->load(['penggalangDanaDokumen' => function ($q) {
+                $q->publicOnly();
+            }]);
+        } else {
+            // Penggalang individu: dokumen identitas (KTP dsb) 100% PRIVATE, jangan pernah di-load untuk publik
+            $penggalang->setRelation('penggalangDanaDokumen', collect([]));
+        }
 
         // Jika owner, tandai notifikasi sudah dibaca
         if ($isOwner && !$penggalang->status_read) {
             $penggalang->update(['status_read' => true]);
         }
 
-        return view('pages.profil-penggalang', compact('penggalang', 'isOwner'));
+        $legalitasDokumen = $penggalang->penggalangDanaDokumen;
+
+        return view('pages.profil-penggalang', compact('penggalang', 'isOwner', 'legalitasDokumen'));
     }
 
     public function rejected()
@@ -313,6 +332,8 @@ class PenggalangDanaController extends Controller
                     'penggalang_dana_id' => $penggalang->id,
                     'nama_dokumen'       => $nama,
                     'file_dokumen'       => $request->file_dokumen[$i],
+                    'is_public'          => false,
+                    'storage_disk'       => 'private',
                 ]);
             }
         }

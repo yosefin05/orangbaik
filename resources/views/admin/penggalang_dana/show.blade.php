@@ -204,6 +204,7 @@
                 <thead>
                     <tr>
                         <th>Nama Dokumen</th>
+                        <th>Klasifikasi Visibilitas</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -220,7 +221,33 @@
                             </td>
 
                             <td>
-                                <a href="{{ $dokumen->file_dokumen }}" target="_blank" class="action-link link-blue">
+                                @if($penggalangDana->jenis_penggalang === 'individu')
+                                    <span class="badge badge-red" title="KTP/Identitas wajib privat">
+                                        <i class="bi bi-lock-fill"></i> Privat (KTP/Identitas)
+                                    </span>
+                                @else
+                                    @if($dokumen->is_public)
+                                        <span class="badge badge-green">
+                                            <i class="bi bi-globe"></i> Publik
+                                        </span>
+                                    @else
+                                        <span class="badge badge-yellow">
+                                            <i class="bi bi-lock-fill"></i> Privat
+                                        </span>
+                                    @endif
+
+                                    <form action="{{ route('admin.penggalang_dana.dokumen.toggle_public', $dokumen->id) }}" method="POST" style="display:inline-block; margin-left: 8px;">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem; padding: 2px 6px;">
+                                            Ubah ke {{ $dokumen->is_public ? 'Privat' : 'Publik' }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </td>
+
+                            <td>
+                                <a href="{{ route('dokumen.show', $dokumen->id) }}" target="_blank" rel="noopener noreferrer" class="action-link link-blue">
                                     <i class="bi bi-file-earmark-text"></i>
                                     <span>Lihat Dokumen</span>
                                 </a>
@@ -230,7 +257,7 @@
                     @empty
 
                         <tr>
-                            <td colspan="2" class="empty-state">
+                            <td colspan="3" class="empty-state">
                                 Tidak ada dokumen.
                             </td>
                         </tr>

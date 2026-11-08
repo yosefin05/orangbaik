@@ -1,59 +1,118 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# OrangBaik.id — Platform Crowdfunding & Kebaikan
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Platform crowdfunding dan donasi terpercaya yang dikelola oleh **Dompet Al-Qur'an Sidoarjo**, memfasilitasi penggalangan dana kemanusiaan, sosial, keagamaan, dan pendidikan dengan sistem pembayaran multi-gateway modern, verifikasi legalitas ketat, serta perlindungan privasi donatur dan penggalang dana.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1. Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Ecosystem Crowdfunding & Zakat**:
+  - Penggalangan dana reguler, darurat (*emergency*), dan berkelanjutan (*sustainable*).
+  - Manajemen kabar terbaru campaign (*campaign updates*) dan berita resmi platform.
+  - Dukungan relawan *fundraiser* dengan sistem kode referral dan tautan donasi khusus.
+  - Kalkulator zakat otomatis dengan integrasi langsung ke form donasi.
+- **Sistem Pembayaran Multi-Gateway & Opsi Transfer**:
+  - **Midtrans**: QRIS, GoPay, ShopeePay, Kartu Kredit/Debit, dan Snap modal 1-klik.
+  - **Flip**: Virtual Account (BCA, BNI, BRI, BSI, Mandiri, Permata, CIMB Niaga) & Bank Transfer otomatis.
+  - **Transfer Manual**: Rekening bank resmi dengan fasilitas unggah bukti transfer aman dan verifikasi admin 1x24 jam.
+  - **Donasi Anonim**: Opsi "Hamba Allah" untuk melindungi privasi identitas donatur.
+  - **Resumable Payments**: Donatur terdaftar dapat melanjutkan pembayaran pending dari riwayat transaksi.
+- **Keamanan Data Pribadi & Hak Akses (Hardened Security)**:
+  - **Isolasi Dokumen KTP**: KTP dan dokumen identitas penggalang individu disimpan di private storage (`storage/app/private/`) dan dilarang muncul di publik.
+  - **Fail-Closed Webhook**: Callback otomatis menolak request jika secret token tidak valid atau tidak dikonfigurasi.
+  - **Anti-IDOR Authorization**: Endpoint sensitif dilindungi pengecekan kepemilikan dan token UUID guest.
+  - **Anti-Tampering Amount Check**: Verifikasi presisi nominal donasi sebelum settlement disetujui.
+- **Dashboard Terpisah**:
+  - Dashboard Admin: Approval campaign, verifikasi penggalang, ekspor donasi, toggle legalitas, dan manajemen gateway.
+  - Dashboard Penggalang: Pantau donatur, progres donasi, kelola update, dan tulis berita terkait campaign.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 2. Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Backend**: Laravel 12 (PHP 8.2 / 8.3)
+- **Frontend**: Blade Templating, CSS Modular, Vanilla JS, Bootstrap Icons
+- **Database**: MySQL 8.0+ / MariaDB 10.5+ (SQLite Memory untuk automated testing)
+- **Authentication**: Laravel Breeze
+- **Payment Gateway**: Midtrans Snap API, Flip Acceptance PWF API
+- **Typography**: Inter (Google Fonts)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 3. Persyaratan Sistem (Requirements)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP >= 8.2 dengan ekstensi: `pdo_mysql`, `curl`, `mbstring`, `fileinfo`, `gd`, `openssl`
+- Composer 2.x
+- MySQL 8.0+ atau MariaDB 10.4+
+- Web server: Apache (dengan mod_rewrite) atau Nginx
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 4. Instalasi Lokal & Setup
 
-## Contributing
+1. **Clone Repository & Masuk ke Folder**:
+   ```bash
+   git clone <repository_url> orangbaik
+   cd orangbaik
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Install Dependencies**:
+   ```bash
+   composer install
+   ```
 
-## Code of Conduct
+3. **Salin Environment File & Generate Key**:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. **Konfigurasi Database pada `.env`**:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=orangbaik
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-## Security Vulnerabilities
+5. **Jalankan Migration & Storage Symlink**:
+   ```bash
+   php artisan migrate
+   php artisan storage:link
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6. **Jalankan Development Server**:
+   ```bash
+   php artisan serve
+   ```
+   Aplikasi dapat diakses melalui browser pada `http://127.0.0.1:8000`.
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 5. Pengujian (Testing)
+
+Jalankan test suite menggunakan SQLite in-memory:
+```bash
+php artisan test
+```
+
+---
+
+## 6. Dokumentasi Lengkap
+
+Struktur dokumentasi teknis tersedia pada direktori `docs/`:
+- [Arsitektur Aplikasi & Layering](docs/architecture/README.md)
+- [Database Schema & ERD Rules](docs/database/README.md)
+- [API & Spesifikasi Webhook](docs/api/README.md)
+- [Security Policy & Klasifikasi Data](docs/security/README.md)
+- [Standar Koding & Guideline Developer](docs/development/README.md)
+- [Panduan Deployment Production & Gateway Readiness](docs/deployment/README.md)
+- [Log Perubahan & Security Audit](CHANGELOG_AUDIT.md)
+
+---
+
+## 7. Kontribusi & Lisensi
+
+Dikelola secara eksklusif untuk **Dompet Al-Qur'an Sidoarjo**. Semua hak cipta dilindungi undang-undang.

@@ -113,4 +113,19 @@ class PenggalangDanaController extends Controller
 
         return back()->with('success', 'Verifikasi dicabut.');
     }
+
+    public function toggleDokumenPublic(Penggalang_Dana_Dokumen $dokumen)
+    {
+        // Dokumen penggalang individu dilarang keras dipublikasikan (KTP/identitas pribadi)
+        if ($dokumen->penggalangDana && $dokumen->penggalangDana->jenis_penggalang === 'individu') {
+            return back()->with('error', 'Dokumen identitas penggalang individu tidak boleh dipublikasikan demi perlindungan data pribadi.');
+        }
+
+        $dokumen->update([
+            'is_public' => !$dokumen->is_public,
+        ]);
+
+        $status = $dokumen->is_public ? 'publik' : 'privat';
+        return back()->with('success', "Visibilitas dokumen berhasil diubah menjadi {$status}.");
+    }
 }

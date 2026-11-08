@@ -62,6 +62,8 @@ Route::middleware(['auth', 'admin'])
             ->name('penggalang_dana.verify');
         Route::patch('/penggalang_dana/{penggalangDana}/unverify', [PenggalangDanaController::class, 'unverify'])
             ->name('penggalang_dana.unverify');
+        Route::patch('/penggalang_dana/dokumen/{dokumen}/toggle-public', [PenggalangDanaController::class, 'toggleDokumenPublic'])
+            ->name('penggalang_dana.dokumen.toggle_public');
 
         // ==================== CAMPAIGN ROUTES ===================
         Route::prefix('campaign')->name('campaign.')->group(function () {

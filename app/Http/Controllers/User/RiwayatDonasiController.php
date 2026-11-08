@@ -69,8 +69,8 @@ class RiwayatDonasiController extends Controller
 
     public function kwitansi(Donasi $donasi)
     {
-        if ($donasi->user_id !== auth()->id()) {
-            abort(403);
+        if ($donasi->user_id !== auth()->id() && !auth()->user()?->isAdmin()) {
+            abort(403, 'Anda tidak memiliki hak akses untuk melihat kwitansi ini.');
         }
 
         $donasi->load(['campaign.penggalangDana', 'pembayaran', 'user']);

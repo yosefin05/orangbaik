@@ -20,7 +20,11 @@ class MidtransController extends Controller
         try {
             $payload = $request->all();
 
-            Log::info('Midtrans webhook received', $payload);
+            Log::info('Midtrans webhook received', [
+                'order_id'           => $payload['order_id'] ?? null,
+                'status_code'        => $payload['status_code'] ?? null,
+                'transaction_status' => $payload['transaction_status'] ?? null,
+            ]);
 
             $result = $this->midtransService->handleWebhook($payload);
 
