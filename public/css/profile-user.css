@@ -5,9 +5,7 @@
    - Mobile (≤ 768px): satu kolom, minimalis TANPA kartu. Profil
      polos, statistik dua kolom, lalu daftar menu datar yang
      dipisah garis tipis.
-   Semua selector halaman diawali .profile-page (modal: #penggalangModal)
-   agar tidak tertimpa global.css yang ikut dimuat ulang oleh
-   komponen modal logout. Memakai token global.css saja.
+   Memakai token global.css saja.
 ============================================================ */
 
 .profile-page {
@@ -16,16 +14,16 @@
     color: var(--text-dark);
 }
 
-.profile-page .profile-content {
+.profile-content {
     padding: var(--space-10) 0 var(--space-16);
 }
 
-.profile-page .profile-container {
+.profile-container {
     width: min(100% - var(--space-12), 1040px);
     margin-inline: auto;
 }
 
-.profile-page .profile-layout {
+.profile-layout {
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
     gap: var(--space-8);
@@ -37,7 +35,7 @@
    RINGKASAN PROFIL
 ============================================================ */
 
-.profile-page .profile-summary {
+.profile-summary {
     position: sticky;
     top: 100px;
 
@@ -49,7 +47,7 @@
     background: linear-gradient(180deg, var(--primary-light) 0, var(--bg) 140px);
 }
 
-.profile-page .profile-user {
+.profile-user {
     min-width: 0;
 
     display: flex;
@@ -60,7 +58,7 @@
     text-align: center;
 }
 
-.profile-page .profile-avatar {
+.profile-avatar {
     width: 96px;
     height: 96px;
     flex-shrink: 0;
@@ -74,7 +72,7 @@
     object-position: center;
 }
 
-.profile-page .profile-avatar-placeholder {
+.profile-avatar-placeholder {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -86,12 +84,12 @@
     font-weight: var(--fw-extrabold);
 }
 
-.profile-page .profile-user-text {
+.profile-user-text {
     width: 100%;
     min-width: 0;
 }
 
-.profile-page .profile-user-text h1 {
+.profile-user-text h1 {
     margin: 0 0 var(--space-1);
 
     color: var(--text-dark);
@@ -102,7 +100,7 @@
     overflow-wrap: anywhere;
 }
 
-.profile-page .profile-user-text p {
+.profile-user-text p {
     margin: 0;
     overflow: hidden;
 
@@ -116,7 +114,7 @@
 
 /* statistik: label kiri, nilai kanan */
 
-.profile-page .profile-stats {
+.profile-stats {
     display: flex;
     flex-direction: column;
 
@@ -126,7 +124,7 @@
     border-top: 1px solid var(--border-soft);
 }
 
-.profile-page .profile-stat-item {
+.profile-stat-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -135,17 +133,17 @@
     padding: var(--space-3) 0;
 }
 
-.profile-page .profile-stat-item + .profile-stat-item {
+.profile-stat-item + .profile-stat-item {
     border-top: 1px solid var(--border-soft);
 }
 
-.profile-page .profile-stat-item span {
+.profile-stat-item span {
     color: var(--muted);
     font-size: var(--fs-xs);
     font-weight: var(--fw-medium);
 }
 
-.profile-page .profile-stat-item strong {
+.profile-stat-item strong {
     color: var(--text-dark);
     font-size: var(--fs-sm);
     font-weight: var(--fw-bold);
@@ -153,7 +151,7 @@
     overflow-wrap: anywhere;
 }
 
-.profile-page .profile-stat-item:first-child strong {
+.profile-stat-item:first-child strong {
     color: var(--primary);
 }
 
@@ -162,7 +160,7 @@
    DAFTAR MENU
 ============================================================ */
 
-.profile-page .profile-sections {
+.profile-sections {
     min-width: 0;
 
     display: flex;
@@ -170,19 +168,15 @@
     gap: var(--space-6);
 }
 
-.profile-page .profile-card {
+.profile-card {
     overflow: hidden;
-
-    margin: 0;
-    padding: 0;
 
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg);
-    box-shadow: none;
 }
 
-.profile-page .profile-card h2 {
+.profile-card h2 {
     margin: 0;
     padding: var(--space-4) var(--space-5) var(--space-3);
 
@@ -195,34 +189,29 @@
     text-transform: uppercase;
 }
 
-.profile-page .profile-menu-list {
+.profile-menu-list {
     display: flex;
     flex-direction: column;
-    gap: 0;
 }
 
 /* garis tipis antar baris (berlaku juga untuk form logout) */
-.profile-page .profile-menu-list > * + * {
+.profile-menu-list > * + * {
     border-top: 1px solid var(--border-soft);
 }
 
-/* kolom ikon "auto": teks tidak pernah tertimpa walau ikon melebar */
-.profile-page .profile-menu-item {
+.profile-menu-item {
     width: 100%;
     min-height: 68px;
 
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: 40px minmax(0, 1fr) 16px;
     align-items: center;
     gap: var(--space-4);
 
-    margin: 0;
     padding: var(--space-3) var(--space-5);
 
     border: 0;
-    border-radius: 0;
     background: transparent;
-    box-shadow: none;
 
     color: inherit;
     font-family: inherit;
@@ -235,34 +224,26 @@
     transition: background-color .2s ease;
 }
 
-.profile-page .profile-menu-item:hover {
+.profile-menu-item:hover {
     background: var(--bg-soft);
 }
 
-.profile-page .profile-menu-item:focus-visible {
+.profile-menu-item:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: -2px;
 }
 
-.profile-page .menu-icon {
+.menu-icon {
     position: relative;
 
     width: 40px;
     height: 40px;
-    min-width: 0;
-    flex: none;
 
     display: grid;
     place-items: center;
 
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-
-    border: 0;
     border-radius: var(--radius-full);
     background: var(--primary-light);
-    box-shadow: none;
     color: var(--primary);
 
     transition:
@@ -270,23 +251,21 @@
         color .2s ease;
 }
 
-.profile-page .menu-icon svg {
-    display: block;
+.menu-icon svg {
     width: 20px;
     height: 20px;
-    flex-shrink: 0;
 }
 
-.profile-page .profile-menu-item:hover .menu-icon {
+.profile-menu-item:hover .menu-icon {
     background: var(--primary);
     color: var(--bg);
 }
 
-.profile-page .menu-text {
+.menu-text {
     min-width: 0;
 }
 
-.profile-page .menu-text strong {
+.menu-text strong {
     display: block;
     margin-bottom: 2px;
 
@@ -296,7 +275,7 @@
     line-height: 1.3;
 }
 
-.profile-page .menu-text small {
+.menu-text small {
     display: block;
 
     color: var(--muted);
@@ -306,15 +285,13 @@
 }
 
 /* chevron digambar dengan CSS */
-.profile-page .menu-arrow {
+.menu-arrow {
     width: 8px;
     height: 8px;
     justify-self: end;
 
     border-top: 2px solid var(--muted-light);
     border-right: 2px solid var(--muted-light);
-    border-bottom: 0;
-    border-left: 0;
     border-radius: 1px;
 
     transform: rotate(45deg);
@@ -324,42 +301,42 @@
         border-color .2s ease;
 }
 
-.profile-page .profile-menu-item:hover .menu-arrow {
+.profile-menu-item:hover .menu-arrow {
     border-color: var(--primary);
     transform: translateX(2px) rotate(45deg);
 }
 
 /* ---------- Logout ---------- */
 
-.profile-page .logout-form {
+.logout-form {
     margin: 0;
 }
 
-.profile-page .logout-button .menu-icon {
+.logout-button .menu-icon {
     background: var(--danger-light);
     color: var(--danger);
 }
 
-.profile-page .logout-button .menu-text strong {
+.logout-button .menu-text strong {
     color: var(--danger);
 }
 
-.profile-page .logout-button:hover {
+.logout-button:hover {
     background: var(--danger-light);
 }
 
-.profile-page .logout-button:hover .menu-icon {
+.logout-button:hover .menu-icon {
     background: var(--danger);
     color: var(--bg);
 }
 
-.profile-page .logout-button .menu-arrow {
+.logout-button .menu-arrow {
     display: none;
 }
 
 /* ---------- Penanda ---------- */
 
-.profile-page .notif-dot {
+.notif-dot {
     position: absolute;
     top: -1px;
     right: -1px;
@@ -372,7 +349,7 @@
     background: var(--danger);
 }
 
-.profile-page .badge-pending {
+.badge-pending {
     display: inline-block;
 
     margin-left: var(--space-2);
@@ -391,11 +368,9 @@
 
 /* ============================================================
    MODAL: DAFTAR PENGGALANG DANA
-   Diawali #penggalangModal agar tidak mengganggu modal logout
-   (yang memakai class .modal-overlay yang sama).
 ============================================================ */
 
-#penggalangModal.modal-overlay {
+.modal-overlay {
     position: fixed;
     inset: 0;
     z-index: 9999;
@@ -412,11 +387,11 @@
     backdrop-filter: blur(4px);
 }
 
-#penggalangModal.modal-overlay.active {
+.modal-overlay.active {
     display: flex;
 }
 
-#penggalangModal .penggalang-modal {
+.penggalang-modal {
     width: 100%;
     max-width: 420px;
 
@@ -453,7 +428,7 @@
     }
 }
 
-#penggalangModal .modal-icon {
+.modal-icon {
     width: 56px;
     height: 56px;
 
@@ -467,12 +442,12 @@
     color: var(--primary);
 }
 
-#penggalangModal .modal-icon svg {
+.modal-icon svg {
     width: 28px;
     height: 28px;
 }
 
-#penggalangModal .penggalang-modal h2 {
+.penggalang-modal h2 {
     margin: 0;
 
     color: var(--text-dark);
@@ -480,7 +455,7 @@
     font-weight: var(--fw-bold);
 }
 
-#penggalangModal .penggalang-modal p {
+.penggalang-modal p {
     margin: var(--space-2) 0 var(--space-6);
 
     color: var(--muted);
@@ -488,7 +463,7 @@
     line-height: 1.6;
 }
 
-#penggalangModal .modal-buttons {
+.modal-buttons {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -496,7 +471,7 @@
     margin-bottom: var(--space-3);
 }
 
-#penggalangModal .modal-buttons a {
+.modal-buttons a {
     min-height: 48px;
 
     display: flex;
@@ -516,28 +491,28 @@
         color .2s ease;
 }
 
-#penggalangModal .btn-individu {
+.btn-individu {
     background: var(--primary);
     color: var(--bg);
 }
 
-#penggalangModal .btn-individu:hover {
+.btn-individu:hover {
     background: var(--primary-hover);
     color: var(--bg);
 }
 
-#penggalangModal .btn-organisasi {
+.btn-organisasi {
     border: 1px solid var(--primary);
     background: var(--bg);
     color: var(--primary);
 }
 
-#penggalangModal .btn-organisasi:hover {
+.btn-organisasi:hover {
     background: var(--primary-light);
     color: var(--primary);
 }
 
-#penggalangModal .btn-close {
+.btn-close {
     width: 100%;
     padding: var(--space-3);
 
@@ -553,7 +528,7 @@
     transition: color .2s ease;
 }
 
-#penggalangModal .btn-close:hover {
+.btn-close:hover {
     color: var(--text-dark);
 }
 
@@ -564,16 +539,16 @@
 
 @media (min-width: 769px) and (max-width: 900px) {
 
-    .profile-page .profile-container {
+    .profile-container {
         width: min(100% - var(--space-8), 820px);
     }
 
-    .profile-page .profile-layout {
+    .profile-layout {
         grid-template-columns: 260px minmax(0, 1fr);
         gap: var(--space-6);
     }
 
-    .profile-page .profile-summary {
+    .profile-summary {
         padding: var(--space-5);
     }
 }
@@ -591,16 +566,16 @@
         background: var(--bg);
     }
 
-    .profile-page .profile-content {
+    .profile-content {
         /* ruang untuk bottom navigation */
         padding: var(--space-5) 0 calc(var(--space-20) + env(safe-area-inset-bottom, 0px));
     }
 
-    .profile-page .profile-container {
+    .profile-container {
         width: min(100% - var(--space-8), 560px);
     }
 
-    .profile-page .profile-layout {
+    .profile-layout {
         display: flex;
         flex-direction: column;
         gap: var(--space-6);
@@ -608,7 +583,7 @@
 
     /* ----- Profil: polos, tanpa panel ----- */
 
-    .profile-page .profile-summary {
+    .profile-summary {
         position: static;
         padding: 0;
 
@@ -617,13 +592,13 @@
         background: transparent;
     }
 
-    .profile-page .profile-user {
+    .profile-user {
         flex-direction: row;
         gap: var(--space-4);
         text-align: left;
     }
 
-    .profile-page .profile-avatar {
+    .profile-avatar {
         width: 64px;
         height: 64px;
 
@@ -631,28 +606,28 @@
         box-shadow: 0 0 0 3px var(--primary-light);
     }
 
-    .profile-page .profile-avatar-placeholder {
+    .profile-avatar-placeholder {
         font-size: var(--fs-md);
     }
 
-    .profile-page .profile-user-text {
+    .profile-user-text {
         flex: 1;
         width: auto;
     }
 
-    .profile-page .profile-user-text h1 {
+    .profile-user-text h1 {
         overflow: hidden;
         font-size: var(--fs-md);
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .profile-page .profile-user-text p {
+    .profile-user-text p {
         font-size: var(--fs-xs);
     }
 
     /* statistik: dua kolom, dibatasi garis tipis atas & bawah */
-    .profile-page .profile-stats {
+    .profile-stats {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
 
@@ -662,7 +637,7 @@
         border-block: 1px solid var(--border-soft);
     }
 
-    .profile-page .profile-stat-item {
+    .profile-stat-item {
         flex-direction: column-reverse;
         justify-content: center;
         gap: 2px;
@@ -672,27 +647,27 @@
         text-align: center;
     }
 
-    .profile-page .profile-stat-item + .profile-stat-item {
+    .profile-stat-item + .profile-stat-item {
         border-top: 0;
         border-left: 1px solid var(--border-soft);
     }
 
-    .profile-page .profile-stat-item span {
+    .profile-stat-item span {
         font-size: var(--fs-xxs);
     }
 
-    .profile-page .profile-stat-item strong {
+    .profile-stat-item strong {
         font-size: var(--fs-sm);
         text-align: center;
     }
 
     /* ----- Menu: daftar datar ----- */
 
-    .profile-page .profile-sections {
+    .profile-sections {
         gap: var(--space-6);
     }
 
-    .profile-page .profile-card {
+    .profile-card {
         overflow: visible;
 
         border: 0;
@@ -701,23 +676,24 @@
     }
 
     /* label grup */
-    .profile-page .profile-card h2 {
+    .profile-card h2 {
         padding: 0 0 var(--space-2);
         border-bottom: 0;
     }
 
-    .profile-page .profile-menu-list {
+    .profile-menu-list {
         border-block: 1px solid var(--border-soft);
     }
 
-    .profile-page .profile-menu-item {
+    .profile-menu-item {
         min-height: 56px;
+        grid-template-columns: 24px minmax(0, 1fr) 12px;
         gap: var(--space-4);
         padding: var(--space-3) 0;
     }
 
     /* ikon polos tanpa lingkaran */
-    .profile-page .menu-icon {
+    .menu-icon {
         width: 24px;
         height: 24px;
 
@@ -726,47 +702,47 @@
         color: var(--primary);
     }
 
-    .profile-page .menu-icon svg {
+    .menu-icon svg {
         width: 22px;
         height: 22px;
     }
 
-    .profile-page .notif-dot {
+    .notif-dot {
         top: -2px;
         right: -4px;
     }
 
-    .profile-page .logout-button .menu-icon {
+    .logout-button .menu-icon {
         background: transparent;
         color: var(--danger);
     }
 
     /* hover tidak "menempel" di layar sentuh; umpan balik lewat :active */
-    .profile-page .profile-menu-item:hover,
-    .profile-page .logout-button:hover {
+    .profile-menu-item:hover,
+    .logout-button:hover {
         background: transparent;
     }
 
-    .profile-page .profile-menu-item:hover .menu-icon {
+    .profile-menu-item:hover .menu-icon {
         background: transparent;
         color: var(--primary);
     }
 
-    .profile-page .logout-button:hover .menu-icon {
+    .logout-button:hover .menu-icon {
         background: transparent;
         color: var(--danger);
     }
 
-    .profile-page .profile-menu-item:hover .menu-arrow {
+    .profile-menu-item:hover .menu-arrow {
         border-color: var(--muted-light);
         transform: rotate(45deg);
     }
 
-    .profile-page .profile-menu-item:active .menu-text strong {
+    .profile-menu-item:active .menu-text strong {
         color: var(--primary);
     }
 
-    .profile-page .logout-button:active .menu-text strong {
+    .logout-button:active .menu-text strong {
         color: var(--danger);
     }
 }
@@ -778,12 +754,12 @@
 
 @media (max-width: 640px) {
 
-    #penggalangModal.modal-overlay {
+    .modal-overlay {
         align-items: flex-end;
         padding: 0;
     }
 
-    #penggalangModal .penggalang-modal {
+    .penggalang-modal {
         max-width: none;
         padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
 
@@ -800,24 +776,24 @@
 
 @media (max-width: 360px) {
 
-    .profile-page .profile-container {
+    .profile-container {
         width: calc(100% - var(--space-6));
     }
 
-    .profile-page .profile-avatar {
+    .profile-avatar {
         width: 56px;
         height: 56px;
     }
 
-    .profile-page .profile-user {
+    .profile-user {
         gap: var(--space-3);
     }
 
-    .profile-page .profile-user-text h1 {
+    .profile-user-text h1 {
         font-size: var(--fs-sm);
     }
 
-    .profile-page .profile-menu-item {
+    .profile-menu-item {
         gap: var(--space-3);
     }
 }
@@ -829,13 +805,159 @@
 
 @media (prefers-reduced-motion: reduce) {
 
-    #penggalangModal .penggalang-modal {
+    .penggalang-modal {
         animation: none;
     }
 
-    .profile-page .menu-arrow,
-    .profile-page .menu-icon,
-    .profile-page .profile-menu-item {
+    .menu-arrow,
+    .menu-icon,
+    .profile-menu-item {
         transition: none;
+    }
+}
+
+/* ============================================================
+   PATCH FINAL — halaman profil user
+   Taruh PALING BAWAH di profile-user.css.
+   Ini MENGGANTIKAN isi profile-user-icon-fix.css sebelumnya
+   (hapus blok lama itu kalau sudah terlanjur ditempel).
+
+   Bagian 1: ikon tidak menimpa teks (sama seperti patch sebelumnya).
+   Bagian 2: jarak mobile dilonggarkan — margin kiri/kanan simetris,
+             baris menu lebih lega, konten tidak tertutup bottom-nav.
+============================================================ */
+
+
+/* ============================================================
+   1. IKON MENU
+============================================================ */
+
+.profile-page .profile-menu-list .profile-menu-item {
+    grid-template-columns: 40px minmax(0, 1fr) 12px;
+}
+
+.profile-page .profile-menu-list .profile-menu-item > .menu-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 0 !important;
+    max-width: 40px !important;
+    min-height: 0 !important;
+    max-height: 40px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: none !important;
+    border-radius: 50% !important;
+    box-sizing: border-box !important;
+}
+
+.profile-page .menu-icon > :not(svg):not(.notif-dot) {
+    position: static !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.profile-page .menu-icon svg {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
+   2. MOBILE (≤ 768px): ikon polos + jarak lebih lega
+============================================================ */
+
+@media (max-width: 768px) {
+
+    /* ----- Kerangka: margin kiri/kanan sama, 20px ----- */
+
+    .profile-page .profile-content {
+        /* bawah: ruang untuk bottom-nav supaya menu terakhir tidak tertutup */
+        padding: 20px 0 calc(96px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .profile-page .profile-container {
+        width: 100%;
+        max-width: 560px;
+        margin-inline: auto;
+        padding-inline: 20px;
+        box-sizing: border-box;
+    }
+
+    .profile-page .profile-layout {
+        gap: 24px;
+    }
+
+    /* ----- Profil ----- */
+
+    .profile-page .profile-user {
+        gap: 16px;
+    }
+
+    .profile-page .profile-stats {
+        margin-top: 20px;
+        padding: 14px 0;
+    }
+
+    /* ----- Grup menu ----- */
+
+    .profile-page .profile-sections {
+        gap: 28px;
+    }
+
+    .profile-page .profile-card h2 {
+        padding: 0 0 10px;
+    }
+
+    /* ----- Baris menu: lebih lega ----- */
+
+    .profile-page .profile-menu-list .profile-menu-item {
+        grid-template-columns: 24px minmax(0, 1fr) 12px;
+        gap: 16px;
+        min-height: 60px;
+        padding: 14px 0;
+    }
+
+    .profile-page .menu-text strong {
+        margin-bottom: 3px;
+    }
+
+    .profile-page .menu-text small {
+        line-height: 1.45;
+    }
+
+    /* ----- Ikon polos tanpa kotak ----- */
+
+    .profile-page .profile-menu-list .profile-menu-item > .menu-icon {
+        width: 24px !important;
+        height: 24px !important;
+        max-width: 24px !important;
+        max-height: 24px !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .profile-page .menu-icon svg {
+        width: 22px !important;
+        height: 22px !important;
     }
 }

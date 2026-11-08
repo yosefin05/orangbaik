@@ -1175,9 +1175,9 @@ footer {
     }
 
     .campaign-row-image-link {
-        flex: 0 0 92px;
-        width: 92px;
-        aspect-ratio: 1 / 1;
+        flex: center;
+        width: 120px;
+        aspect-ratio: 16 / 9;
         border-radius: var(--radius-sm, 10px);
     }
 
