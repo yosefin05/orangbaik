@@ -27,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         View::composer('layouts.admin', AdminNotificationComposer::class);
+
+            app()->setLocale('id');
+
     }
 }
 

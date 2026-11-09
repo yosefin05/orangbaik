@@ -237,7 +237,7 @@ body {
     font-size: var(--fs-lg);
     font-weight: var(--fw-bold);
     line-height: 1.2;
-    color: var(--muted);
+    color: var(--bg);
     margin-bottom: var(--space-3);
 }
 
