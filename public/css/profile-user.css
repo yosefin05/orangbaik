@@ -1,12 +1,22 @@
-/* ============================================================
+ /* ============================================================
    PROFILE USER
    - Desktop (≥ 769px): dua kolom. Panel profil (sticky) di kiri,
      daftar menu di kanan.
    - Mobile (≤ 768px): satu kolom, minimalis TANPA kartu. Profil
-     polos, statistik dua kolom, lalu daftar menu datar yang
+     rata tengah, statistik dua kolom, lalu daftar menu datar yang
      dipisah garis tipis.
    Memakai token global.css saja.
+
+   Catatan: elemen .profile-container dan .profile-layout adalah
+   ELEMEN YANG SAMA di Blade (class="profile-container profile-layout").
 ============================================================ */
+
+.profile-page,
+.profile-page *,
+.profile-page *::before,
+.profile-page *::after {
+    box-sizing: border-box;
+}
 
 .profile-page {
     min-height: 100vh;
@@ -367,6 +377,57 @@
 
 
 /* ============================================================
+   PENGAMAN IKON MENU
+   Mencegah ikon menimpa teks / melar karena style lain.
+   (!important sengaja dipertahankan: ada aturan lain yang
+   menimpa ukuran ikon.)
+============================================================ */
+
+.profile-page .profile-menu-list .profile-menu-item > .menu-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 0 !important;
+    max-width: 40px !important;
+    min-height: 0 !important;
+    max-height: 40px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: none !important;
+    border-radius: 50% !important;
+}
+
+.profile-page .menu-icon > :not(svg):not(.notif-dot) {
+    position: static !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.profile-page .menu-icon svg {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
    MODAL: DAFTAR PENGGALANG DANA
 ============================================================ */
 
@@ -555,33 +616,51 @@
 
 
 /* ============================================================
-   MOBILE (≤ 768px): minimalis, tanpa kartu
-   Latar putih. Profil polos, statistik dua kolom dengan garis
-   tipis, menu = daftar datar (ikon tanpa lingkaran).
+   MOBILE (≤ 768px): minimalis, tanpa kartu, rata tengah
 ============================================================ */
 
 @media (max-width: 768px) {
 
     .profile-page {
         background: var(--bg);
+        /* jaring pengaman: tidak pernah ada scroll horizontal */
+        overflow-x: clip;
     }
 
     .profile-content {
-        /* ruang untuk bottom navigation */
-        padding: var(--space-5) 0 calc(var(--space-20) + env(safe-area-inset-bottom, 0px));
+        /* ruang bawah untuk bottom navigation */
+        padding: var(--space-5) 0 calc(var(--space-20) + var(--space-4) + env(safe-area-inset-bottom, 0px));
     }
 
+    /* ----- Kerangka -----
+       .profile-container = .profile-layout (elemen yang sama).
+       align-items: stretch membatalkan "start" milik desktop,
+       sehingga kolom melebar penuh dan benar-benar di tengah. */
+
     .profile-container {
-        width: min(100% - var(--space-8), 560px);
+        width: 100%;
+        max-width: 560px;
+        margin-inline: auto;
+        padding-inline: var(--space-5);
     }
 
     .profile-layout {
         display: flex;
         flex-direction: column;
+        align-items: stretch;
         gap: var(--space-6);
     }
 
-    /* ----- Profil: polos, tanpa panel ----- */
+    .profile-summary,
+    .profile-sections,
+    .profile-card,
+    .profile-menu-list {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    /* ----- Profil: polos, rata tengah ----- */
 
     .profile-summary {
         position: static;
@@ -593,37 +672,43 @@
     }
 
     .profile-user {
-        flex-direction: row;
-        gap: var(--space-4);
-        text-align: left;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-3);
+        text-align: center;
     }
 
     .profile-avatar {
-        width: 64px;
-        height: 64px;
+        width: 80px;
+        height: 80px;
 
         border: 0;
         box-shadow: 0 0 0 3px var(--primary-light);
     }
 
     .profile-avatar-placeholder {
-        font-size: var(--fs-md);
+        font-size: var(--fs-lg);
     }
 
     .profile-user-text {
-        flex: 1;
-        width: auto;
+        flex: none;
+        width: 100%;
+        min-width: 0;
+        text-align: center;
     }
 
     .profile-user-text h1 {
         overflow: hidden;
         font-size: var(--fs-md);
+        text-align: center;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     .profile-user-text p {
         font-size: var(--fs-xs);
+        text-align: center;
     }
 
     /* statistik: dua kolom, dibatasi garis tipis atas & bawah */
@@ -664,7 +749,7 @@
     /* ----- Menu: daftar datar ----- */
 
     .profile-sections {
-        gap: var(--space-6);
+        gap: var(--space-8);
     }
 
     .profile-card {
@@ -685,26 +770,44 @@
         border-block: 1px solid var(--border-soft);
     }
 
-    .profile-menu-item {
-        min-height: 56px;
+    .profile-page .profile-menu-list .profile-menu-item {
         grid-template-columns: 24px minmax(0, 1fr) 12px;
         gap: var(--space-4);
-        padding: var(--space-3) 0;
+        min-height: 60px;
+        padding: var(--space-4) 0;
+    }
+
+    .menu-text {
+        overflow-wrap: anywhere;
+    }
+
+    .menu-text strong {
+        margin-bottom: 3px;
+    }
+
+    .menu-text small {
+        line-height: 1.45;
     }
 
     /* ikon polos tanpa lingkaran */
-    .menu-icon {
-        width: 24px;
-        height: 24px;
-
-        border-radius: 0;
-        background: transparent;
+    .profile-page .profile-menu-list .profile-menu-item > .menu-icon {
+        width: 24px !important;
+        height: 24px !important;
+        max-width: 24px !important;
+        max-height: 24px !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
         color: var(--primary);
     }
 
-    .menu-icon svg {
-        width: 22px;
-        height: 22px;
+    .profile-page .menu-icon svg {
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    .profile-page .logout-button .menu-icon {
+        color: var(--danger);
     }
 
     .notif-dot {
@@ -712,25 +815,10 @@
         right: -4px;
     }
 
-    .logout-button .menu-icon {
-        background: transparent;
-        color: var(--danger);
-    }
-
     /* hover tidak "menempel" di layar sentuh; umpan balik lewat :active */
     .profile-menu-item:hover,
     .logout-button:hover {
         background: transparent;
-    }
-
-    .profile-menu-item:hover .menu-icon {
-        background: transparent;
-        color: var(--primary);
-    }
-
-    .logout-button:hover .menu-icon {
-        background: transparent;
-        color: var(--danger);
     }
 
     .profile-menu-item:hover .menu-arrow {
@@ -777,23 +865,19 @@
 @media (max-width: 360px) {
 
     .profile-container {
-        width: calc(100% - var(--space-6));
+        padding-inline: var(--space-4);
     }
 
     .profile-avatar {
-        width: 56px;
-        height: 56px;
-    }
-
-    .profile-user {
-        gap: var(--space-3);
+        width: 72px;
+        height: 72px;
     }
 
     .profile-user-text h1 {
         font-size: var(--fs-sm);
     }
 
-    .profile-menu-item {
+    .profile-page .profile-menu-list .profile-menu-item {
         gap: var(--space-3);
     }
 }
@@ -813,213 +897,5 @@
     .menu-icon,
     .profile-menu-item {
         transition: none;
-    }
-}
-
-/* ============================================================
-   PATCH FINAL — halaman profil user
-   Taruh PALING BAWAH di profile-user.css.
-   Ini MENGGANTIKAN isi profile-user-icon-fix.css sebelumnya
-   (hapus blok lama itu kalau sudah terlanjur ditempel).
-
-   Bagian 1: ikon tidak menimpa teks (sama seperti patch sebelumnya).
-   Bagian 2: jarak mobile dilonggarkan — margin kiri/kanan simetris,
-             baris menu lebih lega, konten tidak tertutup bottom-nav.
-============================================================ */
-
-
-/* ============================================================
-   1. IKON MENU
-============================================================ */
-
-.profile-page .profile-menu-list .profile-menu-item {
-    grid-template-columns: 40px minmax(0, 1fr) 12px;
-}
-
-.profile-page .profile-menu-list .profile-menu-item > .menu-icon {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 0 !important;
-    max-width: 40px !important;
-    min-height: 0 !important;
-    max-height: 40px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    flex: none !important;
-    border-radius: 50% !important;
-    box-sizing: border-box !important;
-}
-
-.profile-page .menu-icon > :not(svg):not(.notif-dot) {
-    position: static !important;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    transform: none !important;
-}
-
-.profile-page .menu-icon svg {
-    display: block !important;
-    width: 20px !important;
-    height: 20px !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    flex-shrink: 0;
-}
-
-
-/* ============================================================
-   2. MOBILE (≤ 768px): ikon polos + jarak lebih lega
-============================================================ */
-
-@media (max-width: 768px) {
-
-    /* ----- Kerangka: margin kiri/kanan sama, 20px ----- */
-
-    .profile-page .profile-content {
-        /* bawah: ruang untuk bottom-nav supaya menu terakhir tidak tertutup */
-        padding: 20px 0 calc(96px + env(safe-area-inset-bottom, 0px));
-    }
-
-    .profile-page .profile-container {
-        width: 100%;
-        max-width: 560px;
-        margin-inline: auto;
-        padding-inline: 20px;
-        box-sizing: border-box;
-    }
-
-    .profile-page .profile-layout {
-        gap: 24px;
-    }
-
-    /* ----- Profil ----- */
-
-    .profile-page .profile-user {
-        gap: 16px;
-    }
-
-    .profile-page .profile-stats {
-        margin-top: 20px;
-        padding: 14px 0;
-    }
-
-    /* ----- Grup menu ----- */
-
-    .profile-page .profile-sections {
-        gap: 28px;
-    }
-
-    .profile-page .profile-card h2 {
-        padding: 0 0 10px;
-    }
-
-    /* ----- Baris menu: lebih lega ----- */
-
-    .profile-page .profile-menu-list .profile-menu-item {
-        grid-template-columns: 24px minmax(0, 1fr) 12px;
-        gap: 16px;
-        min-height: 60px;
-        padding: 14px 0;
-    }
-
-    .profile-page .menu-text strong {
-        margin-bottom: 3px;
-    }
-
-    .profile-page .menu-text small {
-        line-height: 1.45;
-    }
-
-    /* ----- Ikon polos tanpa kotak ----- */
-
-    .profile-page .profile-menu-list .profile-menu-item > .menu-icon {
-        width: 24px !important;
-        height: 24px !important;
-        max-width: 24px !important;
-        max-height: 24px !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .profile-page .menu-icon svg {
-        width: 22px !important;
-        height: 22px !important;
-    }
-}
-
-/* ============================================================
-   PATCH — mobile: konten center & tidak keluar batas
-   Akar masalah: .profile-layout mewarisi align-items:start
-   dari versi desktop (grid), sehingga item flex-column tidak
-   melebar penuh dan ikut ter-dorong oleh teks panjang.
-============================================================ */
-
-.profile-page,
-.profile-page *,
-.profile-page *::before,
-.profile-page *::after {
-    box-sizing: border-box;
-}
-
-@media (max-width: 768px) {
-
-    /* jaring pengaman: jangan pernah ada scroll horizontal */
-    .profile-page {
-        overflow-x: clip;
-    }
-
-    .profile-page .profile-container {
-        width: 100%;
-        max-width: 560px;
-        margin-inline: auto;
-        padding-inline: var(--space-5);
-    }
-
-    /* kunci perbaikan: batalkan align-items:start milik desktop */
-    .profile-page .profile-layout {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .profile-page .profile-summary,
-    .profile-page .profile-sections,
-    .profile-page .profile-card,
-    .profile-page .profile-menu-list {
-        width: 100%;
-        min-width: 0;
-        max-width: 100%;
-    }
-
-    /* email / nama panjang dipotong dengan "...", tidak mendorong lebar */
-    .profile-page .profile-user {
-        width: 100%;
-        min-width: 0;
-    }
-
-    .profile-page .profile-user-text {
-        flex: 1 1 0;
-        min-width: 0;
-    }
-
-    /* teks menu boleh turun baris, tidak melebar */
-    .profile-page .menu-text {
-        min-width: 0;
-        overflow-wrap: anywhere;
     }
 }
