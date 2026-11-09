@@ -19,8 +19,7 @@
         </button>
 
         <div class="payment-topbar-text">
-            <h1 class="payment-topbar-title">Donasi</h1>
-            <p class="payment-topbar-sub">{{ $campaign->judul }}</p>
+            <h1 class="payment-topbar-title">{{ $campaign->judul }}</h1>
         </div>
     </div>
 </header>

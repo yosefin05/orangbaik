@@ -719,9 +719,8 @@
 
 .footer-col h4 {
     margin: 0 0 var(--space-2);
-
     color: var(--bg);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
     line-height: 1.3;
 }
