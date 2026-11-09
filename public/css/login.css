@@ -237,7 +237,7 @@ body {
     font-size: var(--fs-lg);
     font-weight: var(--fw-bold);
     line-height: 1.2;
-    color: var(--muted)
+    color: var(--muted);
     margin-bottom: var(--space-3);
 }
 
@@ -284,17 +284,65 @@ body {
    VERIFY EMAIL & ALERT SPECIFIC STYLES
    ========================================================= */
 
-/* Alert Sukses (Pesan Pengiriman Email) */
+/* ALERT (error & sukses) — minimalis, tanpa kotak */
+.alert-error,
 .alert-success {
-    padding: var(--space-3, 12px) var(--space-4, 16px);
-    background: #ecfdf5;
-    border: 1px solid #10b981;
-    border-radius: var(--radius-md);
-    color: #047857;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
     font-size: var(--fs-xs);
     font-weight: var(--fw-semibold);
-    margin-bottom: var(--space-4);
     line-height: 1.5;
+    margin-bottom: var(--space-4);
+    animation: alertIn 0.3s ease-out;
+}
+
+.alert-error {
+    color: var(--danger, #dc2626);
+}
+
+.alert-success {
+    color: var(--success, #059669);
+}
+
+/* Ikon bulat kecil (outline) */
+.alert-error::before,
+.alert-success::before {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: var(--fw-bold);
+    line-height: 1;
+}
+
+.alert-error::before {
+    content: "!";
+}
+
+.alert-success::before {
+    content: "✓";
+}
+
+@keyframes alertIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Box Teks Tampilan Informasi */
