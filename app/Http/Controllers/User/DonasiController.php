@@ -88,7 +88,10 @@ class DonasiController extends Controller
         // 2. VALIDASI NOMINAL TERHADAP CAMPAIGN MINIMAL
         // ============================================================
         $nominal = (int) $request->nominal;
-        $minimalDonasi = (int) ($campaign->minimal_donasi ?? 1000);
+        $minimalDonasi = max(
+            (int) config('payment.minimum_amount', 1000),
+            (int) ($campaign->minimal_donasi ?? 1000)
+        );
 
         if ($nominal < $minimalDonasi) {
             return response()->json([
@@ -265,9 +268,8 @@ return response()->json(array_merge([
             }
         }
 
-        // Jangan izinkan upload jika sudah settlement
-        if ($pembayaran->transaction_status === 'settlement') {
-            return back()->with('error', 'Pembayaran ini sudah lunas, bukti transfer tidak perlu diunggah.');
+        if (!$pembayaran->isPending()) {
+            return back()->with('error', 'Bukti transfer hanya dapat diunggah untuk pembayaran yang masih pending.');
         }
 
         $request->validate([
@@ -287,6 +289,9 @@ return response()->json(array_merge([
             $this->manualTransferService->saveBuktiTransfer($pembayaran, $request->file('bukti_transfer'));
 
             return back()->with('success', 'Bukti transfer berhasil diunggah. Tim OrangBaik akan memverifikasi dalam 1x24 jam.');
+
+        } catch (\DomainException $e) {
+            return back()->with('error', $e->getMessage());
 
         } catch (\Exception $e) {
             Log::error('Upload bukti transfer gagal', [

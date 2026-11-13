@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Donasi;
 use App\Models\Campaign;
 use App\Models\User;
+use App\Services\ManualTransferService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DonasiController extends Controller
 {
+    public function __construct(protected ManualTransferService $manualTransferService)
+    {
+    }
+
     
     public function index(Request $request)
     {
@@ -157,11 +162,11 @@ class DonasiController extends Controller
             return back()->with('error', 'Data pembayaran tidak ditemukan.');
         }
 
-        $donasi->pembayaran->update([
-            'transaction_status' => 'settlement',
-            'paid_at'            => now(),
-            'rejection_reason'   => null,
-        ]);
+        try {
+            $this->manualTransferService->approve($donasi->pembayaran);
+        } catch (\DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         return back()->with('success', 'Pembayaran manual donasi #' . $donasi->id . ' berhasil diverifikasi (Settlement).');
     }
@@ -181,10 +186,14 @@ class DonasiController extends Controller
             return back()->with('error', 'Data pembayaran tidak ditemukan.');
         }
 
-        $donasi->pembayaran->update([
-            'transaction_status' => 'failed',
-            'rejection_reason'   => $request->rejection_reason ?? 'Bukti transfer tidak valid atau dana belum masuk.',
-        ]);
+        try {
+            $this->manualTransferService->reject(
+                $donasi->pembayaran,
+                $request->rejection_reason ?? 'Bukti transfer tidak valid atau dana belum masuk.'
+            );
+        } catch (\DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         return back()->with('warning', 'Pembayaran manual donasi #' . $donasi->id . ' telah ditolak.');
     }
