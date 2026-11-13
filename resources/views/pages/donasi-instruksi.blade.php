@@ -7,7 +7,7 @@
     <title>Instruksi Pembayaran - OrangBaik.id</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/donasi-instruksi.css') }}?v=9">
+    <link rel="stylesheet" href="{{ asset('css/donasi-instruksi.css') }}?v=13">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
@@ -49,17 +49,14 @@
         $inisialMetode = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr((string) $namaMetode, 0, 3));
     @endphp
 
-    {{-- TOPBAR --}}
-    <header class="pay-header">
-        <div class="pay-header-inner">
-            <button class="pay-back" type="button" onclick="history.back()" aria-label="Kembali">
-                <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
-                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                </svg>
+    {{-- TOPBAR (sama dengan halaman donasi-bayar) --}}
+    <header class="payment-topbar" id="payment-topbar">
+        <div class="payment-topbar-inner">
+            <button class="payment-topbar-back" type="button" onclick="history.back()" aria-label="Kembali">
+                <i class="bi bi-chevron-left"></i>
             </button>
-            <div class="pay-header-text">
-                <span class="pay-header-eyebrow">Instruksi Pembayaran</span>
-                <span class="pay-header-brand">OrangBaik.id</span>
+            <div class="payment-topbar-text">
+                <h1 class="payment-topbar-title">Instruksi Pembayaran</h1>
             </div>
         </div>
     </header>
@@ -81,45 +78,17 @@
                 </div>
             @endif
 
-            {{-- PROGRESS --}}
-            <ol class="pay-stepper pay-stepper--{{ $statusKey }}" aria-label="Progres donasi">
-                <li class="is-done">
-                    <span class="stepper-dot"><i class="bi bi-check-lg"></i></span>
-                    <span class="stepper-label">Donasi dibuat</span>
-                </li>
-                <li class="{{ $statusKey === 'settlement' ? 'is-done' : ($statusKey === 'pending' ? 'is-active' : 'is-error') }}">
-                    <span class="stepper-dot">
-                        @if ($statusKey === 'settlement')
-                            <i class="bi bi-check-lg"></i>
-                        @elseif ($statusKey === 'pending')
-                            2
-                        @else
-                            <i class="bi bi-x-lg"></i>
-                        @endif
-                    </span>
-                    <span class="stepper-label">Pembayaran</span>
-                </li>
-                <li class="{{ $statusKey === 'settlement' ? 'is-done' : '' }}">
-                    <span class="stepper-dot">
-                        @if ($statusKey === 'settlement')
-                            <i class="bi bi-check-lg"></i>
-                        @else
-                            3
-                        @endif
-                    </span>
-                    <span class="stepper-label">Terverifikasi</span>
-                </li>
-            </ol>
-
             <div class="pay-layout">
 
                 {{-- ============ RINGKASAN (hero gradient) ============ --}}
                 <aside class="pay-side">
                     <section class="pay-summary pay-summary--{{ $statusKey }}">
 
-                        <span class="summary-status">
-                            <i class="bi {{ $statusIcon }}"></i> {{ $statusLabel }}
-                        </span>
+                        {{-- Order ID + status pill ala invoice --}}
+                        <div class="summary-top">
+                            <span class="summary-order"><i class="bi bi-receipt"></i> {{ $pembayaran->order_id }}</span>
+                            <span class="summary-pill"><i class="bi {{ $statusIcon }}"></i> {{ $statusLabel }}</span>
+                        </div>
 
                         <span class="summary-label">Total yang perlu dibayar</span>
                         <div class="summary-amount-row">
@@ -136,12 +105,12 @@
                                 <dd>{{ $donasi->campaign->judul ?? 'Campaign' }}</dd>
                             </div>
                             <div>
-                                <dt>Order ID</dt>
-                                <dd><code>{{ $pembayaran->order_id }}</code></dd>
+                                <dt>Metode</dt>
+                                <dd>{{ $namaMetode }}</dd>
                             </div>
                         </dl>
 
-                        {{-- CTA desktop (mobile pakai sticky bar) --}}
+                        {{-- CTA desktop (mobile/tablet pakai bar bawah) --}}
                         @if ($hasSnapPay)
                             <button type="button" id="pay-snap-btn" class="cta-main">
                                 <i class="bi bi-lightning-charge-fill"></i>
@@ -367,6 +336,15 @@
         document.getElementById('copy-nominal-btn')?.addEventListener('click', function() {
             copyToClipboard(this.dataset.copy, this);
         });
+
+        // Bayangan topbar saat halaman di-scroll
+        (function () {
+            const bar = document.getElementById('payment-topbar');
+            if (!bar) return;
+            const onScroll = () => bar.classList.toggle('is-scrolled', window.scrollY > 4);
+            onScroll();
+            window.addEventListener('scroll', onScroll, { passive: true });
+        })();
 
         // Preview nama file yang dipilih di file-drop
         document.getElementById('bukti-input')?.addEventListener('change', function() {

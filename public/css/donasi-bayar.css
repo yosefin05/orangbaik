@@ -36,10 +36,8 @@
     position: sticky;
     top: 0;
     z-index: 100;
-
     border-bottom: 1px solid var(--border-soft);
     background: var(--bg);
-
     transition: box-shadow .25s ease;
 }
 
