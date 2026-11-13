@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Campaign;
 use Illuminate\Foundation\Http\FormRequest;
 
 class DonasiRequest extends FormRequest
 {
+    private ?int $resolvedMinimumDonation = null;
+
     /**
      * Tentukan apakah user diizinkan membuat request ini.
      * Guest donation diizinkan (user_id nullable di donasi).
@@ -42,7 +45,7 @@ class DonasiRequest extends FormRequest
      */
     public function rules(): array
     {
-        $minDonasi = 1000; // fallback minimum; controller bisa override dari campaign
+        $minDonasi = $this->minimumDonation();
 
         return [
             'payment_channel_id' => 'required|integer|exists:payment_channels,id',
@@ -60,13 +63,35 @@ class DonasiRequest extends FormRequest
      */
     public function messages(): array
     {
+        $minimumLabel = 'Rp' . number_format($this->minimumDonation(), 0, ',', '.');
+
         return [
             'payment_channel_id.required' => 'Silakan pilih metode pembayaran.',
             'payment_channel_id.exists'   => 'Metode pembayaran tidak valid.',
             'nominal.required'            => 'Silakan masukkan nominal donasi.',
-            'nominal.min'                 => 'Minimal donasi Rp1.000.',
-            'nominal_lainnya.min'         => 'Minimal donasi Rp1.000.',
+            'nominal.min'                 => 'Minimal donasi ' . $minimumLabel . '.',
+            'nominal_lainnya.min'         => 'Minimal donasi ' . $minimumLabel . '.',
             'no_hp.required'              => 'Nomor telepon wajib diisi.',
         ];
+    }
+
+    private function minimumDonation(): int
+    {
+        if ($this->resolvedMinimumDonation !== null) {
+            return $this->resolvedMinimumDonation;
+        }
+
+        $paymentMinimum = (int) config('payment.minimum_amount', 1000);
+        $campaignSlug = $this->route('slug');
+        $campaignMinimum = 1000;
+
+        if ($campaignSlug) {
+            $campaignMinimum = (int) (Campaign::query()
+                ->where('slug', $campaignSlug)
+                ->orWhere('custom_slug', $campaignSlug)
+                ->value('minimal_donasi') ?? 1000);
+        }
+
+        return $this->resolvedMinimumDonation = max($paymentMinimum, $campaignMinimum);
     }
 }

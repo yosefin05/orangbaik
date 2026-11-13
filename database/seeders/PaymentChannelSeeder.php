@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\PaymentGateway;
 use App\Models\PaymentChannel;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class PaymentChannelSeeder extends Seeder
 {
@@ -20,10 +20,6 @@ class PaymentChannelSeeder extends Seeder
             return;
         }
 
-        Schema::disableForeignKeyConstraints();
-        PaymentChannel::truncate();
-        Schema::enableForeignKeyConstraints();
-
         $channels = [
             // E-Wallet & QRIS (Midtrans)
             [
@@ -34,7 +30,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'instant',
                 'sort_order'         => 1,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $midtrans->id,
@@ -44,7 +40,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'instant',
                 'sort_order'         => 2,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $midtrans->id,
@@ -54,10 +50,10 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'instant',
                 'sort_order'         => 3,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
 
-            // Transfer Manual (Dompet Al Qur'an)
+            // Transfer Manual
             [
                 'payment_gateway_id' => $manual->id,
                 'name'               => 'Bank BCA',
@@ -66,14 +62,14 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => '1234567890',
                 'payment_type'       => 'transfer',
                 'sort_order'         => 4,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $manual->id,
                 'name'               => 'Bank Syariah (BSI)',
                 'channel_code'       => 'BSI - NM',
-                'account_name'       => "Dompet Al Qur'an",
-                'account_number'     => '7123456789',
+                'account_name'       => 'Orang Baik',
+                'account_number'     => '3311131318',
                 'payment_type'       => 'transfer',
                 'sort_order'         => 5,
                 'is_active'          => true,
@@ -86,7 +82,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => '0123456789',
                 'payment_type'       => 'transfer',
                 'sort_order'         => 6,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $manual->id,
@@ -96,7 +92,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => '1370012345678',
                 'payment_type'       => 'transfer',
                 'sort_order'         => 7,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $manual->id,
@@ -106,7 +102,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => '001201234567890',
                 'payment_type'       => 'transfer',
                 'sort_order'         => 8,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $manual->id,
@@ -116,7 +112,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => '7089031234',
                 'payment_type'       => 'transfer',
                 'sort_order'         => 9,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $manual->id,
@@ -126,7 +122,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => '6701001234',
                 'payment_type'       => 'transfer',
                 'sort_order'         => 10,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
 
             // Virtual Account (Flip)
@@ -138,7 +134,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 11,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $flip->id,
@@ -148,7 +144,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 12,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $flip->id,
@@ -158,7 +154,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 13,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $flip->id,
@@ -168,7 +164,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 14,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $flip->id,
@@ -178,7 +174,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 15,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $flip->id,
@@ -188,7 +184,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 16,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $flip->id,
@@ -198,7 +194,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 17,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $flip->id,
@@ -208,7 +204,7 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 18,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
             [
                 'payment_gateway_id' => $flip->id,
@@ -218,14 +214,26 @@ class PaymentChannelSeeder extends Seeder
                 'account_number'     => null,
                 'payment_type'       => 'va',
                 'sort_order'         => 19,
-                'is_active'          => true,
+                'is_active'          => false,
             ],
         ];
 
-        foreach ($channels as $channel) {
-            PaymentChannel::create($channel);
-        }
+        DB::transaction(function () use ($manual, $midtrans, $flip, $channels): void {
+            $manual->update(['is_active' => true]);
+            PaymentChannel::whereIn('payment_gateway_id', [$midtrans->id, $flip->id, $manual->id])
+                ->update(['is_active' => false]);
 
-        $this->command->info('PaymentChannel seeded: 19 channels configured for Midtrans, Flip, & Dompet Al Qur\'an');
+            foreach ($channels as $channel) {
+                PaymentChannel::updateOrCreate(
+                    [
+                        'payment_gateway_id' => $channel['payment_gateway_id'],
+                        'channel_code'       => $channel['channel_code'],
+                    ],
+                    $channel
+                );
+            }
+        });
+
+        $this->command->info('PaymentChannel seeded: BSI manual transfer active for soft launch; Midtrans and Flip channels inactive.');
     }
 }

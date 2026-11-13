@@ -320,11 +320,16 @@ class PaymentChannelTest extends TestCase
 
     public function test_manual_transfer_full_flow(): void
     {
-        Storage::fake('public');
+        Storage::fake('private');
 
-        $manualChannel = PaymentChannel::where('payment_type', 'transfer')->first();
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->first();
         $this->assertNotNull($manualChannel);
-        $this->assertEquals("Dompet Al Qur'an", $manualChannel->account_name);
+        $this->assertTrue($manualChannel->is_active);
+        $this->assertSame('3311131318', $manualChannel->account_number);
+        $this->assertSame('Orang Baik', $manualChannel->account_name);
 
         $donasi = $this->createDonasi();
         $service = new ManualTransferService();
@@ -339,7 +344,7 @@ class PaymentChannelTest extends TestCase
         $file = UploadedFile::fake()->image('bukti_transfer.jpg');
         $path = $service->saveBuktiTransfer($pembayaran, $file);
         $this->assertNotNull($pembayaran->fresh()->bukti_transfer);
-        Storage::disk('public')->assertExists($path);
+        Storage::disk('private')->assertExists($path);
 
         // 3. Admin Approve
         $service->approve($pembayaran);
@@ -371,6 +376,184 @@ class PaymentChannelTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+    }
+
+    public function test_donation_minimum_uses_the_larger_global_or_campaign_amount(): void
+    {
+        Config::set('payment.minimum_amount', 10000);
+
+        $donasi = $this->createDonasi();
+        $campaign = $donasi->campaign;
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $channel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+
+        $basePayload = [
+            'payment_channel_id' => $channel->id,
+            'nama_donatur'       => 'Test User',
+            'no_hp'              => '08123456789',
+        ];
+
+        $this->postJson(route('donasi.store', $campaign->slug), $basePayload + ['nominal' => 5000])
+            ->assertStatus(422);
+
+        $campaign->update(['minimal_donasi' => 15000]);
+
+        $this->postJson(route('donasi.store', $campaign->slug), $basePayload + ['nominal' => 10000])
+            ->assertStatus(422);
+
+        $this->postJson(route('donasi.store', $campaign->slug), $basePayload + ['nominal' => 15000])
+            ->assertOk()
+            ->assertJson(['success' => true, 'type' => 'manual_transfer']);
+    }
+
+    public function test_manual_approval_requires_an_available_transfer_proof(): void
+    {
+        Storage::fake('private');
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+        $pembayaran = (new ManualTransferService())->createTransaction($this->createDonasi(), $manualChannel);
+
+        try {
+            (new ManualTransferService())->approve($pembayaran);
+            $this->fail('Approval without a stored proof must be rejected.');
+        } catch (\DomainException $e) {
+            $this->assertSame('Pembayaran tidak dapat disetujui sebelum bukti transfer tersedia.', $e->getMessage());
+        }
+
+        $this->assertSame('pending', $pembayaran->fresh()->transaction_status);
+    }
+
+    public function test_manual_review_cannot_change_terminal_payment_statuses(): void
+    {
+        Storage::fake('private');
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+        $service = new ManualTransferService();
+
+        foreach (['settlement', 'failed', 'expired', 'expire'] as $status) {
+            $pembayaran = Pembayaran::create([
+                'donasi_id'          => $this->createDonasi()->id,
+                'payment_channel_id' => $manualChannel->id,
+                'order_id'           => 'OB-TERMINAL-' . strtoupper($status),
+                'transaction_status' => $status,
+            ]);
+
+            foreach (['approve', 'reject'] as $action) {
+                try {
+                    $action === 'approve'
+                        ? $service->approve($pembayaran)
+                        : $service->reject($pembayaran, 'Tidak valid');
+                    $this->fail("The {$action} action must reject {$status} payments.");
+                } catch (\DomainException $e) {
+                    $this->assertSame($status, $pembayaran->fresh()->transaction_status);
+                }
+            }
+
+            try {
+                $service->saveBuktiTransfer($pembayaran, UploadedFile::fake()->image('bukti.jpg'));
+                $this->fail("Proof uploads must be rejected for {$status} payments.");
+            } catch (\DomainException $e) {
+                $this->assertSame($status, $pembayaran->fresh()->transaction_status);
+            }
+        }
+
+        $this->assertEmpty(Storage::disk('private')->allFiles());
+    }
+
+    public function test_admin_manual_review_endpoints_apply_proof_and_terminal_guards(): void
+    {
+        Storage::fake('private');
+
+        $admin = User::factory()->create(['role' => 'admin']);
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+        $service = new ManualTransferService();
+
+        $approvedDonation = $this->createDonasi();
+        $approvedPayment = $service->createTransaction($approvedDonation, $manualChannel);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.donasi.approve-manual', $approvedDonation->id))
+            ->assertRedirect()
+            ->assertSessionHas('error');
+        $this->assertSame('pending', $approvedPayment->fresh()->transaction_status);
+
+        $service->saveBuktiTransfer($approvedPayment, UploadedFile::fake()->image('bukti.jpg'));
+        $this->patch(route('admin.donasi.approve-manual', $approvedDonation->id))
+            ->assertRedirect()
+            ->assertSessionHas('success');
+        $this->assertSame('settlement', $approvedPayment->fresh()->transaction_status);
+
+        $rejectedDonation = $this->createDonasi();
+        $rejectedPayment = $service->createTransaction($rejectedDonation, $manualChannel);
+        $this->patch(route('admin.donasi.reject-manual', $rejectedDonation->id), [
+            'rejection_reason' => 'Bukti tidak valid',
+        ])->assertRedirect()->assertSessionHas('warning');
+        $this->assertSame('failed', $rejectedPayment->fresh()->transaction_status);
+
+        $this->patch(route('admin.donasi.approve-manual', $rejectedDonation->id))
+            ->assertRedirect()
+            ->assertSessionHas('error');
+        $this->assertSame('failed', $rejectedPayment->fresh()->transaction_status);
+    }
+
+    public function test_soft_launch_enables_only_the_official_manual_bsi_channel(): void
+    {
+        $manual = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $midtrans = PaymentGateway::where('code', 'midtrans')->firstOrFail();
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+
+        $bsiManual = PaymentChannel::where('payment_gateway_id', $manual->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+
+        $this->assertTrue($bsiManual->is_active);
+        $this->assertSame('3311131318', $bsiManual->account_number);
+        $this->assertSame('Orang Baik', $bsiManual->account_name);
+        $this->assertTrue($manual->is_active);
+        $this->assertTrue($midtrans->is_active);
+        $this->assertTrue($flip->is_active);
+        $this->assertSame(1, PaymentChannel::where('payment_gateway_id', $manual->id)->where('is_active', true)->count());
+        $this->assertSame(0, PaymentChannel::whereIn('payment_gateway_id', [$midtrans->id, $flip->id])->where('is_active', true)->count());
+
+        $channelIds = PaymentChannel::orderBy('id')->pluck('id')->all();
+        $this->seed(\Database\Seeders\PaymentChannelSeeder::class);
+        $this->assertSame($channelIds, PaymentChannel::orderBy('id')->pluck('id')->all());
+    }
+
+    public function test_bsi_instruction_uses_the_manual_channel_record(): void
+    {
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+        $donasi = $this->createDonasi();
+        $donasi->update(['user_id' => null]);
+        $token = (string) \Illuminate\Support\Str::uuid();
+        $pembayaran = Pembayaran::create([
+            'donasi_id'          => $donasi->id,
+            'payment_channel_id' => $manualChannel->id,
+            'payment_token'      => $token,
+            'order_id'           => 'OB-BSI-INSTRUKSI-' . $donasi->id,
+            'payment_type'       => 'transfer',
+            'transaction_status' => 'pending',
+        ]);
+
+        $this->get(route('donasi.bayar.instruksi', [
+            'pembayaran' => $pembayaran->id,
+            'token'      => $token,
+        ]))
+            ->assertOk()
+            ->assertSee('3311131318')
+            ->assertSee('Orang Baik');
     }
 
     public function test_only_settlement_donations_counted_in_campaign_total(): void

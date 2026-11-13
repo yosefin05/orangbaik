@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace Tests\Feature;
 
@@ -37,6 +37,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         parent::setUp();
 
         Storage::fake('public');
+        Storage::fake('private');
 
         Config::set('midtrans.serverKey', 'SB-Mid-server-TESTKEY12345');
         Config::set('midtrans.clientKey', 'SB-Mid-client-TESTKEY12345');
@@ -319,6 +320,44 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
 
         $pembayaran->refresh();
         $this->assertNotNull($pembayaran->bukti_transfer);
+        Storage::disk('private')->assertExists($pembayaran->bukti_transfer);
+    }
+
+    /** @test */
+    public function guest_cannot_upload_transfer_proof_after_payment_is_terminal()
+    {
+        foreach (['settlement', 'failed', 'expired', 'expire'] as $status) {
+            $donasi = Donasi::create([
+                'campaign_id'  => $this->campaign->id,
+                'user_id'      => null,
+                'nama_donatur' => 'Guest Donatur',
+                'no_hp'        => '081299990007',
+                'nominal'      => 75000,
+            ]);
+
+            $pembayaran = Pembayaran::create([
+                'donasi_id'          => $donasi->id,
+                'payment_channel_id' => $this->channelManual->id,
+                'payment_token'      => (string) Str::uuid(),
+                'order_id'           => 'OB-TERMINAL-UPLOAD-' . strtoupper($status),
+                'transaction_status' => $status,
+                'payment_type'       => 'transfer',
+            ]);
+
+            $response = $this->post(route('donasi.bayar.upload_bukti', [
+                'pembayaran' => $pembayaran->id,
+                'token'      => $pembayaran->payment_token,
+            ]), [
+                'bukti_transfer' => UploadedFile::fake()->image('bukti.jpg'),
+                'token'          => $pembayaran->payment_token,
+            ]);
+
+            $response->assertRedirect();
+            $response->assertSessionHas('error');
+            $this->assertNull($pembayaran->fresh()->bukti_transfer);
+        }
+
+        $this->assertEmpty(Storage::disk('private')->allFiles());
     }
 
     /*
