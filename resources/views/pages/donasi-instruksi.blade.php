@@ -7,7 +7,7 @@
     <title>Instruksi Pembayaran - OrangBaik.id</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/donasi-instruksi.css') }}?v=5">
+    <link rel="stylesheet" href="{{ asset('css/donasi-instruksi.css') }}?v=9">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
@@ -80,6 +80,36 @@
                     <span>{{ session('error') }}</span>
                 </div>
             @endif
+
+            {{-- PROGRESS --}}
+            <ol class="pay-stepper pay-stepper--{{ $statusKey }}" aria-label="Progres donasi">
+                <li class="is-done">
+                    <span class="stepper-dot"><i class="bi bi-check-lg"></i></span>
+                    <span class="stepper-label">Donasi dibuat</span>
+                </li>
+                <li class="{{ $statusKey === 'settlement' ? 'is-done' : ($statusKey === 'pending' ? 'is-active' : 'is-error') }}">
+                    <span class="stepper-dot">
+                        @if ($statusKey === 'settlement')
+                            <i class="bi bi-check-lg"></i>
+                        @elseif ($statusKey === 'pending')
+                            2
+                        @else
+                            <i class="bi bi-x-lg"></i>
+                        @endif
+                    </span>
+                    <span class="stepper-label">Pembayaran</span>
+                </li>
+                <li class="{{ $statusKey === 'settlement' ? 'is-done' : '' }}">
+                    <span class="stepper-dot">
+                        @if ($statusKey === 'settlement')
+                            <i class="bi bi-check-lg"></i>
+                        @else
+                            3
+                        @endif
+                    </span>
+                    <span class="stepper-label">Terverifikasi</span>
+                </li>
+            </ol>
 
             <div class="pay-layout">
 

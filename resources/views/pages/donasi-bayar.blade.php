@@ -381,9 +381,17 @@
     </button>
 </div>
 
-<!-- Midtrans Snap -->
-<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
-    data-client-key="{{ config('midtrans.clientKey') }}"></script>
+<!-- Midtrans Snap — hanya dimuat jika gateway Midtrans aktif -->
+@php
+    $hasMidtransChannel = $paymentChannels->contains(fn($ch) => $ch->gateway?->code === 'midtrans');
+    $midtransClientKey  = $hasMidtransChannel ? config('payment.midtrans.client_key', config('midtrans.clientKey', '')) : '';
+    $isMidtransProd     = $hasMidtransChannel && config('payment.midtrans.is_production', false);
+@endphp
+@if ($hasMidtransChannel && !empty($midtransClientKey))
+    <script type="text/javascript"
+        src="{{ $isMidtransProd ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
+        data-client-key="{{ $midtransClientKey }}"></script>
+@endif
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -627,7 +635,7 @@
                     return;
                 }
 
-                if (result.snap_token) {
+                if (result.snap_token && typeof snap !== 'undefined') {
                     snap.pay(result.snap_token, {
                         onSuccess: function () {
                             window.location.href = statusUrl.sukses;
@@ -647,7 +655,9 @@
                         }
                     });
                 } else {
-                    alert('Gagal mendapatkan informasi pembayaran.');
+                    // snap_token hadir tapi snap.js belum dimuat, atau response tidak terduga
+                    console.error('Unexpected payment response:', result);
+                    alert('Terjadi kesalahan dalam memproses pembayaran. Silakan refresh halaman dan coba lagi.');
                     setLoading(false);
                 }
             } catch (error) {
