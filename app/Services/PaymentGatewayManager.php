@@ -56,12 +56,25 @@ class PaymentGatewayManager
             return call_user_func($this->customCreators[$code], $gatewayModel);
         }
 
-        return match ($code) {
-            'midtrans' => app(MidtransDriver::class),
-            'flip'     => app(FlipDriver::class),
-            'manual'   => app(ManualTransferDriver::class),
-            default    => app(GenericApiDriver::class),
-        };
+        if ($code === 'midtrans') {
+            return app(MidtransDriver::class);
+        }
+
+        if ($code === 'flip') {
+            return app(FlipDriver::class);
+        }
+
+        if ($code === 'manual') {
+            return app(ManualTransferDriver::class);
+        }
+
+        if ($gatewayModel && !in_array($gatewayModel->driver, [null, '', 'generic'], true)) {
+            throw new InvalidArgumentException(
+                "Driver payment gateway '{$gatewayModel->driver}' belum terdaftar untuk gateway '{$code}'."
+            );
+        }
+
+        return app(GenericApiDriver::class);
     }
 
     /**

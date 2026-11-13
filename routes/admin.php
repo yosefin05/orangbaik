@@ -115,6 +115,8 @@ Route::middleware(['auth', 'admin'])
                 ->name('gateway.destroy');
             Route::patch('/gateway/{gateway}/toggle', [PaymentGatewayController::class, 'toggleActive'])
                 ->name('gateway.toggle');
+            Route::post('/gateway/{gateway}/verify', [PaymentGatewayController::class, 'verifyConnectivity'])
+                ->name('gateway.verify');
 
             // Payment Channel (CRUD + sort + toggle + batch)
             Route::post('/channel/batch', [PaymentChannelController::class, 'batchUpdate'])

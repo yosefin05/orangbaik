@@ -144,6 +144,15 @@
                     @enderror
                 </div>
 
+                <div class="form-group form-group--full">
+                    <label for="instructions" class="form-label">Instruksi Pembayaran</label>
+                    <textarea id="instructions" name="instructions" class="form-control" rows="4"
+                        maxlength="5000" placeholder="Instruksi khusus yang akan ditampilkan kepada donatur">{{ old('instructions') }}</textarea>
+                    @error('instructions')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 {{-- Sort Order --}}
                 <div class="form-group">
                     <label for="sort_order" class="form-label">Urutan Tampilan</label>
@@ -166,6 +175,7 @@
                     <label class="form-label">Status</label>
                     <div class="toggle-field">
                         <label class="toggle-switch">
+                            <input type="hidden" name="is_active" value="0">
                             <input
                                 type="checkbox"
                                 id="is_active"

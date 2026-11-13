@@ -106,7 +106,7 @@
                             <select name="channels[{{ $index }}][payment_gateway_id]" class="form-input custom-select">
                                 @foreach ($gateways as $gateway)
                                     <option value="{{ $gateway->id }}" {{ $channel->payment_gateway_id == $gateway->id ? 'selected' : '' }}>
-                                        {{ $gateway->code === 'manual' ? ($channel->account_name ?: "Dompet Al Qur'an") : $gateway->name }}
+                                        {{ $gateway->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -133,6 +133,32 @@
                             <button type="button" class="btn-row-delete" title="Hapus channel">
                                 <span>&minus;</span>
                             </button>
+                        </div>
+
+                        <div class="field-wrap field-account-name">
+                            <input type="text" name="channels[{{ $index }}][account_name]"
+                                value="{{ $channel->account_name }}" class="form-input"
+                                placeholder="Nama pemilik rekening (mis. Orang Baik)" aria-label="Nama pemilik rekening">
+                        </div>
+
+                        <div class="field-wrap field-account-number">
+                            <input type="text" name="channels[{{ $index }}][account_number]"
+                                value="{{ $channel->account_number }}" class="form-input"
+                                placeholder="Nomor rekening (BSI: 3311131318)" aria-label="Nomor rekening">
+                        </div>
+
+                        <div class="field-wrap field-instructions">
+                            <textarea name="channels[{{ $index }}][instructions]" class="form-input"
+                                placeholder="Instruksi pembayaran khusus" aria-label="Instruksi pembayaran khusus">{{ $channel->instructions }}</textarea>
+                        </div>
+
+                        <div class="field-wrap field-active">
+                            <input type="hidden" name="channels[{{ $index }}][is_active]" value="0">
+                            <label>
+                                <input type="checkbox" name="channels[{{ $index }}][is_active]" value="1"
+                                    {{ $channel->is_active ? 'checked' : '' }}>
+                                Aktif
+                            </label>
                         </div>
                     </div>
                 @empty
@@ -225,12 +251,17 @@
     }
 
     .channel-row-item {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) 32px 38px;
         align-items: center;
         gap: 0.625rem;
         background: #ffffff;
         padding: 0.25rem 0;
         transition: background 0.15s ease;
+    }
+    @media (max-width: 860px) {
+        .channel-row-item { grid-template-columns: repeat(2, minmax(0, 1fr)) 32px 38px; }
+        .field-instructions { grid-column: span 2; }
     }
     .channel-row-item.dragging {
         opacity: 0.45;
@@ -241,7 +272,7 @@
     }
 
     .field-wrap {
-        flex: 1;
+        min-width: 0;
     }
     .field-name {
         flex: 1.25;
@@ -256,8 +287,20 @@
         min-width: 130px;
     }
     .field-type {
-        flex: 0.9;
-        min-width: 95px;
+        min-width: 0;
+    }
+    .field-instructions {
+        grid-column: span 2;
+    }
+    .field-instructions textarea {
+        height: auto;
+        min-height: 54px;
+        resize: vertical;
+    }
+    .field-active {
+        justify-self: center;
+        white-space: nowrap;
+        font-size: 0.8125rem;
     }
 
     .form-input {
@@ -455,6 +498,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 </select>
             </div>
 
+                <div class="field-wrap field-account-name">
+                    <input type="text" name="channels[${nextIndex}][account_name]" value="" class="form-input"
+                        placeholder="Nama pemilik rekening (mis. Orang Baik)" aria-label="Nama pemilik rekening">
+                </div>
+
+                <div class="field-wrap field-account-number">
+                    <input type="text" name="channels[${nextIndex}][account_number]" value="" class="form-input"
+                        placeholder="Nomor rekening (BSI: 3311131318)" aria-label="Nomor rekening">
+                </div>
+
+                <div class="field-wrap field-instructions">
+                    <textarea name="channels[${nextIndex}][instructions]" class="form-input"
+                        placeholder="Instruksi pembayaran khusus" aria-label="Instruksi pembayaran khusus"></textarea>
+                </div>
+
+                <div class="field-wrap field-active">
+                    <input type="hidden" name="channels[${nextIndex}][is_active]" value="0">
+                    <label>
+                        <input type="checkbox" name="channels[${nextIndex}][is_active]" value="1" checked>
+                        Aktif
+                    </label>
+                </div>
+
             <div class="drag-handle-wrap" title="Drag untuk mengubah urutan">
                 <svg viewBox="0 0 24 24" class="drag-icon" width="22" height="22">
                     <path fill="#5b9bd5" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/>
@@ -538,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // 3. Re-index nama array inputs
     function reindexRows() {
         channelList.querySelectorAll('.channel-row-item').forEach((row, idx) => {
-            row.querySelectorAll('input, select').forEach(input => {
+            row.querySelectorAll('input, select, textarea').forEach(input => {
                 if (input.name) {
                     input.name = input.name.replace(/channels\[\d+\]/, `channels[${idx}]`);
                 }

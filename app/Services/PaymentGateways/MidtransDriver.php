@@ -21,6 +21,7 @@ class MidtransDriver implements PaymentDriverInterface
     public function setGateway(PaymentGateway $gateway): self
     {
         $this->gateway = $gateway;
+        $this->service->useGateway($gateway);
         return $this;
     }
 

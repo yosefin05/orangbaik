@@ -54,6 +54,8 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::prefix('payment')->group(function () {
     // Dynamic universal webhook endpoint for any gateway
     Route::post('/webhook', [PaymentWebhookController::class, 'handle']);
+    Route::post('/{gateway}/webhook', [PaymentWebhookController::class, 'handle'])
+        ->name('payment.gateway.webhook');
 
     // Dedicated / legacy aliases
     Route::post('/midtrans/webhook', [MidtransController::class, 'notification'])->name('payment.midtrans.webhook');

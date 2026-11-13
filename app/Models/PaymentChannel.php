@@ -55,6 +55,29 @@ class PaymentChannel extends Model
         return $this->pembayarans()->exists();
     }
 
+    public function isAvailable(): bool
+    {
+        $gateway = $this->gateway;
+
+        if (!$this->is_active || !$gateway || !$gateway->is_active) {
+            return false;
+        }
+
+        if ($gateway->code === 'manual') {
+            return $this->payment_type === 'transfer'
+                && filled($this->name)
+                && filled($this->account_name)
+                && filled($this->account_number);
+        }
+
+        return $gateway->isOperationallyVerified();
+    }
+
+    public function getInstructionsAttribute(): ?string
+    {
+        return $this->gateway?->channelInstructions($this);
+    }
+
     /**
      * Label tipe pembayaran untuk tampilan.
      */

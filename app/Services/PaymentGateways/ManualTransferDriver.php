@@ -31,10 +31,19 @@ class ManualTransferDriver implements PaymentDriverInterface
 
     public function createTransaction(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
     {
-        // Update data pembayaran untuk transfer manual
+        $paymentDetails = [
+            'name'           => $channel->name,
+            'account_name'   => $channel->account_name,
+            'account_number' => $channel->account_number,
+            'instructions'   => $channel->instructions,
+        ];
+
         $pembayaran->update([
             'payment_type'       => 'transfer',
             'transaction_status' => 'pending',
+            'gateway_response'   => array_merge($pembayaran->gateway_response ?? [], [
+                'payment_method' => $paymentDetails,
+            ]),
         ]);
 
         return [

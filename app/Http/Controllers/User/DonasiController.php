@@ -50,10 +50,14 @@ class DonasiController extends Controller
             ->filter(fn($d) => $d->pembayaran && $d->pembayaran->transaction_status === 'settlement')
             ->count();
 
-        // Ambil payment channel aktif, urutkan berdasarkan sort_order, load gateway
+        // Jangan tampilkan channel yang terhubung ke gateway nonaktif atau belum terkonfigurasi.
         $paymentChannels = PaymentChannel::with('gateway')
             ->active()
+            ->whereHas('gateway', fn ($query) => $query->where('is_active', true))
             ->get();
+        $paymentChannels = $paymentChannels
+            ->filter(fn (PaymentChannel $channel) => $channel->isAvailable())
+            ->values();
 
         return view('pages.donasi-bayar', compact(
             'campaign',
@@ -108,7 +112,7 @@ class DonasiController extends Controller
         $channelId = $request->payment_channel_id;
         $channel = PaymentChannel::with('gateway')->findOrFail($channelId);
 
-        if (!$channel->is_active || !$channel->gateway?->is_active) {
+        if (!$channel->isAvailable()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Metode pembayaran yang dipilih sedang tidak tersedia.',
@@ -181,9 +185,7 @@ return response()->json(array_merge([
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Donasi store error', [
-                'message'    => $e->getMessage(),
-                'channel_id' => $channelId,
-                'campaign'   => $campaign->id,
+                'exception_type' => get_class($e),
             ]);
             return response()->json([
                 'success' => false,
@@ -229,7 +231,17 @@ return response()->json(array_merge([
             }
         }
 
-        return view('pages.donasi-instruksi', compact('pembayaran', 'donasi'));
+        $midtransClientKey = $pembayaran->paymentChannel?->gateway?->code === 'midtrans'
+            ? $pembayaran->paymentChannel->gateway->getConfigValue('client_key', '')
+            : '';
+        $midtransIsProduction = (bool) ($pembayaran->paymentChannel?->gateway?->getConfigValue('is_production', false));
+
+        return view('pages.donasi-instruksi', compact(
+            'pembayaran',
+            'donasi',
+            'midtransClientKey',
+            'midtransIsProduction'
+        ));
     }
 
     /**
@@ -295,8 +307,7 @@ return response()->json(array_merge([
 
         } catch (\Exception $e) {
             Log::error('Upload bukti transfer gagal', [
-                'pembayaran_id' => $pembayaran->id,
-                'error'         => $e->getMessage(),
+                'exception_type' => get_class($e),
             ]);
 
             return back()->with('error', 'Gagal mengunggah bukti transfer. Silakan coba lagi.');

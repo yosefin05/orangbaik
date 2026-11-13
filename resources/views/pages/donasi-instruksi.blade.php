@@ -12,6 +12,18 @@
 </head>
 
 <body>
+    @php
+        $paymentMethod = $pembayaran->gateway_response['payment_method'] ?? [];
+        $channel = $pembayaran->paymentChannel;
+        $accountNumber = $pembayaran->gateway_response['account_number'] ?? null;
+        $accountNumber = filled($accountNumber) ? $accountNumber : ($paymentMethod['account_number'] ?? null);
+        $accountNumber = filled($accountNumber) ? $accountNumber : $channel?->account_number;
+        $accountName = $pembayaran->gateway_response['account_name'] ?? null;
+        $accountName = filled($accountName) ? $accountName : ($paymentMethod['account_name'] ?? null);
+        $accountName = filled($accountName) ? $accountName : $channel?->account_name;
+        $accountNumber = filled($accountNumber) ? $accountNumber : null;
+        $accountName = filled($accountName) ? $accountName : 'OrangBaik';
+    @endphp
 
     {{-- HERO BANNER --}}
     <div class="instruksi-hero">
@@ -103,9 +115,9 @@
                         <div class="detail-row">
                             <span class="detail-label">Metode Pembayaran</span>
                             <span class="detail-val">
-                                {{ $pembayaran->paymentChannel->name ?? $pembayaran->payment_type }}
-                                @if ($pembayaran->paymentChannel?->gateway)
-                                    <small class="detail-sub">({{ $pembayaran->paymentChannel->gateway->name }})</small>
+                                {{ $paymentMethod['name'] ?? $channel->name ?? $pembayaran->payment_type }}
+                                @if ($channel?->gateway)
+                                    <small class="detail-sub">({{ $channel->gateway->name }})</small>
                                 @endif
                             </span>
                         </div>
@@ -115,9 +127,9 @@
                             </span>
                             <span class="detail-val">
                                 <span id="rekening-val" class="detail-mono">
-                                    {{ $pembayaran->paymentChannel->account_number ?? $pembayaran->gateway_response['account_number'] ?? '-' }}
+                                    {{ $accountNumber ?? 'Nomor rekening belum dikonfigurasi. Silakan hubungi admin.' }}
                                 </span>
-                                @if ($pembayaran->paymentChannel?->account_number || isset($pembayaran->gateway_response['account_number']))
+                                @if ($accountNumber)
                                     <button class="copy-chip" type="button" id="copy-rekening-btn" onclick="copyRekening()">
                                         <i class="bi bi-clipboard"></i> <span>Salin</span>
                                     </button>
@@ -126,13 +138,16 @@
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">Atas Nama</span>
-                            <span class="detail-val">{{ $pembayaran->paymentChannel->account_name ?? 'OrangBaik' }}</span>
+                            <span class="detail-val">{{ $accountName }}</span>
                         </div>
                     </div>
 
                     {{-- LANGKAH PEMBAYARAN --}}
                     <div class="steps-section">
                         <h2 class="section-title"><i class="bi bi-list-check"></i> Cara Menyelesaikan Pembayaran</h2>
+                        @if (!empty($paymentMethod['instructions']))
+                            <div class="payment-channel-instructions">{!! nl2br(e($paymentMethod['instructions'])) !!}</div>
+                        @endif
                         <ol class="steps-timeline">
                             @if ($pembayaran->payment_type === 'va')
                                 <li>Buka aplikasi Mobile Banking / Internet Banking / ATM bank Anda.</li>
@@ -236,12 +251,8 @@
     @endif
 
     @if ($hasSnapPay)
-        @php
-            $isMidtransProd = config('payment.midtrans.is_production', config('midtrans.isProduction', false));
-            $midtransClientKey = config('payment.midtrans.client_key', config('midtrans.clientKey', ''));
-        @endphp
         @if (!empty($midtransClientKey))
-            <script src="{{ $isMidtransProd ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
+            <script src="{{ $midtransIsProduction ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
                 data-client-key="{{ $midtransClientKey }}"></script>
             <script>
                 function payWithSnap() {

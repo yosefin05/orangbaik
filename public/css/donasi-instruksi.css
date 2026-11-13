@@ -289,6 +289,16 @@ body {
 }
 .section-title i { color: var(--primary, #3365ae); }
 
+.payment-channel-instructions {
+    margin-bottom: var(--space-4, 18px);
+    padding: var(--space-3, 14px) var(--space-4, 18px);
+    border: 1px solid var(--border-soft, #e8eef7);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--bg-soft, #f7faff);
+    color: var(--text-dark, #111827);
+    line-height: 1.6;
+}
+
 .steps-timeline { list-style: none; counter-reset: step; margin: 0; padding: 0; position: relative; }
 
 .steps-timeline li {

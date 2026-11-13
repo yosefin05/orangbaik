@@ -7,15 +7,44 @@ use Midtrans\Snap;
 use App\Models\Donasi;
 use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
+use App\Models\PaymentGateway;
+use App\Services\PaymentWebhookProcessor;
+use App\Support\PaymentAmount;
 use Illuminate\Support\Facades\Log;
 
 class MidtransService
 {
+    protected ?string $serverKey = null;
+    protected ?string $clientKey = null;
+
     public function __construct()
     {
-        Config::$serverKey    = config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
-        Config::$clientKey    = config('midtrans.clientKey') ?: config('payment.midtrans.client_key');
-        Config::$isProduction = config('midtrans.isProduction') ?? config('payment.midtrans.is_production', false);
+        $this->serverKey = config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
+        $this->clientKey = config('midtrans.clientKey') ?: config('payment.midtrans.client_key');
+        $this->applySdkConfig();
+    }
+
+    public function useGateway(PaymentGateway $gateway): void
+    {
+        $this->serverKey = $gateway->getConfigValue(
+            'server_key',
+            config('midtrans.serverKey') ?: config('payment.midtrans.server_key')
+        );
+        $this->clientKey = $gateway->getConfigValue(
+            'client_key',
+            config('midtrans.clientKey') ?: config('payment.midtrans.client_key')
+        );
+        $this->applySdkConfig((bool) $gateway->getConfigValue(
+            'is_production',
+            config('midtrans.isProduction') ?? config('payment.midtrans.is_production', false)
+        ));
+    }
+
+    private function applySdkConfig(?bool $isProduction = null): void
+    {
+        Config::$serverKey    = $this->serverKey;
+        Config::$clientKey    = $this->clientKey;
+        Config::$isProduction = $isProduction ?? config('midtrans.isProduction') ?? config('payment.midtrans.is_production', false);
         Config::$isSanitized  = config('midtrans.isSanitized') ?? config('payment.midtrans.is_sanitized', true);
         Config::$is3ds        = config('midtrans.is3ds') ?? config('payment.midtrans.is_3ds', true);
     }
@@ -62,9 +91,7 @@ class MidtransService
             return $snapToken;
         } catch (\Exception $e) {
             Log::error('Midtrans Snap Error', [
-                'message'  => $e->getMessage(),
-                'order_id' => $pembayaran->order_id,
-                'donasi_id' => $donasi->id,
+                'exception_type' => get_class($e),
             ]);
             throw new \Exception('Gagal membuat transaksi. Silakan coba lagi.');
         }
@@ -75,7 +102,7 @@ class MidtransService
      */
     public function isConfigured(): bool
     {
-        return !empty(config('midtrans.serverKey')) || !empty(config('payment.midtrans.server_key'));
+        return filled($this->serverKey) && filled($this->clientKey);
     }
 
     /**
@@ -90,17 +117,27 @@ class MidtransService
         $signatureKey  = $payload['signature_key'] ?? null;
 
         // Pastikan data penting tersedia
-        if (!$orderId || !$statusCode || !$grossAmount || !$signatureKey) {
-            Log::warning('Midtrans webhook: data tidak lengkap', ['payload' => $payload]);
+        if (
+            !is_string($orderId) || $orderId === '' ||
+            !is_string($statusCode) || $statusCode === '' ||
+            !is_string($grossAmount) || $grossAmount === '' ||
+            !is_string($signatureKey) || $signatureKey === ''
+        ) {
+            Log::warning('Midtrans webhook: data tidak lengkap');
             return false;
         }
 
-        /*
-         * =====================================================
-         * 1. VERIFIKASI SIGNATURE MIDTRANS (FAIL-CLOSED)
-         * =====================================================
-         */
-        $serverKey = config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
+        $pembayaran = Pembayaran::with('paymentChannel.gateway')
+            ->where('order_id', $orderId)
+            ->first();
+
+        if (!$pembayaran || $pembayaran->paymentChannel?->gateway?->code !== 'midtrans') {
+            Log::warning('Midtrans webhook: pembayaran tidak ditemukan', ['order_id' => $orderId]);
+            return false;
+        }
+
+        $gateway = $pembayaran->paymentChannel?->gateway;
+        $serverKey = $gateway->getConfigValue('server_key', $this->serverKey);
         if (empty($serverKey)) {
             Log::critical('Midtrans webhook ditolak: MIDTRANS_SERVER_KEY belum dikonfigurasi (fail-closed).');
             return false;
@@ -113,100 +150,49 @@ class MidtransService
             return false;
         }
 
-        /*
-         * =====================================================
-         * 2. CARI DATA PEMBAYARAN
-         * =====================================================
-         */
-        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
-            ->where('order_id', $orderId)
-            ->first();
+        $pembayaran->load('donasi');
 
-        if (!$pembayaran) {
-            Log::warning('Midtrans webhook: pembayaran tidak ditemukan', ['order_id' => $orderId]);
+        $rawStatus   = $payload['transaction_status'] ?? null;
+        $fraudStatus = $payload['fraud_status'] ?? null;
+        $internalStatus = match (strtolower((string) $rawStatus)) {
+            'capture' => match (strtolower((string) $fraudStatus)) {
+                'accept' => 'settlement',
+                'deny' => 'failed',
+                default => 'pending',
+            },
+            'settlement' => 'settlement',
+            'pending' => 'pending',
+            'deny', 'cancel', 'failure' => 'failed',
+            'expire', 'expired' => 'expired',
+            default => null,
+        };
+        if ($internalStatus === null) {
             return false;
         }
 
-        /*
-         * =====================================================
-         * 3. CEGAH ROLLBACK — STATUS SETTLEMENT TIDAK BOLEH MUNDUR
-         * =====================================================
-         */
-        if ($pembayaran->transaction_status === 'settlement') {
-            Log::info('Midtrans webhook: transaksi sudah settlement (idempotent skip)', ['order_id' => $orderId]);
-            return true;
+        $actualAmount = PaymentAmount::parseIdr($grossAmount);
+        $expectedAmount = PaymentAmount::parseIdr($pembayaran->donasi?->nominal);
+        if ($actualAmount === null || $expectedAmount === null || $actualAmount !== $expectedAmount) {
+            Log::warning('Midtrans webhook rejected: amount mismatch.', ['order_id' => $orderId]);
+            return false;
         }
 
-        /*
-         * =====================================================
-         * 4. AMBIL DATA TRANSAKSI DARI PAYLOAD & MAP KE STATUS INTERNAL
-         * =====================================================
-         */
-        $rawStatus   = $payload['transaction_status'] ?? null;
-        $fraudStatus = $payload['fraud_status'] ?? null;
-        $paymentType = $payload['payment_type'] ?? null;
-        $transactionId = $payload['transaction_id'] ?? null;
-
-        // Map status Midtrans ke 4 status internal: pending, settlement, failed, expired
-        $internalStatus = match ($rawStatus) {
-            'capture' => ($fraudStatus === 'accept' ? 'settlement' : 'pending'),
-            'settlement' => 'settlement',
-            'pending'    => 'pending',
-            'deny', 'cancel' => 'failed',
-            'expire'     => 'expired',
-            default      => $rawStatus ?? 'pending',
-        };
-
-        /*
-         * =====================================================
-         * 4.5. VALIDASI INTEGRITAS AMOUNT
-         * =====================================================
-         */
-        if ($internalStatus === 'settlement') {
-            $expectedNominal = (int) ($pembayaran->donasi?->nominal ?? 0);
-            $actualGrossAmount = (int) round((float) $grossAmount);
-
-            if ($expectedNominal <= 0 || $actualGrossAmount !== $expectedNominal) {
-                Log::error('Midtrans webhook: nominal tidak sesuai (Amount Integrity Mismatch)', [
-                    'order_id'        => $orderId,
-                    'expected_amount' => $expectedNominal,
-                    'actual_amount'   => $actualGrossAmount,
-                ]);
-                return false;
-            }
+        $attributes = [];
+        if (isset($payload['payment_type'])) {
+            $attributes['payment_type'] = $payload['payment_type'];
+        }
+        if (isset($payload['transaction_id'])) {
+            $attributes['transaction_id'] = (string) $payload['transaction_id'];
         }
 
-        /*
-         * =====================================================
-         * 5. UPDATE PEMBAYARAN
-         * =====================================================
-         */
-        $updateData = [
-            'payment_type'       => $paymentType,
-            'transaction_id'     => $transactionId,
-            'transaction_status' => $internalStatus,
-            'gateway_response'   => $payload, // simpan raw response untuk audit
-        ];
-
-        if ($internalStatus === 'settlement') {
-            $updateData['paid_at'] = now();
-        }
-
-        $pembayaran->update($updateData);
-
-        /*
-         * =====================================================
-         * 6. LOG
-         * =====================================================
-         */
-        Log::info('Midtrans webhook berhasil diproses', [
-            'order_id'           => $orderId,
-            'raw_status'         => $rawStatus,
-            'internal_status'    => $internalStatus,
-            'payment_type'       => $paymentType,
-            'transaction_id'     => $transactionId,
-        ]);
-
-        return true;
+        return app(PaymentWebhookProcessor::class)->process(
+            $pembayaran->id,
+            'midtrans',
+            $internalStatus,
+            $payload,
+            fn (Pembayaran $lockedPayment): bool =>
+                $actualAmount === PaymentAmount::parseIdr($lockedPayment->donasi?->nominal),
+            $attributes
+        );
     }
 }

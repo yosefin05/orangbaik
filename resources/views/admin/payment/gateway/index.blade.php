@@ -34,6 +34,13 @@
         </div>
     @endif
 
+    @unless ($appKeyAvailable)
+        <div class="alert alert-danger" role="alert">
+            Enkripsi kredensial gateway tidak tersedia karena APP_KEY runtime kosong atau tidak valid.
+            Jangan masukkan kredensial sebelum konfigurasi aplikasi dipulihkan.
+        </div>
+    @endunless
+
     @if (session('warning'))
         <div class="alert alert-warning">
             <i class="bi bi-exclamation-triangle-fill"></i>
@@ -69,6 +76,9 @@
                 $isConfigured = $gateway->isConfigured();
             @endphp
             <div class="gateway-card {{ $gateway->is_active ? '' : 'gateway-card--inactive' }}">
+                @php
+                    $adminConfig = $gatewayAdminData[$gateway->id]['config'];
+                @endphp
 
                 <div class="gateway-card__header">
                     <div class="gateway-icon">
@@ -102,13 +112,21 @@
                     <div class="gateway-config-note">
                         @if ($gateway->code === 'manual')
                             <i class="bi bi-info-circle text-blue"></i>
-                            <small class="text-blue fw-semibold">Transfer Manual Yayasan</small>
-                        @elseif ($isConfigured)
+                            <small class="text-blue fw-semibold">
+                                {{ $isConfigured ? 'Transfer manual siap jika gateway aktif' : 'Lengkapi detail transfer pada menu Channel' }}
+                            </small>
+                        @elseif (!$appKeyAvailable)
+                            <i class="bi bi-exclamation-circle text-danger"></i>
+                            <small class="text-danger fw-semibold">APP_KEY runtime tidak tersedia</small>
+                        @elseif ($adminConfig['is_verified'])
                             <i class="bi bi-shield-check text-success"></i>
-                            <small class="text-success fw-semibold">API Key Terkonfigurasi & Siap</small>
+                            <small class="text-success fw-semibold">Terverifikasi {{ $adminConfig['verified_at'] }}</small>
+                        @elseif ($adminConfig['is_configured'])
+                            <i class="bi bi-exclamation-circle text-warning"></i>
+                            <small class="text-warning fw-semibold">{{ $adminConfig['verification_reason'] }}</small>
                         @else
                             <i class="bi bi-exclamation-circle text-warning"></i>
-                            <small class="text-warning fw-semibold">API Key Belum Diisi</small>
+                            <small class="text-warning fw-semibold">{{ $adminConfig['verification_reason'] }}</small>
                         @endif
                     </div>
 
@@ -119,9 +137,18 @@
 
                 <div class="gateway-card__footer">
                     @if ($gateway->code !== 'manual')
+                        <form action="{{ route('admin.payment.gateway.verify', $gateway) }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="btn btn-outline-success btn-sm"
+                                {{ !$appKeyAvailable || !$adminConfig['is_configured'] ? 'disabled' : '' }}>
+                                <i class="bi bi-wifi"></i> Uji konektivitas
+                            </button>
+                        </form>
                         <button type="button" 
                             class="btn btn-outline-primary btn-sm"
-                            onclick='openEditConfigModal(@json($gateway))'
+                            data-gateway="{{ json_encode($gatewayAdminData[$gateway->id], JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG) }}"
+                            onclick="openEditConfigModal(JSON.parse(this.dataset.gateway))"
                             title="Atur API Key & Pengaturan Gateway">
                             <i class="bi bi-gear-fill"></i>
                             Pengaturan API
@@ -170,7 +197,7 @@
         <i class="bi bi-shield-lock-fill"></i>
         <div>
             <strong>Konfigurasi Fleksibel & Modular (Driver Pattern)</strong>
-            <p>Anda dapat mengedit API Key langsung dari modal pengaturan di atas atau melalui file <code>.env</code>. Webhook universal untuk semua gateway tersedia di: <code>POST /payment/{gateway}/webhook</code>.</p>
+            <p>Uji konektivitas memanggil endpoint status Midtrans, daftar bank Flip, atau health-check Generic API yang telah dikonfigurasi. Perubahan kredensial atau mode akan menonaktifkan gateway hingga pengujian berhasil dan gateway diaktifkan kembali.</p>
         </div>
     </div>
 
@@ -208,17 +235,23 @@
 
                     <div class="form-group mb-3">
                         <label class="form-label">API Key / Secret Key</label>
-                        <input type="text" name="api_key" class="form-control" placeholder="Masukkan API Key / Secret Key">
+                        <input type="password" name="api_key" class="form-control" autocomplete="new-password" placeholder="Masukkan API Key / Secret Key">
                     </div>
 
                     <div class="form-group mb-3">
                         <label class="form-label">Webhook Token / Signature Key</label>
-                        <input type="text" name="webhook_token" class="form-control" placeholder="Token verifikasi webhook (opsional)">
+                        <input type="password" name="webhook_token" class="form-control" autocomplete="new-password" placeholder="Token verifikasi webhook">
                     </div>
 
                     <div class="form-group mb-3">
                         <label class="form-label">API Endpoint URL (Opsional)</label>
                         <input type="url" name="endpoint_url" class="form-control" placeholder="https://api.gateway.com/v1/payment">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">URL Health-check</label>
+                        <input type="url" name="verification_url" class="form-control" placeholder="https://api.gateway.com/health">
+                        <small class="text-muted">Harus satu origin dengan endpoint dan menjawab JSON <code>{"status":"ok","authenticated":true}</code>.</small>
                     </div>
 
                     <div class="form-group mb-3">
@@ -232,8 +265,8 @@
                     </div>
 
                     <div class="form-check">
-                        <input type="checkbox" name="is_active" value="1" id="addActiveCheck" class="form-check-input" checked>
-                        <label for="addActiveCheck" class="form-check-label">Langsung Aktifkan Gateway</label>
+                        <input type="checkbox" name="is_active" value="1" id="addActiveCheck" class="form-check-input">
+                        <label for="addActiveCheck" class="form-check-label">Aktifkan setelah konfigurasi dan verifikasi</label>
                     </div>
                 </div>
 
@@ -268,11 +301,11 @@
                     <div id="midtransFields" style="display:none;">
                         <div class="form-group mb-3">
                             <label class="form-label">Midtrans Server Key <span class="text-danger">*</span></label>
-                            <input type="text" name="server_key" id="editServerKey" class="form-control" placeholder="SB-Mid-server-xxxx">
+                            <input type="password" name="server_key" id="editServerKey" class="form-control" autocomplete="new-password" placeholder="Masukkan server key baru">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Midtrans Client Key</label>
-                            <input type="text" name="client_key" id="editClientKey" class="form-control" placeholder="SB-Mid-client-xxxx">
+                            <input type="password" name="client_key" id="editClientKey" class="form-control" autocomplete="new-password" placeholder="Masukkan client key baru">
                         </div>
                     </div>
 
@@ -280,12 +313,12 @@
                     <div id="flipFields" style="display:none;">
                         <div class="form-group mb-3">
                             <label class="form-label">Flip Secret API Key <span class="text-danger">*</span></label>
-                            <input type="text" name="api_key" id="editFlipApiKey" class="form-control" placeholder="Masukkan Secret Key Flip">
+                            <input type="password" name="api_key" id="editFlipApiKey" class="form-control" autocomplete="new-password" placeholder="Masukkan Secret Key Flip">
                             <small class="text-muted">Didapatkan dari Dashboard Big Flip > API Integration.</small>
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Flip Webhook Token (X-CALLBACK-TOKEN)</label>
-                            <input type="text" name="webhook_token" id="editFlipWebhookToken" class="form-control" placeholder="Token verifikasi webhook Flip">
+                            <input type="password" name="webhook_token" id="editFlipWebhookToken" class="form-control" autocomplete="new-password" placeholder="Token verifikasi webhook Flip">
                         </div>
                     </div>
 
@@ -293,15 +326,20 @@
                     <div id="genericFields" style="display:none;">
                         <div class="form-group mb-3">
                             <label class="form-label">API Key / Secret Key</label>
-                            <input type="text" name="api_key" id="editGenericApiKey" class="form-control" placeholder="API Secret Key">
+                            <input type="password" name="api_key" id="editGenericApiKey" class="form-control" autocomplete="new-password" placeholder="API Secret Key">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Webhook Token / Signature Key</label>
-                            <input type="text" name="webhook_token" id="editGenericWebhookToken" class="form-control" placeholder="Token Webhook">
+                            <input type="password" name="webhook_token" id="editGenericWebhookToken" class="form-control" autocomplete="new-password" placeholder="Token Webhook">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">API Endpoint URL</label>
                             <input type="url" name="endpoint_url" id="editEndpointUrl" class="form-control" placeholder="https://api.gateway.com/v1/charge">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">URL Health-check</label>
+                            <input type="url" name="verification_url" id="editVerificationUrl" class="form-control" placeholder="https://api.gateway.com/health">
+                            <small class="text-muted">Harus satu origin dan menjawab JSON <code>{"status":"ok","authenticated":true}</code>.</small>
                         </div>
                     </div>
 
@@ -310,12 +348,19 @@
                         <input type="text" name="description" id="editDesc" class="form-control">
                     </div>
 
+                    <p class="text-muted">Kredensial yang sudah tersimpan tidak ditampilkan. Biarkan kolom kosong untuk mempertahankan nilai saat ini.</p>
+                    <div class="form-check mb-2">
+                        <input type="checkbox" name="clear_credentials" value="1" id="clearCredentialsCheck" class="form-check-input">
+                        <label for="clearCredentialsCheck" class="form-check-label">Hapus kredensial tersimpan</label>
+                    </div>
+
                     <div class="form-check mb-2">
                         <input type="checkbox" name="is_production" value="1" id="editProdCheck" class="form-check-input">
                         <label for="editProdCheck" class="form-check-label">Mode Production (Live)</label>
                     </div>
 
                     <div class="form-check">
+                        <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" name="is_active" value="1" id="editActiveCheck" class="form-check-input">
                         <label for="editActiveCheck" class="form-check-label">Status Gateway Aktif</label>
                     </div>
@@ -605,29 +650,49 @@ function openEditConfigModal(gateway) {
 
     const config = gateway.config || {};
     document.getElementById('editProdCheck').checked = !!config.is_production;
+    document.getElementById('clearCredentialsCheck').checked = false;
 
     // Toggle fields based on gateway code
     const midtransFields = document.getElementById('midtransFields');
     const flipFields     = document.getElementById('flipFields');
     const genericFields  = document.getElementById('genericFields');
 
-    midtransFields.style.display = 'none';
-    flipFields.style.display     = 'none';
-    genericFields.style.display  = 'none';
+    [midtransFields, flipFields, genericFields].forEach((group) => {
+        group.style.display = 'none';
+        group.querySelectorAll('input, select, textarea').forEach((input) => {
+            input.disabled = true;
+        });
+    });
 
     if (gateway.code === 'midtrans') {
         midtransFields.style.display = 'block';
-        document.getElementById('editServerKey').value = config.server_key || '';
-        document.getElementById('editClientKey').value = config.client_key || '';
+        midtransFields.querySelectorAll('input, select, textarea').forEach((input) => {
+            input.disabled = false;
+        });
+        document.getElementById('editServerKey').value = '';
+        document.getElementById('editClientKey').value = '';
+        document.getElementById('editServerKey').placeholder = config.has_server_key ? 'Tersimpan — kosongkan untuk mempertahankan' : 'Masukkan server key';
+        document.getElementById('editClientKey').placeholder = config.has_client_key ? 'Tersimpan — kosongkan untuk mempertahankan' : 'Masukkan client key';
     } else if (gateway.code === 'flip') {
         flipFields.style.display = 'block';
-        document.getElementById('editFlipApiKey').value = config.api_key || '';
-        document.getElementById('editFlipWebhookToken').value = config.webhook_token || '';
+        flipFields.querySelectorAll('input, select, textarea').forEach((input) => {
+            input.disabled = false;
+        });
+        document.getElementById('editFlipApiKey').value = '';
+        document.getElementById('editFlipWebhookToken').value = '';
+        document.getElementById('editFlipApiKey').placeholder = config.has_api_key ? 'Tersimpan — kosongkan untuk mempertahankan' : 'Masukkan API key';
+        document.getElementById('editFlipWebhookToken').placeholder = config.has_webhook ? 'Tersimpan — kosongkan untuk mempertahankan' : 'Masukkan webhook token';
     } else {
         genericFields.style.display = 'block';
-        document.getElementById('editGenericApiKey').value = config.api_key || config.server_key || '';
-        document.getElementById('editGenericWebhookToken').value = config.webhook_token || '';
+        genericFields.querySelectorAll('input, select, textarea').forEach((input) => {
+            input.disabled = false;
+        });
+        document.getElementById('editGenericApiKey').value = '';
+        document.getElementById('editGenericWebhookToken').value = '';
         document.getElementById('editEndpointUrl').value = config.endpoint_url || '';
+            document.getElementById('editVerificationUrl').value = config.verification_url || '';
+        document.getElementById('editGenericApiKey').placeholder = config.has_api_key || config.has_server_key ? 'Tersimpan — kosongkan untuk mempertahankan' : 'Masukkan API key';
+        document.getElementById('editGenericWebhookToken').placeholder = config.has_webhook ? 'Tersimpan — kosongkan untuk mempertahankan' : 'Masukkan webhook token';
     }
 
     document.getElementById('editConfigModal').style.display = 'flex';
