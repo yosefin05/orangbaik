@@ -38,8 +38,8 @@
                             : asset('assets/profile-banner.png') }}"
                         alt="{{ $penggalang->nama_penggalang }}"
                         class="penggalang-banner"
-                        width="1200"
-                        height="250"
+                        width="1500"
+                        height="500"
                         loading="eager"
                         decoding="async">
                 </div>
