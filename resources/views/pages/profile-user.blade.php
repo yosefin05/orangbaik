@@ -249,8 +249,18 @@
             <p>Silakan pilih jenis akun penggalang dana yang ingin didaftarkan.</p>
 
             <div class="modal-buttons">
-                <a href="{{ route('verifikasi.penggalang') }}" class="btn-individu">Individu</a>
-                <a href="{{ route('penggalang_dana.organisasi.create') }}" class="btn-organisasi">Organisasi</a>
+                <a href="{{ route('verifikasi.penggalang') }}" class="btn-individu">
+                    <i class="bi bi-person me-2"></i> Individu
+                </a>
+                <a href="{{ route('penggalang_dana.organisasi.create', ['type' => 'organisasi']) }}" class="btn-organisasi">
+                    <i class="bi bi-building me-2"></i> Organisasi
+                </a>
+                <a href="{{ route('penggalang_dana.organisasi.create', ['type' => 'yayasan_lembaga']) }}" class="btn-organisasi">
+                    <i class="bi bi-bank me-2"></i> Yayasan / Lembaga
+                </a>
+                <a href="{{ route('penggalang_dana.organisasi.create', ['type' => 'komunitas']) }}" class="btn-organisasi">
+                    <i class="bi bi-people me-2"></i> Komunitas
+                </a>
             </div>
 
             <button type="button" class="btn-close" id="closePenggalangModal">Batal</button>

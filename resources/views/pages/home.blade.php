@@ -40,6 +40,23 @@
 
     @include('components.header')
 
+    @if (session('success') || session('error'))
+        <div class="container" style="margin-top: 16px; margin-bottom: 8px;">
+            @if (session('success'))
+                <div style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 12px 18px; border-radius: 10px; font-weight: 500; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                    <i class="bi bi-check-circle-fill" style="color: #10b981; font-size: 1.1rem;"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+            @if (session('error'))
+                <div style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; padding: 12px 18px; border-radius: 10px; font-weight: 500; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                    <i class="bi bi-exclamation-triangle-fill" style="color: #ef4444; font-size: 1.1rem;"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <main class="main">
 
         {{-- HERO --}}

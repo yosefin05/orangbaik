@@ -34,7 +34,7 @@ class Penggalang_Dana_Dokumen extends Model
     public function scopePublicOnly(Builder $query): Builder
     {
         return $query->whereHas('penggalangDana', function ($q) {
-            $q->where('jenis_penggalang', 'organisasi');
+            $q->whereIn('jenis_penggalang', ['organisasi', 'yayasan_lembaga', 'komunitas']);
         })->where(function ($q) {
             // Jika kolom is_public ada dan bernilai true
             $q->where('is_public', true)
@@ -54,7 +54,7 @@ class Penggalang_Dana_Dokumen extends Model
     public function isPublicForVisitor(): bool
     {
         // Dokumen individu WAJIB 100% PRIVATE
-        if ($this->penggalangDana && $this->penggalangDana->jenis_penggalang === 'individu') {
+        if ($this->penggalangDana && ($this->penggalangDana->jenis_penggalang === 'individu' || (method_exists($this->penggalangDana, 'isIndividu') && $this->penggalangDana->isIndividu()))) {
             return false;
         }
 

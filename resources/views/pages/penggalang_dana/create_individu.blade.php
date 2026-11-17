@@ -180,7 +180,7 @@
                         <div class="verify-card-header">
                             <h2>Dokumen Identitas</h2>
                             <p>
-                                Unggah dokumen untuk verifikasi identitas.
+                                Unggah dokumen untuk verifikasi identitas (KTP / Paspor). Dokumen ini disimpan di private storage yang aman dan <strong>tidak akan pernah dipublikasikan</strong>.
                             </p>
                         </div>
 
@@ -190,7 +190,7 @@
 
                                 <span>Nama Dokumen <b>*</b></span>
 
-                                <input type="text" name="nama_dokumen[]" placeholder="Contoh: KTP" required>
+                                <input type="text" name="nama_dokumen[]" value="KTP Identitas" placeholder="Contoh: KTP" required>
 
                                 @error('nama_dokumen.0')
                                     <small class="text-danger">{{ $message }}</small>
@@ -198,18 +198,25 @@
 
                             </label>
 
-                            <label class="verify-field">
+                            <div class="verify-field">
 
-                                <span>Link / File Dokumen <b>*</b></span>
+                                <span>Unggah File Dokumen (PDF, JPG, PNG maks 5MB) <b>*</b></span>
 
-                                <input type="url" name="file_dokumen[]" placeholder="Link Google Drive atau URL"
-                                    required>
+                                <input type="file" name="dokumen_files[]" accept=".pdf,.jpg,.jpeg,.png"
+                                    style="padding: 8px 10px; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; width: 100%; font-size: 13px;">
 
+                                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Atau sertakan tautan online / Google Drive:</div>
+                                <input type="url" name="file_dokumen[]" placeholder="https://drive.google.com/..."
+                                    style="margin-top: 2px;">
+
+                                @error('dokumen_files.0')
+                                    <small class="text-danger" style="display:block; margin-top:4px;">{{ $message }}</small>
+                                @enderror
                                 @error('file_dokumen.0')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="text-danger" style="display:block; margin-top:4px;">{{ $message }}</small>
                                 @enderror
 
-                            </label>
+                            </div>
 
                         </div>
 

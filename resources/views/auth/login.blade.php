@@ -23,6 +23,12 @@
                 <h1>Masuk ke Akun Anda</h1>
                 <p class="subtitle">Gunakan email dan password yang sudah terdaftar.</p>
 
+                @if (session('error'))
+                    <div class="alert-error">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="alert-error">
                         {{ $errors->first() }}
@@ -35,7 +41,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}">
+                <form method="POST" action="{{ route('login') }}" id="loginForm">
                     @csrf
 
                     <div class="form-group">
@@ -77,7 +83,7 @@
                         <a href="{{ route('password.request') }}" style="font-size:var(--fs-xs); color:var(--primary); text-decoration:none; font-weight:var(--fw-medium);">Lupa Password?</a>
                     </div>
 
-                    <button type="submit" class="login-button">
+                    <button type="submit" class="login-button" id="btnLoginSubmit">
                         Masuk Sekarang
                     </button>
 
@@ -190,6 +196,18 @@
         })();
     </script>
 
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const btnLoginSubmit = document.getElementById('btnLoginSubmit');
+        if (loginForm && btnLoginSubmit) {
+            loginForm.addEventListener('submit', function () {
+                btnLoginSubmit.disabled = true;
+                btnLoginSubmit.style.opacity = '0.7';
+                btnLoginSubmit.style.cursor = 'not-allowed';
+                btnLoginSubmit.textContent = 'Memproses...';
+            });
+        }
+    </script>
 </body>
 
 </html>

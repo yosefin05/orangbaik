@@ -23,13 +23,25 @@
                 <h1>Buat Akun Baru</h1>
                 <p class="subtitle">Daftar sekarang dan mulai berbagi kebaikan.</p>
 
+                @if (session('error'))
+                    <div class="alert-error">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if (session('success'))
+                    <div class="alert-success" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:12px; border-radius:8px; margin-bottom:16px;">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="alert-error">
                         {{ $errors->first() }}
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('register') }}">
+                <form method="POST" action="{{ route('register') }}" id="registerForm">
                     @csrf
 
                     <div class="form-group">
@@ -94,7 +106,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="login-button">
+                    <button type="submit" class="login-button" id="btnRegisterSubmit">
                         Daftar Sekarang
                     </button>
 
@@ -208,6 +220,18 @@
         })();
     </script>
 
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        const btnRegisterSubmit = document.getElementById('btnRegisterSubmit');
+        if (registerForm && btnRegisterSubmit) {
+            registerForm.addEventListener('submit', function () {
+                btnRegisterSubmit.disabled = true;
+                btnRegisterSubmit.style.opacity = '0.7';
+                btnRegisterSubmit.style.cursor = 'not-allowed';
+                btnRegisterSubmit.textContent = 'Mendaftarkan...';
+            });
+        }
+    </script>
 </body>
 
 </html>

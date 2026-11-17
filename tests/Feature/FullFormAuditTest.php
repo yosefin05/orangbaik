@@ -55,12 +55,12 @@ class FullFormAuditTest extends TestCase
 
         $this->kategori = Kategori::create([
             'nama_kategori' => 'Kemanusiaan',
-            'slug'          => 'kemanusiaan',
+            'slug' => 'kemanusiaan',
         ]);
 
         $this->filter = Filter::create([
             'nama_filter' => 'Tanggap Bencana',
-            'slug'        => 'tanggap-bencana',
+            'slug' => 'tanggap-bencana',
         ]);
 
         $this->gateway = PaymentGateway::create([
@@ -97,7 +97,8 @@ class FullFormAuditTest extends TestCase
             'password_confirmation' => 'password123',
         ]);
 
-        $response->assertRedirect(route('verification.notice'));
+        $response->assertRedirect(route('home'));
+        $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => 'newuser@orangbaik.id',
             'name' => 'New User',
@@ -224,12 +225,13 @@ class FullFormAuditTest extends TestCase
             'misi' => 'Misi Baru',
         ]);
 
-        $response->assertRedirect(route('profil.penggalang', $penggalang->id));
         $this->assertDatabaseHas('penggalang_dana', [
             'id' => $penggalang->id,
             'nama_penggalang' => 'Komunitas Diperbarui',
             'email' => 'baru@orangbaik.id',
         ]);
+        $penggalang->refresh();
+        $response->assertRedirect(route('profil.penggalang', $penggalang->slug));
     }
 
     /*

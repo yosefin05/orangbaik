@@ -100,10 +100,15 @@
 
                             <div class="verify-fields">
                                 <label class="verify-field">
-                                    <span>Jenis Penggalang Dana</span>
-
-                                    <input type="text" value="Organisasi" readonly>
-                                    <input type="hidden" name="jenis_penggalang" value="organisasi">
+                                    <span>Kategori Penggalang Dana <b>*</b></span>
+                                    <select name="jenis_penggalang" id="jenisPenggalangSelect" style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #d1d5db; font-size:14px; background:#fff; font-family:inherit;">
+                                        <option value="organisasi" {{ (old('jenis_penggalang', $selectedCategory ?? 'organisasi') === 'organisasi') ? 'selected' : '' }}>Organisasi</option>
+                                        <option value="yayasan_lembaga" {{ (old('jenis_penggalang', $selectedCategory ?? '') === 'yayasan_lembaga') ? 'selected' : '' }}>Yayasan / Lembaga</option>
+                                        <option value="komunitas" {{ (old('jenis_penggalang', $selectedCategory ?? '') === 'komunitas') ? 'selected' : '' }}>Komunitas</option>
+                                    </select>
+                                    @error('jenis_penggalang')
+                                        <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                                    @enderror
                                 </label>
 
                                 <label class="verify-field">
@@ -227,7 +232,7 @@
 
                                             <input type="text" name="nama_dokumen[]"
                                                 value="{{ old('nama_dokumen.' . ($i - 1)) }}"
-                                                placeholder="Contoh: SK Kemenkumham, Akta, BAZNAS">
+                                                placeholder="Contoh: SK Kemenkumham, Akta, Izin Operasional">
                                             @if($i === 1)
                                                 @error('nama_dokumen.0')
                                                     <small class="text-danger"
@@ -236,19 +241,24 @@
                                             @endif
                                         </label>
 
-                                        <label class="verify-field">
-                                            <span>Link Legalitas {{ $i <= 1 ? '*' : '' }}</span>
-
+                                        <div class="verify-field">
+                                            <span>Unggah Dokumen (PDF, JPG, PNG maks 5MB) {{ $i <= 1 ? '*' : '' }}</span>
+                                            <input type="file" name="dokumen_files[]" accept=".pdf,.jpg,.jpeg,.png"
+                                                style="padding: 8px 10px; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; width: 100%; font-size: 13px;">
+                                            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Atau sertakan tautan online / Google Drive:</div>
                                             <input type="url" name="file_dokumen[]"
                                                 value="{{ old('file_dokumen.' . ($i - 1)) }}"
-                                                placeholder="Masukkan link Google Drive dokumen">
+                                                placeholder="https://drive.google.com/..."
+                                                style="margin-top: 2px;">
                                             @if($i === 1)
+                                                @error('dokumen_files.0')
+                                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px; display:block;">{{ $message }}</small>
+                                                @enderror
                                                 @error('file_dokumen.0')
-                                                    <small class="text-danger"
-                                                        style="color:#ef4444; font-size:12px; margin-top:4px;">{{ $message }}</small>
+                                                    <small class="text-danger" style="color:#ef4444; font-size:12px; margin-top:4px; display:block;">{{ $message }}</small>
                                                 @enderror
                                             @endif
-                                        </label>
+                                        </div>
                                     </div>
                                 </div>
                             @endfor
