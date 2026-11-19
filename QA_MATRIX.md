@@ -32,7 +32,8 @@ Status `PASS` berarti ada bukti test otomatis atau pemeriksaan runtime; `NOT TES
 | Migration pada MariaDB lokal | PASS | `10.4.32`; migration additive dijalankan pada schema QA disposable, record legacy menjadi `Kak` |
 | Migration pada MySQL/MariaDB staging | NOT TESTED | Dokumentasi menyebut MySQL 8.0+/MariaDB 10.5+, tetapi versi target tidak diketahui |
 | Build aset production | PASS | `npm run build` lulus di worktree rilis |
-| Backup, rollback, staging deployment, live smoke test | NOT TESTED | Tidak ada bukti backup/rollback atau akses target; workflow staging memicu saat push `main` |
+| Branch rilis / GitHub Actions | PASS / NOT RUN | `release/orangbaik-evaluation-20261119` dipush; tidak ada workflow run karena file workflow hanya trigger `main` |
+| Backup, rollback, staging deployment, live smoke test | NOT TESTED | Tidak ada bukti backup/rollback atau akses target; push branch rilis tidak deploy ke staging |
 
 ## Catatan regresi
 
