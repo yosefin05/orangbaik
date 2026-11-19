@@ -263,6 +263,15 @@
 
                     <div class="donor-input-group">
                         <div>
+                            <label for="sapaan" class="field-label">Sapaan</label>
+                            <select class="field-input" name="sapaan" id="sapaan" required>
+                                @foreach (['Kak', 'Pak', 'Bu'] as $sapaan)
+                                    <option value="{{ $sapaan }}" @selected(old('sapaan', 'Kak') === $sapaan)>{{ $sapaan }}</option>
+                                @endforeach
+                            </select>
+                            <div id="error-sapaan" class="error-text" role="alert" style="display:none;"></div>
+                        </div>
+                        <div>
                             <label for="nama_donatur" class="field-label">Nama Lengkap</label>
                             <input
                                 class="field-input"

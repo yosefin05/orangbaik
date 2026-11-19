@@ -37,8 +37,14 @@ class DonasiController extends Controller
             ])
             ->firstOrFail();
 
-        // Hanya kampanye aktif yang bisa didonasi
-        if (!$campaign->is_active) {
+        // Kampanye harus memenuhi seluruh syarat kelayakan (aktif, disetujui, dan dalam kurun waktu aktif)
+        if (!$campaign->isDonatable()) {
+            if ($campaign->tanggal_berakhir && now()->greaterThan($campaign->tanggal_berakhir)) {
+                abort(404, 'Campaign ini telah berakhir dan tidak lagi menerima donasi.');
+            }
+            if ($campaign->tanggal_mulai && now()->lessThan($campaign->tanggal_mulai)) {
+                abort(404, 'Campaign ini belum dimulai.');
+            }
             abort(404, 'Campaign ini tidak menerima donasi saat ini.');
         }
 
@@ -75,12 +81,21 @@ class DonasiController extends Controller
             ->firstOrFail();
 
         // ============================================================
-        // 1. CEK STATUS CAMPAIGN
+        // 1. CEK KELAYAKAN STATUS CAMPAIGN (BACKEND HARDENING)
         // ============================================================
-        if (!$campaign->is_active) {
+        if (!$campaign->isDonatable()) {
+            $msg = 'Campaign ini sudah tidak aktif dan tidak menerima donasi.';
+            if ($campaign->tanggal_berakhir && now()->greaterThan($campaign->tanggal_berakhir)) {
+                $msg = 'Campaign ini telah berakhir dan tidak menerima donasi baru.';
+            } elseif ($campaign->tanggal_mulai && now()->lessThan($campaign->tanggal_mulai)) {
+                $msg = 'Campaign ini belum dimulai dan belum dapat menerima donasi.';
+            } elseif (!$campaign->isApproved()) {
+                $msg = 'Campaign ini belum disetujui untuk menerima donasi publik.';
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Campaign ini sudah tidak aktif dan tidak menerima donasi.',
+                'message' => $msg,
             ], 422);
         }
 
@@ -146,6 +161,7 @@ class DonasiController extends Controller
                 'fundraiser_id'=> $fundraiserId,
                 'user_id'      => auth()->id(),
                 'nama_donatur' => $namaDonatur,
+                'sapaan'       => $request->sapaan,
                 'email'        => auth()->user()?->email ?? null,
                 'no_hp'        => $request->no_hp,
                 'nominal'      => $nominal,

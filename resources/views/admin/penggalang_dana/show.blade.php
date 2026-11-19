@@ -24,7 +24,7 @@
             <h2>{{ $penggalangDana->nama_penggalang }}</h2>
 
             <p class="profile-type">
-                {{ ucfirst($penggalangDana->jenis_penggalang) }}
+                {{ $penggalangDana->jenis_penggalang_label }}
             </p>
 
             @if($penggalangDana->status === 'pending')

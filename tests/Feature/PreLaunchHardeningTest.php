@@ -88,6 +88,7 @@ class PreLaunchHardeningTest extends TestCase
     {
         $response = $this->postJson(route('donasi.store', $this->campaign->slug), [
             'payment_channel_id' => $this->channel->id,
+            'sapaan'             => 'Kak',
             'nominal_lainnya'    => 150000,
             'nama_donatur'       => 'Donatur Baik',
             'no_hp'              => '081299998888',

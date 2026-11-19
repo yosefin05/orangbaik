@@ -32,7 +32,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 419);
             }
 
-            return redirect()->back()
+            $fallbackRoute = $request->is('login') ? route('login') : ($request->is('register') ? route('register') : route('home'));
+
+            return redirect()->back(fallback: $fallbackRoute)
                 ->withInput($request->except('password', 'password_confirmation', '_token'))
                 ->with('error', 'Sesi Anda telah kedaluwarsa atau token keamanan tidak valid. Halaman telah diperbarui, silakan coba kembali.');
         });

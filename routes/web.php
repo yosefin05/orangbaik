@@ -87,6 +87,9 @@ Route::get('/donasi/instruksi/{pembayaran}', [DonasiController::class, 'instruks
 Route::post('/donasi/instruksi/{pembayaran}/upload-bukti', [DonasiController::class, 'uploadBukti'])->name('donasi.bayar.upload_bukti');
 Route::get('/donasi/instruksi/{pembayaran}/bukti-transfer', [DonasiController::class, 'viewBuktiTransfer'])->name('donasi.bayar.bukti_transfer');
 Route::get('/donasi/status/{status}', [DonasiController::class, 'status'])->name('donasi.status');
+Route::get('/kwitansi/{donasi}/akses', [RiwayatDonasiController::class, 'kwitansiSigned'])
+    ->middleware('signed')
+    ->name('kwitansi.signed');
 
 // Static pages
 Route::get('/tentang', [PageController::class, 'tentang'])->name('tentang');

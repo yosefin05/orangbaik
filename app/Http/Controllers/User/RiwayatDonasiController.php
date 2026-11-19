@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Donasi;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class RiwayatDonasiController extends Controller
 {
@@ -69,11 +70,33 @@ class RiwayatDonasiController extends Controller
 
     public function kwitansi(Donasi $donasi)
     {
-        if ($donasi->user_id !== auth()->id() && !auth()->user()?->isAdmin()) {
+        $user = auth()->user();
+        $isAdmin = $user && ($user->role === 'admin' || (method_exists($user, 'isAdmin') && $user->isAdmin()));
+        $isOwner = $user && (int) $donasi->user_id === (int) $user->id;
+
+        if (!$isOwner && !$isAdmin) {
             abort(403, 'Anda tidak memiliki hak akses untuk melihat kwitansi ini.');
         }
 
-        $donasi->load(['campaign.penggalangDana', 'pembayaran', 'user']);
+        $donasi->load(['campaign.penggalangDana', 'pembayaran.paymentChannel', 'user']);
+
+        $pembayaran = $donasi->pembayaran;
+        $trxStatus = $pembayaran?->transaction_status;
+
+        // Kwitansi HANYA boleh diterbitkan untuk donasi yang benar-benar settlement
+        if (!$pembayaran || !in_array($trxStatus, ['settlement', 'capture'])) {
+            abort(404, 'E-Kwitansi resmi hanya diterbitkan untuk transaksi donasi yang status pembayarannya telah berhasil (Settlement).');
+        }
+
+        return view('pages.kwitansi', compact('donasi'));
+    }
+
+    public function kwitansiSigned(Request $request, Donasi $donasi)
+    {
+        abort_unless($request->hasValidSignature(), 403);
+
+        $donasi->load(['campaign.penggalangDana', 'pembayaran.paymentChannel', 'user']);
+        abort_unless($donasi->pembayaran?->transaction_status === 'settlement', 404);
 
         return view('pages.kwitansi', compact('donasi'));
     }

@@ -1,0 +1,353 @@
+/* ============================================================
+   DONASI SHOW (ADMIN) - ORANGBAIK.ID
+   Penataan mengikuti Detail Berita. Komponen dasar (detail-card,
+   detail-meta, data-table-kv, badge, alert, btn-*) dari
+   components.css / global.css. Hanya token global.css.
+   ============================================================ */
+
+.donasi-show {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.donasi-show .page-header {
+    margin-bottom: var(--space-5);
+}
+
+.donasi-show .alert {
+    margin-bottom: var(--space-5);
+}
+
+.donasi-show .alert.mb-0 {
+    margin-bottom: 0;
+}
+
+.donasi-muted {
+    color: var(--muted);
+}
+
+.donasi-danger {
+    color: var(--danger);
+    font-weight: var(--fw-semibold);
+}
+
+/* ============================================================
+   META RINGKASAN
+   ============================================================ */
+
+.donasi-show .detail-meta {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-4);
+    padding: var(--space-5);
+}
+
+.donasi-show .meta-item {
+    min-width: 0;
+}
+
+.donasi-show .meta-value-lg {
+    color: var(--primary);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-extrabold);
+    line-height: 1.2;
+}
+
+/* ============================================================
+   SECTION
+   ============================================================ */
+
+.donasi-show .detail-section h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.donasi-show .detail-section h3 i {
+    color: var(--primary);
+    font-size: 18px;
+}
+
+/* Tabel label-nilai: lawan aturan umum .data-table (min-width, max-width) */
+.donasi-show .table-wrapper {
+    margin: 0;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+}
+
+.donasi-show table.data-table-kv {
+    min-width: 0;
+}
+
+.donasi-show table.data-table-kv th {
+    width: 200px;
+}
+
+.donasi-show table.data-table-kv td {
+    max-width: none;
+    color: var(--text-dark);
+    word-break: break-word;
+}
+
+.donasi-show table.data-table-kv td .badge {
+    margin-left: var(--space-2);
+}
+
+.donasi-code {
+    padding: 3px 10px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    color: var(--text-dark);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--fs-xxs);
+    word-break: break-all;
+}
+
+/* ============================================================
+   BUKTI TRANSFER
+   ============================================================ */
+
+.donasi-proof {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    transition: .15s ease;
+}
+
+.donasi-proof:hover {
+    border-color: var(--primary);
+}
+
+.donasi-proof img {
+    width: auto;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+}
+
+.donasi-proof-hint {
+    margin: var(--space-3) 0 0;
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    text-align: center;
+}
+
+/* ============================================================
+   AKSI
+   ============================================================ */
+
+.donasi-show .form-actions {
+    margin-top: 0;
+}
+
+.form-actions-end {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+/* Tombol outline: samakan bentuk dengan tombol solid admin */
+.donasi-show .btn-outline {
+    border: 1px solid var(--border);
+}
+
+/* ============================================================
+   DIALOG TERIMA / TOLAK
+   ============================================================ */
+
+dialog.donasi-dialog {
+    width: min(460px, calc(100% - 32px));
+    margin: auto;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: var(--shadow);
+}
+
+dialog.donasi-dialog::backdrop {
+    background: color-mix(in srgb, var(--text-dark) 55%, transparent);
+}
+
+.donasi-dialog-body {
+    padding: var(--space-8) var(--space-6) var(--space-4);
+    text-align: center;
+}
+
+.donasi-dialog-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto var(--space-4);
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-full);
+    font-size: 26px;
+}
+
+.donasi-dialog-icon.is-success {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.donasi-dialog-icon.is-danger {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.donasi-dialog-body h3 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--fs-md);
+}
+
+.donasi-dialog-body p {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    line-height: 1.7;
+}
+
+.donasi-dialog-body p strong {
+    color: var(--text-dark);
+}
+
+.donasi-dialog-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    text-align: left;
+}
+
+.donasi-dialog-field label {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.donasi-dialog-field textarea {
+    width: 100%;
+    min-height: 96px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: var(--fs-xs);
+    line-height: 1.6;
+    resize: vertical;
+    transition: .2s ease;
+}
+
+.donasi-dialog-field textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg);
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.donasi-field-error {
+    color: var(--danger);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-semibold);
+}
+
+.donasi-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6) var(--space-6);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 992px) {
+    .donasi-show .detail-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .donasi-show .table-wrapper {
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius-md);
+    }
+
+    .donasi-show table.data-table-kv th {
+        width: 140px;
+    }
+}
+
+@media (max-width: 576px) {
+    .donasi-show .detail-meta {
+        padding: var(--space-4);
+    }
+
+    /* Nominal selebar penuh */
+    .donasi-show .detail-meta .meta-item:first-child {
+        grid-column: 1 / -1;
+    }
+
+    /* Tabel label-nilai ditumpuk: label di atas, nilai di bawah */
+    .donasi-show table.data-table-kv,
+    .donasi-show table.data-table-kv tbody,
+    .donasi-show table.data-table-kv tr,
+    .donasi-show table.data-table-kv th,
+    .donasi-show table.data-table-kv td {
+        display: block;
+        width: 100%;
+    }
+
+    .donasi-show table.data-table-kv tr {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--border-soft);
+    }
+
+    .donasi-show table.data-table-kv tr:last-child {
+        border-bottom: none;
+    }
+
+    .donasi-show table.data-table-kv th,
+    .donasi-show table.data-table-kv td {
+        padding: 0;
+        border: none;
+    }
+
+    .donasi-show table.data-table-kv th {
+        margin-bottom: var(--space-1);
+        font-size: var(--fs-xxs);
+    }
+
+    .donasi-proof img {
+        max-height: 320px;
+    }
+
+    .form-actions-end {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .form-actions-end > * {
+        flex: 1 1 0;
+    }
+
+    .donasi-dialog-footer {
+        flex-direction: column-reverse;
+    }
+
+    .donasi-dialog-footer button {
+        width: 100%;
+    }
+}

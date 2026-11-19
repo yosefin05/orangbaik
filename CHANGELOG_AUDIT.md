@@ -84,3 +84,16 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
   - `docs/development/README.md`: Standar coding, penamaan, PSR compliance, dan testing guidelines.
   - `docs/deployment/README.md`: Checklist kesiapan live production, konfigurasi .env, HTTPS webhook requirement, dan panduan `composer dump-autoload -o` untuk Linux.
   - `tests/Feature/SecurityHardeningAuditTest.php`: 10 skenario feature test mencakup isolasi KTP, otorisasi IDOR dokumen, fail-closed webhook Flip & Midtrans, anti-rollback settlement, dan perlindungan kepemilikan campaign.
+### [2026-11-19] Personalisasi Sapaan Donatur & WhatsApp
+- **Status**: IMPLEMENTED; targeted tests verified. Deployment blocked by release prerequisites.
+- Menambahkan pilihan sapaan Kak/Pak/Bu (default Kak), validasi whitelist, dan penyimpanan pada record transaksi.
+- Menambahkan migration additive `2026_11_19_000001_add_sapaan_to_donasi_table.php` dengan default Kak agar data lama kompatibel.
+- Memisahkan template WhatsApp ke `DonorWhatsAppMessage`, menormalisasi nomor Indonesia, dan hanya menghasilkan URL untuk pending/settlement dengan nomor valid.
+- Follow-up meminta penyelesaian pembayaran; settlement menyertakan ucapan terima kasih, doa, nominal, campaign, dan route e-kwitansi resmi bertanda tangan sementara (30 hari), termasuk untuk guest serta tetap memeriksa settlement.
+- Tombol admin yang tersedia dikembangkan, tidak diduplikasi.
+- Test aktual: seluruh Feature suite `126 passed/562 assertions`; mencakup WhatsApp, sapaan, guest/login, search campaign expired, settlement receipt, keamanan, autentikasi, fundraiser, dan pembayaran. Di worktree rilis, suite yang sama lulus; lint, route list, `git diff --check`, dan `npm run build` lulus.
+- Empat test request di `Batch1And2EvaluationHardeningTest`, `Batch2PendingPaymentRecoveryTest`, `PaymentChannelTest`, dan `PreLaunchHardeningTest` dilengkapi sapaan `Kak` setelah regresi awal membuktikan request test lama gagal karena field baru wajib.
+- Migration diuji dengan SQLite `RefreshDatabase` dan skema disposable MariaDB lokal `10.4.32`; record lama mendapat default Kak. Target staging tidak memiliki versi DB yang terdokumentasi; kebutuhan minimum proyek MariaDB 10.5+/MySQL 8.0+.
+- Test viewport browser tidak dapat diselesaikan: Edge headless tidak menghasilkan screenshot yang bisa dinilai. Aplikasi lokal merender home/form via XAMPP dan Feature tests memeriksa opsi form/link status. Gateway live belum dites.
+- Worktree lokal `release/orangbaik-evaluation-20261119` disiapkan dari `7fb041b` dengan 33 path A+B; CSS kosmetik login dikecualikan. Tidak dibuat commit.
+- Staging tidak dijalankan: workflow push hanya mendukung `main`, menarik seluruh branch, dan tidak memiliki backup, migration, health check, atau rollback. Tidak ada bukti backup/versi DB target; production tidak disentuh.

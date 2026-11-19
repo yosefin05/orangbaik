@@ -216,6 +216,14 @@ class Campaign extends Model
     }
 
     /**
+     * Alias backward-compatibility untuk tanggal_selesai -> tanggal_berakhir
+     */
+    public function getTanggalSelesaiAttribute()
+    {
+        return $this->tanggal_berakhir;
+    }
+
+    /**
      * Total nominal donasi yang sudah SETTLEMENT (uang yang benar-benar diterima).
      */
     public function getTotalDonasiSuccess(): int

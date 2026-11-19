@@ -19,6 +19,49 @@
             </div>
         </div>
 
+        {{-- Filter Bar --}}
+        <form action="{{ route('admin.penggalang_dana.index') }}" method="GET" class="filter-bar mb-4">
+            <div class="filter-field">
+                <label>Cari Penggalang</label>
+                <input type="text" name="search" placeholder="Nama / Email / User..." value="{{ request('search') }}">
+            </div>
+
+            <div class="filter-field">
+                <label>Kategori</label>
+                <select name="jenis_penggalang">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories ?? [] as $key => $label)
+                        <option value="{{ $key }}" {{ request('jenis_penggalang') == $key ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label>Status</label>
+                <select name="status">
+                    <option value="">Semua Status</option>
+                    @foreach($statuses ?? ['pending', 'approved', 'rejected'] as $st)
+                        <option value="{{ $st }}" {{ request('status') == $st ? 'selected' : '' }}>
+                            {{ ucfirst($st) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-search"></i>
+                    <span>Filter</span>
+                </button>
+                <a href="{{ route('admin.penggalang_dana.index') }}" class="action-link link-blue">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Reset
+                </a>
+            </div>
+        </form>
+
         <div class="table-wrapper">
 
             <table class="data-table">
@@ -63,7 +106,9 @@
                             </td>
 
                             <td>
-                                {{ ucfirst($item->jenis_penggalang) }}
+                                <span class="badge badge-blue">
+                                    {{ $item->jenis_penggalang_label }}
+                                </span>
                             </td>
 
                             <td>

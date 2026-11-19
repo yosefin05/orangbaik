@@ -44,12 +44,13 @@
 
         if ($type === 'campaign') {
             $campaigns = $campaigns->filter(function ($campaign) {
-                if (!$campaign->tanggal_selesai) {
+                $endDate = $campaign->tanggal_berakhir ?? $campaign->tanggal_selesai;
+                if (!$endDate) {
                     return true;
                 }
 
                 return \Illuminate\Support\Carbon::parse(
-                    $campaign->tanggal_selesai
+                    $endDate
                 )->endOfDay()->isFuture();
 
             })->values();

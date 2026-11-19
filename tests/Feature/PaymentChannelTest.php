@@ -391,6 +391,7 @@ class PaymentChannelTest extends TestCase
 
         $basePayload = [
             'payment_channel_id' => $channel->id,
+            'sapaan'             => 'Kak',
             'nama_donatur'       => 'Test User',
             'no_hp'              => '08123456789',
         ];

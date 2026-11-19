@@ -143,6 +143,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $response = $this->postJson(route('donasi.store', $this->campaign->slug), [
             'payment_channel_id' => $this->channelManual->id,
             'nominal'            => 50000,
+            'sapaan'             => 'Kak',
             'nama_donatur'       => 'Guest Donatur',
             'no_hp'              => '081299990001',
         ]);

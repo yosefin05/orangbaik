@@ -212,17 +212,17 @@
                                     <div class="pesan-doa-card">
                                         <div class="pesan-doa-header">
                                             <div class="pesan-doa-avatar">
-                                                @if (!$doa->is_anonim && $doa->user && $doa->user->foto_profil)
+                                                @if (!($doa->is_anonim || $doa->is_anonymous) && $doa->user && $doa->user->foto_profil)
                                                     <img src="{{ asset('storage/' . $doa->user->foto_profil) }}"
-                                                        alt="{{ $doa->nama_donatur }}">
+                                                        alt="{{ $doa->display_name }}">
                                                 @else
                                                     <span class="avatar-placeholder">
-                                                        {{ $doa->is_anonim ? '🙏' : strtoupper(substr($doa->nama_donatur, 0, 1)) }}
+                                                        {{ ($doa->is_anonim || $doa->is_anonymous) ? '🙏' : strtoupper(substr($doa->nama_donatur ?: ($doa->user?->name ?? 'D'), 0, 1)) }}
                                                     </span>
                                                 @endif
                                             </div>
                                             <div class="pesan-doa-info">
-                                                <strong>{{ $doa->is_anonim ? 'Hamba Allah' : $doa->nama_donatur }}</strong>
+                                                <strong>{{ ($doa->is_anonim || $doa->is_anonymous) ? 'Hamba Allah' : ($doa->nama_donatur ?: ($doa->user?->name ?? 'Donatur')) }}</strong>
                                                 <div>
                                                     <span class="pesan-doa-nominal">
                                                         <i class="bi bi-heart-fill"
@@ -291,10 +291,16 @@
                             <span>{{ $statusHari }}</span>
                         </div>
                         <div class="donate-button-wrapper">
-                            <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}"
-                                class="donate-button">Donasi
-                                Sekarang</a>
-
+                            @if($campaign->isDonatable())
+                                <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}"
+                                    class="donate-button">Donasi
+                                    Sekarang</a>
+                            @else
+                                <button type="button" class="donate-button is-disabled" disabled
+                                    style="background:#94a3b8; cursor:not-allowed; border:none; opacity:0.85; width:100%; text-align:center;">
+                                    {{ $campaign->getStatusText() === 'Berakhir' ? 'Campaign Telah Berakhir' : ($campaign->getStatusText() === 'Akan Datang' ? 'Campaign Belum Dimulai' : 'Donasi Ditutup') }}
+                                </button>
+                            @endif
                         </div>
                     </div>
 
@@ -332,9 +338,9 @@
                             @foreach ($donasiSettlement as $donasi)
                                 <div class="side-list-item">
                                     <div class="avatar-circle">
-                                        @if (!$donasi->is_anonymous && $donasi->user && $donasi->user->foto_profil)
+                                        @if (!($donasi->is_anonim || $donasi->is_anonymous) && $donasi->user && $donasi->user->foto_profil)
                                             <img src="{{ asset('storage/' . $donasi->user->foto_profil) }}"
-                                                alt="{{ $donasi->user->name }}">
+                                                alt="{{ $donasi->display_name }}">
                                         @else
                                             <i class="bi bi-person-fill"></i>
                                         @endif
@@ -342,7 +348,7 @@
                                     <div>
                                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                                             <h4 style="margin:0;">
-                                                {{ $donasi->is_anonymous ? 'Anonim' : ($donasi->nama_donatur ?? $donasi->user->name ?? 'Donatur') }}
+                                                {{ $donasi->display_name }}
                                             </h4>
                                         </div>
                                         <p>Berdonasi sebesar <b>Rp {{ number_format($donasi->nominal, 0, ',', '.') }}</b></p>
@@ -457,9 +463,16 @@
                 <span class="mobile-cta-label">Terkumpul</span>
                 <strong class="mobile-cta-val">Rp {{ number_format($totalTerkumpul ?? $campaign->terkumpul ?? 0, 0, ',', '.') }}</strong>
             </div>
-            <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}" class="btn-mobile-donate">
-                <span>Donasi Sekarang</span>
-            </a>
+            @if($campaign->isDonatable())
+                <a href="{{ route('donasi.create', $campaign->getRouteSlug()) }}" class="btn-mobile-donate">
+                    <span>Donasi Sekarang</span>
+                </a>
+            @else
+                <button type="button" class="btn-mobile-donate is-disabled" disabled
+                    style="background:#94a3b8; cursor:not-allowed; border:none; opacity:0.85;">
+                    <span>{{ $campaign->getStatusText() === 'Berakhir' ? 'Campaign Berakhir' : 'Donasi Ditutup' }}</span>
+                </button>
+            @endif
 
         </div>
 

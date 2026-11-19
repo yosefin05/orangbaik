@@ -257,6 +257,11 @@ class PenggalangDanaController extends Controller
         $isOwner = auth()->check() && (int) auth()->id() === (int) $penggalang->user_id;
         $isAdmin = auth()->check() && method_exists(auth()->user(), 'isAdmin') && auth()->user()->isAdmin();
 
+        // Profil yang belum approved (pending/rejected) hanya boleh diakses oleh owner dan admin
+        if ($penggalang->status !== 'approved' && !$isOwner && !$isAdmin) {
+            abort(404, 'Profil penggalang dana tidak ditemukan atau belum disetujui.');
+        }
+
         // Dokumen handling:
         // - Owner atau Admin: dapat melihat seluruh dokumen
         // - Publik: jika organisasi/yayasan/komunitas, hanya dokumen publik. Jika individu, KOSONG (0 dokumen di-load).
@@ -278,7 +283,7 @@ class PenggalangDanaController extends Controller
 
         $legalitasDokumen = $penggalang->penggalangDanaDokumen;
 
-        return view('pages.profil-penggalang', compact('penggalang', 'isOwner', 'legalitasDokumen'));
+        return view('pages.profil-penggalang', compact('penggalang', 'isOwner', 'isAdmin', 'legalitasDokumen'));
     }
 
     public function rejected()

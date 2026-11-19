@@ -12,6 +12,9 @@
 </head>
 
 <body>
+    @php
+        $isAdmin = $isAdmin ?? (auth()->check() && (auth()->user()->role === 'admin' || (method_exists(auth()->user(), 'isAdmin') && auth()->user()->isAdmin())));
+    @endphp
     {{-- TOPBAR (mobile saja): jadi solid setelah banner di-scroll --}}
     <div class="profile-topbar" id="profileTopbar">
         <button class="profile-topbar-back" type="button" aria-label="Kembali" onclick="window.history.back()">
@@ -60,7 +63,7 @@
                             <img
                                 src="{{ $penggalang->foto_profil
                                     ? asset('storage/' . $penggalang->foto_profil)
-                                    : asset('assets/logo-icon.png') }}"
+                                    : asset('assets/logo.png') }}"
                                 alt="{{ $penggalang->nama_penggalang }}"
                                 class="penggalang-logo"
                                 width="72"
@@ -79,15 +82,15 @@
                                     </span>
                                 @endif
 
-                                @if($penggalang->jenis_penggalang == 'organisasi' && $penggalang->verified)
+                                @if(($penggalang->isEntity() || $penggalang->isOrganisasi()) && $penggalang->verified)
                                     <span class="jenis-badge">
-                                        <i class="bi bi-patch-check-fill"></i> Verified Organization
+                                        <i class="bi bi-patch-check-fill"></i> Verified {{ $penggalang->jenis_penggalang_label }}
                                     </span>
                                 @endif
 
                                 <span class="meta-item">
                                     <i class="bi bi-person-badge"></i>
-                                    {{ ucfirst($penggalang->jenis_penggalang) }}
+                                    {{ $penggalang->jenis_penggalang_label }}
                                 </span>
 
                                 <span class="meta-item">
@@ -287,7 +290,7 @@
                                 </div>
                                 <div class="info-row">
                                     <strong class="info-label">Jenis</strong>
-                                    <p class="info-value">{{ ucfirst($penggalang->jenis_penggalang) }}</p>
+                                    <p class="info-value">{{ $penggalang->jenis_penggalang_label }}</p>
                                 </div>
                                 @if($penggalang->tahun_berdiri)
                                     <div class="info-row">
@@ -295,20 +298,22 @@
                                         <p class="info-value">{{ $penggalang->tahun_berdiri }}</p>
                                     </div>
                                 @endif
-                                <div class="info-row">
-                                    <strong class="info-label">Lokasi</strong>
-                                    <p class="info-value">{{ $penggalang->alamat }}</p>
-                                </div>
+                                @if($penggalang->isEntity() || $isOwner || $isAdmin)
+                                    <div class="info-row">
+                                        <strong class="info-label">Lokasi</strong>
+                                        <p class="info-value">{{ $penggalang->alamat }}</p>
+                                    </div>
+                                @endif
                             </div>
                         </details>
 
                         @php
                             $docsToShow = $legalitasDokumen ?? $penggalang->penggalangDanaDokumen;
                         @endphp
-                        @if(($penggalang->jenis_penggalang === 'organisasi' && $docsToShow->isNotEmpty()) || $isOwner)
+                        @if(($penggalang->isEntity() && $docsToShow->isNotEmpty()) || $isOwner)
                             <details class="info-card" open>
                                 <summary>
-                                    <span>Informasi Legalitas {{ $penggalang->jenis_penggalang === 'organisasi' ? 'Organisasi' : '(Privat Pemilik)' }}</span>
+                                    <span>Informasi Legalitas {{ $penggalang->isEntity() ? $penggalang->jenis_penggalang_label : '(Privat Pemilik)' }}</span>
                                     <b><i class="bi bi-chevron-down"></i></b>
                                 </summary>
                                 @if($docsToShow->isNotEmpty())
@@ -336,16 +341,20 @@
                                 <b><i class="bi bi-chevron-down"></i></b>
                             </summary>
                             <div class="info-table">
-                                <div class="info-row">
-                                    <strong class="info-label">Email</strong>
-                                    <p class="info-value">
-                                        <a href="mailto:{{ $penggalang->email }}">{{ $penggalang->email }}</a>
-                                    </p>
-                                </div>
-                                <div class="info-row">
-                                    <strong class="info-label">Hotline</strong>
-                                    <p class="info-value">{{ $penggalang->no_telepon }}</p>
-                                </div>
+                                @if($penggalang->email && ($penggalang->isEntity() || $isOwner || $isAdmin))
+                                    <div class="info-row">
+                                        <strong class="info-label">Email</strong>
+                                        <p class="info-value">
+                                            <a href="mailto:{{ $penggalang->email }}">{{ $penggalang->email }}</a>
+                                        </p>
+                                    </div>
+                                @endif
+                                @if($penggalang->no_telepon && ($penggalang->isEntity() || $isOwner || $isAdmin))
+                                    <div class="info-row">
+                                        <strong class="info-label">Hotline / Kontak</strong>
+                                        <p class="info-value">{{ $penggalang->no_telepon }}</p>
+                                    </div>
+                                @endif
                                 @if($penggalang->instagram)
                                     <div class="info-row">
                                         <strong class="info-label">Instagram</strong>

@@ -10,15 +10,41 @@ use Illuminate\Support\Facades\DB;
 
 class PenggalangDanaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $penggalangDana = Penggalang_Dana::with('user')
-            ->latest()
-            ->paginate(10);
+        $query = Penggalang_Dana::with('user');
+
+        // Filter kategori (organisasi, yayasan_lembaga, komunitas, individu)
+        if ($request->filled('jenis_penggalang')) {
+            $query->where('jenis_penggalang', $request->jenis_penggalang);
+        }
+
+        // Filter status verifikasi (pending, approved, rejected)
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Pencarian nama, email, nomor
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_penggalang', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('no_telepon', 'LIKE', "%{$search}%")
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $penggalangDana = $query->latest()->paginate(10)->withQueryString();
+        $categories = Penggalang_Dana::getCategoryLabels();
+        $statuses = ['pending', 'approved', 'rejected'];
 
         return view(
             'admin.penggalang_dana.index',
-            compact('penggalangDana')
+            compact('penggalangDana', 'categories', 'statuses')
         );
     }
 

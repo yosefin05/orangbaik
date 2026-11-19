@@ -22,6 +22,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Auth;
 
 class FullFormAuditTest extends TestCase
 {
@@ -414,10 +415,23 @@ class FullFormAuditTest extends TestCase
             'is_active' => true,
         ]);
 
+        $this->get(route('donasi.create', $campaign->slug))
+            ->assertOk()
+            ->assertSee('name="sapaan"', false)
+            ->assertSee('<option value="Kak" selected>Kak</option>', false)
+            ->assertSee('value="Pak"', false)
+            ->assertSee('value="Bu"', false);
+        $this->actingAs($this->user)->get(route('donasi.create', $campaign->slug))
+            ->assertOk()
+            ->assertSee('name="sapaan"', false)
+            ->assertSee('<option value="Kak" selected>Kak</option>', false);
+        Auth::logout();
+
         $response = $this->post(route('donasi.store', $campaign->slug), [
             'nominal' => 50000,
             'payment_channel_id' => $this->channel->id,
             'nama_donatur' => 'Hamba Allah',
+            'sapaan' => 'Kak',
             'no_hp' => '081299998888',
             'doa' => 'Semoga berkah',
             'anonim' => '0',
@@ -432,7 +446,47 @@ class FullFormAuditTest extends TestCase
             'campaign_id' => $campaign->id,
             'nominal' => 50000,
             'nama_donatur' => 'Hamba Allah',
+            'sapaan' => 'Kak',
         ]);
+        $guestDonation = Donasi::whereNull('user_id')->firstOrFail();
+
+        $this->actingAs($this->admin)->get(route('admin.donasi.show', $guestDonation->id))
+            ->assertOk()
+            ->assertSee('menunggu%20pembayaran', false);
+
+        $this->actingAs($this->user)->postJson(route('donasi.store', $campaign->slug), [
+            'nominal' => 50000,
+            'payment_channel_id' => $this->channel->id,
+            'nama_donatur' => $this->user->name,
+            'sapaan' => 'Bu',
+            'no_hp' => '081299998888',
+        ])->assertOk()->assertJsonPath('success', true);
+
+        $this->assertDatabaseHas('donasi', [
+            'campaign_id' => $campaign->id,
+            'user_id' => $this->user->id,
+            'sapaan' => 'Bu',
+        ]);
+
+        $this->actingAs($this->user)->postJson(route('donasi.store', $campaign->slug), [
+            'nominal' => 50000,
+            'payment_channel_id' => $this->channel->id,
+            'nama_donatur' => $this->user->name,
+            'sapaan' => 'Yang Terhormat',
+            'no_hp' => '081299998888',
+        ])->assertUnprocessable()->assertJsonValidationErrors('sapaan');
+
+        $guestDonation->pembayaran->update(['transaction_status' => 'settlement']);
+        $receiptUrl = $guestDonation->fresh()->whatsapp_url;
+        $this->actingAs($this->admin)->get(route('admin.donasi.show', $guestDonation->id))
+            ->assertOk()
+            ->assertSee('kwitansi%2F', false);
+        preg_match('/https?:\/\/[^\s]+/', rawurldecode(parse_url($receiptUrl, PHP_URL_QUERY)), $receiptMatch);
+        $this->assertNotEmpty($receiptMatch);
+
+        Auth::logout();
+        $this->get($receiptMatch[0])->assertOk()->assertSee('E-Kwitansi');
+        $this->get($receiptMatch[0] . '&signature=invalid')->assertForbidden();
     }
 
     /** @test */

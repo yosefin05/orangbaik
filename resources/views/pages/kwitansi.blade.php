@@ -16,7 +16,7 @@
 
         {{-- TOOLBAR (tidak ikut print) --}}
         <div class="kwitansi-toolbar no-print">
-            <a href="{{ route('riwayat.donasi') }}" class="btn-back">
+            <a href="{{ url()->previous() && !str_contains(url()->previous(), 'kwitansi') ? url()->previous() : route('riwayat.donasi') }}" class="btn-back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -95,17 +95,17 @@
                                 <td>Nama</td>
                                 <td>:</td>
                                 <td>
-                                    @if($donasi->is_anonim)
-                                        <em>Hamba Allah</em>
+                                    @if($donasi->is_anonim || $donasi->is_anonymous)
+                                        <em>Hamba Allah (Anonim)</em>
                                     @else
-                                        {{ $donasi->user->name ?? '-' }}
+                                        <strong>{{ $donasi->nama_donatur ?: ($donasi->user->name ?? 'Donatur') }}</strong>
                                     @endif
                                 </td>
                             </tr>
                             <tr>
                                 <td>Email</td>
                                 <td>:</td>
-                                <td>{{ $donasi->is_anonim ? '-' : ($donasi->user->email ?? '-') }}</td>
+                                <td>{{ ($donasi->is_anonim || $donasi->is_anonymous) ? '-' : ($donasi->email ?: ($donasi->user->email ?? '-')) }}</td>
                             </tr>
                             <tr>
                                 <td>Tanggal Donasi</td>
@@ -126,15 +126,16 @@
                             <tr>
                                 <td>Metode</td>
                                 <td>:</td>
-                                <td>{{ ucfirst(str_replace('_', ' ', $donasi->pembayaran->payment_type ?? '-')) }}</td>
+                                <td>{{ $donasi->pembayaran?->paymentChannel?->name ?? ucfirst(str_replace('_', ' ', $donasi->pembayaran->payment_type ?? '-')) }}</td>
                             </tr>
                             <tr>
                                 <td>Tanggal Bayar</td>
                                 <td>:</td>
                                 <td>
-                                    @if($donasi->pembayaran && $donasi->pembayaran->transaction_time)
-                                        {{ \Carbon\Carbon::parse($donasi->pembayaran->transaction_time)->translatedFormat('d F Y, H:i') }}
-                                        WIB
+                                    @if($donasi->pembayaran?->paid_at)
+                                        {{ \Carbon\Carbon::parse($donasi->pembayaran->paid_at)->translatedFormat('d F Y, H:i') }} WIB
+                                    @elseif($donasi->pembayaran && $donasi->pembayaran->transaction_time)
+                                        {{ \Carbon\Carbon::parse($donasi->pembayaran->transaction_time)->translatedFormat('d F Y, H:i') }} WIB
                                     @else
                                         -
                                     @endif

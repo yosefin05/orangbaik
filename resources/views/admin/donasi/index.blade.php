@@ -14,7 +14,7 @@
             <i class="bi bi-wallet2"></i>
         </div>
         <div>
-            <p class="donasi-stat-label">Total Donasi</p>
+            <p class="donasi-stat-label">Total Leads</p>
             <h3 class="donasi-stat-value text-blue">{{ number_format($totalDonasiCount ?? $donasi->total(), 0, ',', '.') }}</h3>
         </div>
     </div>
@@ -202,7 +202,17 @@
                             </td>
 
                             <td>
-                                <span class="text-muted-strong">{{ $item->no_hp ?? '-' }}</span>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <span class="text-muted-strong">{{ $item->donor_phone ?? '-' }}</span>
+                                    @if($item->whatsapp_url)
+                                        <a href="{{ $item->whatsapp_url }}" target="_blank" rel="noopener noreferrer"
+                                           class="btn-wa-badge"
+                                           title="Kirim pesan WhatsApp ke donatur ({{ $item->normalized_whatsapp_number }})"
+                                           style="display:inline-flex; align-items:center; gap:3px; background:#25D366; color:#fff; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:600; text-decoration:none;">
+                                            <i class="bi bi-whatsapp"></i> WA
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
 
                             <td>
@@ -242,6 +252,20 @@
                                         <i class="bi bi-eye"></i>
                                         Detail
                                     </a>
+
+                                    @if($item->whatsapp_url)
+                                        <a href="{{ $item->whatsapp_url }}" target="_blank" rel="noopener noreferrer"
+                                            class="action-link" style="color:#16a34a;"
+                                            title="Hubungi Donatur via WhatsApp ({{ $item->normalized_whatsapp_number }})">
+                                            <i class="bi bi-whatsapp"></i>
+                                            WA
+                                        </a>
+                                    @else
+                                        <span class="action-link text-muted" style="opacity:0.4; cursor:not-allowed;" title="Nomor WhatsApp tidak tersedia">
+                                            <i class="bi bi-whatsapp"></i>
+                                            WA
+                                        </span>
+                                    @endif
 
                                     <a href="{{ route('admin.donasi.edit', $item->id) }}" class="action-link link-yellow"
                                         title="Edit status donasi">

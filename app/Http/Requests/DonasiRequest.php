@@ -52,6 +52,7 @@ class DonasiRequest extends FormRequest
             'nominal'            => 'required|integer|min:' . $minDonasi,
             'nominal_lainnya'    => 'nullable|integer|min:' . $minDonasi,
             'nama_donatur'       => 'nullable|string|max:100',
+            'sapaan'             => 'required|in:Kak,Pak,Bu',
             'no_hp'              => 'required|string|max:20',
             'pesan'              => 'nullable|string|max:255',
             'is_anonim'          => 'boolean',
