@@ -23,7 +23,7 @@ Tanggal checkpoint: 2026-11-19
 
 ## Penghalang deployment
 
-Branch sumber `main` (`7fb041b`, tracking `origin/main`) masih memiliki 34 path lokal. Branch `release/orangbaik-evaluation-20261119` dibuat dari `7fb041b`, berisi manifest 33 path A+B, dan dipush ke `origin` pada commit `d7cb9cb` (kemudian checkpoint ini diperbarui). Worktree terpisah lulus 126 Feature tests/562 assertions dan `npm run build`. Worktree memakai `.env` test-only dan junction read-only ke `vendor`/`node_modules`; `.env` root tidak diubah. Tidak ada workflow run untuk branch rilis: workflow `.github/workflows/main.yml` hanya deploy saat push `main`, menarik seluruh `main` ke staging, dan tidak mencadangkan database/file, menjalankan migration, smoke test, atau rollback. Versi MySQL staging, backup, konfigurasi target terverifikasi, dan akses live belum tersedia. Staging belum dideploy; production tidak disentuh.
+Branch sumber `main` (`7fb041b`, tracking `origin/main`) masih memiliki 34 path lokal. Branch `release/orangbaik-evaluation-20261119` dibuat dari `7fb041b`, berisi manifest 33 path A+B, dan dipush ke `origin` (kode di `d7cb9cb`, checkpoint terbaru `7dbacd7`). Worktree terpisah lulus 126 Feature tests/562 assertions dan `npm run build`. Worktree memakai `.env` test-only serta junction ke `vendor`/`node_modules`; `.env` root tidak diubah. Tidak ada workflow run untuk branch rilis: workflow `.github/workflows/main.yml` hanya deploy saat push `main`, menarik seluruh `main` ke staging, dan tidak mencadangkan database/file, menjalankan migration, smoke test, atau rollback. Versi MySQL staging, backup, konfigurasi target terverifikasi, dan akses live belum tersedia. Staging belum dideploy; production tidak disentuh.
 
 ## Langkah berikutnya
 
