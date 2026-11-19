@@ -71,7 +71,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('penggalang_dana.update', $penggalang->id) }}" method="POST"
+                <form action="{{ route('penggalang_dana.update', $penggalang->slug) }}" method="POST"
                     enctype="multipart/form-data" class="verify-form {{ $isPending ? 'disabled-overlay' : '' }}">
 
                     @csrf

@@ -265,7 +265,7 @@
                 <h1>Dashboard {{ $penggalang->nama_penggalang }}</h1>
                 <p>Kelola campaign, pantau donasi terkumpul, dan perbarui kabar terbaru secara real-time.</p>
             </div>
-            <a href="{{ route('profil.penggalang', $penggalang->id) }}" class="btn-dash-sm btn-dash-outline" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            <a href="{{ route('profil.penggalang', $penggalang->slug) }}" class="btn-dash-sm btn-dash-outline" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
                 <i class="bi bi-person-bounding-box"></i> Lihat Profil Publik
             </a>
         </div>
@@ -319,7 +319,7 @@
             <i class="bi bi-plus-circle-fill"></i>
             <span>Buat Campaign Baru</span>
         </a>
-        <a href="{{ route('profil.penggalang', $penggalang->id) }}" class="action-btn-card">
+        <a href="{{ route('profil.penggalang', $penggalang->slug) }}" class="action-btn-card">
             <i class="bi bi-pencil-square"></i>
             <span>Kelola Profil Penggalang</span>
         </a>

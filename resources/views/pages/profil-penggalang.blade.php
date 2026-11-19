@@ -112,9 +112,11 @@
                             </a>
                         @endif
 
-                        <a href="{{ route('penggalang_dana.edit', $penggalang->id) }}" class="profile-btn">
-                            <i class="bi bi-pencil-square"></i> Edit
-                        </a>
+                        @if($isOwner || $isAdmin)
+                            <a href="{{ route('penggalang_dana.edit', $penggalang->slug) }}" class="profile-btn">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                        @endif
                     </div>
                 </div>
 

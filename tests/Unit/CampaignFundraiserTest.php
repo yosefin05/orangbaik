@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class CampaignFundraiserTest extends TestCase
 {
-    public function test_referral_url_uses_campaign_custom_slug_and_fundraiser_code(): void
+    public function test_referral_url_uses_custom_alias(): void
     {
         $campaign = new Campaign([
             'slug' => 'slug-asli',
@@ -16,30 +16,26 @@ class CampaignFundraiserTest extends TestCase
         ]);
         $fundraiser = new Campaign_Fundraiser([
             'referral_code' => 'REF-USER123',
+            'alias' => 'andi-peduli',
         ]);
         $fundraiser->setRelation('campaign', $campaign);
 
         $url = $fundraiser->referral_url;
-        parse_str(parse_url($url, PHP_URL_QUERY), $query);
-
-        $this->assertSame('/campaign-pilihan', parse_url($url, PHP_URL_PATH));
-        $this->assertSame('REF-USER123', $query['ref']);
+        $this->assertSame('/ajak/andi-peduli', parse_url($url, PHP_URL_PATH));
     }
 
-    public function test_referral_url_falls_back_to_campaign_slug(): void
+    public function test_referral_url_is_campaign_independent(): void
     {
         $campaign = new Campaign([
             'slug' => 'slug-asli',
         ]);
         $fundraiser = new Campaign_Fundraiser([
             'referral_code' => 'REF-USER456',
+            'alias' => 'budi-berbagi',
         ]);
         $fundraiser->setRelation('campaign', $campaign);
 
         $url = $fundraiser->referral_url;
-        parse_str(parse_url($url, PHP_URL_QUERY), $query);
-
-        $this->assertSame('/slug-asli', parse_url($url, PHP_URL_PATH));
-        $this->assertSame('REF-USER456', $query['ref']);
+        $this->assertSame('/ajak/budi-berbagi', parse_url($url, PHP_URL_PATH));
     }
 }

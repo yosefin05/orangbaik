@@ -86,7 +86,7 @@
                     <div class="rejected-actions">
                         <a
                             href="{{ route('penggalang_dana.edit', [
-                                'id' => $penggalang->id,
+                                'id' => $penggalang->slug,
                                 'mode' => 'revisi'
                             ]) }}"
                             class="rejected-primary-button">

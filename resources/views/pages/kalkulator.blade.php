@@ -112,7 +112,7 @@
                         </button>
                     </div>
 
-                    <form action="{{ url('/kalkulator/hitung') }}" method="POST" id="zakatForm" class="zakat-form">
+                    <form action="{{ route('kalkulator.hitung') }}" method="POST" id="zakatForm" class="zakat-form">
                         @csrf
 
                         <input type="hidden" id="jenis" name="jenis" value="{{ $selectedZakat }}">

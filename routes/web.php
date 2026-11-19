@@ -74,15 +74,20 @@ Route::post('/berita/{berita}/komentar', [KomentarController::class, 'store'])
 // ============================================================
 // KALKULATOR ZAKAT
 // ============================================================
-Route::get('/kalkulator', [KalkulatorController::class, 'index']);
-Route::post('/kalkulator/hitung', [KalkulatorController::class, 'calculate'])->name('kalkulator.hitung');
+Route::get('/kalkulator-zakat', [KalkulatorController::class, 'index'])->name('kalkulator.index');
+Route::get('/kalkulator', fn () => redirect()->route('kalkulator.index', request()->query()));
+Route::post('/kalkulator-zakat/hitung', [KalkulatorController::class, 'calculate'])->name('kalkulator.hitung');
+Route::post('/kalkulator/hitung', fn () => redirect()->route('kalkulator.hitung', status: 307));
 
 // ============================================================
 // CAMPAIGN & DONASI (PUBLIC)
 // ============================================================
 Route::get('/donasi', [CampaignController::class, 'index'])->name('donasi');
-Route::get('/campaign/{slug}/donasi', [DonasiController::class, 'create'])->name('donasi.create');
-Route::post('/campaign/{slug}/donasi', [DonasiController::class, 'store'])->name('donasi.store');
+Route::get('/donasi/{slug}/bayar', [DonasiController::class, 'create'])->name('donasi.create');
+Route::post('/donasi/{slug}/bayar', [DonasiController::class, 'store'])->name('donasi.store');
+Route::match(['get', 'post'], '/campaign/{slug}/donasi', function (Request $request, string $slug) {
+    return redirect()->route('donasi.create', array_merge(['slug' => $slug], $request->query()), status: $request->isMethod('post') ? 307 : 302);
+});
 Route::get('/donasi/instruksi/{pembayaran}', [DonasiController::class, 'instruksi'])->name('donasi.bayar.instruksi');
 Route::post('/donasi/instruksi/{pembayaran}/upload-bukti', [DonasiController::class, 'uploadBukti'])->name('donasi.bayar.upload_bukti');
 Route::get('/donasi/instruksi/{pembayaran}/bukti-transfer', [DonasiController::class, 'viewBuktiTransfer'])->name('donasi.bayar.bukti_transfer');
@@ -97,7 +102,13 @@ Route::get('/syarat-ketentuan', [PageController::class, 'syaratKetentuan'])->nam
 Route::get('/pusat-bantuan', [PageController::class, 'pusatBantuan'])->name('pusat.bantuan');
 
 // Penggalang Dana (Public)
-Route::get('/profil-penggalang/{id}', [PenggalangDanaController::class, 'profile'])->name('profil.penggalang');
+Route::get('/penggalang/{id}', [PenggalangDanaController::class, 'profile'])
+    ->where('id', '^(?!dashboard$)[A-Za-z0-9][A-Za-z0-9-]*$')
+    ->name('profil.penggalang');
+Route::get('/profil-penggalang/{id}', function (string $id) {
+    $penggalang = \App\Models\Penggalang_Dana::where('id', $id)->orWhere('slug', $id)->firstOrFail();
+    return redirect()->route('profil.penggalang', $penggalang);
+});
 Route::get('/dokumen-penggalang/{id}', [DokumenPenggalangController::class, 'show'])->name('dokumen.show');
 
 // ============================================================
@@ -127,20 +138,23 @@ Route::middleware('auth')->group(function () {
     })->name('verifikasi.penggalang');
     Route::post('/verifikasi-penggalang', [PenggalangDanaController::class, 'storeIndividu'])
         ->name('penggalang_dana.individu.store');
-    Route::get('/penggalang-dana/{id}/edit', [PenggalangDanaController::class, 'edit'])
+    Route::get('/penggalang/{id}/edit', [PenggalangDanaController::class, 'edit'])
         ->name('penggalang_dana.edit');
-    Route::patch('/penggalang-dana/{id}', [PenggalangDanaController::class, 'update'])
+    Route::patch('/penggalang/{id}', [PenggalangDanaController::class, 'update'])
         ->name('penggalang_dana.update');
+    Route::get('/penggalang-dana/{id}/edit', fn (string $id) => redirect()->route('penggalang_dana.edit', $id));
+    Route::patch('/penggalang-dana/{id}', fn (Request $request, string $id) => redirect()->route('penggalang_dana.update', $id, 307));
     Route::get('/penggalang/rejected', [PenggalangDanaController::class, 'rejected'])
         ->name('penggalang_dana.rejected');
     Route::patch('/penggalang-dana/{id}/resubmit', [PenggalangDanaController::class, 'resubmit'])
         ->name('penggalang_dana.resubmit');
 
     // Profile User
-    Route::get('/profile-user', function () {
+    Route::get('/profil', function () {
         $penggalang = auth()->user()->penggalangDana()->first();
         return view('pages.profile-user', compact('penggalang'));
     })->name('profile.user');
+    Route::get('/profile-user', fn () => redirect()->route('profile.user'));
 
     // Riwayat Donasi & Resume Pembayaran
     Route::get('/riwayat-donasi', [RiwayatDonasiController::class, 'index'])->name('riwayat.donasi');
@@ -150,9 +164,13 @@ Route::middleware('auth')->group(function () {
         ->name('donasi.resume');
 
     // Profile (Breeze)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profil/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profil', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Legacy Breeze URLs tetap aktif agar form/bookmark lama tidak rusak.
+    Route::get('/profile', [ProfileController::class, 'edit']);
+    Route::patch('/profile', [ProfileController::class, 'update']);
+    Route::delete('/profile', [ProfileController::class, 'destroy']);
 });
 
 // ============================================================
@@ -183,6 +201,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/campaign/{slug}/fundraiser', [FundraiserController::class, 'destroy'])
         ->name('fundraiser.destroy')
         ->where('slug', '.*');
+    Route::patch('/fundraiser/{fundraiser}/alias', [FundraiserController::class, 'updateAlias'])->name('fundraiser.alias.update');
 
     // ============================================================
     // BERITA MANAGEMENT (Admin & Penggalang Dana)
@@ -202,8 +221,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__ . '/admin.php';
 
 // ============================================================
-// WILDCARD CAMPAIGN - HARUS DI PALING AKHIR!
-// ============================================================
-Route::get('/{slug}', [CampaignController::class, 'show'])
-    ->where('slug', '.*')
-    ->name('campaign.show');
+// Campaign detail menggunakan URL yang jelas; URL root lama tetap diarahkan.
+Route::get('/donasi/{slug}', [CampaignController::class, 'show'])->name('campaign.show');
+Route::get('/ajak/{alias}', [FundraiserController::class, 'track'])->name('referral.track');
+Route::get('/{slug}', function (string $slug) {
+    $campaign = \App\Models\Campaign::where('slug', $slug)->orWhere('custom_slug', $slug)->firstOrFail();
+    return redirect()->route('campaign.show', $campaign->getRouteSlug());
+})->where('slug', '[A-Za-z0-9][A-Za-z0-9-]*')->name('campaign.legacy');

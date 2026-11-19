@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
 
 class PenggalangDanaController extends Controller
 {
@@ -310,9 +311,7 @@ class PenggalangDanaController extends Controller
             ->orWhere('slug', $id)
             ->firstOrFail();
 
-        if ($penggalang->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak memiliki akses untuk mengedit profil ini.');
-        }
+        Gate::authorize('update', $penggalang);
 
         $categories = Penggalang_Dana::getCategoryLabels();
 
@@ -332,9 +331,7 @@ class PenggalangDanaController extends Controller
             ->orWhere('slug', $id)
             ->firstOrFail();
 
-        if ($penggalang->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak memiliki akses untuk mengubah profil ini.');
-        }
+        Gate::authorize('update', $penggalang);
 
         $validated = $request->validate([
             'jenis_penggalang' => 'nullable|string|in:organisasi,yayasan_lembaga,komunitas,individu',

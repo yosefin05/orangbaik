@@ -74,7 +74,7 @@
                 @endif
 
                 <form class="verify-form {{ $isPending ? 'disabled-overlay' : '' }}"
-                    action="{{ route('penggalang_dana.update', $penggalang->id) }}"
+                    action="{{ route('penggalang_dana.update', $penggalang->slug) }}"
                     method="POST" enctype="multipart/form-data" novalidate>
 
                     @csrf

@@ -307,7 +307,7 @@
                     <div class="fundraiser-info-card">
                         <h3>Informasi Penggalang Dana</h3>
 
-                        <a href="{{ route('profil.penggalang', $campaign->penggalangDana->id) }}"
+                        <a href="{{ route('profil.penggalang', $campaign->penggalangDana->slug) }}"
                             class="fundraiser-profile">
                             <img src="{{ asset('storage/' . ($campaign->penggalangDana->foto_profil ?? 'assets/logo-icon.png')) }}"
                                 alt="{{ $campaign->penggalangDana->nama_penggalang }}">

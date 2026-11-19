@@ -34,7 +34,7 @@
             <h4>Navigasi</h4>
             <a href="{{ route('home') }}">Beranda</a>
             <a href="{{ url('/donasi') }}">Donasi</a>
-            <a href="{{ url('/kalkulator') }}">Kalkulator</a>
+            <a href="{{ route('kalkulator.index') }}">Kalkulator</a>
             <a href="{{ url('/berita') }}">Berita</a>
         </div>
 

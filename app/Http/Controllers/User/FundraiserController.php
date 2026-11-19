@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 
 class FundraiserController extends Controller
 {
-    public function store($slug)
+    public function store($slug, Request $request)
     {
         // Cari campaign berdasarkan slug atau custom_slug
         $campaign = Campaign::where('slug', $slug)
@@ -36,12 +36,14 @@ class FundraiserController extends Controller
 
         // Generate referral code yang unik
         $referralCode = 'REF-' . strtoupper(Str::random(8));
+        $request->validate(['alias' => ['nullable', 'string', 'alpha_dash', 'min:3', 'max:120', 'unique:campaign_fundraiser,alias']]);
 
         // Buat fundraiser
         $fundraiser = Campaign_Fundraiser::create([
             'campaign_id' => $campaign->id,
             'user_id' => Auth::id(),
             'referral_code' => $referralCode,
+            'alias' => $request->input('alias'),
             'status' => 'active',
         ]);
 
@@ -56,6 +58,25 @@ class FundraiserController extends Controller
             'fundraiser_name' => Auth::user()->name,
             'fundraiser_avatar' => Auth::user()->foto_profil ?? 'assets/logo-icon.png',
         ]);
+    }
+
+    public function track(string $alias)
+    {
+        $fundraiser = Campaign_Fundraiser::with('campaign')
+            ->where('alias', $alias)->where('status', 'active')->firstOrFail();
+        abort_unless($fundraiser->campaign?->is_active, 404);
+        session()->put('campaign_referral.' . $fundraiser->campaign_id, $fundraiser->referral_code);
+        return redirect()->route('campaign.show', $fundraiser->campaign->getRouteSlug());
+    }
+
+    public function updateAlias(Request $request, Campaign_Fundraiser $fundraiser)
+    {
+        abort_unless((int) $fundraiser->user_id === (int) Auth::id(), 403);
+        $validated = $request->validate([
+            'alias' => ['required', 'string', 'alpha_dash', 'min:3', 'max:120', 'unique:campaign_fundraiser,alias,' . $fundraiser->id],
+        ]);
+        $fundraiser->update(['alias' => Str::slug($validated['alias'])]);
+        return back()->with('success', 'Alias referral berhasil diperbarui.');
     }
 
     public function destroy($slug)

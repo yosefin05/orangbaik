@@ -13,6 +13,7 @@ class Campaign_Fundraiser extends Model
         'campaign_id',
         'user_id',
         'referral_code',
+        'alias',
         'qr_path',
         'total_donasi',
         'status',
@@ -33,7 +34,26 @@ class Campaign_Fundraiser extends Model
             if (empty($model->status)) {
                 $model->status = 'active';
             }
+            if (empty($model->alias)) {
+                $model->alias = $model->generateAlias();
+            }
         });
+    }
+
+    public function generateAlias(): string
+    {
+        $base = Str::slug($this->user?->name ?: 'ajak-' . ($this->campaign_id ?: 'campaign')) ?: 'ajak';
+        $alias = $base;
+        $suffix = 1;
+        while (self::where('alias', $alias)->where('id', '!=', $this->getKey() ?: 0)->exists()) {
+            $alias = $base . '-' . (++$suffix);
+        }
+        return $alias;
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'alias';
     }
 
     public function generateReferralCode()
@@ -69,6 +89,6 @@ class Campaign_Fundraiser extends Model
 
     public function getReferralUrlAttribute()
     {
-        return route('campaign.show', $this->campaign->getRouteSlug()) . '?ref=' . $this->referral_code;
+        return route('referral.track', ['alias' => $this->alias]);
     }
 }

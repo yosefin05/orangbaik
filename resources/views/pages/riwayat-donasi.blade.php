@@ -180,7 +180,7 @@
                                         <a href="{{ $donation['resume_url'] }}"
                                             class="resume-button btn-resume"
                                             data-resume-url="{{ $donation['resume_url'] }}">
-                                            Lanjutkan Bayar
+                                            Lanjutkan Pembayaran
                                         </a>
                                     @endif
                                 </div>

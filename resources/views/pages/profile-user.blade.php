@@ -128,7 +128,7 @@
                                     <span class="menu-arrow" aria-hidden="true"></span>
                                 </a>
                             @elseif ($penggalangStatus === 'pending')
-                                <a href="{{ route('profil.penggalang', $penggalang->id) }}" class="profile-menu-item">
+                                <a href="{{ route('profil.penggalang', $penggalang->slug) }}" class="profile-menu-item">
                                     <span class="menu-icon">
                                         @include('components.profile-icon', ['type' => 'handshake'])
                                     </span>
@@ -156,7 +156,7 @@
                                     <span class="menu-arrow" aria-hidden="true"></span>
                                 </a>
                             @elseif ($penggalangStatus === 'approved')
-                                <a href="{{ route('profil.penggalang', $penggalang->id) }}" class="profile-menu-item">
+                            <a href="{{ route('profil.penggalang', $penggalang->slug) }}" class="profile-menu-item">
                                     <span class="menu-icon">
                                         @include('components.profile-icon', ['type' => 'handshake'])
                                         @if (!$penggalang->status_read)

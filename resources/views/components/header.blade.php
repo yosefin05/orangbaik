@@ -141,7 +141,7 @@
                         @endphp
 
                         @if ($penggalang && $penggalang->status === 'approved')
-                            <a href="{{ route('profil.penggalang', $penggalang->id) }}">
+                            <a href="{{ route('profil.penggalang', $penggalang->slug) }}">
                                 <i class="bi bi-people"></i>
                                 <span>Profil Penggalang</span>
                             </a>
