@@ -40,7 +40,7 @@ body {
 
 .register-links a {
     color: var(--muted);
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-bold);
     text-decoration: none;
 }
 
@@ -206,7 +206,7 @@ body {
     text-align: center;
     color: var(--primary);
     font-size: var(--fs-xxs);
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-bold);
     text-decoration: none;
 }
 
