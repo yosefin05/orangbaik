@@ -8,18 +8,33 @@
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/riwayat-donasi.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/riwayat-donasi.css') }}?v=2">
 </head>
 
 <body>
-
-    @include('components.header')
-
     @php
         // Data dikirim dari controller: $formattedDonations, $totalDonasi, $totalNominal, $totalSelesai
         $donations = $formattedDonations ?? [];
         $formatRupiah = fn($value) => 'Rp' . number_format($value, 0, ',', '.');
+
+        // presentasi saja: hitung dari data yang sudah ada
+        $totalMenunggu = collect($donations)->where('status_key', 'menunggu')->count();
+        $backUrl = url()->previous() && !str_contains(url()->previous(), 'riwayat-donasi')
+            ? url()->previous()
+            : route('profile.user');
     @endphp
+
+    {{-- TOPBAR (sama dengan halaman donasi-bayar & instruksi; tidak ikut print) --}}
+    <header class="history-topbar" id="history-topbar">
+        <div class="history-topbar-inner">
+            <a class="history-topbar-back" href="{{ $backUrl }}" aria-label="Kembali">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <div class="history-topbar-text">
+                <h1 class="history-topbar-title">Riwayat Donasi</h1>
+            </div>
+        </div>
+    </header>
 
     <main class="history-page page-wrapper">
         <div class="container">
@@ -36,7 +51,7 @@
 
                     <p class="section-description">
                         Pantau semua donasi yang sudah kamu lakukan, lihat status transaksi,
-                        dan akses e-kwitansi dengan mudah.
+                        dan akses bukti donasi dengan mudah.
                     </p>
                 </div>
 
@@ -58,7 +73,7 @@
                     </span>
 
                     <div>
-                        <span>Total Transaksi</span>
+                        <span>Transaksi</span>
                         <strong>{{ $totalDonasi ?? 0 }}</strong>
                     </div>
                 </article>
@@ -71,7 +86,7 @@
                     </span>
 
                     <div>
-                        <span>Donasi Selesai</span>
+                        <span>Selesai</span>
                         <strong>{{ $totalSelesai ?? 0 }}</strong>
                     </div>
                 </article>
@@ -79,15 +94,14 @@
                 <article class="summary-card">
                     <span class="summary-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24">
-                            <path d="M12 3V21" />
-                            <path
-                                d="M17 7H9.5C8.1 7 7 7.9 7 9.2C7 10.5 8.1 11.2 9.5 11.5L14.5 12.5C15.9 12.8 17 13.5 17 14.8C17 16.1 15.9 17 14.5 17H7" />
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M12 7V12L15 14" />
                         </svg>
                     </span>
 
                     <div>
-                        <span>Total Nominal</span>
-                        <strong>{{ $formatRupiah($totalNominal ?? 0) }}</strong>
+                        <span>Menunggu</span>
+                        <strong>{{ $totalMenunggu }}</strong>
                     </div>
                 </article>
             </section>
@@ -153,20 +167,20 @@
                                     </div>
                                 </div>
 
-                                <div class="history-payment">
+                                <div class="history-history">
                                     <span>Nominal</span>
                                     <strong>{{ $donation['amount'] }}</strong>
 
                                     @if ($donation['status_key'] === 'selesai')
                                         <a href="{{ route('riwayat-donasi.kwitansi', ['donasi' => $donation['id']]) }}"
                                             class="receipt-button" target="_blank">
-                                            E-Kwitansi
+                                            Lihat Bukti
                                         </a>
                                     @elseif ($donation['status_key'] === 'menunggu' && !empty($donation['resume_url']))
                                         <a href="{{ $donation['resume_url'] }}"
                                             class="resume-button btn-resume"
                                             data-resume-url="{{ $donation['resume_url'] }}">
-                                            Lanjutkan Pembayaran
+                                            Lanjutkan Bayar
                                         </a>
                                     @endif
                                 </div>
@@ -198,8 +212,8 @@
     @include('components.footer')
 
     @php
-        $isMidtransProd = config('payment.midtrans.is_production', config('midtrans.isProduction', false));
-        $midtransClientKey = config('payment.midtrans.client_key', config('midtrans.clientKey', ''));
+        $isMidtransProd = config('history.midtrans.is_production', config('midtrans.isProduction', false));
+        $midtransClientKey = config('history.midtrans.client_key', config('midtrans.clientKey', ''));
     @endphp
     @if (!empty($midtransClientKey))
         <script src="{{ $isMidtransProd ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
@@ -291,7 +305,7 @@
                 window.location.href = resumeUrl;
 
             } catch (err) {
-                console.error('Resume payment error:', err);
+                console.error('Resume history error:', err);
 
                 btn.textContent = originalText;
                 btn.style.pointerEvents = 'auto';

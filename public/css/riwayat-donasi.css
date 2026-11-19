@@ -1,11 +1,10 @@
 /* ================================
-   RIWAYAT DONASI - DASHBOARD STYLE
-   Responsive mengikuti pola campaign-show.css
+   RIWAYAT DONASI
+   Desktop: tampilan lama dengan sedikit perapian.
+   Mobile (<= 768px): didesain ulang — ringkas, tanpa kartu berlapis.
+   Token-based (global.css).
 ================================ */
 
-/* ================================
-   GLOBAL OVERFLOW PROTECTION
-================================ */
 body {
     overflow-x: hidden;
 }
@@ -13,8 +12,62 @@ body {
 .history-page {
     min-height: 100vh;
     background:
-        radial-gradient(circle at top left, rgba(51, 101, 175, 0.14), transparent 32%),
+        radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 14%, transparent), transparent 32%),
         linear-gradient(180deg, var(--bg-soft), var(--bg));
+}
+
+/* TOPBAR */
+.history-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border-soft);
+    background: var(--bg);
+    transition: box-shadow .25s ease;
+}
+
+.history-topbar.is-scrolled { box-shadow: var(--shadow-soft); }
+
+.history-topbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-inline: var(--space-4);
+    padding-top: env(safe-area-inset-top, 0px);
+    height: calc(56px + env(safe-area-inset-top, 0px));
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.history-topbar-back {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--bg-soft);
+    color: var(--text-dark);
+    font-size: var(--fs-md);
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color .2s ease, color .2s ease, transform .2s ease;
+}
+.history-topbar-back:hover { background: var(--primary-light); color: var(--primary); }
+.history-topbar-back:active { transform: scale(.94); }
+.history-topbar-back:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.history-topbar-text { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+
+.history-topbar-title {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
 }
 
 /* ================================
@@ -217,21 +270,24 @@ body {
     border-radius: 999px;
     background: transparent;
     color: var(--muted);
+    font-family: inherit;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .filter-button:hover,
 .filter-button.active {
     background: var(--primary);
     color: var(--bg);
-    box-shadow: 0 8px 18px rgba(51, 101, 175, 0.2);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.filter-button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 /* ================================
@@ -250,16 +306,13 @@ body {
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     min-width: 0;
 }
 
 .history-item:hover {
     transform: translateY(-3px);
-    border-color: rgba(51, 101, 175, 0.26);
+    border-color: color-mix(in srgb, var(--primary) 26%, transparent);
     box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
 }
 
@@ -378,24 +431,24 @@ body {
 }
 
 .status-selesai {
-    background: rgba(34, 197, 94, 0.12);
+    background: color-mix(in srgb, var(--success) 12%, transparent);
     color: var(--success);
 }
 
 .status-menunggu {
-    background: rgba(245, 158, 11, 0.14);
+    background: color-mix(in srgb, var(--secondary) 14%, transparent);
     color: var(--secondary);
 }
 
 .status-gagal {
-    background: rgba(239, 68, 68, 0.12);
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
     color: var(--danger);
 }
 
 /* ================================
-   PAYMENT
+   history
 ================================ */
-.history-payment {
+.history-history {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -407,13 +460,13 @@ body {
     min-width: 0;
 }
 
-.history-payment span {
+.history-history span {
     color: var(--muted);
     font-size: 13px;
     font-weight: 600;
 }
 
-.history-payment strong {
+.history-history strong {
     color: var(--text);
     font-size: 20px;
     font-weight: 900;
@@ -421,56 +474,43 @@ body {
     word-break: break-word;
 }
 
-.receipt-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 40px;
-    padding: 0 16px;
-    border-radius: 999px;
-    background: var(--primary);
-    color: var(--bg);
-    font-size: 13px;
-    font-weight: 800;
-    text-decoration: none;
-    white-space: nowrap;
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.receipt-button:hover {
-    transform: translateY(-2px);
-    background: var(--primary-hover);
-    box-shadow: 0 10px 22px rgba(51, 101, 175, 0.22);
-}
-
+.receipt-button,
 .resume-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 40px;
     padding: 0 16px;
+    border: none;
     border-radius: 999px;
-    background: #f59e0b;
-    color: #ffffff;
+    color: var(--bg);
+    font-family: inherit;
     font-size: 13px;
     font-weight: 800;
     text-decoration: none;
     white-space: nowrap;
-    border: none;
     cursor: pointer;
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.receipt-button {
+    background: var(--primary);
+}
+
+.receipt-button:hover {
+    transform: translateY(-2px);
+    background: var(--primary-hover);
+    box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.resume-button {
+    background: var(--secondary);
 }
 
 .resume-button:hover {
     transform: translateY(-2px);
-    background: #d97706;
-    box-shadow: 0 10px 22px rgba(245, 158, 11, 0.28);
+    background: color-mix(in srgb, var(--secondary) 85%, black);
+    box-shadow: 0 10px 22px color-mix(in srgb, var(--secondary) 28%, transparent);
 }
 
 /* ================================
@@ -532,17 +572,17 @@ body {
 }
 
 /* ================================
-   RESPONSIVE
+   TABLET (<= 1024px)
 ================================ */
-
-/* Tablet besar / laptop kecil */
 @media (max-width: 1024px) {
     .history-hero {
         grid-template-columns: 1fr;
+        gap: var(--space-5);
     }
 
-    .history-summary {
-        grid-template-columns: 1fr;
+    .history-hero-content,
+    .history-hero-card {
+        padding: var(--space-6);
     }
 
     .history-toolbar {
@@ -568,181 +608,332 @@ body {
     }
 }
 
-/* Tablet */
-@media (max-width: 992px) {
-    .history-hero {
-        gap: var(--space-5);
-    }
-
-    .history-hero-content,
-    .history-hero-card {
-        padding: var(--space-6);
-    }
-}
-
-/* Mobile besar */
+/* ===================================================================
+   MOBILE (<= 768px) — didesain ulang
+   Urutan: judul → total donasi → 3 angka ringkas → filter → daftar.
+   Panel tanpa kartu; tiap donasi = satu kartu ringkas:
+   [foto] status / judul / penggalang / tanggal · metode
+   ──────────────
+   Nominal                         [tombol aksi]
+   =================================================================== */
 @media (max-width: 768px) {
-    .history-hero-content,
-    .history-hero-card,
-    .history-panel {
+    .history-page {
+        background: var(--bg-soft);
+    }
+
+    /* --- hero --- */
+    .history-hero {
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    .history-hero-content {
+        padding: 0;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .history-hero-content .section-label {
+        display: none;
+    }
+
+    .history-hero-content .section-title {
+        margin-bottom: var(--space-1);
+        font-size: 24px;
+    }
+
+    .history-hero-content .section-description {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--muted);
+    }
+
+    .history-hero-card {
         padding: var(--space-5);
         border-radius: 20px;
+        box-shadow: none;
+    }
+
+    .history-hero-card::after {
+        width: 140px;
+        height: 140px;
+        right: -50px;
+        bottom: -60px;
+    }
+
+    .history-hero-card span {
+        margin-bottom: var(--space-1);
+        font-size: 13px;
     }
 
     .history-hero-card strong {
         font-size: 28px;
     }
 
-    .history-item {
-        grid-template-columns: 1fr;
-        gap: var(--space-4);
+    .history-hero-card p {
+        margin-top: var(--space-2);
+        font-size: 13px;
     }
 
-    .history-payment {
-        align-items: stretch;
-        padding-left: 0;
-        padding-top: var(--space-4);
+    /* --- 3 angka ringkas --- */
+    .history-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-2);
+        margin-bottom: var(--space-5);
+    }
+
+    .summary-card {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 2px;
+        padding: var(--space-3) var(--space-3);
+        border: 0;
+        border-radius: 14px;
+        box-shadow: none;
+    }
+
+    .summary-icon {
+        display: none;
+    }
+
+    .summary-card span:not(.summary-icon) {
+        order: 2;
+        margin: 0;
+        font-size: 12px;
+    }
+
+    .summary-card strong {
+        order: 1;
+        font-size: 20px;
+    }
+
+    /* --- panel tanpa kartu --- */
+    .history-panel {
+        padding: 0;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .history-toolbar {
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+    }
+
+    .history-toolbar h2 {
+        font-size: 18px;
+    }
+
+    .history-toolbar p {
+        display: none;
+    }
+
+    .history-filter {
+        padding: 4px;
+        border: 0;
+        background: var(--bg);
+        border-radius: 999px;
+    }
+
+    .filter-button {
+        flex: 1 0 auto;
+        min-height: 36px;
+        padding: 0 14px;
+        font-size: 12px;
+    }
+
+    .filter-button:hover:not(.active) {
+        background: transparent;
+        color: var(--muted);
+        box-shadow: none;
+    }
+
+    /* --- kartu donasi ringkas --- */
+    .history-list {
+        gap: var(--space-3);
+    }
+
+    .history-item {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        border: 0;
+        border-radius: 18px;
+        box-shadow: none;
+    }
+
+    .history-item:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .history-item-main {
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    .history-image-wrap {
+        width: 64px;
+        height: 64px;
+        flex: 0 0 64px;
+        padding: 0;
+        border: 0;
+        border-radius: 14px;
+        background: transparent;
+    }
+
+    .history-image {
+        border-radius: 14px;
+    }
+
+    .history-info-top {
+        margin-bottom: 4px;
+    }
+
+    .history-type {
+        display: none;
+    }
+
+    .status-badge {
+        min-height: 22px;
+        padding: 0 8px;
+        font-size: 11px;
+    }
+
+    .history-info h3 {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .history-organizer {
+        margin-top: 2px;
+        overflow: hidden;
+        font-size: 12px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .history-detail {
+        gap: 0;
+        margin-top: var(--space-1);
+    }
+
+    .history-detail span {
+        min-height: 0;
+        padding: 0;
+        background: transparent;
+        border-radius: 0;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .history-detail span + span::before {
+        content: "\00b7";
+        margin: 0 6px;
+    }
+
+    /* nomor invoice disembunyikan di HP (ada di kwitansi) */
+    .history-detail span:nth-child(3) {
+        display: none;
+    }
+
+    /* --- baris nominal + aksi --- */
+    .history-history {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+        column-gap: var(--space-3);
+        row-gap: 0;
+        align-items: center;
+        padding: var(--space-3) 0 0;
         border-left: 0;
         border-top: 1px dashed var(--border);
         text-align: left;
     }
 
-    .receipt-button {
-        width: 100%;
-    }
-}
-
-/* Mobile */
-@media (max-width: 520px) {
-    .history-page {
-        background: var(--bg-soft);
-    }
-
-    .history-hero-content,
-    .history-hero-card,
-    .history-panel {
-        padding: var(--space-4);
-        border-radius: 16px;
-    }
-
-    .history-hero-card strong {
-        font-size: 24px;
-    }
-
-    .history-item-main {
-        align-items: flex-start;
-    }
-
-    .history-image-wrap {
-        width: 86px;
-        height: 78px;
-        flex-basis: 86px;
-        border-radius: 16px;
-    }
-
-    .history-image {
-        border-radius: 12px;
-    }
-
-    .history-info h3 {
-        font-size: 15px;
-    }
-
-    .history-organizer {
-        font-size: 13px;
-    }
-
-    .history-detail {
-        gap: 6px;
-    }
-
-    .history-detail span {
+    .history-history span {
+        grid-column: 1;
+        grid-row: 1;
         font-size: 11px;
+        font-weight: 500;
     }
 
-    .history-toolbar h2 {
-        font-size: 21px;
+    .history-history strong {
+        grid-column: 1;
+        grid-row: 2;
+        font-size: 17px;
     }
 
-    .history-toolbar p {
-        font-size: 13px;
+    .history-history .receipt-button,
+    .history-history .resume-button {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        width: auto;
+        min-height: 36px;
+        padding: 0 16px;
+        font-size: 12px;
     }
 
-    .summary-card {
-        padding: var(--space-4);
+    .receipt-button:hover,
+    .resume-button:hover {
+        transform: none;
+        box-shadow: none;
     }
 
-    .summary-card strong {
-        font-size: 18px;
-    }
-
-    .summary-icon {
-        width: 42px;
-        height: 42px;
-        flex-basis: 42px;
-        border-radius: 14px;
-    }
-
-    .summary-icon svg {
-        width: 20px;
-        height: 20px;
-    }
-
-    .history-payment strong {
-        font-size: 18px;
-    }
-
+    /* --- kosong --- */
     .history-empty,
     .history-empty-filter {
         padding: var(--space-6) var(--space-4);
+        background: var(--bg);
+        border: 0;
+        border-radius: 18px;
     }
 
     .history-empty h2,
     .history-empty-filter h3 {
-        font-size: 18px;
+        font-size: 17px;
     }
 
     .history-empty p,
     .history-empty-filter p {
         font-size: 13px;
     }
+
+    .empty-button {
+        width: 100%;
+    }
 }
 
-/* Mobile kecil */
-@media (max-width: 420px) {
-    .history-item-main {
-        flex-direction: column;
+/* ================================
+   HP KECIL
+================================ */
+@media (max-width: 380px) {
+    .history-hero-card strong {
+        font-size: 24px;
+    }
+
+    .summary-card strong {
+        font-size: 18px;
     }
 
     .history-image-wrap {
-        width: 100%;
-        height: 150px;
-        flex-basis: auto;
+        width: 56px;
+        height: 56px;
+        flex-basis: 56px;
     }
 
-    .history-info-top {
-        flex-wrap: wrap;
-    }
-
-    .history-filter {
-        border-radius: 14px;
-    }
-
-    .filter-button {
-        min-height: 34px;
+    .history-history .receipt-button,
+    .history-history .resume-button {
         padding: 0 12px;
-        font-size: 12px;
-    }
-
-    .history-hero-card strong {
-        font-size: 22px;
     }
 }
 
-/* ============================================================
-   Sembunyikan elemen mobile-only di desktop
-   (misal bottom-nav atau floating CTA kalau ada)
-============================================================ */
+/* Elemen mobile-only disembunyikan di desktop */
 @media (min-width: 769px) {
     .mobile-sticky-cta {
         display: none !important;

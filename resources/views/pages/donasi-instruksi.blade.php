@@ -7,7 +7,7 @@
     <title>Instruksi Pembayaran - OrangBaik.id</title>
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/donasi-instruksi.css') }}?v=13">
+    <link rel="stylesheet" href="{{ asset('css/donasi-instruksi.css') }}?v=15">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
@@ -33,7 +33,7 @@
         };
         $statusNote = match ($statusKey) {
             'settlement' => 'Terima kasih, donasimu sudah kami terima.',
-            'pending'    => 'Selesaikan pembayaran agar donasimu langsung terverifikasi.',
+            'pending'    => 'Selesaikan pembayaran agar donasimu terverifikasi.',
             default      => 'Pembayaran tidak dapat dilanjutkan. Silakan buat donasi baru.',
         };
         $statusIcon = match ($statusKey) {
@@ -41,12 +41,16 @@
             'pending'    => 'bi-clock-fill',
             default      => 'bi-x-circle-fill',
         };
+        $methodIcon = match ($pembayaran->payment_type) {
+            'va'       => 'bi-bank2',
+            'transfer' => 'bi-bank',
+            default    => 'bi-wallet2',
+        };
 
         $nominalFormatted = number_format($donasi->nominal, 0, ',', '.');
         $nominalRaw = number_format($donasi->nominal, 0, '', '');
         $nomorRekening = $pembayaran->paymentChannel->account_number ?? $pembayaran->gateway_response['account_number'] ?? null;
         $namaMetode = $pembayaran->paymentChannel->name ?? $pembayaran->payment_type;
-        $inisialMetode = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr((string) $namaMetode, 0, 3));
     @endphp
 
     {{-- TOPBAR (sama dengan halaman donasi-bayar) --}}
@@ -64,94 +68,79 @@
     <main class="pay-page">
         <div class="pay-container">
 
-            @if (session('success'))
-                <div class="alert alert--success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>{{ session('success') }}</span>
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="alert alert--danger">
-                    <i class="bi bi-x-circle-fill"></i>
-                    <span>{{ session('error') }}</span>
+            @if (session('success') || session('error'))
+                <div class="pay-alerts">
+                    @if (session('success'))
+                        <div class="alert alert--success">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert--danger">
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>{{ session('error') }}</span>
+                        </div>
+                    @endif
                 </div>
             @endif
 
             <div class="pay-layout">
 
-                {{-- ============ RINGKASAN (hero gradient) ============ --}}
-                <aside class="pay-side">
-                    <section class="pay-summary pay-summary--{{ $statusKey }}">
+                {{-- ============ HERO: STATUS + NOMINAL ============ --}}
+                <section class="pay-hero pay-hero--{{ $statusKey }}">
 
-                        {{-- Order ID + status pill ala invoice --}}
-                        <div class="summary-top">
-                            <span class="summary-order"><i class="bi bi-receipt"></i> {{ $pembayaran->order_id }}</span>
-                            <span class="summary-pill"><i class="bi {{ $statusIcon }}"></i> {{ $statusLabel }}</span>
+                    <div class="hero-top">
+                        <span class="hero-pill"><i class="bi {{ $statusIcon }}"></i> {{ $statusLabel }}</span>
+                        <span class="hero-order">{{ $pembayaran->order_id }}</span>
+                    </div>
+
+                    <span class="hero-label">Total yang perlu dibayar</span>
+                    <div class="hero-amount-row">
+                        <span class="hero-amount" id="nominal-transfer">Rp {{ $nominalFormatted }}</span>
+                        <button class="copy-chip" type="button" id="copy-nominal-btn" data-copy="{{ $nominalRaw }}" aria-label="Salin nominal">
+                            <i class="bi bi-clipboard"></i> <span>Salin</span>
+                        </button>
+                    </div>
+                    <p class="hero-hint">{{ $statusNote }}</p>
+
+                    <div class="hero-campaign">
+                        <i class="bi bi-heart-fill"></i>
+                        <div>
+                            <small>Donasi untuk</small>
+                            <strong>{{ $donasi->campaign->judul ?? 'Campaign' }}</strong>
                         </div>
+                    </div>
 
-                        <span class="summary-label">Total yang perlu dibayar</span>
-                        <div class="summary-amount-row">
-                            <span class="summary-amount" id="nominal-transfer">Rp {{ $nominalFormatted }}</span>
-                            <button class="summary-copy" type="button" id="copy-nominal-btn" data-copy="{{ $nominalRaw }}" aria-label="Salin nominal">
-                                <i class="bi bi-clipboard"></i> <span>Salin</span>
-                            </button>
-                        </div>
-                        <p class="summary-hint">{{ $statusNote }}</p>
+                    {{-- CTA desktop (mobile/tablet pakai bar bawah) --}}
+                    @if ($hasSnapPay)
+                        <button type="button" id="pay-snap-btn" class="cta-main">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                            <span>Bayar Sekarang</span>
+                        </button>
+                    @elseif ($flipPaymentUrl)
+                        <a href="{{ $flipPaymentUrl }}" target="_blank" rel="noopener noreferrer" class="cta-main">
+                            <i class="bi bi-box-arrow-up-right"></i>
+                            <span>Lanjutkan ke Halaman Pembayaran</span>
+                        </a>
+                    @endif
+                </section>
 
-                        <dl class="summary-meta">
-                            <div>
-                                <dt>Donasi untuk</dt>
-                                <dd>{{ $donasi->campaign->judul ?? 'Campaign' }}</dd>
-                            </div>
-                            <div>
-                                <dt>Metode</dt>
-                                <dd>{{ $namaMetode }}</dd>
-                            </div>
-                        </dl>
-
-                        {{-- CTA desktop (mobile/tablet pakai bar bawah) --}}
-                        @if ($hasSnapPay)
-                            <button type="button" id="pay-snap-btn" class="cta-main">
-                                <i class="bi bi-lightning-charge-fill"></i>
-                                <span>Bayar Sekarang</span>
-                            </button>
-                            <p class="cta-sub">GoPay, QRIS, Virtual Account &amp; lainnya</p>
-                        @elseif ($flipPaymentUrl)
-                            <a href="{{ $flipPaymentUrl }}" target="_blank" rel="noopener noreferrer" class="cta-main">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                                <span>Lanjutkan ke Halaman Pembayaran</span>
-                            </a>
-                            <p class="cta-sub">Kamu akan diarahkan ke halaman pembayaran Flip</p>
-                        @endif
-                    </section>
-
-                    <p class="pay-trust">
-                        <i class="bi bi-shield-lock-fill"></i>
-                        Transaksi aman &amp; terenkripsi standar perbankan
-                    </p>
-                </aside>
-
-                {{-- ============ DETAIL & LANGKAH ============ --}}
-                <div class="pay-main">
+                {{-- ============ KONTEN ============ --}}
+                <div class="pay-content">
 
                     {{-- METODE + REKENING --}}
-                    <section class="pay-card">
-                        <div class="method-row">
-                            <span class="method-avatar">{{ $inisialMetode }}</span>
+                    <section class="pay-block">
+                        <div class="method-line">
+                            <span class="method-icon"><i class="bi {{ $methodIcon }}"></i></span>
                             <div class="method-text">
                                 <span class="method-label">Metode pembayaran</span>
-                                <strong class="method-name">
-                                    {{ $namaMetode }}
-                                    @if ($pembayaran->paymentChannel?->gateway)
-                                        <small>· {{ $pembayaran->paymentChannel->gateway->name }}</small>
-                                    @endif
-                                </strong>
+                                <strong class="method-name">{{ $namaMetode }}</strong>
                             </div>
                         </div>
 
                         @if ($nomorRekening)
-                            <div class="account-box">
+                            <div class="account">
                                 <span class="account-label">
                                     {{ $pembayaran->payment_type === 'va' ? 'Nomor Virtual Account' : 'Nomor Rekening' }}
                                 </span>
@@ -169,37 +158,35 @@
                         @endif
                     </section>
 
-                    {{-- LANGKAH PEMBAYARAN --}}
-                    <details class="pay-card steps-card" open>
-                        <summary class="card-title card-title--toggle">
-                            <span><i class="bi bi-list-check"></i> Cara Menyelesaikan Pembayaran</span>
+                    {{-- CARA BAYAR --}}
+                    <details class="pay-block steps-block" open>
+                        <summary>
+                            <h2 class="block-title"><i class="bi bi-list-check"></i> Cara Pembayaran</h2>
                             <i class="bi bi-chevron-down toggle-chevron"></i>
                         </summary>
                         <ol class="steps">
                             @if ($pembayaran->payment_type === 'va')
-                                <li>Buka aplikasi Mobile Banking / Internet Banking / ATM bank Anda.</li>
-                                <li>Pilih menu <strong>Transfer / Pembayaran</strong> &gt; <strong>Virtual Account</strong>.</li>
-                                <li>Masukkan nomor Virtual Account di atas.</li>
-                                <li>Periksa kembali nominal dan nama penerima, lalu konfirmasi pembayaran.</li>
-                                <li>Status donasi akan terverifikasi secara otomatis setelah pembayaran berhasil.</li>
+                                <li>Buka aplikasi m-banking, internet banking, atau ATM.</li>
+                                <li>Pilih <strong>Transfer</strong> &gt; <strong>Virtual Account</strong>.</li>
+                                <li>Masukkan nomor Virtual Account di atas, lalu periksa nominalnya.</li>
+                                <li>Konfirmasi pembayaran. Status donasi terverifikasi otomatis.</li>
                             @elseif (!empty($pembayaran->snap_token))
-                                <li>Klik tombol <strong>Bayar Sekarang</strong> untuk membuka jendela pembayaran Midtrans.</li>
-                                <li>Pilih metode pembayaran yang Anda inginkan (GoPay, ShopeePay, QRIS, Virtual Account, dll.).</li>
-                                <li>Selesaikan pembayaran sesuai instruksi pada layar Midtrans.</li>
-                                <li>Status donasi akan terverifikasi secara otomatis setelah pembayaran berhasil.</li>
+                                <li>Klik tombol <strong>Bayar Sekarang</strong>.</li>
+                                <li>Pilih metode pembayaran (GoPay, ShopeePay, QRIS, Virtual Account, dll).</li>
+                                <li>Selesaikan pembayaran sesuai instruksi di layar. Status donasi terverifikasi otomatis.</li>
                             @else
-                                <li>Transfer dana sejumlah <strong>Rp {{ $nominalFormatted }}</strong> ke nomor rekening di atas.</li>
-                                <li>Simpan bukti transfer berupa struk / screenshot m-banking.</li>
-                                <li>Unggah foto/tangkapan layar bukti transfer pada formulir di bawah ini.</li>
-                                <li>Tim OrangBaik akan memverifikasi pembayaran Anda dalam waktu 1x24 jam.</li>
+                                <li>Transfer sejumlah <strong>Rp {{ $nominalFormatted }}</strong> ke rekening di atas.</li>
+                                <li>Simpan bukti transfer (struk atau screenshot).</li>
+                                <li>Unggah bukti transfer pada formulir di bawah.</li>
+                                <li>Tim OrangBaik memverifikasi dalam 1x24 jam.</li>
                             @endif
                         </ol>
                     </details>
 
                     {{-- UPLOAD BUKTI TRANSFER (KHUSUS TRANSFER MANUAL) --}}
                     @if ($pembayaran->payment_type === 'transfer' || $pembayaran->isManualTransfer())
-                        <section class="pay-card">
-                            <h2 class="card-title"><i class="bi bi-cloud-arrow-up-fill"></i> Upload Bukti Transfer</h2>
+                        <section class="pay-block">
+                            <h2 class="block-title"><i class="bi bi-cloud-arrow-up-fill"></i> Upload Bukti Transfer</h2>
 
                             @if ($pembayaran->bukti_transfer)
                                 <div class="upload-existing">
@@ -210,7 +197,7 @@
                                         <img src="{{ route('donasi.bayar.bukti_transfer', ['pembayaran' => $pembayaran->id, 'token' => request()->query('token')]) }}" alt="Bukti Transfer" class="upload-preview">
                                     </a>
                                     @if ($pembayaran->transaction_status === 'pending')
-                                        <p class="upload-hint">Ingin mengganti bukti transfer? Pilih file baru di bawah dan klik upload ulang.</p>
+                                        <p class="upload-hint">Ingin mengganti? Pilih file baru di bawah.</p>
                                     @endif
                                 </div>
                             @endif
@@ -222,8 +209,8 @@
                                     <input type="hidden" name="token" value="{{ request()->query('token') }}">
                                     <label class="file-drop" for="bukti-input">
                                         <i class="bi bi-image"></i>
-                                        <span class="file-drop-text">Klik untuk pilih foto bukti transfer</span>
-                                        <small class="upload-hint">Format: JPG, PNG, WEBP (Maksimal 5MB)</small>
+                                        <span class="file-drop-text">Pilih foto bukti transfer</span>
+                                        <small class="upload-hint">JPG, PNG, WEBP &middot; maks. 5MB</small>
                                         <input id="bukti-input" type="file" name="bukti_transfer" accept="image/jpeg,image/png,image/jpg,image/webp" required>
                                     </label>
                                     <button type="submit" class="btn-upload">
@@ -234,7 +221,7 @@
                             @elseif ($pembayaran->transaction_status === 'settlement')
                                 <div class="alert alert--success alert--flush">
                                     <i class="bi bi-check-circle-fill"></i>
-                                    <span>Pembayaran telah diverifikasi oleh admin. Terima kasih atas donasi Anda!</span>
+                                    <span>Pembayaran sudah diverifikasi. Terima kasih atas donasimu!</span>
                                 </div>
                             @endif
                         </section>
@@ -251,7 +238,7 @@
         </div>
     </main>
 
-    {{-- STICKY CTA (khusus mobile) --}}
+    {{-- STICKY CTA (khusus mobile & tablet) --}}
     @if ($hasSnapPay)
         <div class="sticky-cta">
             <div class="sticky-cta-inner">
