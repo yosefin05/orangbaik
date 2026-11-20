@@ -1,0 +1,1065 @@
+/* ============================================================
+   VERIFIKASI PENGGALANG DANA — ORANGBAIK.ID
+   Halaman pendaftaran Individu & Organisasi (desain baru)
+
+   Prinsip: minimalis, ringkas, mudah diikuti.
+   - Desktop : kolom progres (sticky) di kiri + form berupa kartu.
+   - Mobile  : progres ringkas di atas, section datar dipisah garis
+               tipis (tanpa kartu bertumpuk), tombol kirim menempel
+               di bawah.
+   Seluruh nilai memakai token global.css.
+
+   File ini TIDAK menggantikan verify-penggalang.css (masih dipakai
+   halaman edit). Halaman pendaftaran cukup memuat file ini.
+
+   Daftar isi:
+   1.  Page & judul
+   2.  Layout & progres
+   3.  Kartu section
+   4.  Field & input
+   5.  Unggah (banner, foto/logo, dokumen)
+   6.  Bagian lipat (opsional)
+   7.  Tombol aksi
+   8.  Responsive tablet
+   9.  Responsive mobile
+   10. Aksesibilitas
+============================================================ */
+
+
+/* ============================================================
+   1. PAGE & JUDUL
+============================================================ */
+
+.reg-page {
+    padding-block: var(--space-8) var(--space-16);
+
+    background: var(--bg-soft);
+    color: var(--text-dark);
+}
+
+.reg-head {
+    max-width: 720px;
+    margin-bottom: var(--space-6);
+}
+
+.reg-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+
+    color: var(--primary);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    line-height: 1.4;
+}
+
+.reg-eyebrow::before {
+    width: 6px;
+    height: 6px;
+
+    border-radius: var(--radius-full);
+    background: var(--primary);
+
+    content: "";
+}
+
+.reg-head h1 {
+    margin: 0 0 var(--space-2);
+
+    color: var(--text-dark);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+}
+
+.reg-head p {
+    margin: 0;
+
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    line-height: 1.7;
+}
+
+/* "Siapkan dulu" */
+.reg-prepare {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+}
+
+.reg-prepare-title {
+    width: 100%;
+    margin: 0;
+
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.reg-prepare ul {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.reg-prepare li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    color: var(--text);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+}
+
+.reg-prepare li i {
+    color: var(--primary);
+}
+
+
+/* ============================================================
+   2. LAYOUT & PROGRES
+============================================================ */
+
+.reg-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+}
+
+.reg-main {
+    min-width: 0;
+}
+
+.reg-side {
+    position: sticky;
+    top: calc(75px + var(--space-6)); /* tepat di bawah header situs */
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    padding: var(--space-4);
+
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    background: var(--bg);
+    box-shadow: var(--shadow-card);
+}
+
+.reg-progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.reg-progress-top span {
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+}
+
+.reg-bar {
+    height: 6px;
+    overflow: hidden;
+
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+}
+
+.reg-bar-fill {
+    height: 100%;
+
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+
+    transition: width .3s ease;
+}
+
+.reg-progress-text {
+    margin: var(--space-2) 0 0;
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.5;
+}
+
+/* Daftar langkah */
+.reg-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: var(--space-3) 0 0;
+
+    border-top: 1px solid var(--border-soft);
+    list-style: none;
+}
+
+.reg-steps a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    padding: var(--space-2) var(--space-2);
+
+    border-radius: var(--radius-md);
+
+    color: var(--text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    line-height: 1.3;
+
+    transition:
+        background-color .15s ease,
+        color .15s ease;
+}
+
+.reg-steps a:hover {
+    background: var(--bg-soft);
+}
+
+.reg-steps a.is-current {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: var(--fw-bold);
+}
+
+.reg-step-num {
+    width: 24px;
+    height: 24px;
+
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg);
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+
+    transition:
+        background-color .15s ease,
+        border-color .15s ease,
+        color .15s ease;
+}
+
+.reg-step-num i {
+    display: none;
+}
+
+.reg-steps a.is-current .reg-step-num {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.reg-steps a.is-done .reg-step-num {
+    border-color: var(--success);
+    background: var(--success);
+    color: var(--bg);
+}
+
+.reg-steps a.is-done .reg-step-num b {
+    display: none;
+}
+
+.reg-steps a.is-done .reg-step-num i {
+    display: block;
+}
+
+.reg-step-label {
+    min-width: 0;
+    flex: 1;
+}
+
+.reg-step-tag {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-regular);
+}
+
+
+/* ============================================================
+   3. KARTU SECTION
+============================================================ */
+
+.reg-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.reg-card {
+    scroll-margin-top: calc(75px + var(--space-4));
+    padding: var(--space-6);
+
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    background: var(--bg);
+    box-shadow: var(--shadow-card);
+}
+
+.reg-card-head {
+    margin-bottom: var(--space-5);
+}
+
+.reg-card-head h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-1);
+
+    color: var(--text-dark);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1.3;
+}
+
+.reg-tag {
+    padding: 2px var(--space-2);
+
+    border-radius: var(--radius-full);
+    background: var(--bg-soft);
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+    line-height: 1.4;
+}
+
+.reg-card-head p {
+    max-width: 640px;
+    margin: 0;
+
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    line-height: 1.6;
+}
+
+.reg-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+
+/* ============================================================
+   4. FIELD & INPUT
+============================================================ */
+
+.reg-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+}
+
+.reg-field {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.reg-label {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    line-height: 1.4;
+}
+
+.reg-label b {
+    color: var(--danger);
+}
+
+.reg-label em {
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-style: normal;
+    font-weight: var(--fw-regular);
+}
+
+.reg-hint {
+    margin: 0;
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    line-height: 1.5;
+}
+
+.reg-error {
+    display: block;
+    margin: 0;
+
+    color: var(--danger);
+    font-size: var(--fs-xxs);
+    font-weight: var(--fw-medium);
+    line-height: 1.4;
+}
+
+/* 16px agar iOS tidak memperbesar layar saat input difokus */
+.reg-field input:not([type="file"]),
+.reg-field select,
+.reg-field textarea {
+    width: 100%;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+
+    color: var(--text-dark);
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-regular);
+
+    scroll-margin-top: calc(75px + var(--space-6));
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
+
+.reg-field input:not([type="file"]),
+.reg-field select {
+    height: 44px;
+    padding: 0 var(--space-4);
+}
+
+.reg-field textarea {
+    min-height: 96px;
+    padding: var(--space-3) var(--space-4);
+
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.reg-field textarea.is-tall {
+    min-height: 144px;
+}
+
+.reg-field input::placeholder,
+.reg-field textarea::placeholder {
+    color: var(--muted-light);
+}
+
+.reg-field input:not([type="file"]):focus,
+.reg-field select:focus,
+.reg-field textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.reg-field:has(.reg-error) input:not([type="file"]),
+.reg-field:has(.reg-error) select,
+.reg-field:has(.reg-error) textarea {
+    border-color: var(--danger);
+}
+
+/* panah select */
+.reg-field select {
+    padding-right: var(--space-10);
+
+    appearance: none;
+    -webkit-appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 15px) 50%;
+    background-repeat: no-repeat;
+    background-size: 5px 5px;
+
+    cursor: pointer;
+}
+
+/* input terkunci (mis. jenis penggalang individu) */
+.reg-static {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: fit-content;
+
+    padding: var(--space-2) var(--space-4);
+
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+
+    color: var(--primary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+
+/* ============================================================
+   5. UNGGAH (banner, foto/logo, dokumen)
+============================================================ */
+
+/* ----- Banner (organisasi) ----- */
+.reg-cover {
+    position: relative;
+
+    width: 100%;
+    min-height: 140px;
+    aspect-ratio: 21 / 6;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+}
+
+.reg-cover-preview {
+    display: none;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+/* class .has-image dipasang JS saat file dipilih */
+.reg-cover.has-image .reg-cover-preview {
+    display: block;
+}
+
+.reg-cover.has-image .reg-cover-placeholder {
+    display: none;
+}
+
+.reg-cover-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+
+    padding: var(--space-4);
+
+    color: var(--muted);
+    text-align: center;
+}
+
+.reg-cover-placeholder i {
+    color: var(--primary);
+    font-size: var(--fs-lg);
+    line-height: 1;
+}
+
+.reg-cover-placeholder strong {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.reg-cover-placeholder span {
+    font-size: var(--fs-xxs);
+}
+
+.reg-cover-button {
+    position: absolute;
+    right: var(--space-3);
+    bottom: var(--space-3);
+    z-index: 2;
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    padding: var(--space-2) var(--space-4);
+
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    box-shadow: var(--shadow-soft);
+
+    color: var(--bg);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+
+    cursor: pointer;
+
+    transition: background-color .2s ease;
+}
+
+.reg-cover-button input {
+    display: none;
+}
+
+.reg-cover-button:hover {
+    background: var(--primary-hover);
+}
+
+/* ----- Foto / logo ----- */
+.reg-avatar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.reg-avatar-preview {
+    width: 80px;
+    height: 80px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+
+    color: var(--primary);
+    font-size: var(--fs-lg);
+}
+
+.reg-avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.reg-avatar-actions {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+}
+
+.reg-avatar-actions strong {
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.reg-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    padding: var(--space-2) var(--space-4);
+
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+
+    color: var(--primary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+
+    cursor: pointer;
+
+    transition:
+        background-color .2s ease,
+        color .2s ease;
+}
+
+.reg-upload-btn input {
+    display: none;
+}
+
+.reg-upload-btn:hover {
+    background: var(--primary);
+    color: var(--bg);
+}
+
+/* ----- Dokumen ----- */
+.reg-doc-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.reg-doc {
+    padding: var(--space-4);
+
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+}
+
+.reg-doc-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+
+    color: var(--text-dark);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.3;
+}
+
+.reg-doc-title b {
+    color: var(--danger);
+}
+
+.reg-doc-title em {
+    padding: 2px var(--space-2);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg);
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+    font-style: normal;
+    font-weight: var(--fw-medium);
+}
+
+.reg-doc-upload {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+/* input file: tombol "Pilih File" yang jelas */
+.reg-field input[type="file"] {
+    width: 100%;
+    padding: var(--space-2);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+
+    color: var(--muted);
+    font-family: inherit;
+    font-size: var(--fs-xs);
+}
+
+.reg-field input[type="file"]::file-selector-button {
+    margin-right: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+
+    color: var(--primary);
+    font-family: inherit;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+
+    cursor: pointer;
+}
+
+.reg-or {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    color: var(--muted);
+    font-size: var(--fs-xxs);
+}
+
+.reg-or::before,
+.reg-or::after {
+    height: 1px;
+    flex: 1;
+
+    background: var(--border-soft);
+
+    content: "";
+}
+
+/* catatan privasi */
+.reg-note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+    padding: var(--space-3) var(--space-4);
+
+    border-radius: var(--radius-md);
+    background: var(--info-light);
+
+    color: var(--text);
+    font-size: var(--fs-xxs);
+    line-height: 1.6;
+}
+
+.reg-note i {
+    color: var(--info);
+    font-size: var(--fs-sm);
+    line-height: 1.3;
+}
+
+
+/* ============================================================
+   6. BAGIAN LIPAT (dokumen tambahan, sosial media)
+============================================================ */
+
+.reg-more {
+    margin-top: var(--space-4);
+}
+
+.reg-more summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    padding: var(--space-2) 0;
+
+    color: var(--primary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.3;
+
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.reg-more summary::-webkit-details-marker {
+    display: none;
+}
+
+.reg-more summary::marker {
+    content: "";
+}
+
+.reg-more summary i {
+    font-size: var(--fs-xxs);
+    transition: transform .2s ease;
+}
+
+.reg-more[open] summary i {
+    transform: rotate(180deg);
+}
+
+.reg-more-body {
+    margin-top: var(--space-3);
+}
+
+/* tanpa jarak ganda saat berada tepat di bawah judul kartu / di dalam daftar dokumen */
+.reg-card-head + .reg-more,
+.reg-doc-list > .reg-more {
+    margin-top: 0;
+}
+
+
+/* ============================================================
+   7. TOMBOL AKSI
+============================================================ */
+
+.reg-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}
+
+.reg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+
+    padding: var(--space-3) var(--space-6);
+
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+
+    font-family: inherit;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    line-height: 1.2;
+
+    cursor: pointer;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.reg-btn-ghost {
+    border-color: var(--border);
+    background: var(--bg);
+    color: var(--muted);
+}
+
+.reg-btn-ghost:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.reg-btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    box-shadow: var(--shadow-soft);
+    color: var(--bg);
+}
+
+.reg-btn-primary:hover:not(:disabled) {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+
+.reg-btn-primary:disabled {
+    background: var(--muted-light);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   8. RESPONSIVE TABLET (≤ 900px)
+   Kolom progres jadi bar ringkas di atas form.
+============================================================ */
+
+@media (max-width: 900px) {
+
+    .reg-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-5);
+    }
+
+    .reg-side {
+        position: static;
+        padding: var(--space-3) var(--space-4);
+
+        box-shadow: none;
+    }
+
+    .reg-steps {
+        display: none;
+    }
+
+    .reg-grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .reg-cover {
+        aspect-ratio: 16 / 7;
+    }
+}
+
+
+/* ============================================================
+   9. RESPONSIVE MOBILE (≤ 768px)
+   Section datar dipisah garis tipis (seperti halaman show),
+   tombol kirim menempel di bawah layar.
+============================================================ */
+
+@media (max-width: 768px) {
+
+    /* ruang untuk tombol kembali global yang melayang di kiri atas */
+    .reg-page {
+        padding-block: calc(56px + var(--space-2)) 0;
+    }
+
+    .reg-head {
+        margin-bottom: var(--space-4);
+    }
+
+    .reg-head h1 {
+        font-size: var(--fs-md);
+    }
+
+    .reg-prepare {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .reg-form {
+        gap: 0;
+    }
+
+    .reg-card {
+        scroll-margin-top: var(--space-4);
+        padding: var(--space-5) 0;
+
+        border: 0;
+        border-top: 1px solid var(--muted-light);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .reg-card:first-of-type {
+        border-top: 0;
+    }
+
+    .reg-card-head {
+        margin-bottom: var(--space-4);
+    }
+
+    .reg-doc {
+        background: var(--bg);
+    }
+
+    .reg-cover {
+        min-height: 140px;
+        aspect-ratio: 16 / 9;
+    }
+
+    /* tombol kirim menempel di bawah layar, selebar layar */
+    .reg-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 40;
+
+        width: 100vw;
+        margin-inline: calc(50% - 50vw);
+        padding:
+            var(--space-3)
+            calc(50vw - 50%)
+            calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+
+        border-top: 1px solid var(--border-soft);
+        background: var(--bg);
+    }
+
+    .reg-actions .reg-btn-ghost {
+        flex: 0 0 auto;
+        padding-inline: var(--space-5);
+    }
+
+    .reg-actions .reg-btn-primary {
+        flex: 1;
+    }
+}
+
+
+/* ============================================================
+   10. AKSESIBILITAS
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    * {
+        transition: none !important;
+    }
+}
