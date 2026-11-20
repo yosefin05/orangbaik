@@ -65,7 +65,7 @@
                 <div class="hero-card hero-main-slider">
                     @foreach ($heroCampaigns as $index => $campaign)
                         <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
-                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}">
+                            <a href="{{ $campaign->public_url }}">
                                 <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}">
                             </a>
                         </div>
@@ -162,7 +162,7 @@
                         @foreach ($campaignTerbaru as $campaign)
                             @php [$terkumpul, $totalDonatur, $persen] = $statistik($campaign); @endphp
 
-                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
+                            <a href="{{ $campaign->public_url }}" class="new-item">
                                 <img src="{{ asset('storage/' . $campaign->thumbnail) }}" alt="{{ $campaign->judul }}"
                                     loading="lazy">
 

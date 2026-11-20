@@ -399,6 +399,12 @@
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                 </div>
+                                <form action="{{ route('fundraiser.alias.update', $fundraiser) }}" method="POST" class="mt-3">
+                                    @csrf @method('PATCH')
+                                    <label for="fundraiser-alias">Alias referral</label>
+                                    <input id="fundraiser-alias" name="alias" value="{{ $fundraiser->alias }}" minlength="3" maxlength="120" pattern="[A-Za-z0-9_-]+" required>
+                                    <button type="submit" class="btn-copy-link">Ubah alias</button>
+                                </form>
 
                                 <div style="display: none;">
                                     <span id="sidebarReferralCode">{{ $fundraiser->referral_code }}</span>

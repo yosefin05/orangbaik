@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\URL;
 
 class DonorWhatsAppMessage
 {
+    /**
+     * Normalisasi nomor HP Indonesia ke format internasional.
+     */
     public static function normalizeIndonesianPhone(?string $phone): ?string
     {
         if ($phone === null || trim($phone) === '') {
@@ -14,6 +17,7 @@ class DonorWhatsAppMessage
         }
 
         $digits = preg_replace('/\D+/', '', $phone);
+
         if (str_starts_with($digits, '0062')) {
             $digits = substr($digits, 2);
         } elseif (str_starts_with($digits, '0')) {
@@ -22,31 +26,124 @@ class DonorWhatsAppMessage
             $digits = '62' . $digits;
         }
 
-        // Indonesian mobile numbers use 62 followed by 9–13 digits, beginning with 8.
-        return preg_match('/^628[0-9]{7,11}$/', $digits) ? $digits : null;
+        // Nomor seluler Indonesia: 628 + 7 sampai 11 digit.
+        return preg_match('/^628[0-9]{7,11}$/', $digits)
+            ? $digits
+            : null;
     }
 
+    /**
+     * Membuat pesan WhatsApp berdasarkan status pembayaran.
+     *
+     * Pending:
+     * Mengingatkan donatur untuk melanjutkan pembayaran.
+     *
+     * Settlement:
+     * Mengucapkan terima kasih dan memberikan link e-kwitansi.
+     */
     public function forDonation(Donasi $donasi): ?string
     {
-        $status = $donasi->pembayaran?->transaction_status;
-        if (!in_array($status, ['pending', 'settlement'], true) || !$donasi->normalized_whatsapp_number) {
+        $pembayaran = $donasi->pembayaran;
+        $status = $pembayaran?->transaction_status;
+
+        // Hanya pending dan settlement yang boleh dihubungi.
+        if (
+            !in_array($status, ['pending', 'settlement'], true) ||
+            !$donasi->normalized_whatsapp_number
+        ) {
             return null;
         }
 
-        $name = trim((string) ($donasi->nama_donatur ?: 'Donatur'));
-        $campaign = trim((string) ($donasi->campaign?->judul ?: 'program donasi OrangBaik'));
-        $amount = 'Rp ' . number_format((int) $donasi->nominal, 0, ',', '.');
-        $greeting = $donasi->sapaan . ' ' . $name;
+        $nama = trim(
+            (string) ($donasi->nama_donatur ?: 'Donatur')
+        );
+
+        $sapaan = trim(
+            (string) ($donasi->sapaan ?: 'Kak')
+        );
+
+        $campaign = trim(
+            (string) (
+                $donasi->campaign?->judul
+                ?: 'program donasi OrangBaik'
+            )
+        );
+
+        $nominal = 'Rp ' . number_format(
+            (int) $donasi->nominal,
+            0,
+            ',',
+            '.'
+        );
+
+        $greeting = trim($sapaan . ' ' . $nama);
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATUS PENDING
+        |--------------------------------------------------------------------------
+        | Tujuan:
+        | Mengingatkan donatur agar menyelesaikan pembayaran.
+        */
 
         if ($status === 'pending') {
-            return "Halo {$greeting}, donasi Anda sebesar {$amount} untuk campaign \"{$campaign}\" masih menunggu pembayaran. Silakan selesaikan pembayaran melalui instruksi yang telah diberikan. Jika ada kendala, kami siap membantu. Terima kasih.";
+            $linkPembayaran = $pembayaran?->getKey()
+                ? route('donasi.bayar.instruksi', $pembayaran->id)
+                : null;
+
+            $message = "Assalamu'alaikum, {$greeting} 😊\n\n";
+
+            $message .= "Terima kasih telah memilih untuk berdonasi melalui OrangBaik.\n\n";
+
+            $message .= "Kami ingin mengingatkan bahwa pembayaran donasi Kakak untuk program *{$campaign}* sebesar *{$nominal}* masih menunggu penyelesaian.\n\n";
+
+            $message .= "Yuk, selesaikan pembayaran agar donasi Kakak dapat segera diproses. 💙\n\n";
+
+            if ($linkPembayaran) {
+                $message .= "🔗 *Lanjutkan Pembayaran:*\n";
+                $message .= $linkPembayaran . "\n\n";
+            } else {
+                $message .= "Silakan gunakan instruksi pembayaran yang telah diberikan sebelumnya.\n\n";
+            }
+
+            $message .= "Jika Kakak sudah melakukan pembayaran, silakan abaikan pesan ini. Apabila mengalami kendala, tim OrangBaik siap membantu.\n\n";
+
+            $message .= "Terima kasih telah menjadi bagian dari kebaikan!\n\n";
+
+            $message .= "*OrangBaik — Bersama Menebar Kebaikan.*";
+
+            return $message;
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATUS SETTLEMENT
+        |--------------------------------------------------------------------------
+        | Tujuan:
+        | Mengucapkan terima kasih dan memberikan e-kwitansi resmi.
+        */
 
         $receiptUrl = URL::temporarySignedRoute(
             'kwitansi.signed',
             now()->addDays(30),
             ['donasi' => $donasi->id]
         );
-        return "Halo {$greeting}, terima kasih atas donasi sebesar {$amount} untuk campaign \"{$campaign}\". Semoga kebaikan Anda membawa keberkahan dan manfaat bagi banyak orang. Aamiin. E-kwitansi resmi: {$receiptUrl}";
+
+        $message = "Assalamu'alaikum, {$greeting} 💙\n\n";
+
+        $message .= "Alhamdulillah, donasi Kakak untuk program *{$campaign}* sebesar *{$nominal}* telah berhasil kami terima.\n\n";
+
+        $message .= "Terima kasih telah mempercayakan kebaikan Kakak melalui OrangBaik. Semoga donasi ini menjadi amal jariyah dan membawa manfaat bagi banyak orang. Aamiin. 🤲\n\n";
+
+        $message .= "Sebagai bukti transaksi, berikut e-kwitansi resmi donasi Kakak:\n\n";
+
+        $message .= "🧾 *Lihat E-Kwitansi:*\n";
+        $message .= $receiptUrl . "\n\n";
+
+        $message .= "Terima kasih telah ikut menghadirkan kebaikan bersama OrangBaik!\n\n";
+
+        $message .= "*OrangBaik — Bersama Menebar Kebaikan.*";
+
+        return $message;
     }
 }

@@ -70,6 +70,9 @@ Route::middleware(['auth', 'admin'])
 
             // List & Detail
             Route::get('/', [CampaignController::class, 'index'])->name('index');
+            Route::get('/custom-url', [CampaignController::class, 'customUrls'])->name('custom-url.index');
+            Route::patch('/custom-url/{campaign}', [CampaignController::class, 'updateCustomUrl'])->name('custom-url.update');
+            Route::delete('/custom-url/{campaign}', [CampaignController::class, 'destroyCustomUrl'])->name('custom-url.destroy');
             Route::get('/{campaign}', [CampaignController::class, 'show'])->name('show');
             Route::delete('/{campaign}', [CampaignController::class, 'destroy'])->name('destroy');
 
@@ -80,6 +83,9 @@ Route::middleware(['auth', 'admin'])
             Route::post('/{campaign}/reject', [CampaignController::class, 'reject'])->name('reject');
             Route::post('/{campaign}/unapprove', [CampaignController::class, 'unapprove'])->name('unapprove');
         });
+
+        Route::patch('/fundraiser/{fundraiser}/alias', [CampaignController::class, 'updateFundraiserAlias'])
+            ->name('fundraiser.alias.update');
 
         Route::resource('testimoni', TestimoniController::class);
 

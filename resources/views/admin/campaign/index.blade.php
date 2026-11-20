@@ -13,6 +13,9 @@
                     Kelola seluruh campaign donasi yang ada di platform OrangBaik.id.
                 </p>
             </div>
+            <a href="{{ route('admin.campaign.custom-url.index') }}" class="btn-primary">
+                <i class="bi bi-link-45deg"></i><span>Kelola Custom URL</span>
+            </a>
 
             {{-- Cek apakah admin terdaftar sebagai penggalang dana --}}
             @php

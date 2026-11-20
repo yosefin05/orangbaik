@@ -76,7 +76,11 @@ class SearchController extends Controller
                             );
                     })
 
-                    ->where('judul', 'LIKE', '%' . $keyword . '%')
+                    ->where(function ($query) use ($keyword) {
+                        $query->where('judul', 'LIKE', '%' . $keyword . '%')
+                            ->orWhereHas('penggalangDana', fn ($penggalang) =>
+                                $penggalang->where('nama_penggalang', 'LIKE', '%' . $keyword . '%'));
+                    })
                     ->latest()
                     ->get();
             }

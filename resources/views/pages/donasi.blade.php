@@ -482,7 +482,7 @@
                                     : 0;
                             @endphp
 
-                            <a href="{{ route('campaign.show', $campaign->custom_slug ?? $campaign->slug) }}" class="new-item">
+                            <a href="{{ $campaign->public_url }}" class="new-item">
                                 <img
                                     src="{{ asset('storage/' . $campaign->thumbnail) }}"
                                     alt="{{ $campaign->judul }}"

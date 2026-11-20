@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
+use App\Models\Campaign_Url_Alias;
 use App\Models\Campaign_Filter;
 use App\Models\Campaign_Package;
 use App\Models\Filter;
@@ -36,6 +37,15 @@ class CampaignController extends Controller
                 $query->whereNull('tanggal_berakhir')
                     ->orWhere('tanggal_berakhir', '>=', $now);
             });
+
+        if ($request->filled('q')) {
+            $keyword = trim($request->input('q'));
+            $query->where(function ($q) use ($keyword) {
+                $q->where('judul', 'like', '%' . $keyword . '%')
+                    ->orWhereHas('penggalangDana', fn ($penggalang) =>
+                        $penggalang->where('nama_penggalang', 'like', '%' . $keyword . '%'));
+            });
+        }
 
         // Hanya tampilkan campaign yang approved atau regular
         $query->where(function ($q) {
@@ -126,6 +136,7 @@ class CampaignController extends Controller
     {
         // Clean money inputs before validation
         $request->merge([
+            'custom_slug' => $request->filled('custom_slug') ? Str::slug($request->custom_slug) : null,
             'target_donasi' => $this->cleanMoney($request->target_donasi),
             'minimal_donasi' => $this->cleanMoney($request->minimal_donasi),
         ]);
@@ -158,7 +169,7 @@ class CampaignController extends Controller
             'packages.*.description' => 'nullable|string',
             'packages.*.nominal' => 'nullable|numeric|min:0',
             'packages.*.image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'custom_slug' => 'nullable|alpha_dash|unique:campaign,custom_slug',
+            'custom_slug' => Campaign::customSlugRules(),
         ]);
 
         DB::beginTransaction();
@@ -240,8 +251,7 @@ class CampaignController extends Controller
                 : 'Campaign berhasil dibuat.';
 
             $redirectSlug = $campaign->custom_slug ?? $campaign->slug;
-            return redirect()
-                ->route('campaign.show', $redirectSlug)
+            return redirect($campaign->public_url)
                 ->with('success', $message);
 
         } catch (\Exception $e) {
@@ -295,11 +305,15 @@ class CampaignController extends Controller
             })
             ->firstOrFail();
 
+        if ($campaign->custom_slug === $slug && request()->is('campaign/*')) {
+            return redirect($campaign->public_url, 301);
+        }
+
         // ============================================================
         // 2. HITUNG TOTAL TERKUMPUL & DONATUR
         // ============================================================
         $totalTerkumpul = $campaign->donasi->sum('nominal');
-        $totalDonatur = $campaign->donasi->count();
+        $totalDonatur = Campaign::countUniqueSettlementDonors($campaign->donasi);
 
         // Tambahkan ke object campaign
         $campaign->terkumpul = $totalTerkumpul;
@@ -415,6 +429,7 @@ class CampaignController extends Controller
         // CLEAN MONEY INPUTS
         // ============================================================
         $request->merge([
+            'custom_slug' => $request->filled('custom_slug') ? Str::slug($request->custom_slug) : null,
             'target_donasi' => $this->cleanMoney($request->target_donasi),
             'minimal_donasi' => $this->cleanMoney($request->minimal_donasi),
         ]);
@@ -459,11 +474,7 @@ class CampaignController extends Controller
             // WEBP SUPPORT
             'packages.*.image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
 
-            'custom_slug' => [
-                'nullable',
-                'alpha_dash',
-                'unique:campaign,custom_slug,' . $campaign->id,
-            ],
+            'custom_slug' => Campaign::customSlugRules($campaign->id),
         ]);
 
         // ============================================================
@@ -557,6 +568,12 @@ class CampaignController extends Controller
             // ========================================================
             // UPDATE CAMPAIGN
             // ========================================================
+            if ($campaign->custom_slug && $campaign->custom_slug !== ($data['custom_slug'] ?? null)) {
+                Campaign_Url_Alias::firstOrCreate([
+                    'campaign_id' => $campaign->id,
+                    'custom_slug' => $campaign->custom_slug,
+                ]);
+            }
             $campaign->update($data);
             $campaign->refresh(); // refresh slug/custom_slug terbaru
 
@@ -723,8 +740,7 @@ class CampaignController extends Controller
                 ? 'Campaign berhasil diupdate dan menunggu persetujuan admin'
                 : 'Campaign berhasil diupdate';
 
-            return redirect()
-                ->route('campaign.show', ['slug' => $redirectSlug])
+            return redirect($campaign->public_url)
                 ->with('success', $message);
 
         } catch (\Throwable $e) {

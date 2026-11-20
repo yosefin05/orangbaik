@@ -352,7 +352,7 @@
                     <div class="dash-campaign-item">
                         <img src="{{ asset('storage/' . $cmp->thumbnail) }}" alt="{{ $cmp->judul }}" class="dash-campaign-thumb">
                         <div class="dash-campaign-info">
-                            <a href="{{ route('campaign.show', $cmp->getRouteSlug()) }}" class="dash-campaign-title">
+                            <a href="{{ $cmp->public_url }}" class="dash-campaign-title">
                                 {{ $cmp->judul }}
                             </a>
                             <div class="dash-campaign-meta my-1">
@@ -374,7 +374,7 @@
                             </div>
                         </div>
                         <div class="dash-action-btns">
-                            <a href="{{ route('campaign.show', $cmp->getRouteSlug()) }}" class="btn-dash-sm btn-dash-outline" title="Lihat Detail">
+                            <a href="{{ $cmp->public_url }}" class="btn-dash-sm btn-dash-outline" title="Lihat Detail">
                                 <i class="bi bi-eye"></i> Lihat
                             </a>
                             <a href="{{ route('campaign.update.create', $cmp->getRouteSlug()) }}" class="btn-dash-sm btn-dash-outline" title="Tambah Kabar Terbaru">
@@ -425,7 +425,7 @@
                                     <strong>{{ $d->is_anonim ? 'Hamba Allah (Anonim)' : $d->nama_donatur }}</strong>
                                 </td>
                                 <td>
-                                    <a href="{{ route('campaign.show', $d->campaign?->getRouteSlug() ?? '') }}" style="color: #3365af; text-decoration: none;">
+                                    <a href="{{ $d->campaign?->public_url ?? '#' }}" style="color: #3365af; text-decoration: none;">
                                         {{ Str::limit($d->campaign?->judul ?? '-', 35) }}
                                     </a>
                                 </td>

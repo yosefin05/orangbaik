@@ -76,6 +76,26 @@ class Donasi extends Model
         return $this->nama_donatur ?: ($this->user?->name ?? 'Donatur');
     }
 
+    /** Stable identity for unique-donor statistics; never used for public display. */
+    public function getDonorIdentityKeyAttribute(): string
+    {
+        if ($this->user_id !== null) {
+            return 'user:' . $this->user_id;
+        }
+
+        $email = strtolower(trim((string) $this->email));
+        if ($email !== '') {
+            return 'email:' . $email;
+        }
+
+        $phone = preg_replace('/\D+/', '', (string) $this->no_hp);
+        if ($phone !== '') {
+            return 'phone:' . $phone;
+        }
+
+        return 'donation:' . $this->getKey();
+    }
+
     /**
      * Ambil nomor telepon donatur (dari donasi atau akun user)
      */

@@ -21,13 +21,8 @@
         if (Auth::check()) {
             $user = Auth::user();
 
-            $isPenggalang = $user->penggalangDana 
-                && in_array($user->penggalangDana->status, ['approved', 'verified']);
-
             if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
                 $urlTambahBerita = route('admin.berita.create');
-            } elseif ($isPenggalang) {
-                $urlTambahBerita = route('penggalang.berita.create');
             }
         }
 
@@ -66,17 +61,13 @@
                     @forelse ($beritas as $berita)
 
                         @php
-                            $penerbit = $berita->penggalangDana;
-
-                            $namaPenerbit = $penerbit?->nama_penggalang ?? 'Orang Baik';
+                            $namaPenerbit = 'OrangBaik';
 
                             $inisialPenerbit = mb_strtoupper(
                                 mb_substr($namaPenerbit, 0, 1)
                             );
 
-                            $fotoPenerbit = $penerbit?->foto_profil
-                                ? asset('storage/' . $penerbit->foto_profil)
-                                : ($penerbit ? null : asset('assets/logo.png'));
+                            $fotoPenerbit = asset('assets/logo.png');
                         @endphp
 
                         <a href="{{ route('berita.show', $berita->custom_slug ?? $berita->slug) }}" class="berita-card">

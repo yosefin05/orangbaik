@@ -13,7 +13,7 @@
 
 <body>
 
-    @include('components.header')
+    @include('components.header')update 20 noveebr
 
     @php
         $user = auth()->user();

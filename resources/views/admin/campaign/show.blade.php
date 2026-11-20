@@ -240,7 +240,8 @@
 
         <table class="data-table data-table-kv">
             <tbody>
-                <tr><th>Slug</th><td><span class="badge badge-blue">{{ $campaign->slug }}</span></td></tr>
+                <tr><th>Slug otomatis</th><td><span class="badge badge-blue">{{ $campaign->slug }}</span></td></tr>
+                <tr><th>Custom URL</th><td>{{ $campaign->custom_slug ? '/' . $campaign->custom_slug : 'Tidak digunakan' }}</td></tr>
                 <tr><th>Penggalang Dana</th><td>{{ $campaign->penggalangDana->nama_penggalang ?? '-' }}</td></tr>
                 <tr><th>Target Donasi</th><td><span class="text-muted-strong">Rp {{ number_format($campaign->target_donasi, 0, ',', '.') }}</span></td></tr>
                 <tr><th>Minimal Donasi</th><td><span class="text-muted-strong">Rp {{ number_format($campaign->minimal_donasi, 0, ',', '.') }}</span></td></tr>
@@ -358,15 +359,24 @@
         </div>
         <div class="table-wrapper">
             <table class="data-table">
-                <thead><tr><th>Nama User</th><th>Total Donasi</th></tr></thead>
+                <thead><tr><th>Nama User</th><th>Alias</th><th>Total Donatur</th><th>Total Donasi</th><th>Aksi</th></tr></thead>
                 <tbody>
                     @forelse($campaign->campaignFundraisers as $fundraiser)
                         <tr>
                             <td><p class="cell-title">{{ $fundraiser->user->name ?? 'User tidak ditemukan' }}</p></td>
+                            <td>{{ $fundraiser->alias }}</td>
+                            <td>{{ $fundraiser->donorCountSettlement() }}</td>
                             <td>Rp {{ number_format($fundraiser->total_donasi_settlement, 0, ',', '.') }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('admin.fundraiser.alias.update', $fundraiser) }}" class="inline-form">
+                                    @csrf @method('PATCH')
+                                    <input name="alias" value="{{ $fundraiser->alias }}" required minlength="3" maxlength="120">
+                                    <button type="submit" class="action-link link-blue">Simpan alias</button>
+                                </form>
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="2" class="empty-state">Tidak ada fundraiser pendukung.</td></tr>
+                        <tr><td colspan="5" class="empty-state">Tidak ada fundraiser pendukung.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -4,10 +4,67 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
+use App\Models\Campaign_Fundraiser;
+use App\Models\Campaign_Fundraiser_Alias;
+use App\Models\Campaign_Url_Alias;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CampaignController extends Controller
 {
+    public function customUrls()
+    {
+        $campaigns = Campaign::query()->latest()->paginate(20);
+        return view('admin.campaign.custom-url', compact('campaigns'));
+    }
+
+    public function updateCustomUrl(Request $request, Campaign $campaign)
+    {
+        $request->merge([
+            'custom_slug' => $request->filled('custom_slug') ? Str::slug($request->custom_slug) : null,
+        ]);
+        $validated = $request->validate([
+            'custom_slug' => Campaign::customSlugRules($campaign->id),
+        ]);
+        if ($campaign->custom_slug && $campaign->custom_slug !== ($validated['custom_slug'] ?? null)) {
+            Campaign_Url_Alias::firstOrCreate([
+                'campaign_id' => $campaign->id,
+                'custom_slug' => $campaign->custom_slug,
+            ]);
+        }
+        $campaign->update(['custom_slug' => $validated['custom_slug'] ?? null]);
+        return back()->with('success', 'Custom URL campaign berhasil diperbarui.');
+    }
+
+    public function destroyCustomUrl(Campaign $campaign)
+    {
+        if ($campaign->custom_slug) {
+            Campaign_Url_Alias::firstOrCreate([
+                'campaign_id' => $campaign->id,
+                'custom_slug' => $campaign->custom_slug,
+            ]);
+        }
+        $campaign->update(['custom_slug' => null]);
+        return back()->with('success', 'Custom URL dihapus. Campaign kembali menggunakan URL otomatis.');
+    }
+
+    public function updateFundraiserAlias(Request $request, Campaign_Fundraiser $fundraiser)
+    {
+        $validated = $request->validate(['alias' => Campaign_Fundraiser::aliasRules($fundraiser->id)]);
+        $alias = Str::slug($validated['alias']);
+
+        DB::transaction(function () use ($fundraiser, $alias): void {
+            if ($fundraiser->alias !== $alias) {
+                Campaign_Fundraiser_Alias::firstOrCreate([
+                    'campaign_fundraiser_id' => $fundraiser->id,
+                    'alias' => $fundraiser->alias,
+                ]);
+                $fundraiser->update(['alias' => $alias]);
+            }
+        });
+        return back()->with('success', 'Alias fundraiser berhasil diperbarui.');
+    }
     public function index()
     {
         $campaign = Campaign::with([

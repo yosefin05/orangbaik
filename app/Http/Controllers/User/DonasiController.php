@@ -52,9 +52,8 @@ class DonasiController extends Controller
             ->filter(fn($d) => $d->pembayaran && $d->pembayaran->transaction_status === 'settlement')
             ->sum('nominal');
 
-        $jumlahDonatur = $campaign->donasi
-            ->filter(fn($d) => $d->pembayaran && $d->pembayaran->transaction_status === 'settlement')
-            ->count();
+        $jumlahDonatur = Campaign::countUniqueSettlementDonors($campaign->donasi
+            ->filter(fn($d) => $d->pembayaran && $d->pembayaran->transaction_status === 'settlement'));
 
         // Ambil payment channel aktif, urutkan berdasarkan sort_order, load gateway
         $paymentChannels = PaymentChannel::with('gateway')

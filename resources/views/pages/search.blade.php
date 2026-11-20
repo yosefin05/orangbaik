@@ -138,18 +138,13 @@
                                         ================================================== --}}
 
                                         @php
-                                            $penerbit = $item->penggalangDana;
-
-                                            $namaPenerbit = $penerbit?->nama_penggalang
-                                                ?? 'Orang Baik';
+                                            $namaPenerbit = 'OrangBaik';
 
                                             $inisialPenerbit = mb_strtoupper(
                                                 mb_substr($namaPenerbit, 0, 1)
                                             );
 
-                                            $fotoPenerbit = $penerbit?->foto_profil
-                                                ? asset('storage/' . $penerbit->foto_profil)
-                                                : ($penerbit ? null : asset('assets/logo.png'));
+                                            $fotoPenerbit = asset('assets/logo.png');
                                         @endphp
 
                                         <a

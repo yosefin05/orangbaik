@@ -36,6 +36,15 @@ class HomeController extends Controller
                 ->orWhereNull('approval_status');
         });
 
+        if ($request->filled('q')) {
+            $keyword = trim($request->input('q'));
+            $query->where(function ($q) use ($keyword) {
+                $q->where('judul', 'like', '%' . $keyword . '%')
+                    ->orWhereHas('penggalangDana', fn ($penggalang) =>
+                        $penggalang->where('nama_penggalang', 'like', '%' . $keyword . '%'));
+            });
+        }
+
         // 🔥 HERO CAMPAIGN - Emergency (PASTI MUNCUL!)
         $heroCampaigns = Campaign::with(['penggalangDana', 'donasi.pembayaran'])
             ->where('is_active', true)
@@ -87,15 +96,15 @@ class HomeController extends Controller
             ->take(2)
             ->get();
 
+        if ($request->filled('kategori')) {
+            $query->where('kategori_id', $request->kategori);
+        }
+
         $campaigns = (clone $query)
             ->where('campaign_type', 'regular')
             ->latest()
             ->paginate(12)
             ->withQueryString();
-
-        if ($request->filled('kategori')) {
-            $campaigns = $campaigns->where('kategori_id', $request->kategori);
-        }
 
         return view('pages.home', compact(
             'testimoni',

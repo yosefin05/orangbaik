@@ -7,12 +7,14 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\Campaign_Fundraiser;
+use App\Models\Campaign_Fundraiser_Alias;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class FundraiserController extends Controller
 {
@@ -36,14 +38,17 @@ class FundraiserController extends Controller
 
         // Generate referral code yang unik
         $referralCode = 'REF-' . strtoupper(Str::random(8));
-        $request->validate(['alias' => ['nullable', 'string', 'alpha_dash', 'min:3', 'max:120', 'unique:campaign_fundraiser,alias']]);
+        $request->merge([
+            'alias' => $request->filled('alias') ? Str::slug($request->alias) : null,
+        ]);
+        $validated = $request->validate(['alias' => array_merge(['nullable'], array_slice(Campaign_Fundraiser::aliasRules(), 1))]);
 
         // Buat fundraiser
         $fundraiser = Campaign_Fundraiser::create([
             'campaign_id' => $campaign->id,
             'user_id' => Auth::id(),
             'referral_code' => $referralCode,
-            'alias' => $request->input('alias'),
+            'alias' => $validated['alias'] ?? null,
             'status' => 'active',
         ]);
 
@@ -63,19 +68,30 @@ class FundraiserController extends Controller
     public function track(string $alias)
     {
         $fundraiser = Campaign_Fundraiser::with('campaign')
-            ->where('alias', $alias)->where('status', 'active')->firstOrFail();
+            ->where('alias', $alias)->where('status', 'active')->first();
+        if (!$fundraiser) {
+            $fundraiser = Campaign_Fundraiser_Alias::with('fundraiser.campaign')
+                ->where('alias', $alias)->firstOrFail()->fundraiser;
+        }
         abort_unless($fundraiser->campaign?->is_active, 404);
         session()->put('campaign_referral.' . $fundraiser->campaign_id, $fundraiser->referral_code);
-        return redirect()->route('campaign.show', $fundraiser->campaign->getRouteSlug());
+        return redirect($fundraiser->campaign->public_url);
     }
 
     public function updateAlias(Request $request, Campaign_Fundraiser $fundraiser)
     {
         abort_unless((int) $fundraiser->user_id === (int) Auth::id(), 403);
-        $validated = $request->validate([
-            'alias' => ['required', 'string', 'alpha_dash', 'min:3', 'max:120', 'unique:campaign_fundraiser,alias,' . $fundraiser->id],
-        ]);
-        $fundraiser->update(['alias' => Str::slug($validated['alias'])]);
+        $validated = $request->validate(['alias' => Campaign_Fundraiser::aliasRules($fundraiser->id)]);
+        $alias = Str::slug($validated['alias']);
+        DB::transaction(function () use ($fundraiser, $alias): void {
+            if ($fundraiser->alias !== $alias) {
+                Campaign_Fundraiser_Alias::firstOrCreate([
+                    'campaign_fundraiser_id' => $fundraiser->id,
+                    'alias' => $fundraiser->alias,
+                ]);
+                $fundraiser->update(['alias' => $alias]);
+            }
+        });
         return back()->with('success', 'Alias referral berhasil diperbarui.');
     }
 

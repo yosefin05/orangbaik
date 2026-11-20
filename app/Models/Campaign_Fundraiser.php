@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class Campaign_Fundraiser extends Model
 {
@@ -42,18 +43,34 @@ class Campaign_Fundraiser extends Model
 
     public function generateAlias(): string
     {
-        $base = Str::slug($this->user?->name ?: 'ajak-' . ($this->campaign_id ?: 'campaign')) ?: 'ajak';
+        $name = $this->user?->name ?: ($this->user_id ? $this->user()->value('name') : null);
+        $base = Str::slug($name ?: 'ajak-' . ($this->campaign_id ?: 'campaign')) ?: 'ajak';
         $alias = $base;
         $suffix = 1;
-        while (self::where('alias', $alias)->where('id', '!=', $this->getKey() ?: 0)->exists()) {
+        while (
+            self::where('alias', $alias)->where('id', '!=', $this->getKey() ?: 0)->exists()
+            || Campaign_Fundraiser_Alias::where('alias', $alias)->exists()
+        ) {
             $alias = $base . '-' . (++$suffix);
         }
         return $alias;
     }
 
-    public function getRouteKeyName(): string
+    public static function aliasRules(?int $ignoreId = null): array
     {
-        return 'alias';
+        $unique = Rule::unique('campaign_fundraiser', 'alias');
+        if ($ignoreId !== null) {
+            $unique->ignore($ignoreId);
+        }
+
+        return [
+            'required', 'string', 'alpha_dash', 'min:3', 'max:120', $unique,
+            function (string $attribute, mixed $value, \Closure $fail): void {
+                if (Campaign_Fundraiser_Alias::where('alias', $value)->exists()) {
+                    $fail('Alias tersebut pernah digunakan dan tidak dapat dipakai ulang.');
+                }
+            },
+        ];
     }
 
     public function generateReferralCode()
@@ -90,5 +107,12 @@ class Campaign_Fundraiser extends Model
     public function getReferralUrlAttribute()
     {
         return route('referral.track', ['alias' => $this->alias]);
+    }
+
+    public function donorCountSettlement(): int
+    {
+        return Campaign::countUniqueSettlementDonors(
+            $this->donasis()->whereHas('pembayaran', fn ($q) => $q->where('transaction_status', 'settlement'))->get()
+        );
     }
 }

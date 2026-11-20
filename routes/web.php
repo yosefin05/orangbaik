@@ -17,7 +17,7 @@ use App\Http\Controllers\User\{
     RiwayatDonasiController,
     PageController,
     PenggalangDashboardController,
-    PenggalangDanaBeritaController
+    FundraiserDashboardController
 };
 use App\Http\Controllers\{
     MidtransController,
@@ -83,6 +83,11 @@ Route::post('/kalkulator/hitung', fn () => redirect()->route('kalkulator.hitung'
 // CAMPAIGN & DONASI (PUBLIC)
 // ============================================================
 Route::get('/donasi', [CampaignController::class, 'index'])->name('donasi');
+Route::get('/donasi/bayar-login', function () {
+    return auth()->check()
+        ? redirect()->route('riwayat.donasi')
+        : redirect()->route('home');
+})->name('donasi.bayar.login');
 Route::get('/donasi/{slug}/bayar', [DonasiController::class, 'create'])->name('donasi.create');
 Route::post('/donasi/{slug}/bayar', [DonasiController::class, 'store'])->name('donasi.store');
 Route::match(['get', 'post'], '/campaign/{slug}/donasi', function (Request $request, string $slug) {
@@ -118,15 +123,13 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard Penggalang Dana
     Route::get('/penggalang/dashboard', [PenggalangDashboardController::class, 'index'])->name('penggalang.dashboard');
+    Route::get('/fundraiser/dashboard', [FundraiserDashboardController::class, 'index'])->name('fundraiser.dashboard');
 
     // Set intended URL
     Route::post('/set-intended-url', function (Request $request) {
         session(['url.intended' => $request->url]);
         return response()->json(['success' => true]);
     })->name('set.intended.url');
-
-    // Donasi Bayar (butuh login)
-    Route::view('/donasi/bayar-login', 'pages.donasi-bayar-login')->name('donasi.bayar.login');
 
     // Penggalang Dana (CRUD)
     Route::get('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'createOrganisasi'])
@@ -203,16 +206,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->where('slug', '.*');
     Route::patch('/fundraiser/{fundraiser}/alias', [FundraiserController::class, 'updateAlias'])->name('fundraiser.alias.update');
 
-    // ============================================================
-    // BERITA MANAGEMENT (Admin & Penggalang Dana)
-    // ============================================================
-    Route::prefix('penggalang/berita')->name('penggalang.berita.')->group(function () {
-        Route::get('/create', [PenggalangDanaBeritaController::class, 'create'])->name('create');
-        Route::post('/', [PenggalangDanaBeritaController::class, 'store'])->name('store');
-        Route::get('/{beritum}/edit', [PenggalangDanaBeritaController::class, 'edit'])->name('edit');
-        Route::put('/{beritum}', [PenggalangDanaBeritaController::class, 'update'])->name('update');
-        Route::delete('/{beritum}', [PenggalangDanaBeritaController::class, 'destroy'])->name('destroy');
-    });
 });
 
 // ============================================================
@@ -221,10 +214,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__ . '/admin.php';
 
 // ============================================================
-// Campaign detail menggunakan URL yang jelas; URL root lama tetap diarahkan.
-Route::get('/donasi/{slug}', [CampaignController::class, 'show'])->name('campaign.show');
+// URL campaign canonical: slug otomatis berada di /campaign, custom URL di root.
+Route::get('/campaign/{slug}', [CampaignController::class, 'show'])->name('campaign.show');
+Route::get('/donasi/{slug}', function (string $slug) {
+    $campaign = \App\Models\Campaign::where('slug', $slug)->orWhere('custom_slug', $slug)->firstOrFail();
+    return redirect($campaign->public_url, 301);
+})->name('campaign.legacy.show');
 Route::get('/ajak/{alias}', [FundraiserController::class, 'track'])->name('referral.track');
 Route::get('/{slug}', function (string $slug) {
-    $campaign = \App\Models\Campaign::where('slug', $slug)->orWhere('custom_slug', $slug)->firstOrFail();
-    return redirect()->route('campaign.show', $campaign->getRouteSlug());
+    $campaign = \App\Models\Campaign::where('custom_slug', $slug)->first();
+    if ($campaign) {
+        return app(CampaignController::class)->show($slug);
+    }
+    $oldUrl = \App\Models\Campaign_Url_Alias::with('campaign')->where('custom_slug', $slug)->first();
+    if ($oldUrl?->campaign) {
+        return redirect($oldUrl->campaign->public_url, 301);
+    }
+    $campaign = \App\Models\Campaign::where('slug', $slug)->firstOrFail();
+    return redirect()->route('campaign.show', $campaign->slug, 301);
 })->where('slug', '[A-Za-z0-9][A-Za-z0-9-]*')->name('campaign.legacy');

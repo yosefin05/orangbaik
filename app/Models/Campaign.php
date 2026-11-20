@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rule;
 
 class Campaign extends Model
 {
@@ -98,6 +99,11 @@ class Campaign extends Model
     public function packages()
     {
         return $this->hasMany(Campaign_Package::class);
+    }
+
+    public function urlAliases()
+    {
+        return $this->hasMany(Campaign_Url_Alias::class);
     }
 
     public function approvedBy()
@@ -215,6 +221,48 @@ class Campaign extends Model
         return $this->custom_slug ?? $this->slug;
     }
 
+    public function getPublicUrlAttribute(): string
+    {
+        return $this->custom_slug
+            ? url('/' . $this->custom_slug)
+            : route('campaign.show', $this->slug);
+    }
+
+    public static function reservedCustomSlugs(): array
+    {
+        return [
+            'admin', 'ajak', 'api', 'berita', 'campaign', 'donasi', 'dokumen-penggalang',
+            'confirm-password', 'email', 'forgot-password', 'fundraiser', 'kalkulator', 'kalkulator-zakat', 'kwitansi', 'login',
+            'logout', 'payment', 'penggalang', 'penggalang-dana', 'penggalang_dana_organisasi',
+            'profile', 'profile-user', 'profil', 'profil-penggalang', 'register', 'reset-password',
+            'search', 'set-intended-url', 'storage', 'syarat-ketentuan', 'tentang', 'verify-email',
+            'verifikasi-penggalang', 'pusat-bantuan', 'riwayat-donasi',
+        ];
+    }
+
+    public static function customSlugRules(?int $ignoreId = null): array
+    {
+        $unique = Rule::unique('campaign', 'custom_slug');
+        if ($ignoreId !== null) {
+            $unique->ignore($ignoreId);
+        }
+
+        return [
+            'nullable', 'string', 'alpha_dash', 'max:120',
+            $unique,
+            Rule::notIn(self::reservedCustomSlugs()),
+            function (string $attribute, mixed $value, \Closure $fail) use ($ignoreId): void {
+                $query = self::where('slug', $value);
+                if ($ignoreId !== null) {
+                    $query->where('id', '!=', $ignoreId);
+                }
+                if ($query->exists()) {
+                    $fail('Custom URL tidak boleh sama dengan slug otomatis campaign lain.');
+                }
+            },
+        ];
+    }
+
     /**
      * Alias backward-compatibility untuk tanggal_selesai -> tanggal_berakhir
      */
@@ -246,9 +294,16 @@ class Campaign extends Model
      */
     public function getDonaturCount(): int
     {
-        return (int) $this->donasi()
+        return self::countUniqueSettlementDonors($this->donasi()
             ->whereHas('pembayaran', fn($q) => $q->where('transaction_status', 'settlement'))
-            ->count();
+            ->get());
+    }
+
+    public static function countUniqueSettlementDonors($donations): int
+    {
+        return $donations->mapWithKeys(function (Donasi $donasi): array {
+            return [$donasi->donor_identity_key => true];
+        })->count();
     }
 
     public function getProgressPercentage(): float
