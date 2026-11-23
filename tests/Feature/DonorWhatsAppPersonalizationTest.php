@@ -32,10 +32,18 @@ class DonorWhatsAppPersonalizationTest extends TestCase
         $donasi->id = 123;
         $donasi->setRelation('campaign', $campaign);
 
-        $payment = new Pembayaran(['transaction_status' => 'pending']);
+        $payment = new Pembayaran([
+            'transaction_status' => 'pending',
+            'payment_token' => 'guest-payment-token-123',
+        ]);
+        $payment->id = 456;
         $donasi->setRelation('pembayaran', $payment);
         $pendingUrl = $donasi->whatsapp_url;
         $this->assertStringContainsString('wa.me/6281234567890', $pendingUrl);
+        $this->assertStringContainsString(
+            route('donasi.bayar.instruksi', ['pembayaran' => 456, 'token' => 'guest-payment-token-123']),
+            rawurldecode(parse_url($pendingUrl, PHP_URL_QUERY))
+        );
         $pendingMessage = rawurldecode(parse_url($pendingUrl, PHP_URL_QUERY));
         $this->assertStringContainsString('Bu Siti', $pendingMessage);
         $this->assertStringContainsString('Bantu Sekolah', $pendingMessage);
