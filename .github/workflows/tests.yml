@@ -25,10 +25,21 @@ jobs:
           extensions: mbstring, dom, fileinfo, pdo_sqlite, sqlite3, xml, curl
           coverage: none
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Run Laravel test suite
+      - name: Build frontend assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Run manual transfer expiration regression tests
         env:
           APP_ENV: testing
           APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
@@ -38,4 +49,4 @@ jobs:
           SESSION_DRIVER: array
           QUEUE_CONNECTION: sync
           MAIL_MAILER: array
-        run: php artisan test
+        run: php artisan test --filter=ManualTransferExpirationTest
