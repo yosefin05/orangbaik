@@ -267,23 +267,6 @@
                                         </span>
                                     @endif
 
-                                    <a href="{{ route('admin.donasi.edit', $item->id) }}" class="action-link link-yellow"
-                                        title="Edit status donasi">
-                                        <i class="bi bi-pencil"></i>
-                                        Edit
-                                    </a>
-
-                                    <form action="{{ route('admin.donasi.destroy', $item->id) }}" method="POST"
-                                        class="inline-form"
-                                        onsubmit="return confirm('Yakin ingin menghapus donasi #{{ $item->id }}?')">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="submit" class="action-link link-red" title="Hapus donasi">
-                                            <i class="bi bi-trash"></i>
-                                            <span>Hapus</span>
-                                        </button>
-                                    </form>
 
                                 </div>
                             </td>
