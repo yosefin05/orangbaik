@@ -124,9 +124,10 @@ class Campaign_Fundraiser extends Model
                     ->exists();
                 $reserved = Campaign_Fundraiser_Alias::where('alias', $value)->exists();
                 $campaignSlug = Campaign::where('slug', $value)->orWhere('custom_slug', $value)->exists();
+                $oldCampaignSlug = Campaign_Url_Alias::where('custom_slug', $value)->exists();
                 $reservedRoute = in_array(strtolower($value), Campaign::reservedCustomSlugs(), true);
 
-                if ($conflictsWithFundraiserAlias || $reserved || $campaignSlug || $reservedRoute) {
+                if ($conflictsWithFundraiserAlias || $reserved || $campaignSlug || $oldCampaignSlug || $reservedRoute) {
                     $fail('Alias pendek sudah digunakan atau merupakan URL yang dicadangkan.');
                 }
             },
