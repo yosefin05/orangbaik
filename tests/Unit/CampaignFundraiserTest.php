@@ -21,7 +21,7 @@ class CampaignFundraiserTest extends TestCase
         $fundraiser->setRelation('campaign', $campaign);
 
         $url = $fundraiser->referral_url;
-        $this->assertSame('/ajak/andi-peduli', parse_url($url, PHP_URL_PATH));
+        $this->assertSame('/campaign-pilihan/andi-peduli', parse_url($url, PHP_URL_PATH));
     }
 
     public function test_referral_url_is_campaign_independent(): void
@@ -36,6 +36,6 @@ class CampaignFundraiserTest extends TestCase
         $fundraiser->setRelation('campaign', $campaign);
 
         $url = $fundraiser->referral_url;
-        $this->assertSame('/ajak/budi-berbagi', parse_url($url, PHP_URL_PATH));
+        $this->assertSame('/campaign/slug-asli/budi-berbagi', parse_url($url, PHP_URL_PATH));
     }
 }
