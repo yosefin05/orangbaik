@@ -206,7 +206,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/campaign/{slug}/fundraiser', [FundraiserController::class, 'destroy'])
         ->name('fundraiser.destroy')
         ->where('slug', '.*');
-    Route::patch('/fundraiser/{fundraiser}/alias', [FundraiserController::class, 'updateAlias'])->name('fundraiser.alias.update');
+    Route::patch('/fundraiser/{fundraiser}/alias', [FundraiserController::class, 'updateShortAlias'])->name('fundraiser.alias.update');
 
 });
 
@@ -223,6 +223,12 @@ Route::get('/donasi/{slug}', function (string $slug) {
     return redirect($campaign->public_url, 301);
 })->name('campaign.legacy.show');
 Route::get('/ajak/{alias}', [FundraiserController::class, 'track'])->name('referral.track');
+Route::get('/campaign/{campaignSlug}/{fundraiserAlias}', [FundraiserController::class, 'showReferral'])
+    ->name('fundraiser.referral.canonical')
+    ->where(['campaignSlug' => '[A-Za-z0-9][A-Za-z0-9-]*', 'fundraiserAlias' => '[A-Za-z0-9][A-Za-z0-9_-]*']);
+Route::get('/{campaignSlug}/{fundraiserAlias}', [FundraiserController::class, 'showReferral'])
+    ->name('fundraiser.referral')
+    ->where(['campaignSlug' => '[A-Za-z0-9][A-Za-z0-9-]*', 'fundraiserAlias' => '[A-Za-z0-9][A-Za-z0-9_-]*']);
 Route::get('/{slug}', function (string $slug) {
     $campaign = \App\Models\Campaign::where('custom_slug', $slug)->first();
     if ($campaign) {
