@@ -299,27 +299,10 @@
                                         {{ $penggalang->isEntity() ? $penggalang->jenis_penggalang_label : '(Privat Pemilik)' }}</span>
                                     <b><i class="bi bi-chevron-down"></i></b>
                                 </summary>
-                                @php
-                                    $canManageLegalDocuments = ($isOwner || $isAdmin)
-                                        && ($isAdmin || $penggalang->status !== 'pending');
-                                @endphp
                                 @if($docsToShow->isNotEmpty())
-                                    @if($canManageLegalDocuments)
-                                        <form method="POST"
-                                            action="{{ route('penggalang_dana.dokumen.destroy', $penggalang->slug ?? $penggalang->id) }}"
-                                            onsubmit="return confirm('Hapus dokumen yang dipilih? File yang masih digunakan dokumen lain akan tetap disimpan.');">
-                                            @csrf
-                                            @method('DELETE')
-                                    @endif
                                     <div class="info-table">
                                         @foreach($docsToShow as $dokumen)
                                             <div class="info-row legal-doc-row">
-                                                @if($canManageLegalDocuments)
-                                                    <label class="legal-doc-select" style="display:flex;align-items:center;gap:8px;">
-                                                        <input type="checkbox" name="dokumen_ids[]" value="{{ $dokumen->id }}">
-                                                        <span class="visually-hidden">Pilih {{ $dokumen->nama_dokumen }}</span>
-                                                    </label>
-                                                @endif
                                                 <strong class="info-label">{{ $dokumen->nama_dokumen }}</strong>
                                                 <p class="info-value">
                                                     @if($dokumen->isPublicForVisitor() || $isOwner || $isAdmin)
@@ -336,17 +319,6 @@
                                             </div>
                                         @endforeach
                                     </div>
-                                    @if($canManageLegalDocuments)
-                                        <div class="legal-doc-bulk-actions" style="display:flex;justify-content:flex-end;gap:10px;padding:12px 0;">
-                                            <button type="submit" class="profile-btn"
-                                                style="border:1px solid #dc3545;color:#dc3545;background:#fff;">
-                                                <i class="bi bi-trash"></i> Hapus dokumen terpilih
-                                            </button>
-                                        </div>
-                                        </form>
-                                    @elseif($isOwner && $penggalang->status === 'pending')
-                                        <p class="info-empty">Dokumen tidak dapat dihapus selama proses verifikasi berlangsung.</p>
-                                    @endif
                                 @else
                                     <p class="info-empty">
                                         {{ $isOwner || $isAdmin ? 'Belum ada dokumen legalitas.' : 'Dokumen legalitas belum dipublikasikan.' }}
