@@ -435,7 +435,10 @@ class PenggalangDanaController extends Controller
                     continue;
                 }
 
-                $document = $existingDokumen->get($i);
+                $documentId = $request->input("dokumen_ids.{$i}");
+                $document = $documentId
+                    ? $existingDokumen->firstWhere('id', (int) $documentId)
+                    : $existingDokumen->get($i);
                 $oldPath = $document?->file_dokumen;
                 $oldDisk = $document?->storage_disk ?? 'private';
                 $newPath = null;
@@ -521,6 +524,85 @@ class PenggalangDanaController extends Controller
         return redirect()
             ->route('profil.penggalang', $penggalang->slug ?? $penggalang->id)
             ->with('success', $message);
+    }
+
+    /**
+     * Hapus satu atau beberapa dokumen legalitas milik penggalang.
+     * File fisik hanya dihapus jika tidak lagi dipakai record dokumen lain.
+     */
+    public function destroyDocuments(Request $request, $id)
+    {
+        $penggalang = Penggalang_Dana::where('id', $id)
+            ->orWhere('slug', $id)
+            ->firstOrFail();
+
+        Gate::authorize('update', $penggalang);
+
+        $isAdmin = auth()->user() && method_exists(auth()->user(), 'isAdmin')
+            && auth()->user()->isAdmin();
+
+        if ($penggalang->status === 'pending' && !$isAdmin) {
+            return back()->with('error', 'Dokumen tidak dapat diubah saat pengajuan sedang diverifikasi.');
+        }
+
+        $validated = $request->validate([
+            'dokumen_ids' => 'required|array|min:1',
+            'dokumen_ids.*' => 'required|integer|distinct',
+        ]);
+
+        $documents = $penggalang->penggalangDanaDokumen()
+            ->whereIn('id', $validated['dokumen_ids'])
+            ->get();
+
+        if ($documents->count() !== count(array_unique($validated['dokumen_ids']))) {
+            abort(404, 'Satu atau beberapa dokumen tidak ditemukan pada profil ini.');
+        }
+
+        $filesToCheck = $documents
+            ->filter(fn ($document) => $document->file_dokumen && !filter_var($document->file_dokumen, FILTER_VALIDATE_URL))
+            ->map(fn ($document) => [
+                'disk' => $document->storage_disk ?: 'private',
+                'path' => $document->file_dokumen,
+            ])
+            ->unique(fn ($file) => $file['disk'] . '|' . $file['path'])
+            ->values()
+            ->all();
+
+        DB::transaction(function () use ($documents, $penggalang) {
+            foreach ($documents as $document) {
+                $document->delete();
+            }
+
+            if (in_array($penggalang->status, ['approved', 'rejected'], true)) {
+                $penggalang->update([
+                    'status' => 'pending',
+                    'status_read' => false,
+                    'catatan_verifikasi' => null,
+                    'verified_by' => null,
+                    'verified_at' => null,
+                    'revision_count' => (int) $penggalang->revision_count + 1,
+                ]);
+            }
+        });
+
+        foreach ($filesToCheck as $file) {
+            $stillUsedQuery = Penggalang_Dana_Dokumen::where('file_dokumen', $file['path']);
+            if ($file['disk'] === 'private') {
+                $stillUsedQuery->where(function ($query) {
+                    $query->where('storage_disk', 'private')->orWhereNull('storage_disk');
+                });
+            } else {
+                $stillUsedQuery->where('storage_disk', $file['disk']);
+            }
+
+            if (!$stillUsedQuery->exists()) {
+                Storage::disk($file['disk'])->delete($file['path']);
+            }
+        }
+
+        return redirect()
+            ->route('profil.penggalang', $penggalang->slug ?? $penggalang->id)
+            ->with('success', $documents->count() . ' dokumen berhasil dihapus.');
     }
 
     /**
