@@ -46,11 +46,16 @@ class DonorWhatsAppMessage
         $pembayaran = $donasi->pembayaran;
         $status = $pembayaran?->transaction_status;
 
-        // Hanya pending dan settlement yang boleh dihubungi.
+        // Hanya pending yang masih berlaku dan settlement yang boleh dihubungi.
+        // Tanggal berakhir campaign tidak membatalkan masa berlaku transaksi gateway.
         if (
             !in_array($status, ['pending', 'settlement'], true) ||
             !$donasi->normalized_whatsapp_number
         ) {
+            return null;
+        }
+
+        if ($status === 'pending' && !$pembayaran?->isFollowUpAvailable()) {
             return null;
         }
 
