@@ -21,6 +21,132 @@
                 </p>
             </div>
 
+            <a href="{{ route('admin.users.index') }}" class="btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                <span>Kembali</span>
+            </a>
+        </div>
+
+        {{-- ========================================================== --}}
+        {{-- FORM                                                      --}}
+        {{-- ========================================================== --}}
+        <form action="{{ route('admin.users.update', $user) }}" method="POST" class="form-wrapper">
+
+            @csrf
+            @method('PUT')
+
+            {{-- Row 1: Nama & Email --}}
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label for="name">Nama Lengkap <span class="text-danger">*</span></label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="form-control"
+                        value="{{ old('name', $user->name) }}"
+                        placeholder="Masukkan nama lengkap"
+                        required
+                    />
+                    @error('name')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email <span class="text-danger">*</span></label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-control"
+                        value="{{ old('email', $user->email) }}"
+                        placeholder="Masukkan alamat email"
+                        required
+                    />
+                    @error('email')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+            </div>
+
+            {{-- Row 2: Nomor & Jenis Kelamin --}}
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label for="nomor">Nomor Telepon</label>
+                    <input
+                        type="text"
+                        id="nomor"
+                        name="nomor"
+                        class="form-control"
+                        value="{{ old('nomor', $user->nomor) }}"
+                        placeholder="Masukkan nomor telepon"
+                    />
+                    @error('nomor')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="jenis_kelamin">Jenis Kelamin</label>
+                    <select id="jenis_kelamin" name="jenis_kelamin" class="form-control">
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="L" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'L' ? 'selected' : '' }}>
+                            Laki-laki
+                        </option>
+                        <option value="P" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'P' ? 'selected' : '' }}>
+                            Perempuan
+                        </option>
+                    </select>
+                    @error('jenis_kelamin')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+            </div>
+
+            {{-- Row 3: Role --}}
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label for="role">Role <span class="text-danger">*</span></label>
+                    <select id="role" name="role" class="form-control" required>
+                        <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>
+                            User
+                        </option>
+                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
+                            Admin
+                        </option>
+                    </select>
+                    @error('role')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    {{-- Kosong atau bisa diisi dengan info tambahan --}}
+                    <label>&nbsp;</label>
+                    <div class="text-muted" style="padding-top: 8px;">
+                        <i class="bi bi-info-circle"></i>
+                        Role menentukan akses user ke sistem
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- ========================================================== --}}
+            {{-- FORM ACTIONS                                               --}}
+            {{-- ========================================================== --}}
+            <div class="form-actions">
+
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-check-circle"></i>
+                    Simpan Perubahan
+                </button>
+
 
             </div>
 
