@@ -186,9 +186,6 @@
 
             {{-- Actions --}}
             <div class="form-actions">
-                <a href="{{ route('admin.payment.channel.index') }}" class="btn btn-outline">
-                    Batal
-                </a>
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-check-lg"></i>
                     Simpan Perubahan

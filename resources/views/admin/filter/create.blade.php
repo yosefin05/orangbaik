@@ -57,9 +57,6 @@
                         <span>Simpan Filter</span>
                     </button>
 
-                    <a href="{{ route('admin.filter.index') }}" class="btn-secondary">
-                        Batal
-                    </a>
                 </div>
             </div>
 

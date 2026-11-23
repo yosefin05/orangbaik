@@ -82,7 +82,6 @@
                         <i class="bi bi-save"></i>
                         <span>Simpan Perubahan</span>
                     </button>
-                    <a href="{{ route('admin.faq.index') }}" class="btn-secondary">Batal</a>
                 </div>
             </div>
         </form>

@@ -125,10 +125,6 @@
                         <span>Simpan Berita</span>
                     </button>
 
-                    <a href="{{ route('admin.berita.index') }}" class="btn-secondary">
-                        <i class="bi bi-x-circle"></i>
-                        Batal
-                    </a>
 
                 </div>
             </div>

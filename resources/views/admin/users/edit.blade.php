@@ -147,10 +147,6 @@
                     Simpan Perubahan
                 </button>
 
-                <a href="{{ route('admin.users.index') }}" class="btn-secondary">
-                    <i class="bi bi-x-circle"></i>
-                    Batal
-                </a>
 
             </div>
 

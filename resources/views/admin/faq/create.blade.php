@@ -83,7 +83,6 @@
                         <i class="bi bi-save"></i>
                         <span>Simpan FAQ</span>
                     </button>
-                    <a href="{{ route('admin.faq.index') }}" class="btn-secondary">Batal</a>
                 </div>
             </div>
         </form>

@@ -150,10 +150,6 @@
                         <span>Simpan Testimoni</span>
                     </button>
 
-                    <a href="{{ route('admin.testimoni.index') }}" class="btn-secondary">
-                        <i class="bi bi-x-circle"></i>
-                        Batal
-                    </a>
                 </div>
             </div>
 
