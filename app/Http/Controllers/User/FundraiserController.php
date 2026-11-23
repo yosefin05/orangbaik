@@ -65,34 +65,93 @@ class FundraiserController extends Controller
         ]);
     }
 
+    public function showReferral(string $campaignSlug, string $fundraiserAlias)
+    {
+        $campaign = Campaign::where('custom_slug', $campaignSlug)
+            ->orWhere('slug', $campaignSlug)
+            ->firstOrFail();
+
+        $fundraiser = Campaign_Fundraiser::with('campaign')
+            ->where('campaign_id', $campaign->id)
+            ->where('alias', $fundraiserAlias)
+            ->where('status', 'active')
+            ->firstOrFail();
+
+        return $this->activateReferral($fundraiser);
+    }
+
     public function track(string $alias)
     {
         $fundraiser = Campaign_Fundraiser::with('campaign')
             ->where('alias', $alias)->where('status', 'active')->first();
+
         if (!$fundraiser) {
-            $fundraiser = Campaign_Fundraiser_Alias::with('fundraiser.campaign')
-                ->where('alias', $alias)->firstOrFail()->fundraiser;
+            $history = Campaign_Fundraiser_Alias::with('fundraiser.campaign')
+                ->where('alias', $alias)
+                ->where('alias_type', 'referral')
+                ->firstOrFail();
+            $fundraiser = $history->fundraiser;
         }
-        abort_unless($fundraiser->campaign?->is_active, 404);
+
+        return $this->activateReferral($fundraiser);
+    }
+
+    public function trackShort(string $alias)
+    {
+        $fundraiser = Campaign_Fundraiser::with('campaign')
+            ->where('short_alias', $alias)->where('status', 'active')->first();
+
+        if (!$fundraiser) {
+            $history = Campaign_Fundraiser_Alias::with('fundraiser.campaign')
+                ->where('alias', $alias)
+                ->where('alias_type', 'short')
+                ->firstOrFail();
+            $fundraiser = $history->fundraiser;
+        }
+
+        abort_unless($fundraiser?->status === 'active' && $fundraiser->campaign?->is_active, 404);
+
+        return redirect($fundraiser->referral_url);
+    }
+
+    private function activateReferral(?Campaign_Fundraiser $fundraiser)
+    {
+        abort_unless($fundraiser?->status === 'active' && $fundraiser->campaign?->is_active, 404);
         session()->put('campaign_referral.' . $fundraiser->campaign_id, $fundraiser->referral_code);
+
         return redirect($fundraiser->campaign->public_url);
     }
 
-    public function updateAlias(Request $request, Campaign_Fundraiser $fundraiser)
+    public function updateShortAlias(Request $request, Campaign_Fundraiser $fundraiser)
     {
         abort_unless((int) $fundraiser->user_id === (int) Auth::id(), 403);
-        $validated = $request->validate(['alias' => Campaign_Fundraiser::aliasRules($fundraiser->id)]);
-        $alias = Str::slug($validated['alias']);
-        DB::transaction(function () use ($fundraiser, $alias): void {
-            if ($fundraiser->alias !== $alias) {
-                Campaign_Fundraiser_Alias::firstOrCreate([
-                    'campaign_fundraiser_id' => $fundraiser->id,
-                    'alias' => $fundraiser->alias,
-                ]);
-                $fundraiser->update(['alias' => $alias]);
+
+        $request->merge([
+            'short_alias' => $request->filled('short_alias')
+                ? Str::slug($request->input('short_alias'))
+                : null,
+        ]);
+
+        $validated = $request->validate([
+            'short_alias' => Campaign_Fundraiser::shortAliasRules($fundraiser->id),
+        ]);
+
+        $shortAlias = $validated['short_alias'] ?? null;
+
+        DB::transaction(function () use ($fundraiser, $shortAlias): void {
+            if ($fundraiser->short_alias !== $shortAlias) {
+                if ($fundraiser->short_alias) {
+                    Campaign_Fundraiser_Alias::firstOrCreate(
+                        ['alias' => $fundraiser->short_alias],
+                        ['campaign_fundraiser_id' => $fundraiser->id, 'alias_type' => 'short']
+                    );
+                }
+
+                $fundraiser->update(['short_alias' => $shortAlias]);
             }
         });
-        return back()->with('success', 'Alias referral berhasil diperbarui.');
+
+        return back()->with('success', 'Alias pendek berhasil diperbarui.');
     }
 
     public function destroy($slug)
