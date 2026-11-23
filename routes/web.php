@@ -145,6 +145,8 @@ Route::middleware('auth')->group(function () {
         ->name('penggalang_dana.edit');
     Route::patch('/penggalang/{id}', [PenggalangDanaController::class, 'update'])
         ->name('penggalang_dana.update');
+    Route::delete('/penggalang/{id}/dokumen', [PenggalangDanaController::class, 'destroyDocuments'])
+        ->name('penggalang_dana.dokumen.destroy');
     Route::get('/penggalang-dana/{id}/edit', fn (string $id) => redirect()->route('penggalang_dana.edit', $id));
     Route::patch('/penggalang-dana/{id}', fn (Request $request, string $id) => redirect()->route('penggalang_dana.update', $id, 307));
     Route::get('/penggalang/rejected', [PenggalangDanaController::class, 'rejected'])
