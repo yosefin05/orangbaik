@@ -67,6 +67,41 @@ class DonorWhatsAppPersonalizationTest extends TestCase
         }
     }
 
+    public function test_pending_follow_up_uses_gateway_expiry_not_campaign_end_date(): void
+    {
+        $campaign = new Campaign([
+            'judul' => 'Program Telah Berakhir',
+            'tanggal_berakhir' => now()->subDay(),
+        ]);
+        $donasi = new Donasi([
+            'nama_donatur' => 'Rina',
+            'no_hp' => '081234567890',
+            'nominal' => 50000,
+        ]);
+        $donasi->id = 321;
+        $donasi->setRelation('campaign', $campaign);
+
+        $payment = new Pembayaran([
+            'transaction_status' => 'pending',
+            'gateway_response' => [
+                'expired_date' => now()->addHour()->format('Y-m-d H:i:s'),
+            ],
+        ]);
+        $payment->id = 654;
+        $donasi->setRelation('pembayaran', $payment);
+
+        $this->assertTrue($payment->isFollowUpAvailable());
+        $this->assertNotNull($donasi->whatsapp_url, 'Campaign expired must not block a still-valid gateway payment follow-up.');
+
+        $payment->gateway_response = [
+            'expired_date' => now()->subMinute()->format('Y-m-d H:i:s'),
+        ];
+
+        $this->assertFalse($payment->isFollowUpAvailable());
+        $this->assertFalse($payment->isResumable());
+        $this->assertNull($donasi->whatsapp_url, 'A gateway-expired pending transaction must not offer follow-up.');
+    }
+
     public function test_legacy_greeting_falls_back_to_kak_and_admin_pages_are_protected(): void
     {
         $donasi = new Donasi();
