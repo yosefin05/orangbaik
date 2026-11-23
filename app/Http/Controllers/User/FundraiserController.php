@@ -77,7 +77,9 @@ class FundraiserController extends Controller
             ->where('status', 'active')
             ->firstOrFail();
 
-        return $this->activateReferral($fundraiser);
+        session()->put('campaign_referral.' . $fundraiser->campaign_id, $fundraiser->referral_code);
+
+        return app(CampaignController::class)->show($campaign->getRouteSlug());
     }
 
     public function track(string $alias)
