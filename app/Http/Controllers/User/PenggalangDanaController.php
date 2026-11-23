@@ -386,16 +386,12 @@ class PenggalangDanaController extends Controller
         ]);
 
         // Cek perubahan dokumen
-        $oldDokumen = $penggalang->penggalangDanaDokumen()->get();
         $isDokumenChanged = false;
+        $documentsToDelete = [];
         $importantFields = ['nama_penggalang', 'jenis_penggalang', 'no_telepon', 'alamat'];
         $requiresProfileApproval = $penggalang->status === 'approved' && $penggalang->verified
             && collect($importantFields)->contains(fn ($field) => array_key_exists($field, $validated)
                 && (string) $validated[$field] !== (string) $penggalang->{$field});
-
-        if ($request->hasFile('dokumen_files')) {
-            $isDokumenChanged = true;
-        }
 
         // Upload foto profil
         if ($request->boolean('remove_foto_profil') && !$request->hasFile('foto_profil')) {
@@ -404,11 +400,12 @@ class PenggalangDanaController extends Controller
             }
             $validated['foto_profil'] = null;
         } elseif ($request->hasFile('foto_profil')) {
+            $newFotoProfil = $request->file('foto_profil')
+                ->store('penggalang_dana/profil', 'public');
             if ($penggalang->foto_profil && Storage::disk('public')->exists($penggalang->foto_profil)) {
                 Storage::disk('public')->delete($penggalang->foto_profil);
             }
-            $validated['foto_profil'] = $request->file('foto_profil')
-                ->store('penggalang_dana/profil', 'public');
+            $validated['foto_profil'] = $newFotoProfil;
         }
 
         // Upload thumbnail
@@ -418,11 +415,71 @@ class PenggalangDanaController extends Controller
             }
             $validated['thumbnail'] = null;
         } elseif ($request->hasFile('thumbnail')) {
+            $newThumbnail = $request->file('thumbnail')
+                ->store('penggalang_dana/thumbnail', 'public');
             if ($penggalang->thumbnail && Storage::disk('public')->exists($penggalang->thumbnail)) {
                 Storage::disk('public')->delete($penggalang->thumbnail);
             }
-            $validated['thumbnail'] = $request->file('thumbnail')
-                ->store('penggalang_dana/thumbnail', 'public');
+            $validated['thumbnail'] = $newThumbnail;
+        }
+
+        // Simpan dokumen baru terlebih dahulu. Dokumen lama hanya dihapus
+        // setelah record baru berhasil disimpan agar tidak terjadi kehilangan data.
+        if ($request->hasFile('dokumen_files') || $request->filled('nama_dokumen')) {
+            $namaDokumenArr = $request->input('nama_dokumen', []);
+            $existingDokumen = $penggalang->penggalangDanaDokumen()->orderBy('id')->get();
+
+            foreach ($namaDokumenArr as $i => $nama) {
+                $nama = trim((string) $nama);
+                if ($nama === '') {
+                    continue;
+                }
+
+                $document = $existingDokumen->get($i);
+                $oldPath = $document?->file_dokumen;
+                $oldDisk = $document?->storage_disk ?? 'private';
+                $newPath = null;
+                $newDisk = 'private';
+
+                if ($request->hasFile("dokumen_files.{$i}")) {
+                    $newPath = $request->file("dokumen_files.{$i}")
+                        ->store("dokumen_penggalang/{$penggalang->id}", 'private');
+                } else {
+                    $candidateUrl = trim((string) $request->input("file_dokumen.{$i}"));
+                    if ($candidateUrl !== '') {
+                        $newPath = $candidateUrl;
+                    }
+                }
+
+                if (!$newPath) {
+                    if ($document && $document->nama_dokumen !== $nama) {
+                        $document->update(['nama_dokumen' => $nama]);
+                    }
+                    continue;
+                }
+
+                $pathChanged = !$document || $oldPath !== $newPath || $oldDisk !== $newDisk;
+                $data = [
+                    'nama_dokumen' => $nama,
+                    'file_dokumen' => $newPath,
+                    'is_public' => $document?->is_public ?? false,
+                    'storage_disk' => $newDisk,
+                ];
+
+                if ($document) {
+                    $document->update($data);
+                } else {
+                    $data['penggalang_dana_id'] = $penggalang->id;
+                    $document = Penggalang_Dana_Dokumen::create($data);
+                }
+
+                if ($pathChanged) {
+                    $isDokumenChanged = true;
+                    if ($oldPath && $oldPath !== $newPath && !filter_var($oldPath, FILTER_VALIDATE_URL)) {
+                        $documentsToDelete[] = [$oldDisk, $oldPath];
+                    }
+                }
+            }
         }
 
         // Jika dokumen berubah, reset ke pending
@@ -450,44 +507,8 @@ class PenggalangDanaController extends Controller
 
         $penggalang->update($validated);
 
-        // Jika ada unggahan dokumen baru
-        if ($request->hasFile('dokumen_files') || $request->filled('nama_dokumen')) {
-            $namaDokumenArr = $request->input('nama_dokumen', []);
-            $existingDokumen = $penggalang->penggalangDanaDokumen()->orderBy('id')->get();
-            foreach ($namaDokumenArr as $i => $nama) {
-                if (empty($nama)) continue;
-
-                $document = $existingDokumen->get($i);
-                $oldPath = $document?->file_dokumen;
-                $oldDisk = $document?->storage_disk ?? 'private';
-                $newPath = null;
-                $newDisk = 'private';
-                if ($request->hasFile("dokumen_files.{$i}")) {
-                    $uploaded = $request->file("dokumen_files.{$i}");
-                    $newPath = $uploaded->store("dokumen_penggalang/{$penggalang->id}", 'private');
-                } elseif (!empty($request->file_dokumen[$i])) {
-                    $newPath = trim($request->file_dokumen[$i]);
-                }
-
-                if (!$newPath) continue;
-
-                $data = [
-                    'nama_dokumen' => $nama,
-                    'file_dokumen' => $newPath,
-                    'is_public' => false,
-                    'storage_disk' => $newDisk,
-                ];
-                if ($document) {
-                    $document->update($data);
-                } else {
-                    $data['penggalang_dana_id'] = $penggalang->id;
-                    $document = Penggalang_Dana_Dokumen::create($data);
-                }
-
-                if ($oldPath && $oldPath !== $newPath && !filter_var($oldPath, FILTER_VALIDATE_URL)) {
-                    Storage::disk($oldDisk)->delete($oldPath);
-                }
-            }
+        foreach ($documentsToDelete as [$oldDisk, $oldPath]) {
+            Storage::disk($oldDisk)->delete($oldPath);
         }
 
         $message = 'Data berhasil diperbarui.';

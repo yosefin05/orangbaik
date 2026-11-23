@@ -427,6 +427,10 @@
     gap: var(--space-5, 20px);
 }
 
+.verify-grid-single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .verify-field {
     display: flex;
     flex-direction: column;
@@ -559,6 +563,37 @@
    kontras dengan bg-soft milik .verify-document-item */
 .verify-document-item .verify-field input {
     background: var(--bg);
+}
+
+.verify-document-link-row {
+    display: grid;
+    gap: var(--space-3, 12px);
+    margin-top: var(--space-4, 16px);
+}
+
+.verify-document-link,
+.verify-document-link-row > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    color: var(--primary);
+    font-weight: var(--fw-semibold);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.verify-document-link:hover,
+.verify-document-link-row > a:hover {
+    text-decoration: underline;
+}
+
+.field-help {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: var(--fs-xxs, 11px);
+    line-height: 1.5;
 }
 
 /* ============================

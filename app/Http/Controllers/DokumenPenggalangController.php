@@ -60,7 +60,7 @@ class DokumenPenggalangController extends Controller
         $realPath = realpath($fullPath);
         $basePath = realpath(Storage::disk($disk)->path(''));
 
-        if (!$realPath || !str_starts_with($realPath, $basePath)) {
+        if (!$realPath || !$basePath || ($realPath !== $basePath && !str_starts_with($realPath, $basePath . DIRECTORY_SEPARATOR))) {
             abort(Response::HTTP_FORBIDDEN, 'Deteksi percobaan path traversal file tidak sah.');
         }
 

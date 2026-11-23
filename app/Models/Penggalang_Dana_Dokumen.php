@@ -53,6 +53,10 @@ class Penggalang_Dana_Dokumen extends Model
      */
     public function isPublicForVisitor(): bool
     {
+        if (!$this->penggalangDana || !$this->penggalangDana->isEntity()) {
+            return false;
+        }
+
         // Dokumen individu WAJIB 100% PRIVATE
         if ($this->penggalangDana && ($this->penggalangDana->jenis_penggalang === 'individu' || (method_exists($this->penggalangDana, 'isIndividu') && $this->penggalangDana->isIndividu()))) {
             return false;

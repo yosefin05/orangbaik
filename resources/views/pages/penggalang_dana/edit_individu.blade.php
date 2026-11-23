@@ -189,18 +189,32 @@
 
                         <div class="verify-grid-2">
                             <label class="verify-field">
-                                <span>Nama Dokumen</span>
+                                <span>Nama Dokumen <b>*</b></span>
                                 <input type="text" name="nama_dokumen[]"
                                     value="{{ old('nama_dokumen.0', $dokumen->nama_dokumen ?? '') }}"
                                     {{ $isPending ? 'disabled' : '' }}
-                                    placeholder="Contoh: KTP, NPWP">
+                                    placeholder="Contoh: KTP, NPWP" required>
                             </label>
                             <label class="verify-field">
-                                <span>Link Dokumen</span>
+                                <span>Unggah Dokumen Baru</span>
+                                <input type="file" name="dokumen_files[]" accept=".pdf,.jpg,.jpeg,.png"
+                                    {{ $isPending ? 'disabled' : '' }}>
+                                <small class="field-help">PDF, JPG, atau PNG. Maksimal 5 MB.</small>
+                            </label>
+                        </div>
+                        <div class="verify-document-link-row">
+                            @if($dokumen)
+                                <a href="{{ $dokumen->secure_view_url }}" target="_blank" rel="noopener noreferrer">
+                                    <i class="bi bi-file-earmark-text"></i> Lihat dokumen tersimpan
+                                </a>
+                            @endif
+                            <label class="verify-field">
+                                <span>Atau Tautan Dokumen</span>
                                 <input type="url" name="file_dokumen[]"
-                                    value="{{ old('file_dokumen.0', $dokumen->file_dokumen ?? '') }}"
+                                    value="{{ old('file_dokumen.0', filter_var($dokumen?->file_dokumen, FILTER_VALIDATE_URL) ? $dokumen->file_dokumen : '') }}"
                                     {{ $isPending ? 'disabled' : '' }}
-                                    placeholder="Masukkan link Google Drive">
+                                    placeholder="https://drive.google.com/...">
+                                <small class="field-help">Gunakan tautan Google Drive atau penyimpanan online lain.</small>
                             </label>
                         </div>
                     </section>
@@ -236,7 +250,7 @@
                         </div>
                         <div class="verify-grid-2">
                             <label class="verify-field">
-                                <input type="text" name="instagram" value="{{ old('instagram', $penggalang->instagram) }}" placeholder="Instagram" {{ $isPending ? 'disabled' : '' }}>
+                                <input type="text" name="instagram" value="{{ old('instagram', ltrim((string) $penggalang->instagram, '@')) }}" placeholder="Username Instagram" {{ $isPending ? 'disabled' : '' }}>
                             </label>
                             <label class="verify-field">
                                 <input type="text" name="facebook" value="{{ old('facebook', $penggalang->facebook) }}" placeholder="Facebook" {{ $isPending ? 'disabled' : '' }}>
@@ -245,7 +259,7 @@
                                 <input type="text" name="youtube" value="{{ old('youtube', $penggalang->youtube) }}" placeholder="Youtube" {{ $isPending ? 'disabled' : '' }}>
                             </label>
                             <label class="verify-field">
-                                <input type="text" name="tiktok" value="{{ old('tiktok', $penggalang->tiktok) }}" placeholder="TikTok" {{ $isPending ? 'disabled' : '' }}>
+                                <input type="text" name="tiktok" value="{{ old('tiktok', ltrim((string) $penggalang->tiktok, '@')) }}" placeholder="Username TikTok" {{ $isPending ? 'disabled' : '' }}>
                             </label>
                         </div>
                     </section>

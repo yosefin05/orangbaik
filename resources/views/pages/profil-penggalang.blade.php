@@ -237,24 +237,21 @@
                                         // Pisah hanya pada "-" atau "•" di awal baris / setelah spasi DAN diikuti spasi.
                                         // Hyphen dalam kata ("tri-dharma") tidak ikut terpecah.
                                         foreach (preg_split('/(?:^|\s)[-•]\s+/u', $line, -1, PREG_SPLIT_NO_EMPTY) as $item) {
-                                            $item = trim($item);
+                                            $item = trim(preg_replace('/^\s*(?:[-*]|[\x{2022}])\s*/u', '', $item));
                                             if ($item !== '') {
                                                 $misiItems[] = $item;
                                             }
                                         }
                                     }
 
-                                    $misiAsList = count($misiItems) > 1 || preg_match('/^[-•]\s/u', $misiRaw);
                                 @endphp
 
-                                @if($misiAsList)
+                                @if($misiRaw !== '')
                                     <ul class="misi-list">
                                         @foreach($misiItems as $item)
                                             <li>{{ $item }}</li>
                                         @endforeach
                                     </ul>
-                                @elseif($misiRaw !== '')
-                                    <p>{!! nl2br(e($penggalang->misi)) !!}</p>
                                 @endif
                             </div>
                         </details>
@@ -295,7 +292,7 @@
                         @php
                             $docsToShow = $legalitasDokumen ?? $penggalang->penggalangDanaDokumen;
                         @endphp
-                        @if(($penggalang->isEntity() && $docsToShow->isNotEmpty()) || $isOwner)
+                        @if($penggalang->isEntity() || $isOwner || $isAdmin)
                             <details class="info-card" open>
                                 <summary>
                                     <span>Informasi Legalitas
@@ -305,19 +302,27 @@
                                 @if($docsToShow->isNotEmpty())
                                     <div class="info-table">
                                         @foreach($docsToShow as $dokumen)
-                                            <div class="info-row">
+                                            <div class="info-row legal-doc-row">
                                                 <strong class="info-label">{{ $dokumen->nama_dokumen }}</strong>
                                                 <p class="info-value">
-                                                    <a href="{{ route('dokumen.show', $dokumen->id) }}" target="_blank"
-                                                        rel="noopener noreferrer">
-                                                        <i class="bi bi-file-earmark-text"></i> Lihat Dokumen
-                                                    </a>
+                                                    @if($dokumen->isPublicForVisitor() || $isOwner || $isAdmin)
+                                                        <a href="{{ $dokumen->secure_view_url }}" target="_blank"
+                                                            rel="noopener noreferrer">
+                                                            <i class="bi bi-file-earmark-text"></i> Lihat / Unduh Dokumen
+                                                        </a>
+                                                    @else
+                                                        <span class="legal-doc-private">
+                                                            <i class="bi bi-lock-fill"></i> Dokumen privat
+                                                        </span>
+                                                    @endif
                                                 </p>
                                             </div>
                                         @endforeach
                                     </div>
                                 @else
-                                    <p class="info-empty">Belum ada dokumen legalitas.</p>
+                                    <p class="info-empty">
+                                        {{ $isOwner || $isAdmin ? 'Belum ada dokumen legalitas.' : 'Dokumen legalitas belum dipublikasikan.' }}
+                                    </p>
                                 @endif
                             </details>
                         @endif

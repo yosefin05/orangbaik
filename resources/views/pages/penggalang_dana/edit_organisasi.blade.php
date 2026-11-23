@@ -171,7 +171,7 @@
                             </div>
                         </div>
 
-                        <div class="verify-grid-2">
+                        <div class="verify-grid-2 verify-grid-single">
                             <label class="verify-field">
                                 <span>Tahun Berdiri <b>*</b></span>
                                 <select name="tahun_berdiri" required {{ $isPending ? 'disabled' : '' }}>
@@ -188,15 +188,6 @@
                                 @enderror
                             </label>
 
-                            <label class="verify-field">
-                                <span>Email Organisasi <b>*</b></span>
-                                <input type="email" name="email"
-                                    value="{{ old('email', $penggalang->email ?? $user->email ?? '') }}"
-                                    placeholder="Masukkan email organisasi" {{ $isPending ? 'disabled' : '' }}>
-                                @error('email')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </label>
                         </div>
 
                         <label class="verify-field">
@@ -267,7 +258,7 @@
 
                         <div class="verify-document-list">
 
-                            @for($i = 1; $i <= 4; $i++)
+                            @for($i = 1; $i <= 3; $i++)
                                 @php
                                     $index = $i - 1;
                                     $dokumen = $penggalang->penggalangDanaDokumen[$index] ?? null;
@@ -278,7 +269,7 @@
                                     <div class="verify-document-title">
                                         <h3>
                                             Dokumen Legalitas {{ $i }}
-                                            @if($i <= 2)
+                                            @if($i === 1)
                                                 <b>*</b>
                                             @else
                                                 <em>Opsional</em>
@@ -289,23 +280,33 @@
                                     <div class="verify-grid-2">
 
                                         <label class="verify-field">
-                                            <span>Nama Legalitas {{ $i <= 2 ? '*' : '' }}</span>
+                                                <span>Nama Dokumen {{ $i === 1 ? '*' : '' }}</span>
                                             <input
                                                 type="text"
                                                 name="nama_dokumen[]"
                                                 value="{{ old('nama_dokumen.' . $index, $dokumen->nama_dokumen ?? '') }}"
-                                                placeholder="Contoh: SK Kemenkumham, Akta, BAZNAS"
+                                                placeholder="Contoh: SK Kemenkumham, Akta, Izin Operasional"
                                                 {{ $isPending ? 'disabled' : '' }}>
                                         </label>
 
                                         <label class="verify-field">
-                                            <span>Link Legalitas {{ $i <= 2 ? '*' : '' }}</span>
+                                            <span>Unggah Dokumen {{ $i === 1 ? '*' : '' }}</span>
+                                            <input type="file" name="dokumen_files[]" accept=".pdf,.jpg,.jpeg,.png"
+                                                {{ $isPending ? 'disabled' : '' }}>
+                                            <small class="field-help">PDF, JPG, atau PNG. Maksimal 5 MB.</small>
+                                            <span>Atau Tautan Dokumen</span>
                                             <input
                                                 type="url"
                                                 name="file_dokumen[]"
-                                                value="{{ old('file_dokumen.' . $index, $dokumen->file_dokumen ?? '') }}"
-                                                placeholder="Masukkan link Google Drive dokumen"
+                                                value="{{ old('file_dokumen.' . $index, filter_var($dokumen?->file_dokumen, FILTER_VALIDATE_URL) ? $dokumen->file_dokumen : '') }}"
+                                                placeholder="https://drive.google.com/..."
                                                 {{ $isPending ? 'disabled' : '' }}>
+                                            <small class="field-help">Gunakan tautan Google Drive atau penyimpanan online lain.</small>
+                                            @if($dokumen)
+                                                <a class="verify-document-link" href="{{ $dokumen->secure_view_url }}" target="_blank" rel="noopener noreferrer">
+                                                    <i class="bi bi-file-earmark-text"></i> Lihat dokumen tersimpan
+                                                </a>
+                                            @endif
                                         </label>
 
                                     </div>
@@ -360,7 +361,7 @@
                             <label class="verify-field">
                                 <span>Instagram</span>
                                 <input type="text" name="instagram"
-                                    value="{{ old('instagram', $penggalang->instagram) }}"
+                                    value="{{ old('instagram', ltrim((string) $penggalang->instagram, '@')) }}"
                                     placeholder="Username Instagram" {{ $isPending ? 'disabled' : '' }}>
                             </label>
 
@@ -381,7 +382,7 @@
                             <label class="verify-field">
                                 <span>TikTok</span>
                                 <input type="text" name="tiktok"
-                                    value="{{ old('tiktok', $penggalang->tiktok) }}"
+                                    value="{{ old('tiktok', ltrim((string) $penggalang->tiktok, '@')) }}"
                                     placeholder="Username TikTok" {{ $isPending ? 'disabled' : '' }}>
                             </label>
 

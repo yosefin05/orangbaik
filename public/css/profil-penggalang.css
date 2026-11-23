@@ -442,6 +442,18 @@ footer {
     text-decoration: underline;
 }
 
+.legal-doc-row .info-label {
+    overflow-wrap: anywhere;
+}
+
+.legal-doc-private {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-weight: var(--fw-medium);
+}
+
 .info-empty {
     margin: 0;
     padding-top: 14px;
