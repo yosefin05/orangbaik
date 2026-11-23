@@ -4,7 +4,7 @@
 <main class="container py-5">
     <h1>Dashboard Fundraiser</h1>
     <div class="row g-3 my-4">
-        <div class="col-md-6"><div class="card p-4"><strong>{{ $totalDonatur }}</strong><span>Donatur unik (settlement)</span></div></div>
+        <div class="col-md-6"><div class="card p-4"><strong>{{ $totalDonatur }}</strong><span>Transaksi donasi berhasil</span></div></div>
         <div class="col-md-6"><div class="card p-4"><strong>Rp {{ number_format($totalDonasi, 0, ',', '.') }}</strong><span>Total donasi (settlement)</span></div></div>
     </div>
     <div class="card p-4">
