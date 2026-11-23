@@ -536,13 +536,14 @@ class PenggalangDanaController extends Controller
             ->orWhere('slug', $id)
             ->firstOrFail();
 
-        Gate::authorize('update', $penggalang);
+        // Penghapusan dokumen hanya boleh dilakukan oleh pemilik akun penggalang.
+        // Admin bertugas memverifikasi dan tidak boleh menghapus dokumen milik penggalang.
+        if ((int) $penggalang->user_id !== (int) auth()->id()) {
+            abort(403, 'Hanya pemilik akun penggalang yang dapat menghapus dokumen.');
+        }
 
-        $isAdmin = auth()->user() && method_exists(auth()->user(), 'isAdmin')
-            && auth()->user()->isAdmin();
-
-        if ($penggalang->status === 'pending' && !$isAdmin) {
-            return back()->with('error', 'Dokumen tidak dapat diubah saat pengajuan sedang diverifikasi.');
+        if ($penggalang->status === 'pending') {
+            return back()->with('error', 'Dokumen tidak dapat dihapus selama proses verifikasi berlangsung.');
         }
 
         $validated = $request->validate([
@@ -601,7 +602,7 @@ class PenggalangDanaController extends Controller
         }
 
         return redirect()
-            ->route('profil.penggalang', $penggalang->slug ?? $penggalang->id)
+            ->route('penggalang_dana.edit', $penggalang->slug ?? $penggalang->id)
             ->with('success', $documents->count() . ' dokumen berhasil dihapus.');
     }
 
