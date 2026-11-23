@@ -1,18 +1,18 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Models\\Campaign;
-use App\\Models\\Donasi;
-use App\\Models\\Kategori;
-use App\\Models\\PaymentChannel;
-use App\\Models\\PaymentGateway;
-use App\\Models\\Pembayaran;
-use App\\Models\\Penggalang_Dana;
-use App\\Models\\User;
-use App\\Services\\ManualTransferService;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Tests\\TestCase;
+use App\Models\Campaign;
+use App\Models\Donasi;
+use App\Models\Kategori;
+use App\Models\PaymentChannel;
+use App\Models\PaymentGateway;
+use App\Models\Pembayaran;
+use App\Models\Penggalang_Dana;
+use App\Models\User;
+use App\Services\ManualTransferService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ManualTransferExpirationTest extends TestCase
 {
@@ -21,9 +21,9 @@ class ManualTransferExpirationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\\Database\\Seeders\\KategoriSeeder::class);
-        $this->seed(\\Database\\Seeders\\PaymentGatewaySeeder::class);
-        $this->seed(\\Database\\Seeders\\PaymentChannelSeeder::class);
+        $this->seed(\Database\Seeders\KategoriSeeder::class);
+        $this->seed(\Database\Seeders\PaymentGatewaySeeder::class);
+        $this->seed(\Database\Seeders\PaymentChannelSeeder::class);
     }
 
     private function createDonation(): Donasi
