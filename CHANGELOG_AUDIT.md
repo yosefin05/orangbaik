@@ -97,3 +97,15 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Test viewport browser tidak dapat diselesaikan: Edge headless tidak menghasilkan screenshot yang bisa dinilai. Aplikasi lokal merender home/form via XAMPP dan Feature tests memeriksa opsi form/link status. Gateway live belum dites.
 - Branch `release/orangbaik-evaluation-20261119` dari `7fb041b` berisi manifest 33 path A+B; CSS kosmetik login dikecualikan. Commit `d7cb9cb` dibuat dan dipush ke origin; checkpoint dokumentasi ini kemudian diperbarui.
 - GitHub Actions tidak melaporkan run untuk commit branch release. Staging tidak dijalankan karena workflow hanya memicu `main`, menarik seluruh branch, dan tidak memiliki backup, migration, health check, atau rollback. Versi DB/backup staging belum tersedia; production tidak disentuh.
+
+
+### [2026-11-23] Manual Transfer Expiration & Comprehensive First-Pass Audit
+- **Status**: IMPLEMENTED ON REVIEW BRANCH; TEST EXECUTION PENDING.
+- Menambahkan aksi admin untuk menandai pembayaran transfer manual `pending` menjadi `expired` setelah donatur tidak merespons tindak lanjut.
+- Transisi memakai `ManualTransferService` dan row lock; hanya pembayaran dengan gateway `manual` dan status `pending` yang dapat diubah. Settlement, failed, expired, dan transaksi gateway lain ditolak.
+- Metadata audit disimpan pada `pembayaran.expired_at`, `expired_by`, dan `expiration_reason`; migration additive disediakan.
+- Admin detail menampilkan aksi konfirmasi, catatan tindak lanjut, waktu kedaluwarsa, dan alasan. Status legacy `expire` dan canonical `expired` dinormalisasi pada daftar dan export.
+- Route/UI Edit dan Hapus transaksi admin yang tidak memiliki view edit/create terpasang di repository dihilangkan; route Kelola Donasi dibatasi ke index/detail dan aksi pembayaran eksplisit untuk melindungi jejak finansial.
+- Menambahkan `tests/Feature/ManualTransferExpirationTest.php` untuk akses admin, audit metadata, penolakan gateway non-manual, status terminal, dan akses non-admin. Test belum dieksekusi pada branch ini.
+- Audit awal code-level didokumentasikan di `AUDIT_REVIEW_2026-11-23.md`. Temuan prioritas meliputi generic webhook yang belum aman/route tidak cocok, sanitizer rich text custom yang belum cukup kuat untuk konten raw HTML, inkonsistensi status capture, total nominal riwayat donor yang mencakup transaksi non-settlement, pagination/performa pencarian, dan header mobile kategori yang menyembunyikan search.
+- Belum ada merge ke main, deployment staging, migration staging, atau perubahan database runtime.
