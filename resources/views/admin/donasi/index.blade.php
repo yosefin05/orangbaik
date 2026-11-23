@@ -166,7 +166,7 @@
                                 'settlement' => 'badge-green',
                                 'pending' => 'badge-yellow',
                                 'failed' => 'badge-red',
-                                'expired' => 'badge-gray',
+                                'expired', 'expire' => 'badge-gray',
                                 default => 'badge-gray',
                             };
 
@@ -174,7 +174,7 @@
                                 'settlement' => 'bi-check-circle-fill',
                                 'pending' => 'bi-hourglass-split',
                                 'failed' => 'bi-x-circle-fill',
-                                'expired' => 'bi-clock-history',
+                                'expired', 'expire' => 'bi-clock-history',
                                 default => 'bi-clock-history',
                             };
 
@@ -224,7 +224,7 @@
                             <td>
                                 <span class="badge {{ $badgeClass }}">
                                     <i class="bi {{ $icon }}"></i>
-                                    {{ ucfirst($status) }}
+                                    {{ in_array($status, ['expired', 'expire'], true) ? 'Kedaluwarsa' : ucfirst($status) }}
                                 </span>
                             </td>
 
