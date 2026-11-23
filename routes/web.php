@@ -234,10 +234,16 @@ Route::get('/{slug}', function (string $slug) {
     if ($campaign) {
         return app(CampaignController::class)->show($slug);
     }
+
     $oldUrl = \App\Models\Campaign_Url_Alias::with('campaign')->where('custom_slug', $slug)->first();
     if ($oldUrl?->campaign) {
         return redirect($oldUrl->campaign->public_url, 301);
     }
-    $campaign = \App\Models\Campaign::where('slug', $slug)->firstOrFail();
-    return redirect()->route('campaign.show', $campaign->slug, 301);
-})->where('slug', '[A-Za-z0-9][A-Za-z0-9-]*')->name('campaign.legacy');
+
+    $campaign = \App\Models\Campaign::where('slug', $slug)->first();
+    if ($campaign) {
+        return redirect()->route('campaign.show', $campaign->slug, 301);
+    }
+
+    return app(FundraiserController::class)->trackShort($slug);
+})->where('slug', '[A-Za-z0-9][A-Za-z0-9_-]*')->name('campaign.legacy');
