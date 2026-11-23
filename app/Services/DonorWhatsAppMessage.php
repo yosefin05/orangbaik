@@ -87,9 +87,19 @@ class DonorWhatsAppMessage
         */
 
         if ($status === 'pending') {
-            $linkPembayaran = $pembayaran?->getKey()
-                ? route('donasi.bayar.instruksi', $pembayaran->id)
-                : null;
+            $linkPembayaran = null;
+
+            if ($pembayaran?->getKey()) {
+                $routeParameters = ['pembayaran' => $pembayaran->id];
+
+                // Donasi guest wajib membawa token meskipun link dibuka setelah
+                // berpindah perangkat atau tidak memiliki sesi login.
+                if ($donasi->user_id === null) {
+                    $routeParameters['token'] = $pembayaran->payment_token;
+                }
+
+                $linkPembayaran = route('donasi.bayar.instruksi', $routeParameters);
+            }
 
             $message = "Assalamu'alaikum, {$greeting} 😊\n\n";
 
