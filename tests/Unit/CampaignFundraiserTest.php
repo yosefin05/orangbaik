@@ -38,4 +38,14 @@ class CampaignFundraiserTest extends TestCase
         $url = $fundraiser->referral_url;
         $this->assertSame('/campaign/slug-asli/budi-berbagi', parse_url($url, PHP_URL_PATH));
     }
+
+    public function test_short_referral_url_uses_separate_custom_alias(): void
+    {
+        $fundraiser = new Campaign_Fundraiser([
+            'short_alias' => 'makan',
+        ]);
+
+        $this->assertSame('/makan', parse_url($fundraiser->short_referral_url, PHP_URL_PATH));
+    }
+
 }
