@@ -20,8 +20,20 @@ class DashboardController extends Controller
     public function index()
     {
         $settlementQuery = Donasi::whereHas('pembayaran', fn($q) => $q->where('transaction_status', 'settlement'));
-        $pendingQuery    = Donasi::whereHas('pembayaran', fn($q) => $q->where('transaction_status', 'pending'));
-        $failedQuery     = Donasi::whereHas('pembayaran', fn($q) => $q->whereIn('transaction_status', ['failed', 'expired', 'expire']));
+
+        // Statistik pembayaran dihitung dari tabel pembayaran agar setiap
+        // transaksi hanya dihitung satu kali dan status pending tidak masuk
+        // ke denominator tingkat keberhasilan.
+        $settlementTransaksi = Pembayaran::where('transaction_status', 'settlement')->count();
+        $pendingTransaksi = Pembayaran::where('transaction_status', 'pending')->count();
+        $failedTransaksi = Pembayaran::whereIn('transaction_status', ['failed', 'expired', 'expire'])->count();
+        $totalFinalizedTransaksi = Pembayaran::whereIn('transaction_status', [
+            'settlement', 'failed', 'expired', 'expire',
+        ])->count();
+
+        $paymentSuccessRate = $totalFinalizedTransaksi > 0
+            ? round(($settlementTransaksi / $totalFinalizedTransaksi) * 100, 1)
+            : 0;
 
         return view('admin.dashboard', [
             'totalCampaign'         => Campaign::count(),
@@ -33,9 +45,11 @@ class DashboardController extends Controller
             'totalKomentar'         => Komentar::count(),
             'totalFilter'           => Filter::count(),
             'totalTransaksi'        => Donasi::count(),
-            'settlementTransaksi'   => (clone $settlementQuery)->count(),
-            'pendingTransaksi'      => (clone $pendingQuery)->count(),
-            'failedTransaksi'       => (clone $failedQuery)->count(),
+            'settlementTransaksi'   => $settlementTransaksi,
+            'pendingTransaksi'      => $pendingTransaksi,
+            'failedTransaksi'       => $failedTransaksi,
+            'paymentSuccessRate'    => $paymentSuccessRate,
+            'totalFinalizedTransaksi' => $totalFinalizedTransaksi,
             'totalSettlementAmount' => (clone $settlementQuery)->sum('nominal'),
         ]);
     }

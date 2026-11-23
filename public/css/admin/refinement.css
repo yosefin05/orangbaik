@@ -451,3 +451,145 @@ body.admin-body .content-area .empty-state {
         animation-iteration-count: 1 !important;
     }
 }
+
+
+/* ============================================================
+   APPROVAL ACTIONS — shared admin pattern
+   ============================================================ */
+body.admin-body .content-area .approval-actions,
+body.admin-body .content-area .form-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+body.admin-body .content-area .approval-actions {
+    margin-top: 20px;
+}
+
+body.admin-body .content-area .approval-actions form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+body.admin-body .content-area .approval-actions .btn,
+body.admin-body .content-area .form-actions > .btn,
+body.admin-body .content-area .form-actions > form > .btn,
+body.admin-body .content-area .form-actions .btn-primary,
+body.admin-body .content-area .form-actions .btn-danger {
+    min-height: 42px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.2;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: none;
+}
+
+body.admin-body .content-area .approval-actions .btn-success,
+body.admin-body .content-area .form-actions .btn-success {
+    border: 1px solid #16864a;
+    background: #16864a;
+    color: #fff;
+}
+
+body.admin-body .content-area .approval-actions .btn-success:hover,
+body.admin-body .content-area .form-actions .btn-success:hover {
+    background: #126f3d;
+    border-color: #126f3d;
+    color: #fff;
+}
+
+body.admin-body .content-area .approval-actions .btn-danger,
+body.admin-body .content-area .form-actions .btn-danger {
+    border: 1px solid #f1c7c7;
+    background: #fff5f5;
+    color: #b42318;
+}
+
+body.admin-body .content-area .approval-actions .btn-danger:hover,
+body.admin-body .content-area .form-actions .btn-danger:hover {
+    border-color: #b42318;
+    background: #b42318;
+    color: #fff;
+}
+
+body.admin-body .content-area .approval-actions .btn-warning,
+body.admin-body .content-area .form-actions .btn-warning {
+    border: 1px solid #f3d28b;
+    background: #fff8e8;
+    color: #8a5a00;
+}
+
+body.admin-body .content-area .approval-actions .btn-warning:hover,
+body.admin-body .content-area .form-actions .btn-warning:hover {
+    border-color: #c58a16;
+    background: #c58a16;
+    color: #fff;
+}
+
+body.admin-body .content-area .btn-helper {
+    max-width: 360px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+body.admin-body .content-area .form-actions-end {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: auto;
+}
+
+@media (max-width: 640px) {
+    body.admin-body .content-area .approval-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    body.admin-body .content-area .approval-actions form,
+    body.admin-body .content-area .approval-actions form .btn,
+    body.admin-body .content-area .approval-actions > .btn,
+    body.admin-body .content-area .form-actions > form,
+    body.admin-body .content-area .form-actions > form .btn {
+        width: 100%;
+    }
+
+    body.admin-body .content-area .approval-actions form .btn,
+    body.admin-body .content-area .approval-actions > .btn {
+        min-height: 44px;
+    }
+
+    body.admin-body .content-area .form-actions {
+        align-items: stretch;
+    }
+
+    body.admin-body .content-area .form-actions-end {
+        width: 100%;
+        margin-left: 0;
+        justify-content: stretch;
+    }
+
+    body.admin-body .content-area .form-actions-end > * {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+}
+
+
+body.admin-body .content-area .stat-helper {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.4;
+}

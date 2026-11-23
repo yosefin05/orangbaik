@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Pembayaran extends Model
 {
@@ -103,11 +104,57 @@ class Pembayaran extends Model
     }
 
     /**
-     * Apakah pembayaran bisa dilanjutkan (masih pending, belum terminal).
+     * Waktu kedaluwarsa pembayaran yang dikirim oleh payment gateway.
+     *
+     * Flip menyertakan expired_date saat membuat bill, sedangkan Midtrans
+     * menyertakan expiry_time pada notifikasi transaksi. Metadata ini
+     * disimpan di gateway_response agar tidak memerlukan perubahan skema.
+     */
+    public function getPaymentExpiresAtAttribute(): ?Carbon
+    {
+        $response = $this->gateway_response ?? [];
+
+        $expiresAt = data_get($response, 'payment_expires_at')
+            ?? data_get($response, 'expiry_time')
+            ?? data_get($response, 'expired_date')
+            ?? data_get($response, 'expired_at')
+            ?? data_get($response, 'bill_payment.expired_date');
+
+        if (blank($expiresAt)) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($expiresAt);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Follow-up pembayaran hanya tersedia selama status masih pending
+     * dan batas waktu gateway (jika tersedia) belum terlewati.
+     *
+     * Campaign yang telah berakhir tidak membatalkan transaksi gateway
+     * yang masih berlaku.
+     */
+    public function isFollowUpAvailable(): bool
+    {
+        if (!$this->isPending()) {
+            return false;
+        }
+
+        $expiresAt = $this->payment_expires_at;
+
+        return $expiresAt === null || now()->lt($expiresAt);
+    }
+
+    /**
+     * Apakah pembayaran masih dapat dilanjutkan oleh donatur.
      */
     public function isResumable(): bool
     {
-        return $this->transaction_status === 'pending';
+        return $this->isFollowUpAvailable();
     }
 
     /**

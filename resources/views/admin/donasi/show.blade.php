@@ -22,6 +22,7 @@
         $showProof = $p && ($p->isManualTransfer() || $p->bukti_transfer);
         $canVerify = $showProof && $p->isPending();
         $canExpire = $p && $p->isManualTransfer() && $p->isPending();
+        $paymentFollowUpExpired = $p?->isPending() && !$p->isFollowUpAvailable();
         $nominal   = 'Rp ' . number_format($donasi->nominal, 0, ',', '.');
     @endphp
 
@@ -51,6 +52,14 @@
                 <i class="bi bi-hourglass-split"></i>
                 <strong>Menunggu verifikasi Anda.</strong>
                 Cocokkan nominal di bukti transfer dengan {{ $nominal }}, lalu terima atau tolak pembayaran ini di bagian bawah halaman.
+            </div>
+        @endif
+
+        @if ($paymentFollowUpExpired)
+            <div class="alert alert-warning">
+                <i class="bi bi-clock-history"></i>
+                <strong>Batas pembayaran telah terlewati.</strong>
+                Status gateway masih tercatat pending. Periksa dashboard payment gateway sebelum menghubungi donatur atau meminta pembayaran baru.
             </div>
         @endif
 
@@ -190,9 +199,15 @@
                                     <td class="donasi-danger">{{ $p->rejection_reason }}</td>
                                 </tr>
                             @endif
+                            @if ($p->payment_expires_at)
+                                <tr>
+                                    <th>Batas Waktu Payment Gateway</th>
+                                    <td>{{ $p->payment_expires_at->timezone(config('app.timezone'))->format('d/m/Y H:i') }} WIB</td>
+                                </tr>
+                            @endif
                             @if ($p->expired_at)
                                 <tr>
-                                    <th>Waktu Kedaluwarsa</th>
+                                    <th>Waktu Ditandai Kedaluwarsa</th>
                                     <td>{{ $p->expired_at->format('d/m/Y H:i') }} WIB</td>
                                 </tr>
                             @endif
