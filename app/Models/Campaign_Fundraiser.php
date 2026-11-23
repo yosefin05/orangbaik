@@ -15,6 +15,7 @@ class Campaign_Fundraiser extends Model
         'user_id',
         'referral_code',
         'alias',
+        'short_alias',
         'qr_path',
         'total_donasi',
         'status',
@@ -104,9 +105,50 @@ class Campaign_Fundraiser extends Model
             ->sum('nominal');
     }
 
+    public static function shortAliasRules(?int $ignoreId = null): array
+    {
+        $unique = Rule::unique('campaign_fundraiser', 'short_alias');
+        if ($ignoreId !== null) {
+            $unique->ignore($ignoreId);
+        }
+
+        return [
+            'nullable', 'string', 'alpha_dash', 'min:3', 'max:120', $unique,
+            function (string $attribute, mixed $value, \\Closure $fail) use ($ignoreId): void {
+                if (!$value) {
+                    return;
+                }
+
+                $conflictsWithFundraiserAlias = self::where('alias', $value)
+                    ->when($ignoreId !== null, fn ($query) => $query->where('id', '!=', $ignoreId))
+                    ->exists();
+                $reserved = Campaign_Fundraiser_Alias::where('alias', $value)->exists();
+                $campaignSlug = Campaign::where('slug', $value)->orWhere('custom_slug', $value)->exists();
+                $reservedRoute = in_array(strtolower($value), Campaign::reservedCustomSlugs(), true);
+
+                if ($conflictsWithFundraiserAlias || $reserved || $campaignSlug || $reservedRoute) {
+                    $fail('Alias pendek sudah digunakan atau merupakan URL yang dicadangkan.');
+                }
+            },
+        ];
+    }
+
     public function getReferralUrlAttribute()
     {
-        return route('referral.track', ['alias' => $this->alias]);
+        if (!$this->campaign) {
+            return '';
+        }
+
+        $campaignPath = $this->campaign->custom_slug
+            ? $this->campaign->custom_slug
+            : 'campaign/' . $this->campaign->slug;
+
+        return url('/' . $campaignPath . '/' . $this->alias);
+    }
+
+    public function getShortReferralUrlAttribute(): ?string
+    {
+        return $this->short_alias ? url('/' . $this->short_alias) : null;
     }
 
     public function donorCountSettlement(): int
