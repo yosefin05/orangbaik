@@ -281,6 +281,7 @@
 
                                         <label class="verify-field">
                                                 <span>Nama Dokumen {{ $i === 1 ? '*' : '' }}</span>
+                                            <input type="hidden" name="dokumen_ids[]" value="{{ $dokumen?->id }}">
                                             <input
                                                 type="text"
                                                 name="nama_dokumen[]"
