@@ -65,7 +65,11 @@ class PenggalangDanaController extends Controller
 
     public function approve(Penggalang_Dana $penggalangDana)
     {
-        $penggalangDana->update([
+        if ($penggalangDana->status === 'approved') {
+            return back()->with('warning', 'Penggalang dana ini sudah disetujui.');
+        }
+
+        $approvalData = [
 
             'status' => 'approved',
             'verified' => true,
@@ -74,7 +78,11 @@ class PenggalangDanaController extends Controller
             'catatan_verifikasi' => 'Selamat! Pengajuan Anda telah disetujui. Sekarang Anda dapat mulai membuat campaign penggalangan dana.',
             'status_read' => false,
 
-        ]);
+        ];
+        if (is_array($penggalangDana->pending_changes)) {
+            $approvalData = array_merge($approvalData, $penggalangDana->pending_changes, ['pending_changes' => null]);
+        }
+        $penggalangDana->update($approvalData);
 
         return back()->with(
             'success',
@@ -86,13 +94,18 @@ class PenggalangDanaController extends Controller
         Penggalang_Dana $penggalangDana,
         Request $request
     ) {
+        $request->validate([
+            'catatan_verifikasi' => 'required|string|max:1000',
+        ]);
+
         $penggalangDana->update([
             'status' => 'rejected',
             'verified' => false,
             'verified_by' => auth()->id(),
             'verified_at' => now(),
             'catatan_verifikasi' => $request->catatan_verifikasi,
-            'status_read' => false
+            'status_read' => false,
+            'pending_changes' => null,
 
         ]);
 

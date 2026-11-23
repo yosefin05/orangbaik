@@ -114,6 +114,9 @@
                             <label class="verify-cover-button">
                                 <input type="file" id="thumbnailInput" name="thumbnail" accept="image/*"
                                     {{ $isPending ? 'disabled' : '' }}>
+                                @if($penggalang->thumbnail)
+                                    <label><input type="checkbox" name="remove_thumbnail" value="1" {{ $isPending ? 'disabled' : '' }}> Hapus banner</label>
+                                @endif
                                 <i class="bi bi-camera-fill"></i>
                                 <span>{{ $penggalang->thumbnail ? 'Ganti Banner' : 'Pilih Banner' }}</span>
                             </label>
@@ -141,6 +144,9 @@
                                 <label class="verify-upload-button">
                                     <input type="file" id="fotoProfilInput" name="foto_profil" accept="image/*"
                                         {{ $isPending ? 'disabled' : '' }}>
+                                    @if($penggalang->foto_profil)
+                                        <label><input type="checkbox" name="remove_foto_profil" value="1" {{ $isPending ? 'disabled' : '' }}> Hapus logo</label>
+                                    @endif
                                     <i class="bi bi-camera-fill"></i>
                                     <span>Ganti Logo</span>
                                 </label>
@@ -222,9 +228,8 @@
                         <div class="verify-grid-2">
                             <label class="verify-field">
                                 <span>Visi <b>*</b></span>
-                                <input type="text" name="visi"
-                                    value="{{ old('visi', $penggalang->visi) }}"
-                                    placeholder="Masukkan visi organisasi" {{ $isPending ? 'disabled' : '' }}>
+                                <textarea name="visi" rows="3"
+                                    placeholder="Masukkan visi organisasi" {{ $isPending ? 'disabled' : '' }}>{{ old('visi', $penggalang->visi) }}</textarea>
                                 @error('visi')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -232,9 +237,8 @@
 
                             <label class="verify-field">
                                 <span>Misi <b>*</b></span>
-                                <input type="text" name="misi"
-                                    value="{{ old('misi', $penggalang->misi) }}"
-                                    placeholder="Masukkan misi organisasi" {{ $isPending ? 'disabled' : '' }}>
+                                <textarea name="misi" rows="4"
+                                    placeholder="Masukkan misi organisasi, satu poin per baris" {{ $isPending ? 'disabled' : '' }}>{{ old('misi', $penggalang->misi) }}</textarea>
                                 @error('misi')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror

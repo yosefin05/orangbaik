@@ -13,7 +13,7 @@
 
 <body>
 
-    @include('components.header')update 20 noveebr
+    @include('components.header')
 
     @php
         $user = auth()->user();
@@ -277,13 +277,7 @@
                                     <label class="reg-field">
                                         <span class="reg-label">Visi <b>*</b></span>
 
-                                        <input
-                                            type="text"
-                                            name="visi"
-                                            value="{{ old('visi') }}"
-                                            placeholder="Tujuan jangka panjang organisasi"
-                                            data-reg-required
-                                        >
+                                        <textarea name="visi" rows="3" placeholder="Tujuan jangka panjang organisasi" data-reg-required>{{ old('visi') }}</textarea>
 
                                         @error('visi')
                                             <small class="reg-error">{{ $message }}</small>

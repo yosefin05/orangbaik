@@ -133,6 +133,7 @@ class CampaignController extends Controller
             'approved_at' => now(),
             'approved_by' => auth()->id(),
         ]);
+        $campaign->updateActiveStatus();
 
         return back()->with('success', 'Campaign berhasil disetujui.');
     }
@@ -151,6 +152,9 @@ class CampaignController extends Controller
         $campaign->update([
             'approval_status' => 'rejected',
             'rejection_reason' => $request->rejection_reason,
+            'approved_at' => null,
+            'approved_by' => null,
+            'is_active' => false,
         ]);
 
         return back()->with('success', 'Campaign berhasil ditolak.');
@@ -167,6 +171,7 @@ class CampaignController extends Controller
             'approval_status' => 'pending',
             'approved_at' => null,
             'approved_by' => null,
+            'is_active' => false,
         ]);
 
         return back()->with('success', 'Approval campaign berhasil dibatalkan.');

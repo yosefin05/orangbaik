@@ -127,7 +127,7 @@
 
                                 {{-- Foto --}}
                                 <div class="reg-field">
-                                    <span class="reg-label">Foto Profil <b>*</b></span>
+                                    <span class="reg-label">Foto Profil <em>(opsional)</em></span>
 
                                     <div class="reg-avatar">
                                         <div class="reg-avatar-preview verify-avatar-preview" id="avatarPreview">
@@ -140,7 +140,7 @@
 
                                         <div class="reg-avatar-actions">
                                             <label class="reg-upload-btn verify-upload-button">
-                                                <input type="file" name="foto_profil" id="fotoProfilInput" accept="image/*" required data-reg-required>
+                                                <input type="file" name="foto_profil" id="fotoProfilInput" accept="image/*">
                                                 <i class="bi bi-camera-fill"></i>
                                                 <span>Upload Foto</span>
                                             </label>
@@ -221,15 +221,9 @@
 
                                 <div class="reg-grid-2">
                                     <label class="reg-field">
-                                        <span class="reg-label">Visi <b>*</b></span>
+                                        <span class="reg-label">Visi <em>(opsional)</em></span>
 
-                                        <input
-                                            type="text"
-                                            name="visi"
-                                            value="{{ old('visi') }}"
-                                            placeholder="Tujuan jangka panjang Anda"
-                                            data-reg-required
-                                        >
+                                        <textarea name="visi" rows="3" placeholder="Tujuan jangka panjang Anda">{{ old('visi') }}</textarea>
 
                                         @error('visi')
                                             <small class="reg-error">{{ $message }}</small>
@@ -237,15 +231,9 @@
                                     </label>
 
                                     <label class="reg-field">
-                                        <span class="reg-label">Misi <b>*</b></span>
+                                        <span class="reg-label">Misi <em>(opsional)</em></span>
 
-                                        <input
-                                            type="text"
-                                            name="misi"
-                                            value="{{ old('misi') }}"
-                                            placeholder="Langkah untuk mencapainya"
-                                            data-reg-required
-                                        >
+                                        <textarea name="misi" rows="4" placeholder="Langkah untuk mencapainya, satu poin per baris">{{ old('misi') }}</textarea>
 
                                         @error('misi')
                                             <small class="reg-error">{{ $message }}</small>

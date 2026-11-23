@@ -96,7 +96,7 @@
                                 <i class="bi bi-plus-lg"></i> Tambahkan Campaign
                             </a>
 
-                            <a href="#" class="profile-btn">
+                    <a href="{{ route('penggalang.dashboard') }}" class="profile-btn">
                                 <i class="bi bi-bar-chart-line"></i> Dashboard
                             </a>
                         @endif
@@ -124,7 +124,7 @@
                             <div class="campaign-list">
                                 @forelse ($penggalang->campaign as $campaign)
                                                             @php
-                                                                $terkumpul = $campaign->donasi->sum('nominal');
+                                                                $terkumpul = $campaign->getTotalDonasiSuccess();
                                                                 $persen = $campaign->target_donasi
                                                                     ? min(100, ($terkumpul / $campaign->target_donasi) * 100)
                                                                     : 0;
@@ -163,7 +163,7 @@
 
                                                                     <div class="campaign-footer">
                                                                         <div class="campaign-meta">
-                                                                            <span class="campaign-status">{{ ucfirst($campaign->status) }}</span>
+                                                                            <span class="campaign-status">{{ $campaign->getStatusText() }}</span>
 
                                                                             @if ($campaign->tanggal_berakhir)
                                                                                 <span>{{ \Carbon\Carbon::parse($campaign->tanggal_berakhir)->format('d M Y') }}</span>
@@ -339,13 +339,13 @@
                                 @if($penggalang->no_telepon && ($penggalang->isEntity() || $isOwner || $isAdmin))
                                     <div class="info-row">
                                         <strong class="info-label">Hotline / Kontak</strong>
-                                        <p class="info-value">{{ $penggalang->no_telepon }}</p>
+                                <p class="info-value">{{ $penggalang->no_telepon_lokal }}</p>
                                     </div>
                                 @endif
                                 @if($penggalang->instagram)
                                     <div class="info-row">
                                         <strong class="info-label">Instagram</strong>
-                                        <p class="info-value">{{ '@' . $penggalang->instagram }}</p>
+                                    <p class="info-value">{{ '@' . ltrim($penggalang->instagram, '@') }}</p>
                                     </div>
                                 @endif
                                 @if($penggalang->facebook)
@@ -363,7 +363,7 @@
                                 @if($penggalang->tiktok)
                                     <div class="info-row">
                                         <strong class="info-label">TikTok</strong>
-                                        <p class="info-value">{{ '@' . $penggalang->tiktok }}</p>
+                                        <p class="info-value">{{ '@' . ltrim($penggalang->tiktok, '@') }}</p>
                                     </div>
                                 @endif
                             </div>

@@ -11,11 +11,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 
 class PenggalangDanaController extends Controller
 {
     public function createOrganisasi(Request $request)
     {
+        $existing = $request->user()->penggalangDana;
+        if ($existing) {
+            return redirect()->route('profile.user')->with('warning', 'Anda sudah memiliki pengajuan Penggalang Dana dengan status: ' . strtoupper($existing->status));
+        }
+
         $selectedCategory = $request->query('type', Penggalang_Dana::CATEGORY_ORGANISASI);
         if (!in_array($selectedCategory, [
             Penggalang_Dana::CATEGORY_ORGANISASI,
@@ -36,10 +42,15 @@ class PenggalangDanaController extends Controller
 
     public function storeOrganisasi(Request $request)
     {
+        if ($request->user()->penggalangDana()->exists()) {
+            return redirect()->route('profile.user')->with('warning', 'Pengajuan Penggalang Dana Anda sudah tercatat.');
+        }
+
+        $request->merge(self::normalizedContactInput($request));
         $request->validate([
             'jenis_penggalang' => 'nullable|string|in:organisasi,yayasan_lembaga,komunitas',
-            'thumbnail'        => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
-            'foto_profil'      => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'thumbnail'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'foto_profil'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'nama_penggalang'  => 'required|max:255',
             'tahun_berdiri'    => 'required|digits:4',
             'alamat'           => 'required',
@@ -47,12 +58,16 @@ class PenggalangDanaController extends Controller
             'visi'             => 'required',
             'misi'             => 'required',
             'email'            => 'required|email',
-            'no_telepon'       => 'required',
+            'no_telepon'       => ['required', 'regex:/^62[0-9]{8,13}$/'],
             'nama_dokumen'     => 'required|array|min:1',
             'nama_dokumen.0'   => 'required|string',
             'dokumen_files.*'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'file_dokumen.*'   => 'nullable|string',
-            'file_dokumen.0'   => 'required_without:dokumen_files.0|string',
+            'file_dokumen.*'   => 'nullable|url|max:2048',
+            'file_dokumen.0'   => 'required_without:dokumen_files.0|nullable|url|max:2048',
+            'instagram'        => 'nullable|string|max:255',
+            'facebook'         => 'nullable|string|max:255',
+            'youtube'          => 'nullable|string|max:255',
+            'tiktok'           => 'nullable|string|max:255',
         ]);
 
         // Cek setidaknya ada 1 file atau URL dokumen
@@ -75,11 +90,13 @@ class PenggalangDanaController extends Controller
         DB::beginTransaction();
 
         try {
-            $thumbnail = $request->file('thumbnail')
-                ->store('penggalang_dana/thumbnail', 'public');
+            $thumbnail = $request->hasFile('thumbnail')
+                ? $request->file('thumbnail')->store('penggalang_dana/thumbnail', 'public')
+                : null;
 
-            $fotoProfil = $request->file('foto_profil')
-                ->store('penggalang_dana/profil', 'public');
+            $fotoProfil = $request->hasFile('foto_profil')
+                ? $request->file('foto_profil')->store('penggalang_dana/profil', 'public')
+                : null;
 
             $penggalangDana = Penggalang_Dana::create([
                 'user_id'          => auth()->id(),
@@ -148,19 +165,24 @@ class PenggalangDanaController extends Controller
 
     public function storeIndividu(Request $request)
     {
+        if ($request->user()->penggalangDana()->exists()) {
+            return redirect()->route('profile.user')->with('warning', 'Pengajuan Penggalang Dana Anda sudah tercatat.');
+        }
+
+        $request->merge(self::normalizedContactInput($request));
         $request->validate([
-            'foto_profil'     => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'foto_profil'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'nama_penggalang' => 'required|max:255',
             'alamat'          => 'required',
             'deskripsi'       => 'nullable',
             'email'           => 'required|email',
-            'no_telepon'      => 'required',
+            'no_telepon'      => ['required', 'regex:/^62[0-9]{8,13}$/'],
             'nama_dokumen'    => 'required|array|min:1',
             'nama_dokumen.0'  => 'required|string',
             'dokumen_files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'file_dokumen.*'  => 'nullable|string',
-            'visi'            => 'nullable',
-            'misi'            => 'nullable',
+            'file_dokumen.*'  => 'nullable|url|max:2048',
+            'visi'            => 'nullable|string|max:5000',
+            'misi'            => 'nullable|string|max:10000',
             'instagram'       => 'nullable',
             'facebook'        => 'nullable',
             'youtube'         => 'nullable',
@@ -177,8 +199,9 @@ class PenggalangDanaController extends Controller
         DB::beginTransaction();
 
         try {
-            $fotoProfil = $request->file('foto_profil')
-                ->store('penggalang_dana/profil', 'public');
+            $fotoProfil = $request->hasFile('foto_profil')
+                ? $request->file('foto_profil')->store('penggalang_dana/profil', 'public')
+                : null;
 
             $penggalangDana = Penggalang_Dana::create([
                 'user_id'          => auth()->id(),
@@ -268,7 +291,12 @@ class PenggalangDanaController extends Controller
         // - Publik: jika organisasi/yayasan/komunitas, hanya dokumen publik. Jika individu, KOSONG (0 dokumen di-load).
         if ($isOwner || $isAdmin) {
             $penggalang->load('penggalangDanaDokumen');
+            // Pemilik/admin perlu melihat campaign pending/rejected untuk memantau workflow.
+            $penggalang->load('campaign');
         } elseif ($penggalang->isEntity()) {
+            $penggalang->setRelation('campaign', $penggalang->campaign
+                ->filter(fn ($campaign) => $campaign->is_active && $campaign->isApproved())
+                ->values());
             $penggalang->load(['penggalangDanaDokumen' => function ($q) {
                 $q->publicOnly();
             }]);
@@ -333,37 +361,49 @@ class PenggalangDanaController extends Controller
 
         Gate::authorize('update', $penggalang);
 
+        $request->merge(self::normalizedContactInput($request));
         $validated = $request->validate([
             'jenis_penggalang' => 'nullable|string|in:organisasi,yayasan_lembaga,komunitas,individu',
             'nama_penggalang'  => 'required|string|max:255',
             'email'            => 'required|email',
-            'no_telepon'       => 'required',
+            'no_telepon'       => ['required', 'regex:/^62[0-9]{8,13}$/'],
             'alamat'           => 'required',
-            'deskripsi'        => 'required',
-            'visi'             => 'required',
-            'misi'             => 'required',
+            'deskripsi'        => $penggalang->isIndividu() ? 'nullable|string' : 'required|string',
+            'visi'             => $penggalang->isIndividu() ? 'nullable|string|max:5000' : 'required|string|max:5000',
+            'misi'             => $penggalang->isIndividu() ? 'nullable|string|max:10000' : 'required|string|max:10000',
             'instagram'        => 'nullable',
             'facebook'         => 'nullable',
             'youtube'          => 'nullable',
             'tiktok'           => 'nullable',
             'foto_profil'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'thumbnail'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'remove_foto_profil' => 'nullable|boolean',
+            'remove_thumbnail' => 'nullable|boolean',
             'tahun_berdiri'    => 'nullable',
             'nama_dokumen'     => 'nullable|array',
             'dokumen_files.*'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'file_dokumen.*'   => 'nullable|string',
+            'file_dokumen.*'   => 'nullable|url|max:2048',
         ]);
 
         // Cek perubahan dokumen
         $oldDokumen = $penggalang->penggalangDanaDokumen()->get();
         $isDokumenChanged = false;
+        $importantFields = ['nama_penggalang', 'jenis_penggalang', 'no_telepon', 'alamat'];
+        $requiresProfileApproval = $penggalang->status === 'approved' && $penggalang->verified
+            && collect($importantFields)->contains(fn ($field) => array_key_exists($field, $validated)
+                && (string) $validated[$field] !== (string) $penggalang->{$field});
 
         if ($request->hasFile('dokumen_files')) {
             $isDokumenChanged = true;
         }
 
         // Upload foto profil
-        if ($request->hasFile('foto_profil')) {
+        if ($request->boolean('remove_foto_profil') && !$request->hasFile('foto_profil')) {
+            if ($penggalang->foto_profil && Storage::disk('public')->exists($penggalang->foto_profil)) {
+                Storage::disk('public')->delete($penggalang->foto_profil);
+            }
+            $validated['foto_profil'] = null;
+        } elseif ($request->hasFile('foto_profil')) {
             if ($penggalang->foto_profil && Storage::disk('public')->exists($penggalang->foto_profil)) {
                 Storage::disk('public')->delete($penggalang->foto_profil);
             }
@@ -372,7 +412,12 @@ class PenggalangDanaController extends Controller
         }
 
         // Upload thumbnail
-        if ($request->hasFile('thumbnail')) {
+        if ($request->boolean('remove_thumbnail') && !$request->hasFile('thumbnail')) {
+            if ($penggalang->thumbnail && Storage::disk('public')->exists($penggalang->thumbnail)) {
+                Storage::disk('public')->delete($penggalang->thumbnail);
+            }
+            $validated['thumbnail'] = null;
+        } elseif ($request->hasFile('thumbnail')) {
             if ($penggalang->thumbnail && Storage::disk('public')->exists($penggalang->thumbnail)) {
                 Storage::disk('public')->delete($penggalang->thumbnail);
             }
@@ -392,32 +437,55 @@ class PenggalangDanaController extends Controller
             }
         }
 
+        if ($requiresProfileApproval && Schema::hasColumn('penggalang_dana', 'pending_changes')) {
+            $pending = $penggalang->pending_changes ?? [];
+            foreach ($importantFields as $field) {
+                if (array_key_exists($field, $validated)) {
+                    $pending[$field] = $validated[$field];
+                    unset($validated[$field]);
+                }
+            }
+            $validated['pending_changes'] = $pending;
+        }
+
         $penggalang->update($validated);
 
         // Jika ada unggahan dokumen baru
         if ($request->hasFile('dokumen_files') || $request->filled('nama_dokumen')) {
             $namaDokumenArr = $request->input('nama_dokumen', []);
+            $existingDokumen = $penggalang->penggalangDanaDokumen()->orderBy('id')->get();
             foreach ($namaDokumenArr as $i => $nama) {
                 if (empty($nama)) continue;
 
+                $document = $existingDokumen->get($i);
+                $oldPath = $document?->file_dokumen;
+                $oldDisk = $document?->storage_disk ?? 'private';
+                $newPath = null;
+                $newDisk = 'private';
                 if ($request->hasFile("dokumen_files.{$i}")) {
                     $uploaded = $request->file("dokumen_files.{$i}");
-                    $storedPath = $uploaded->store("dokumen_penggalang/{$penggalang->id}", 'private');
-                    Penggalang_Dana_Dokumen::create([
-                        'penggalang_dana_id' => $penggalang->id,
-                        'nama_dokumen'       => $nama,
-                        'file_dokumen'       => $storedPath,
-                        'is_public'          => false,
-                        'storage_disk'       => 'private',
-                    ]);
+                    $newPath = $uploaded->store("dokumen_penggalang/{$penggalang->id}", 'private');
                 } elseif (!empty($request->file_dokumen[$i])) {
-                    Penggalang_Dana_Dokumen::create([
-                        'penggalang_dana_id' => $penggalang->id,
-                        'nama_dokumen'       => $nama,
-                        'file_dokumen'       => trim($request->file_dokumen[$i]),
-                        'is_public'          => false,
-                        'storage_disk'       => 'private',
-                    ]);
+                    $newPath = trim($request->file_dokumen[$i]);
+                }
+
+                if (!$newPath) continue;
+
+                $data = [
+                    'nama_dokumen' => $nama,
+                    'file_dokumen' => $newPath,
+                    'is_public' => false,
+                    'storage_disk' => $newDisk,
+                ];
+                if ($document) {
+                    $document->update($data);
+                } else {
+                    $data['penggalang_dana_id'] = $penggalang->id;
+                    $document = Penggalang_Dana_Dokumen::create($data);
+                }
+
+                if ($oldPath && $oldPath !== $newPath && !filter_var($oldPath, FILTER_VALIDATE_URL)) {
+                    Storage::disk($oldDisk)->delete($oldPath);
                 }
             }
         }
@@ -425,6 +493,8 @@ class PenggalangDanaController extends Controller
         $message = 'Data berhasil diperbarui.';
         if ($isDokumenChanged) {
             $message .= ' Dokumen baru diunggah, status kini PENDING dan menunggu verifikasi ulang.';
+        } elseif ($requiresProfileApproval) {
+            $message .= ' Perubahan identitas penting menunggu persetujuan admin; data lama tetap tampil di publik.';
         }
 
         return redirect()
@@ -461,5 +531,27 @@ class PenggalangDanaController extends Controller
         return redirect()
             ->route('profile.user')
             ->with('success', 'Pengajuan ulang berhasil! Status kini PENDING, menunggu verifikasi admin.');
+    }
+
+    private static function normalizedContactInput(Request $request): array
+    {
+        $data = [];
+        if ($request->has('no_telepon')) {
+            $digits = preg_replace('/\D+/', '', (string) $request->input('no_telepon'));
+            if (str_starts_with($digits, '0062')) {
+                $digits = substr($digits, 2);
+            }
+            $data['no_telepon'] = str_starts_with($digits, '0')
+                ? '62' . substr($digits, 1)
+                : $digits;
+        }
+
+        foreach (['instagram', 'tiktok'] as $field) {
+            if ($request->has($field)) {
+                $data[$field] = ltrim(trim((string) $request->input($field)), '@');
+            }
+        }
+
+        return $data;
     }
 }

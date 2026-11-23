@@ -47,7 +47,7 @@
                                 {{ ucfirst($status ?? 'Belum terdaftar') }}
                             </span>
                             @if($isPending)
-                                <span class="status-note">
+                            <span class="status-note">
                                     ⏳ Sedang diverifikasi, Anda tidak dapat mengubah data sampai verifikasi selesai.
                                 </span>
                             @endif
@@ -102,6 +102,9 @@
                                 </div>
                                 <label class="verify-upload-button">
                                     <input type="file" name="foto_profil" id="fotoProfilInput" accept="image/*" {{ $isPending ? 'disabled' : '' }}>
+                                    @if($penggalang->foto_profil)
+                                        <label><input type="checkbox" name="remove_foto_profil" value="1" {{ $isPending ? 'disabled' : '' }}> Hapus foto</label>
+                                    @endif
                                     <i class="bi bi-camera-fill"></i>
                                     <span>Ganti Foto</span>
                                 </label>
@@ -150,14 +153,14 @@
                         <div class="verify-grid-2">
                             <label class="verify-field">
                                 <span>Visi</span>
-                                <input type="text" name="visi" value="{{ old('visi', $penggalang->visi) }}" {{ $isPending ? 'disabled' : '' }}>
+                                <textarea name="visi" rows="3" {{ $isPending ? 'disabled' : '' }}>{{ old('visi', $penggalang->visi) }}</textarea>
                                 @error('visi')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </label>
                             <label class="verify-field">
                                 <span>Misi</span>
-                                <input type="text" name="misi" value="{{ old('misi', $penggalang->misi) }}" {{ $isPending ? 'disabled' : '' }}>
+                                <textarea name="misi" rows="4" {{ $isPending ? 'disabled' : '' }}>{{ old('misi', $penggalang->misi) }}</textarea>
                                 @error('misi')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror

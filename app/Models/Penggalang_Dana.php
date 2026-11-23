@@ -85,6 +85,7 @@ class Penggalang_Dana extends Model
         'catatan_verifikasi',
         'status_read',
         'revision_count',
+        'pending_changes',
     ];
 
     protected $casts = [
@@ -92,7 +93,29 @@ class Penggalang_Dana extends Model
         'verified' => 'boolean',
         'status_read' => 'boolean',
         'revision_count' => 'integer',
+        'pending_changes' => 'array',
     ];
+
+    public function setNoTeleponAttribute($value): void
+    {
+        $digits = preg_replace('/\D+/', '', (string) $value);
+        if (str_starts_with($digits, '0062')) {
+            $digits = substr($digits, 2);
+        }
+        if (str_starts_with($digits, '62')) {
+            $this->attributes['no_telepon'] = $digits;
+        } elseif (str_starts_with($digits, '0')) {
+            $this->attributes['no_telepon'] = '62' . substr($digits, 1);
+        } else {
+            $this->attributes['no_telepon'] = $digits;
+        }
+    }
+
+    public function getNoTeleponLokalAttribute(): string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $this->no_telepon);
+        return str_starts_with($digits, '62') ? '0' . substr($digits, 2) : $digits;
+    }
 
     protected static function boot()
     {

@@ -122,6 +122,11 @@ class CampaignController extends Controller
 
     public function create()
     {
+        $penggalang = auth()->user()->penggalangDana;
+        if (!$penggalang || $penggalang->status !== 'approved') {
+            return redirect()->route('profile.user')->with('warning', 'Profil Penggalang Dana harus disetujui sebelum membuat campaign.');
+        }
+
         $kategori = Kategori::all();
         $filter = Filter::all();
         $today = date('Y-m-d');
@@ -134,6 +139,11 @@ class CampaignController extends Controller
      */
     public function store(Request $request)
     {
+        $penggalang = auth()->user()->penggalangDana;
+        if (!$penggalang || $penggalang->status !== 'approved') {
+            return redirect()->route('profile.user')->with('warning', 'Profil Penggalang Dana harus disetujui sebelum membuat campaign.');
+        }
+
         // Clean money inputs before validation
         $request->merge([
             'custom_slug' => $request->filled('custom_slug') ? Str::slug($request->custom_slug) : null,
@@ -177,9 +187,6 @@ class CampaignController extends Controller
         try {
             // Upload thumbnail
             $thumbnail = $request->file('thumbnail')->store('campaign/thumbnail', 'public');
-
-            // Penggalang Dana
-            $penggalang = Penggalang_Dana::where('user_id', Auth::id())->firstOrFail();
 
             // Campaign tanpa tanggal akhir diperlakukan sebagai sustainable.
             $campaignType = $request->tanggal_akhir ? $request->campaign_type : 'sustainable';

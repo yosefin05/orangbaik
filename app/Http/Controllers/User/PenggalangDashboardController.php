@@ -47,6 +47,10 @@ class PenggalangDashboardController extends Controller
         // Total Donatur (HANYA SETTLEMENT)
         $totalDonatur = Donasi::whereIn('campaign_id', $campaignIds)
             ->whereHas('pembayaran', fn($q) => $q->where('transaction_status', 'settlement'))
+            ->get()
+            ->pluck('donor_identity_key')
+            ->filter()
+            ->unique()
             ->count();
 
         // Total Fundraiser di campaign-campaign penggalang ini
