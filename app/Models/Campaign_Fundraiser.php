@@ -114,7 +114,7 @@ class Campaign_Fundraiser extends Model
 
         return [
             'nullable', 'string', 'alpha_dash', 'min:3', 'max:120', $unique,
-            function (string $attribute, mixed $value, \\Closure $fail) use ($ignoreId): void {
+            function (string $attribute, mixed $value, \Closure $fail) use ($ignoreId): void {
                 if (!$value) {
                     return;
                 }
