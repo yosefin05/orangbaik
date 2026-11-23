@@ -429,6 +429,7 @@
                                     </div>
                                     <small>Gunakan huruf, angka, tanda hubung, atau garis bawah.</small>
                                 </form>
+                                <span id="sidebarReferralCode" hidden>{{ $fundraiser->referral_code }}</span>
                                 <div class="referral-qr-section">
                                     @php
                                         $qrSvg = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(180)->margin(1)->generate($fundraiser->referral_url);
