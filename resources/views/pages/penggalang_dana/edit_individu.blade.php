@@ -190,7 +190,8 @@
                         <div class="verify-grid-2">
                             <label class="verify-field">
                                 <span>Nama Dokumen <b>*</b></span>
-                                <input type="text" name="nama_dokumen[]"
+                                <input type="hidden" name="dokumen_ids[]" value="{{ $dokumen?->id }}">
+                            <input type="text" name="nama_dokumen[]"
                                     value="{{ old('nama_dokumen.0', $dokumen->nama_dokumen ?? '') }}"
                                     {{ $isPending ? 'disabled' : '' }}
                                     placeholder="Contoh: KTP, NPWP" required>
