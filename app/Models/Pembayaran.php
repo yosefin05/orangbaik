@@ -126,7 +126,7 @@ class Pembayaran extends Model
 
         try {
             return Carbon::parse($expiresAt);
-        } catch (\\Throwable) {
+        } catch (\Throwable) {
             return null;
         }
     }
