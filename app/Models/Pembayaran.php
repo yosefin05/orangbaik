@@ -21,11 +21,15 @@ class Pembayaran extends Model
         'bukti_transfer',
         'rejection_reason',
         'paid_at',
+        'expired_at',
+        'expired_by',
+        'expiration_reason',
     ];
 
     protected $casts = [
         'gateway_response' => 'array',
         'paid_at'          => 'datetime',
+        'expired_at'       => 'datetime',
     ];
 
     /**

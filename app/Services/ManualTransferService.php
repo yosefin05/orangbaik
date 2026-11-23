@@ -139,6 +139,34 @@ class ManualTransferService
         });
     }
 
+    /**
+     * Menandai transfer manual pending sebagai kedaluwarsa setelah donatur tidak merespons.
+     *
+     * @throws \\DomainException jika transaksi bukan transfer manual atau tidak lagi pending
+     */
+    public function expire(Pembayaran $pembayaran, ?int $adminId = null, string $reason = ''): void
+    {
+        DB::transaction(function () use ($pembayaran, $adminId, $reason): void {
+            $lockedPayment = $this->lockPendingManualPayment($pembayaran);
+            $expiredAt = now();
+
+            $lockedPayment->update([
+                'transaction_status' => 'expired',
+                'expired_at' => $expiredAt,
+                'expired_by' => $adminId,
+                'expiration_reason' => $reason !== ''
+                    ? $reason
+                    : 'Donatur tidak merespons setelah tindak lanjut admin.',
+            ]);
+
+            Log::info('Manual transfer marked as expired by admin', [
+                'order_id' => $lockedPayment->order_id,
+                'expired_by' => $adminId,
+                'expired_at' => $expiredAt,
+            ]);
+        });
+    }
+
     private function lockPendingManualPayment(Pembayaran $pembayaran): Pembayaran
     {
         $lockedPayment = Pembayaran::with('paymentChannel.gateway')

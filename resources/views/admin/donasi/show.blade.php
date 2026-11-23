@@ -21,6 +21,7 @@
 
         $showProof = $p && ($p->isManualTransfer() || $p->bukti_transfer);
         $canVerify = $showProof && $p->isPending();
+        $canExpire = $p && $p->isManualTransfer() && $p->isPending();
         $nominal   = 'Rp ' . number_format($donasi->nominal, 0, ',', '.');
     @endphp
 
@@ -189,6 +190,18 @@
                                     <td class="donasi-danger">{{ $p->rejection_reason }}</td>
                                 </tr>
                             @endif
+                            @if ($p->expired_at)
+                                <tr>
+                                    <th>Waktu Kedaluwarsa</th>
+                                    <td>{{ $p->expired_at->format('d/m/Y H:i') }} WIB</td>
+                                </tr>
+                            @endif
+                            @if ($p->expiration_reason)
+                                <tr>
+                                    <th>Alasan Kedaluwarsa</th>
+                                    <td>{{ $p->expiration_reason }}</td>
+                                </tr>
+                            @endif
                         </table>
                     </div>
                 @else
@@ -219,6 +232,11 @@
 
             {{-- AKSI --}}
             <div class="form-actions">
+                @if ($canExpire)
+                    <button type="button" class="btn-outline" data-dialog-open="dialogExpire" style="border-color:#dc3545; color:#dc3545;">
+                        <i class="bi bi-calendar-x"></i> Tandai Kedaluwarsa
+                    </button>
+                @endif
                 @if ($canVerify)
                     <button type="button" class="btn-primary" data-dialog-open="dialogApprove">
                         <i class="bi bi-check-circle-fill"></i> Terima Pembayaran
@@ -242,9 +260,6 @@
                             <i class="bi bi-receipt"></i> E-Kwitansi
                         </a>
                     @endif
-                    <a href="{{ route('admin.donasi.edit', $donasi->id) }}" class="btn-outline">
-                        <i class="bi bi-pencil"></i> Edit
-                    </a>
                     <a href="{{ route('admin.donasi.index') }}" class="btn-secondary">
                         <i class="bi bi-arrow-left"></i> Kembali
                     </a>
@@ -304,6 +319,38 @@
             </form>
         </dialog>
 
+        @if ($canExpire)
+            <dialog id="dialogExpire" class="donasi-dialog">
+                <form action="{{ route('admin.donasi.expire-manual', $donasi->id) }}" method="POST" data-once>
+                    @csrf
+                    @method('PATCH')
+                    <div class="donasi-dialog-body">
+                        <div class="donasi-dialog-icon is-danger"><i class="bi bi-calendar-x"></i></div>
+                        <h3>Kedaluwarsakan transaksi ini?</h3>
+                        <p>
+                            Transaksi transfer manual dari <strong>{{ $donasi->nama_donatur }}</strong>
+                            akan ditandai kedaluwarsa dan tidak dapat dilanjutkan. Pastikan kamu sudah menghubungi donatur
+                            dan memberi waktu yang cukup untuk merespons.
+                        </p>
+                        <div class="donasi-dialog-field">
+                            <label for="expiration_reason">Catatan tindak lanjut (opsional)</label>
+                            <textarea name="expiration_reason" id="expiration_reason" rows="3" maxlength="500"
+                                      placeholder="Contoh: Sudah dihubungi melalui WhatsApp pada 23/11/2026, belum ada respons.">{{ old('expiration_reason', 'Donatur tidak merespons setelah tindak lanjut admin.') }}</textarea>
+                            @error('expiration_reason')
+                                <span class="donasi-field-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="donasi-dialog-footer">
+                        <button type="button" class="btn-secondary" data-dialog-close>Batal</button>
+                        <button type="submit" class="btn-danger">
+                            <i class="bi bi-calendar-x"></i> Ya, Kedaluwarsakan
+                        </button>
+                    </div>
+                </form>
+            </dialog>
+        @endif
+
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll('[data-dialog-open]').forEach(function (btn) {
@@ -335,6 +382,9 @@
 
                 @if ($errors->has('rejection_reason'))
                     document.getElementById('dialogReject')?.showModal();
+                @endif
+                @if ($errors->has('expiration_reason'))
+                    document.getElementById('dialogExpire')?.showModal();
                 @endif
             });
         </script>

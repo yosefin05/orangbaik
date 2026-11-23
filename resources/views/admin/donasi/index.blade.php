@@ -166,7 +166,7 @@
                                 'settlement' => 'badge-green',
                                 'pending' => 'badge-yellow',
                                 'failed' => 'badge-red',
-                                'expired' => 'badge-gray',
+                                'expired', 'expire' => 'badge-gray',
                                 default => 'badge-gray',
                             };
 
@@ -174,7 +174,7 @@
                                 'settlement' => 'bi-check-circle-fill',
                                 'pending' => 'bi-hourglass-split',
                                 'failed' => 'bi-x-circle-fill',
-                                'expired' => 'bi-clock-history',
+                                'expired', 'expire' => 'bi-clock-history',
                                 default => 'bi-clock-history',
                             };
 
@@ -224,7 +224,7 @@
                             <td>
                                 <span class="badge {{ $badgeClass }}">
                                     <i class="bi {{ $icon }}"></i>
-                                    {{ ucfirst($status) }}
+                                    {{ in_array($status, ['expired', 'expire'], true) ? 'Kedaluwarsa' : ucfirst($status) }}
                                 </span>
                             </td>
 
@@ -267,23 +267,6 @@
                                         </span>
                                     @endif
 
-                                    <a href="{{ route('admin.donasi.edit', $item->id) }}" class="action-link link-yellow"
-                                        title="Edit status donasi">
-                                        <i class="bi bi-pencil"></i>
-                                        Edit
-                                    </a>
-
-                                    <form action="{{ route('admin.donasi.destroy', $item->id) }}" method="POST"
-                                        class="inline-form"
-                                        onsubmit="return confirm('Yakin ingin menghapus donasi #{{ $item->id }}?')">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="submit" class="action-link link-red" title="Hapus donasi">
-                                            <i class="bi bi-trash"></i>
-                                            <span>Hapus</span>
-                                        </button>
-                                    </form>
 
                                 </div>
                             </td>
