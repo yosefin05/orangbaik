@@ -71,6 +71,12 @@
                     </div>
                 @endif
 
+                <form id="deleteDocumentsForm" method="POST"
+                    action="{{ route('penggalang_dana.dokumen.destroy', $penggalang->slug ?? $penggalang->id) }}">
+                    @csrf
+                    @method('DELETE')
+                </form>
+
                 <form action="{{ route('penggalang_dana.update', $penggalang->slug) }}" method="POST"
                     enctype="multipart/form-data" class="verify-form {{ $isPending ? 'disabled-overlay' : '' }}">
 
@@ -187,6 +193,13 @@
                             $dokumen = $penggalang->penggalangDanaDokumen[0] ?? null;
                         @endphp
 
+                        @if($dokumen && !$isPending && (int) auth()->id() === (int) $penggalang->user_id)
+                            <label class="field-help" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                                <input type="checkbox" name="dokumen_ids[]" value="{{ $dokumen->id }}" form="deleteDocumentsForm">
+                                Pilih dokumen untuk dihapus
+                            </label>
+                        @endif
+
                         <div class="verify-grid-2">
                             <label class="verify-field">
                                 <span>Nama Dokumen <b>*</b></span>
@@ -218,6 +231,15 @@
                                 <small class="field-help">Gunakan tautan Google Drive atau penyimpanan online lain.</small>
                             </label>
                         </div>
+                        @if($dokumen && !$isPending && (int) auth()->id() === (int) $penggalang->user_id)
+                            <div class="verify-actions" style="justify-content:flex-end;">
+                                <button type="submit" form="deleteDocumentsForm" class="verify-cancel-button"
+                                    style="border:1px solid #dc3545;color:#dc3545;background:#fff;"
+                                    onclick="return confirm('Hapus dokumen identitas ini? Tindakan ini tidak dapat dibatalkan.');">
+                                    <i class="bi bi-trash"></i> Hapus dokumen
+                                </button>
+                            </div>
+                        @endif
                     </section>
 
                     {{-- KONTAK --}}
