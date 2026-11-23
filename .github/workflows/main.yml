@@ -18,5 +18,17 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            set -e
             cd /www/wwwroot/staging.orangbaik.id/orangbaik
-            git pull origin main
+            git fetch origin main
+            git pull --ff-only origin main
+
+            EXPECTED_COMMIT="$(git rev-parse origin/main)"
+            DEPLOYED_COMMIT="$(git rev-parse HEAD)"
+            if [ "$DEPLOYED_COMMIT" != "$EXPECTED_COMMIT" ]; then
+              echo "Deployment commit mismatch: expected $EXPECTED_COMMIT, got $DEPLOYED_COMMIT"
+              exit 1
+            fi
+
+            php artisan optimize:clear
+            echo "Staging deployed successfully at $DEPLOYED_COMMIT"
