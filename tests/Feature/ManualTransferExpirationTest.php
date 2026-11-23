@@ -30,6 +30,7 @@ class ManualTransferExpirationTest extends TestCase
     {
         $owner = User::factory()->create();
         $suffix = uniqid();
+        $uniquePhone = '08' . random_int(100000000, 999999999);
         $fundraiser = Penggalang_Dana::create([
             'user_id' => $owner->id,
             'verified_by' => $owner->id,
@@ -37,7 +38,7 @@ class ManualTransferExpirationTest extends TestCase
             'foto_profil' => 'profile.jpg',
             'nama_penggalang' => 'Yayasan Uji ' . $suffix,
             'email' => 'yayasan-' . $suffix . '@example.com',
-            'no_telepon' => '081234567890',
+            'no_telepon' => $uniquePhone,
             'alamat' => 'Sidoarjo',
             'status' => 'approved',
         ]);
