@@ -422,12 +422,18 @@
                                 <form action="{{ route('fundraiser.alias.update', $fundraiser) }}" method="POST" class="fundraiser-alias-form">
                                     @csrf
                                     @method('PATCH')
-                                    <label class="fundraiser-field-label" for="fundraiser-alias">Atur nama link</label>
+                                    <label class="fundraiser-field-label" for="fundraiser-short-alias">Buat link pendek custom (opsional)</label>
                                     <div class="fundraiser-alias-controls">
-                                        <input id="fundraiser-alias" name="alias" value="{{ $fundraiser->alias }}" minlength="3" maxlength="120" pattern="[A-Za-z0-9_-]+" required>
+                                        <input id="fundraiser-short-alias" name="short_alias" value="{{ $fundraiser->short_alias }}" minlength="3" maxlength="120" pattern="[A-Za-z0-9_-]+" placeholder="contoh: makan">
                                         <button type="submit" class="btn-copy-link">Simpan</button>
                                     </div>
-                                    <small>Gunakan huruf, angka, tanda hubung, atau garis bawah.</small>
+                                    @if ($fundraiser->short_referral_url)
+                                        <div class="referral-link-box">
+                                            <input type="text" value="{{ $fundraiser->short_referral_url }}" readonly aria-label="Link pendek custom">
+                                            <button type="button" onclick="navigator.clipboard.writeText(@js($fundraiser->short_referral_url))" class="btn-copy-link" aria-label="Salin link pendek"><i class="bi bi-copy"></i></button>
+                                        </div>
+                                    @endif
+                                    <small>Link otomatis di atas tetap memakai nama akun. Link pendek ini terpisah dan harus unik di seluruh OrangBaik.</small>
                                 </form>
                                 <span id="sidebarReferralCode" hidden>{{ $fundraiser->referral_code }}</span>
                                 <div class="referral-qr-section">

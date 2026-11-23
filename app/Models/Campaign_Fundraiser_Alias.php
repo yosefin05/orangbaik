@@ -8,7 +8,7 @@ class Campaign_Fundraiser_Alias extends Model
 {
     protected $table = 'campaign_fundraiser_alias';
 
-    protected $fillable = ['campaign_fundraiser_id', 'alias'];
+    protected $fillable = ['campaign_fundraiser_id', 'alias', 'alias_type'];
 
     public function fundraiser()
     {

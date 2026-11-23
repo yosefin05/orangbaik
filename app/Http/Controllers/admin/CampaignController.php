@@ -51,20 +51,34 @@ class CampaignController extends Controller
 
     public function updateFundraiserAlias(Request $request, Campaign_Fundraiser $fundraiser)
     {
-        $validated = $request->validate(['alias' => Campaign_Fundraiser::aliasRules($fundraiser->id)]);
-        $alias = Str::slug($validated['alias']);
+        $request->merge([
+            'short_alias' => $request->filled('short_alias')
+                ? Str::slug($request->input('short_alias'))
+                : null,
+        ]);
 
-        DB::transaction(function () use ($fundraiser, $alias): void {
-            if ($fundraiser->alias !== $alias) {
-                Campaign_Fundraiser_Alias::firstOrCreate([
-                    'campaign_fundraiser_id' => $fundraiser->id,
-                    'alias' => $fundraiser->alias,
-                ]);
-                $fundraiser->update(['alias' => $alias]);
+        $validated = $request->validate([
+            'short_alias' => Campaign_Fundraiser::shortAliasRules($fundraiser->id),
+        ]);
+
+        $shortAlias = $validated['short_alias'] ?? null;
+
+        DB::transaction(function () use ($fundraiser, $shortAlias): void {
+            if ($fundraiser->short_alias !== $shortAlias) {
+                if ($fundraiser->short_alias) {
+                    Campaign_Fundraiser_Alias::firstOrCreate(
+                        ['alias' => $fundraiser->short_alias],
+                        ['campaign_fundraiser_id' => $fundraiser->id, 'alias_type' => 'short']
+                    );
+                }
+
+                $fundraiser->update(['short_alias' => $shortAlias]);
             }
         });
-        return back()->with('success', 'Alias fundraiser berhasil diperbarui.');
+
+        return back()->with('success', 'Alias pendek fundraiser berhasil diperbarui.');
     }
+
     public function index()
     {
         $campaign = Campaign::with([

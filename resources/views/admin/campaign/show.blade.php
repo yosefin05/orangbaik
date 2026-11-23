@@ -370,8 +370,8 @@
                             <td>
                                 <form method="POST" action="{{ route('admin.fundraiser.alias.update', $fundraiser) }}" class="inline-form">
                                     @csrf @method('PATCH')
-                                    <input name="alias" value="{{ $fundraiser->alias }}" required minlength="3" maxlength="120">
-                                    <button type="submit" class="action-link link-blue">Simpan alias</button>
+                                    <input name="short_alias" value="{{ $fundraiser->short_alias }}" placeholder="Alias pendek (opsional)" minlength="3" maxlength="120">
+                                    <button type="submit" class="action-link link-blue">Simpan link pendek</button>
                                 </form>
                             </td>
                         </tr>
