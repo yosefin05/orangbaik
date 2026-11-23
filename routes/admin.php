@@ -106,7 +106,7 @@ Route::middleware(['auth', 'admin'])
         Route::patch('donasi/{donasi}/approve-manual', [DonasiController::class, 'approveManual'])->name('donasi.approve-manual');
         Route::patch('donasi/{donasi}/reject-manual', [DonasiController::class, 'rejectManual'])->name('donasi.reject-manual');
         Route::patch('donasi/{donasi}/expire-manual', [DonasiController::class, 'expireManual'])->name('donasi.expire-manual');
-        Route::resource('donasi', DonasiController::class);
+        Route::resource('donasi', DonasiController::class)->only(['index', 'show']);
 
         // ==================== PAYMENT MANAGEMENT ====================
         Route::prefix('payment')->name('payment.')->group(function () {
