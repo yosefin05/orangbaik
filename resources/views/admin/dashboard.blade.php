@@ -78,6 +78,17 @@
 
         <div class="stat-card">
             <div class="stat-icon icon-blue">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div>
+                <p class="stat-label">Keberhasilan Pembayaran</p>
+                <h3 class="stat-value text-blue">{{ number_format($paymentSuccessRate, 1, ',', '.') }}%</h3>
+                <small class="stat-helper">Dari {{ number_format($totalFinalizedTransaksi, 0, ',', '.') }} transaksi selesai</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-blue">
                 <i class="bi bi-megaphone"></i>
             </div>
             <div>
