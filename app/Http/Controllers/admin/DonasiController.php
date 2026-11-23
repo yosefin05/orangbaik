@@ -304,7 +304,11 @@ class DonasiController extends Controller
         }
         if ($request->filled('status')) {
             $query->whereHas('pembayaran', function ($q) use ($request) {
-                $q->where('transaction_status', $request->status);
+                if (in_array($request->status, ['expired', 'expire'], true)) {
+                    $q->whereIn('transaction_status', ['expired', 'expire']);
+                } else {
+                    $q->where('transaction_status', $request->status);
+                }
             });
         }
         if ($request->filled('date_from')) {
