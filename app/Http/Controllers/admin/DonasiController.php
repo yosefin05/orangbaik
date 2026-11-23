@@ -198,6 +198,34 @@ class DonasiController extends Controller
         return back()->with('warning', 'Pembayaran manual donasi #' . $donasi->id . ' telah ditolak.');
     }
 
+    /**
+     * Tandai transfer manual pending sebagai kedaluwarsa setelah tindak lanjut.
+     */
+    public function expireManual(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'expiration_reason' => 'nullable|string|max:500',
+        ]);
+
+        $donasi = Donasi::with('pembayaran')->findOrFail($id);
+
+        if (!$donasi->pembayaran) {
+            return back()->with('error', 'Data pembayaran tidak ditemukan.');
+        }
+
+        try {
+            $this->manualTransferService->expire(
+                $donasi->pembayaran,
+                $request->user()->id,
+                trim($validated['expiration_reason'] ?? '')
+            );
+        } catch (\\DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Donasi #' . $donasi->id . ' berhasil ditandai kedaluwarsa. Status transaksi tidak lagi dapat dilanjutkan.');
+    }
+
     public function edit($id)
     {
         $donasi = Donasi::with('pembayaran')->findOrFail($id);
