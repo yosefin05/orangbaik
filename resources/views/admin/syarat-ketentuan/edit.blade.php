@@ -14,6 +14,75 @@
                 </p>
             </div>
 
+            <a href="{{ route('admin.syarat-ketentuan.index') }}" class="btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                <span>Kembali</span>
+            </a>
+        </div>
+
+        @if ($errors->any())
+            <div class="alert alert-error">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('admin.syarat-ketentuan.update', $item) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="form-wrapper">
+                <div class="form-group">
+                    <label for="judul">Judul Bagian</label>
+                    <input
+                        type="text"
+                        id="judul"
+                        name="judul"
+                        value="{{ old('judul', $item->judul) }}"
+                        class="form-control"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="isi">Isi</label>
+                    <textarea
+                        id="isi"
+                        name="isi"
+                        rows="8"
+                        class="form-control"
+                        required>{{ old('isi', $item->isi) }}</textarea>
+                    <small class="text-muted">Setiap baris baru akan ditampilkan sebagai paragraf terpisah di halaman publik.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="urutan">Urutan</label>
+                    <input
+                        type="number"
+                        id="urutan"
+                        name="urutan"
+                        min="0"
+                        value="{{ old('urutan', $item->urutan) }}"
+                        class="form-control"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', $item->is_active) ? 'checked' : '' }}>
+                        Tampilkan di halaman publik
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="bi bi-save"></i>
+                        <span>Simpan Perubahan</span>
+                    </button>
                 </div>
             </div>
         </form>
