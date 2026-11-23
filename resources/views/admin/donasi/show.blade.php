@@ -260,9 +260,6 @@
                             <i class="bi bi-receipt"></i> E-Kwitansi
                         </a>
                     @endif
-                    <a href="{{ route('admin.donasi.edit', $donasi->id) }}" class="btn-outline">
-                        <i class="bi bi-pencil"></i> Edit
-                    </a>
                     <a href="{{ route('admin.donasi.index') }}" class="btn-secondary">
                         <i class="bi bi-arrow-left"></i> Kembali
                     </a>
@@ -385,6 +382,9 @@
 
                 @if ($errors->has('rejection_reason'))
                     document.getElementById('dialogReject')?.showModal();
+                @endif
+                @if ($errors->has('expiration_reason'))
+                    document.getElementById('dialogExpire')?.showModal();
                 @endif
             });
         </script>
