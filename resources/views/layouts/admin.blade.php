@@ -31,8 +31,9 @@
 
     {{-- ============================================================ --}}
     {{-- FINAL ADMIN UI REFINEMENT (loaded after all page styles) --}}
+    {{-- Cache-busting berdasarkan waktu modifikasi file agar browser mengambil CSS terbaru. --}}
     {{-- ============================================================ --}}
-    <link rel="stylesheet" href="{{ asset('css/admin/refinement.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/refinement.css') }}?v={{ filemtime(public_path('css/admin/refinement.css')) }}">
 
     {{-- ============================================================ --}}
     {{-- BOOTSTRAP ICONS --}}
