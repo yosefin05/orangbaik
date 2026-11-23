@@ -219,7 +219,7 @@ class DonasiController extends Controller
                 $request->user()->id,
                 trim($validated['expiration_reason'] ?? '')
             );
-        } catch (\\DomainException $e) {
+        } catch (\DomainException $e) {
             return back()->with('error', $e->getMessage());
         }
 
