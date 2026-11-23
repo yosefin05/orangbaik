@@ -129,7 +129,7 @@ class ManualTransferExpirationTest extends TestCase
         try {
             app(ManualTransferService::class)->approve($manualPayment);
             $this->fail('Expired manual payment must not be approved.');
-        } catch (\\DomainException $exception) {
+        } catch (\DomainException $exception) {
             $this->assertSame('expired', $manualPayment->fresh()->transaction_status);
         }
     }
