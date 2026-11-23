@@ -19,7 +19,7 @@ class FundraiserDashboardController extends Controller
 
         return view('pages.fundraiser-dashboard', [
             'fundraisers' => $fundraisers,
-            'totalDonatur' => $donations->map(fn ($donasi) => $donasi->donor_identity_key)->unique()->count(),
+            'totalDonatur' => $donations->count(),
             'totalDonasi' => $donations->sum('nominal'),
         ]);
     }
