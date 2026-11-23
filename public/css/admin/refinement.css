@@ -584,3 +584,12 @@ body.admin-body .content-area .form-actions-end {
         width: 100%;
     }
 }
+
+
+body.admin-body .content-area .stat-helper {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.4;
+}
