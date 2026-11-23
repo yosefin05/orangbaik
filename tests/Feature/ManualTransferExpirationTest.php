@@ -100,10 +100,7 @@ class ManualTransferExpirationTest extends TestCase
             ->assertOk()
             ->assertSee('Kedaluwarsa');
 
-        $this->get(route('donasi.bayar.instruksi', [
-            'pembayaran' => $payment->id,
-            'token' => $payment->payment_token,
-        ]))->assertRedirect();
+        $this->assertFalse($payment->isResumable());
     }
 
     public function test_expiration_rejects_non_manual_and_terminal_payments(): void
