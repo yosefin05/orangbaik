@@ -93,6 +93,30 @@ function copyReferralLink() {
 }
 
 
+function copyShortReferralLink() {
+    const input = document.getElementById('shortReferralLink');
+    if (!input) return;
+
+    const link = input.value;
+    const fallbackCopy = () => {
+        input.focus();
+        input.select();
+        const copied = document.execCommand('copy');
+        showToast(copied
+            ? 'Link pendek berhasil disalin!'
+            : 'Link pendek gagal disalin. Silakan salin manual.');
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(link)
+            .then(() => showToast('Link pendek berhasil disalin!'))
+            .catch(fallbackCopy);
+    } else {
+        fallbackCopy();
+    }
+}
+
+
 /* ============================================================
    4. OWNER "KELOLA" DROPDOWN MENU
 ============================================================ */
