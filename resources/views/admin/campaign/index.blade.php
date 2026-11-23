@@ -149,7 +149,7 @@
                                         action="{{ route('admin.campaign.destroy', $item) }}"
                                         method="POST"
                                         class="inline-form"
-                                        onsubmit="return confirm('Yakin ingin menghapus FAQ ini?')">
+                                        onsubmit="return confirm('Yakin ingin menghapus campaign ini?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="action-link link-red">
