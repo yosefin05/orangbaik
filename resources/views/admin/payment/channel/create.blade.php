@@ -9,6 +9,179 @@
             <h2>Tambah Payment Channel</h2>
             <p>Tambahkan metode pembayaran baru untuk donatur.</p>
         </div>
+        <a href="{{ route('admin.payment.channel.index') }}" class="btn btn-outline">
+            <i class="bi bi-arrow-left"></i>
+            Kembali
+        </a>
+    </section>
+
+    <div class="form-card">
+        <form action="{{ route('admin.payment.channel.store') }}" method="POST" id="channel-form">
+            @csrf
+
+            <div class="form-grid">
+
+                {{-- Payment Method Name --}}
+                <div class="form-group form-group--full">
+                    <label for="name" class="form-label">
+                        Nama Metode Pembayaran <span class="required">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="form-control @error('name') is-invalid @enderror"
+                        value="{{ old('name') }}"
+                        placeholder="Contoh: QRIS, GoPay, Bank BCA"
+                        required>
+                    @error('name')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Payment Gateway --}}
+                <div class="form-group">
+                    <label for="payment_gateway_id" class="form-label">
+                        Payment Gateway <span class="required">*</span>
+                    </label>
+                    <select
+                        id="payment_gateway_id"
+                        name="payment_gateway_id"
+                        class="form-control @error('payment_gateway_id') is-invalid @enderror"
+                        required>
+                        <option value="">— Pilih Gateway —</option>
+                        @foreach ($gateways as $gateway)
+                            <option value="{{ $gateway->id }}"
+                                data-code="{{ $gateway->code }}"
+                                {{ old('payment_gateway_id') == $gateway->id ? 'selected' : '' }}>
+                                {{ $gateway->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('payment_gateway_id')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Payment Type --}}
+                <div class="form-group">
+                    <label for="payment_type" class="form-label">
+                        Tipe Pembayaran <span class="required">*</span>
+                    </label>
+                    <select
+                        id="payment_type"
+                        name="payment_type"
+                        class="form-control @error('payment_type') is-invalid @enderror"
+                        required>
+                        <option value="">— Pilih Tipe —</option>
+                        <option value="instant"  {{ old('payment_type') === 'instant' ? 'selected' : '' }}>
+                            Instant (QRIS, E-Wallet)
+                        </option>
+                        <option value="va"       {{ old('payment_type') === 'va' ? 'selected' : '' }}>
+                            Virtual Account
+                        </option>
+                        <option value="transfer" {{ old('payment_type') === 'transfer' ? 'selected' : '' }}>
+                            Transfer Manual
+                        </option>
+                    </select>
+                    @error('payment_type')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Channel Code --}}
+                <div class="form-group">
+                    <label for="channel_code" class="form-label">
+                        Channel Code <span class="required">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="channel_code"
+                        name="channel_code"
+                        class="form-control @error('channel_code') is-invalid @enderror"
+                        value="{{ old('channel_code') }}"
+                        placeholder="Contoh: qris, gopay, bca, bni"
+                        required>
+                    <small class="form-hint">Kode harus sesuai dengan channel yang tersedia di provider.</small>
+                    @error('channel_code')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Account Name --}}
+                <div class="form-group" id="account-name-group">
+                    <label for="account_name" class="form-label">
+                        Nama Rekening / Akun
+                    </label>
+                    <input
+                        type="text"
+                        id="account_name"
+                        name="account_name"
+                        class="form-control @error('account_name') is-invalid @enderror"
+                        value="{{ old('account_name') }}"
+                        placeholder="Contoh: OrangBaik">
+                    <small class="form-hint">Opsional. Diisi untuk Virtual Account dan Transfer Manual.</small>
+                    @error('account_name')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Account Number --}}
+                <div class="form-group" id="account-number-group">
+                    <label for="account_number" class="form-label">
+                        Nomor Rekening
+                    </label>
+                    <input
+                        type="text"
+                        id="account_number"
+                        name="account_number"
+                        class="form-control @error('account_number') is-invalid @enderror"
+                        value="{{ old('account_number') }}"
+                        placeholder="Contoh: 1234567890">
+                    <small class="form-hint">Opsional. Diisi hanya untuk Transfer Manual.</small>
+                    @error('account_number')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Sort Order --}}
+                <div class="form-group">
+                    <label for="sort_order" class="form-label">Urutan Tampilan</label>
+                    <input
+                        type="number"
+                        id="sort_order"
+                        name="sort_order"
+                        class="form-control @error('sort_order') is-invalid @enderror"
+                        value="{{ old('sort_order', 0) }}"
+                        min="0"
+                        placeholder="0">
+                    <small class="form-hint">Semakin kecil, semakin atas posisinya. Kosongkan untuk otomatis.</small>
+                    @error('sort_order')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Status --}}
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <div class="toggle-field">
+                        <label class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="is_active"
+                                name="is_active"
+                                value="1"
+                                {{ old('is_active', 1) ? 'checked' : '' }}>
+                            <span class="toggle-track"></span>
+                        </label>
+                        <span class="toggle-label" id="status-label">Aktif</span>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- Actions --}}
+            <div class="form-actions">
                 <button type="submit" class="btn btn-primary" id="btn-simpan">
                     <i class="bi bi-check-lg"></i>
                     Simpan Channel
