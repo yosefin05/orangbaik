@@ -73,6 +73,12 @@
                     </div>
                 @endif
 
+                <form id="deleteDocumentsForm" method="POST"
+                    action="{{ route('penggalang_dana.dokumen.destroy', $penggalang->slug ?? $penggalang->id) }}">
+                    @csrf
+                    @method('DELETE')
+                </form>
+
                 <form class="verify-form {{ $isPending ? 'disabled-overlay' : '' }}"
                     action="{{ route('penggalang_dana.update', $penggalang->slug) }}"
                     method="POST" enctype="multipart/form-data" novalidate>
@@ -275,6 +281,12 @@
                                                 <em>Opsional</em>
                                             @endif
                                         </h3>
+                                        @if($dokumen && !$isPending && (int) auth()->id() === (int) $penggalang->user_id)
+                                            <label class="field-help" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                                                <input type="checkbox" name="dokumen_ids[]" value="{{ $dokumen->id }}" form="deleteDocumentsForm">
+                                                Pilih untuk dihapus
+                                            </label>
+                                        @endif
                                     </div>
 
                                     <div class="verify-grid-2">
@@ -316,6 +328,15 @@
                             @endfor
 
                         </div>
+                        @if(!$isPending && $penggalang->penggalangDanaDokumen->isNotEmpty() && (int) auth()->id() === (int) $penggalang->user_id)
+                            <div class="verify-actions" style="justify-content:flex-end;">
+                                <button type="submit" form="deleteDocumentsForm" class="verify-cancel-button"
+                                    style="border:1px solid #dc3545;color:#dc3545;background:#fff;"
+                                    onclick="return confirm('Hapus dokumen yang dipilih? Tindakan ini tidak dapat dibatalkan.');">
+                                    <i class="bi bi-trash"></i> Hapus dokumen terpilih
+                                </button>
+                            </div>
+                        @endif
                     </section>
 
                     {{-- KONTAK --}}
