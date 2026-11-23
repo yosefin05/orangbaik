@@ -372,90 +372,96 @@
                         @endphp
 
                         @if (!$isFundraiser)
-                            <div class="fundraiser-join-card">
-                                <h3>Jadi Fundraiser</h3>
-                                <img src="{{ asset('assets/fundraiser.png') }}" alt="Fundraiser" class="icon-section">
-                                <p>Bantu sebarkan campaign ini dan dapatkan reward!</p>
+                            <section class="fundraiser-join-card fundraiser-invite-card">
+                                <div class="fundraiser-card-topline">
+                                    <span class="fundraiser-card-icon" aria-hidden="true"><i class="bi bi-megaphone-fill"></i></span>
+                                    <span class="fundraiser-card-kicker">Sebarkan lebih banyak kebaikan</span>
+                                </div>
+                                <h3>Yuk, bantu campaign ini menjangkau lebih banyak orang!</h3>
+                                <p>Jadilah fundraiser dan bagikan tautan pribadi kamu. Setiap donasi yang masuk melalui tautan tersebut akan tercatat sebagai hasil fundraising kamu.</p>
+                                <ul class="fundraiser-benefits">
+                                    <li><i class="bi bi-check-circle-fill"></i><span>Punya tautan referral pribadi</span></li>
+                                    <li><i class="bi bi-check-circle-fill"></i><span>Hasil donasi tercatat otomatis</span></li>
+                                    <li><i class="bi bi-check-circle-fill"></i><span>Bisa dibagikan ke keluarga dan teman</span></li>
+                                </ul>
                                 <form action="{{ route('fundraiser.store', $routeSlug) }}" method="POST" id="fundraiserForm">
                                     @csrf
-                                    <button type="submit" class="btn-fundraiser-join" id="btnJoinFundraiser">
-                                        <i class="bi bi-megaphone"></i> Gabung Jadi Fundraiser
-                                    </button>
+                                    <button type="submit" class="btn-fundraiser-join" id="btnJoinFundraiser"><i class="bi bi-megaphone-fill"></i> Gabung Jadi Fundraiser</button>
                                 </form>
-                            </div>
+                                <small class="fundraiser-card-footnote">Tautan referral akan dibuat otomatis setelah kamu bergabung.</small>
+                            </section>
                         @endif
 
                         @if ($isFundraiser)
                             @php
                                 $fundraiser = $campaign->getFundraiserByUser(Auth::id());
+                                $settledFundraiserDonations = $fundraiser->donasis()
+                                    ->whereHas('pembayaran', fn ($q) => $q->where('transaction_status', 'settlement'));
+                                $fundraiserTransactionCount = (clone $settledFundraiserDonations)->count();
+                                $fundraiserRaisedTotal = (clone $settledFundraiserDonations)->sum('nominal');
                             @endphp
 
-                            <div class="fundraiser-referral-card" id="fundraiserReferralCard">
-                                <h4>🔗 Link Referral Anda</h4>
-                                <p>Bagikan link ini untuk mengajak donasi:</p>
+                            <section class="fundraiser-referral-card" id="fundraiserReferralCard">
+                                <div class="fundraiser-referral-heading">
+                                    <div>
+                                        <span class="fundraiser-card-kicker">Fundraising aktif</span>
+                                        <h3>Link fundraising kamu</h3>
+                                        <p>Bagikan tautan ini agar lebih banyak orang ikut berdonasi.</p>
+                                    </div>
+                                    <span class="fundraiser-active-badge"><i class="bi bi-check-circle-fill"></i> Aktif</span>
+                                </div>
+                                <div class="fundraiser-result-stats">
+                                    <div class="fundraiser-result-stat"><span>Transaksi berhasil</span><strong>{{ number_format($fundraiserTransactionCount, 0, ',', '.') }}</strong></div>
+                                    <div class="fundraiser-result-stat"><span>Dana terkumpul</span><strong>Rp{{ number_format($fundraiserRaisedTotal, 0, ',', '.') }}</strong></div>
+                                </div>
+                                <label class="fundraiser-field-label" for="referralLink">Link referral pribadi</label>
                                 <div class="referral-link-box">
                                     <input type="text" id="referralLink" value="{{ $fundraiser->referral_url }}" readonly>
-                                    <button onclick="copyReferralLink()" class="btn-copy-link">
-                                        <i class="bi bi-clipboard"></i>
-                                    </button>
+                                    <button type="button" onclick="copyReferralLink()" class="btn-copy-link" aria-label="Salin link referral"><i class="bi bi-copy"></i></button>
                                 </div>
-                                <form action="{{ route('fundraiser.alias.update', $fundraiser) }}" method="POST" class="mt-3">
-                                    @csrf @method('PATCH')
-                                    <label for="fundraiser-alias">Alias referral</label>
-                                    <input id="fundraiser-alias" name="alias" value="{{ $fundraiser->alias }}" minlength="3" maxlength="120" pattern="[A-Za-z0-9_-]+" required>
-                                    <button type="submit" class="btn-copy-link">Ubah alias</button>
+                                <form action="{{ route('fundraiser.alias.update', $fundraiser) }}" method="POST" class="fundraiser-alias-form">
+                                    @csrf
+                                    @method('PATCH')
+                                    <label class="fundraiser-field-label" for="fundraiser-alias">Atur nama link</label>
+                                    <div class="fundraiser-alias-controls">
+                                        <input id="fundraiser-alias" name="alias" value="{{ $fundraiser->alias }}" minlength="3" maxlength="120" pattern="[A-Za-z0-9_-]+" required>
+                                        <button type="submit" class="btn-copy-link">Simpan</button>
+                                    </div>
+                                    <small>Gunakan huruf, angka, tanda hubung, atau garis bawah.</small>
                                 </form>
-
-                                <div style="display: none;">
-                                    <span id="sidebarReferralCode">{{ $fundraiser->referral_code }}</span>
-                                </div>
-
-                                <small>Setiap donasi melalui link ini akan tercatat atas nama Anda.</small>
-                                <div class="fundraiser-total-donasi">
-                                    Terkumpul melalui Anda:
-                                    <strong>Rp {{ number_format($fundraiser->total_donasi_settlement, 0, ',', '.') }}</strong>
-                                </div>
-
                                 <div class="referral-qr-section">
                                     @php
-                                        $qrSvg = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
-                                            ->size(180)->margin(1)
-                                            ->generate($fundraiser->referral_url);
+                                        $qrSvg = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(180)->margin(1)->generate($fundraiser->referral_url);
                                     @endphp
-                                    <div class="qr-canvas-wrapper" onclick="openFundraiserModalFromSidebar()"
-                                        style="cursor: pointer;">
-                                        {!! $qrSvg !!}
-                                    </div>
-                                    <span class="text-hint-light">👆 Klik QR Code untuk lihat detail</span>
-                                    <a class="btn-download-qr" id="btnDownloadQr" href="#"
-                                        download="qr-referral-{{ $fundraiser->referral_code }}.svg">
-                                        <i class="bi bi-download"></i> Download QR Code
-                                    </a>
+                                    <div class="qr-canvas-wrapper" onclick="openFundraiserModalFromSidebar()" role="button" tabindex="0" aria-label="Perbesar QR Code referral">{!! $qrSvg !!}</div>
+                                    <span class="text-hint-light">Pindai QR code untuk membuka link fundraising</span>
+                                    <a class="btn-download-qr" id="btnDownloadQr" href="#" download="qr-referral-{{ $fundraiser->referral_code }}.svg"><i class="bi bi-download"></i> Download QR Code</a>
                                 </div>
-                            </div>
-
-                            <div class="fundraiser-join-card joined">
-                                <h3>✅ Anda Fundraiser</h3>
-                                <p>Terima kasih telah menjadi fundraiser untuk campaign ini!</p>
+                            </section>
+                            <section class="fundraiser-join-card joined fundraiser-joined-status">
+                                <div class="fundraiser-joined-copy">
+                                    <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+                                    <div><h3>Kamu sudah menjadi fundraiser</h3><p>Terima kasih sudah ikut menyebarkan kebaikan.</p></div>
+                                </div>
                                 <form action="{{ route('fundraiser.destroy', $routeSlug) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-fundraiser-leave"
-                                        onclick="return confirm('Yakin ingin berhenti menjadi fundraiser?')">
-                                        <i class="bi bi-x-circle"></i> Berhenti
-                                    </button>
+                                    <button type="submit" class="btn-fundraiser-leave" onclick="return confirm('Yakin ingin berhenti menjadi fundraiser?')"><i class="bi bi-box-arrow-right"></i> Berhenti</button>
                                 </form>
-                            </div>
+                            </section>
                         @endif
                     @endauth
 
-                                        @guest
-                        <div class="fundraiser-join-card">
-                            <h3>Jadi Fundraiser</h3>
-                            <img src="{{ asset('assets/fundraiser.png') }}" alt="Fundraiser" class="icon-section">
-                            <p>Login terlebih dahulu untuk menjadi fundraiser.</p>
-                            <a href="{{ route('login') }}" class="btn-fundraiser-login">Login</a>
-                        </div>
+                    @guest
+                        <section class="fundraiser-join-card fundraiser-invite-card">
+                            <div class="fundraiser-card-topline">
+                                <span class="fundraiser-card-icon" aria-hidden="true"><i class="bi bi-megaphone-fill"></i></span>
+                                <span class="fundraiser-card-kicker">Sebarkan lebih banyak kebaikan</span>
+                            </div>
+                            <h3>Jadilah bagian dari gerakan kebaikan</h3>
+                            <p>Login terlebih dahulu untuk bergabung sebagai fundraiser dan mendapatkan tautan referral pribadi.</p>
+                            <a href="{{ route('login') }}" class="btn-fundraiser-login"><i class="bi bi-box-arrow-in-right"></i> Login untuk bergabung</a>
+                        </section>
                     @endguest
 
                 </aside>

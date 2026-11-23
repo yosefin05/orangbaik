@@ -29,6 +29,14 @@
 
         $totalDonasi = $donasiSettlement->sum('nominal');
         $jumlahDonasi = $donasiSettlement->count();
+
+        // Hasil fundraising pribadi, hanya pembayaran settlement.
+        $fundraiserParticipations = \App\Models\Campaign_Fundraiser::with([
+            'donasis' => fn ($q) => $q->whereHas('pembayaran', fn ($p) => $p->where('transaction_status', 'settlement')),
+        ])->where('user_id', $user->id)->where('status', 'active')->get();
+        $fundraiserDonations = $fundraiserParticipations->flatMap->donasis;
+        $jumlahTransaksiFundraising = $fundraiserDonations->count();
+        $totalHasilFundraising = $fundraiserDonations->sum('nominal');
     @endphp
 
     <main class="profile-page">
@@ -64,9 +72,18 @@
                         </div>
                         <div class="profile-stat-item">
                             <span>Jumlah Donasi</span>
-                            <strong>{{ $jumlahDonasi ?? 0 }}</strong>
+                            <strong>{{ number_format($jumlahDonasi ?? 0, 0, ',', '.') }}</strong>
                         </div>
                     </div>
+
+                    @if ($fundraiserParticipations->isNotEmpty())
+                        <div class="profile-stats profile-fundraiser-stats">
+                            <h2 class="profile-fundraiser-heading"><i class="bi bi-megaphone-fill" aria-hidden="true"></i> Hasil Fundraising</h2>
+                            <div class="profile-stat-item"><span>Transaksi donasi berhasil</span><strong>{{ number_format($jumlahTransaksiFundraising, 0, ',', '.') }}</strong></div>
+                            <div class="profile-stat-item"><span>Total donasi terkumpul</span><strong>Rp{{ number_format($totalHasilFundraising, 0, ',', '.') }}</strong></div>
+                            <a href="{{ route('fundraiser.dashboard') }}" class="profile-fundraiser-link">Lihat detail fundraising <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    @endif
 
                 </aside>
 

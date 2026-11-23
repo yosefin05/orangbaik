@@ -111,13 +111,15 @@
                     <div class="custom-input-wrap">
                         <span aria-hidden="true">Rp</span>
                         <input
-                            type="number"
+                            type="text"
                             inputmode="numeric"
+                            autocomplete="off"
                             name="nominal_lainnya"
                             id="nominal_lainnya"
                             placeholder="0"
-                            min="{{ $campaign->minimal_donasi ?? 1000 }}"
+                            data-min="{{ $campaign->minimal_donasi ?? 1000 }}"
                             value="{{ old('nominal_lainnya') }}"
+                            aria-label="Nominal donasi lainnya"
                         >
                     </div>
                     <p class="custom-amount-hint">Minimal donasi sebesar Rp {{ number_format($campaign->minimal_donasi ?? 1000, 0, ',', '.') }}</p>
@@ -439,14 +441,23 @@
         updateTopbar();
 
         // ----- Nominal & ringkasan -----
+        function getRawCustomNominal() {
+            return String(nominalLainnya.value || '').replace(/\D/g, '');
+        }
+
+        function formatCustomNominal(value) {
+            const digits = String(value || '').replace(/\D/g, '');
+            return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
         function getNominal() {
-            const customValue = parseInt(nominalLainnya.value, 10);
-            if (customValue && customValue > 0) {
-                return customValue;
-            }
+            const customValue = parseInt(getRawCustomNominal(), 10);
+            if (customValue && customValue > 0) return customValue;
             const selectedRadio = document.querySelector('input[name="nominal"]:checked');
             return selectedRadio ? (parseInt(selectedRadio.value, 10) || 0) : 0;
         }
+
+        nominalLainnya.value = formatCustomNominal(nominalLainnya.value);
 
         function updateTotal() {
             const formatted = 'Rp ' + getNominal().toLocaleString('id-ID');
@@ -497,9 +508,21 @@
         });
 
         nominalLainnya.addEventListener('input', function () {
-            if (this.value && parseInt(this.value, 10) > 0) {
-                nominalRadios.forEach(function (r) { r.checked = false; });
+            const currentValue = this.value;
+            const cursor = this.selectionStart ?? currentValue.length;
+            const digitsBeforeCursor = currentValue.slice(0, cursor).replace(/\D/g, '').length;
+            const formattedValue = formatCustomNominal(currentValue);
+            this.value = formattedValue;
+
+            let nextCursor = 0;
+            let countedDigits = 0;
+            while (nextCursor < formattedValue.length && countedDigits < digitsBeforeCursor) {
+                if (/\d/.test(formattedValue[nextCursor])) countedDigits++;
+                nextCursor++;
             }
+            this.setSelectionRange(nextCursor, nextCursor);
+
+            if (getNominal() > 0) nominalRadios.forEach(function (r) { r.checked = false; });
             updateTotal();
         });
 
@@ -607,7 +630,11 @@
             }
 
             const form = document.getElementById('donasiForm');
+            // FormData mengirim angka murni tanpa titik agar validasi backend tetap numerik.
+            const formattedCustomValue = nominalLainnya.value;
+            nominalLainnya.value = getRawCustomNominal();
             const formData = new FormData(form);
+            nominalLainnya.value = formattedCustomValue;
 
             setLoading(true);
 
