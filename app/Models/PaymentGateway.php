@@ -206,7 +206,11 @@ class PaymentGateway extends Model
                 && filled($this->getCredentialForMode('signature_secret_key', $mode)),
             'flip' => filled($this->getCredentialForMode('api_key', $mode))
                 && filled($this->getCredentialForMode('webhook_token', $mode))
-                && ($mode !== 'staging' || filled($this->getConfigValue('staging_base_url'))),
+                && ($mode !== 'staging' || (
+                    filled($this->getConfigValue('staging_base_url'))
+                    && filled($this->getCredentialForMode('api_key', 'sandbox'))
+                    && filled($this->getCredentialForMode('webhook_token', 'sandbox'))
+                )),
             default => false,
         };
     }
