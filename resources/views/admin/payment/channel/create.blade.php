@@ -45,7 +45,7 @@
                 {{-- Channel Code --}}
                 <div class="form-group">
                     <label for="channel_code" class="form-label">
-                        Channel Code <span class="required">*</span>
+                        Kode internal rekening <span class="required">*</span>
                     </label>
                     <input
                         type="text"
@@ -53,9 +53,9 @@
                         name="channel_code"
                         class="form-control @error('channel_code') is-invalid @enderror"
                         value="{{ old('channel_code') }}"
-                        placeholder="Contoh: qris, gopay, bca, bni"
+                        placeholder="Contoh: BSI-UTAMA"
                         required>
-                    <small class="form-hint">Kode harus sesuai dengan channel yang tersedia di provider.</small>
+                    <small class="form-hint">Kode internal untuk membedakan rekening. Tidak ditampilkan sebagai nomor rekening kepada donatur.</small>
                     @error('channel_code')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
@@ -72,7 +72,7 @@
                         name="account_name"
                         class="form-control @error('account_name') is-invalid @enderror"
                         value="{{ old('account_name') }}"
-                        placeholder="Contoh: OrangBaik">
+                        placeholder="Contoh: OrangBaik" required>
                     <small class="form-hint">Opsional. Diisi untuk Virtual Account dan Transfer Manual.</small>
                     @error('account_name')
                         <span class="invalid-feedback">{{ $message }}</span>
@@ -90,7 +90,7 @@
                         name="account_number"
                         class="form-control @error('account_number') is-invalid @enderror"
                         value="{{ old('account_number') }}"
-                        placeholder="Contoh: 1234567890">
+                        placeholder="Contoh: 1234567890" required>
                     <small class="form-hint">Opsional. Diisi hanya untuk Transfer Manual.</small>
                     @error('account_number')
                         <span class="invalid-feedback">{{ $message }}</span>
