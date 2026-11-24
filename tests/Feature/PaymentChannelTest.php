@@ -746,17 +746,17 @@ class PaymentChannelTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.payment.gateway.show', $flip))
             ->assertOk()
-            ->assertSee('BCA Virtual Account')
-            ->assertSee('BNI Virtual Account')
-            ->assertSee('Virtual Account yang didukung adapter Flip');
+            ->assertSee('Bank BCA')
+            ->assertSee('Virtual Account yang didukung adapter Flip')
+            ->assertSee('SeaBank Virtual Account');
 
         $this->post(route('admin.payment.gateway.methods.store', $flip), [
-            'channel_code' => 'bca',
+            'channel_code' => 'seabank',
         ])->assertRedirect(route('admin.payment.gateway.show', $flip))
             ->assertSessionHas('success');
 
         $channel = PaymentChannel::where('payment_gateway_id', $flip->id)
-            ->where('channel_code', 'bca')
+            ->where('channel_code', 'seabank')
             ->firstOrFail();
 
         $this->assertSame('va', $channel->payment_type);
