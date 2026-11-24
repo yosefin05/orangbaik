@@ -62,12 +62,7 @@ class DonasiController extends Controller
             ->filter(fn ($channel) => $channel->gateway
                 && $channel->gateway->is_active
                 && ($channel->gateway->code === 'manual' || $channel->gateway->isConfigured())
-                && match ($channel->gateway->code) {
-                    'midtrans' => $channel->payment_type === 'instant',
-                    'flip' => $channel->payment_type === 'va',
-                    'manual' => $channel->payment_type === 'transfer',
-                    default => false,
-                })
+                && $channel->gateway->supportsPaymentType($channel->payment_type))
             ->values();
 
         return view('pages.donasi-bayar', compact(
@@ -146,8 +141,7 @@ class DonasiController extends Controller
             ], 422);
         }
 
-        $supportedTypes = ['midtrans' => ['instant'], 'flip' => ['va'], 'manual' => ['transfer']];
-        if (!in_array($channel->payment_type, $supportedTypes[$channel->gateway->code] ?? [], true)) {
+        if (!$channel->gateway->supportsPaymentType($channel->payment_type)) {
             return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak didukung oleh provider yang dipilih.'], 422);
         }
 
