@@ -159,10 +159,11 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 
 
 ### [2026-11-24] Admin Payment Configuration UI Polish
-- **Status**: IMPLEMENTED ON REVIEW BRANCH; CI / visual verification pending.
+- **Status**: IMPLEMENTED ON REVIEW BRANCH; CI PASSED; visual verification pending.
 - Audit menemukan selector halaman gateway yang terlalu generik, routing form tanpa layout responsif khusus, serta baris metode pembayaran yang menumpuk kontrol routing dan status.
 - Memperbarui tampilan ringkasan Payment Gateway dengan selector yang terisolasi, hierarki status yang lebih jelas, kartu konsisten, dan tata letak mobile.
 - Memperbaiki halaman detail provider: ringkasan konfigurasi, panel kredensial, daftar metode, kontrol routing, dan aksi status memiliki jarak serta susunan responsif.
 - Memperbaiki daftar rekening transfer manual agar form rekening lebih konsisten, field tidak overflow, dan kontrol mobile tersusun vertikal.
 - Perubahan hanya pada Blade/CSS; tidak mengubah route, model, database, credential, maupun perilaku transaksi.
-- Belum dilakukan inspeksi visual pada browser staging; perlu verifikasi setelah CI/deploy dan review viewport desktop/mobile.
+- GitHub Actions run `45324987199` berhasil: build frontend dan seluruh kelompok regression test lulus. Ini tidak menggantikan inspeksi visual.
+- Belum dilakukan inspeksi visual pada browser staging; perlu review viewport desktop/mobile setelah deployment staging.
