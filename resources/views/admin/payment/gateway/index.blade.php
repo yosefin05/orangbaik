@@ -125,6 +125,7 @@
                                 'is_production' => (bool) $gateway->getConfigValue('is_production', false),
                                 'has_server_key' => $gateway->hasConfigValue('server_key'),
                                 'has_client_key' => $gateway->hasConfigValue('client_key'),
+                                'has_signature_secret_key' => $gateway->hasConfigValue('signature_secret_key'),
                                 'has_api_key' => $gateway->hasConfigValue('api_key'),
                                 'has_webhook_token' => $gateway->hasConfigValue('webhook_token'),
                             ],
@@ -284,8 +285,13 @@
                             <input type="password" autocomplete="new-password" name="server_key" id="editServerKey" class="form-control" placeholder="SB-Mid-server-xxxx">
                         </div>
                         <div class="form-group mb-3">
-                            <label class="form-label">Midtrans Client Key</label>
-                            <input type="password" autocomplete="new-password" name="client_key" id="editClientKey" class="form-control" placeholder="SB-Mid-client-xxxx">
+                            <label class="form-label">Midtrans Client Key <span class="text-danger">*</span></label>
+                            <input type="password" autocomplete="new-password" name="client_key" id="editClientKey" class="form-control" placeholder="Masukkan Client Key">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Midtrans Signature Secret Key <span class="text-danger">*</span></label>
+                            <input type="password" autocomplete="new-password" name="signature_secret_key" id="editSignatureSecretKey" class="form-control" placeholder="Masukkan Signature Secret Key">
+                            <small class="text-muted">Dipakai khusus untuk verifikasi notifikasi pembayaran. Pada akun lama, nilai ini bisa sama dengan Server Key.</small>
                         </div>
                     </div>
 
@@ -632,6 +638,8 @@ function openEditConfigModal(gateway) {
         midtransFields.style.display = 'block';
         document.getElementById('editServerKey').value = '';\n        document.getElementById('editServerKey').placeholder = config.has_server_key ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Server Key';
         document.getElementById('editClientKey').value = '';\n        document.getElementById('editClientKey').placeholder = config.has_client_key ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Client Key';
+        document.getElementById('editSignatureSecretKey').value = '';
+        document.getElementById('editSignatureSecretKey').placeholder = config.has_signature_secret_key ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Signature Secret Key';
     } else if (gateway.code === 'flip') {
         flipFields.style.display = 'block';
         document.getElementById('editFlipApiKey').value = '';\n        document.getElementById('editFlipApiKey').placeholder = config.has_api_key ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Secret Key Flip';
