@@ -32,6 +32,7 @@
                 <article class="manual-account" data-account>
                     <input type="hidden" name="channels[{{ $index }}][id]" value="{{ $channel->id }}">
                     <input type="hidden" name="channels[{{ $index }}][channel_code]" value="{{ $channel->channel_code }}">
+                    <input type="hidden" name="channels[{{ $index }}][payment_type]" value="transfer">
                     <div class="manual-account__top">
                         <div class="manual-bank-icon"><i class="bi bi-bank"></i></div>
                         <div class="manual-account__identity">
