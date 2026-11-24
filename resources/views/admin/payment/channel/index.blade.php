@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('page-title', 'Bank Account / Payment Channel')
+@section('page-title', 'Metode Pembayaran')
 
 @section('content')
 
@@ -8,12 +8,12 @@
 
         <div class="channel-page-header">
             <div>
-                <h1 class="channel-title">Bank Account</h1>
-                <p class="channel-subtitle">Konfigurasi metode pembayaran, kode channel/no. rekening, payment gateway/provider, dan tipe pembayaran.</p>
+                <h1 class="channel-title">Metode Pembayaran</h1>
+                <p class="channel-subtitle">Kelola rekening transfer manual dan channel pembayaran provider dalam satu daftar.</p>
             </div>
             <div class="header-actions">
                 <a href="{{ route('admin.payment.gateway.index') }}" class="btn-top-gateway">
-                    <i class="bi bi-gear-wide-connected"></i> Gateway Status
+                    <i class="bi bi-arrow-left"></i> Kembali ke Payment
                 </a>
             </div>
         </div>
@@ -84,7 +84,7 @@
                                 name="channels[{{ $index }}][name]"
                                 value="{{ $channel->name }}"
                                 class="form-input"
-                                placeholder="Nama Bank / E-Wallet (misal: Bank BCA)"
+                                placeholder="Nama metode pembayaran"
                                 required
                             >
                         </div>
@@ -96,7 +96,7 @@
                                 name="channels[{{ $index }}][channel_code]"
                                 value="{{ $channel->channel_code }}"
                                 class="form-input"
-                                placeholder="Kode bank/provider (contoh: bsi)"
+                                placeholder="Kode channel / bank"
                                 required
                             >
                         </div>
@@ -105,12 +105,12 @@
                         <div class="field-wrap field-account-name">
                             <input type="text" name="channels[{{ $index }}][account_name]"
                                 value="{{ $channel->account_name }}" class="form-input"
-                                placeholder="Nama pemilik rekening">
+                                placeholder="Nama pemilik (khusus transfer)">
                         </div>
                         <div class="field-wrap field-account-number">
                             <input type="text" name="channels[{{ $index }}][account_number]"
                                 value="{{ $channel->account_number }}" class="form-input"
-                                placeholder="Nomor rekening">
+                                placeholder="Nomor rekening (khusus transfer)">
                         </div>
 
                         {{-- 3. Provider / Payment Gateway --}}
@@ -164,13 +164,13 @@
             {{-- Bottom Actions --}}
             <div class="bottom-actions-row">
                 <button type="button" id="btnAddBank" class="btn-add-bank">
-                    + Add Bank
+                    <i class="bi bi-plus-lg"></i> Tambah metode
                 </button>
 
                 <div class="submit-wrap">
                     <span id="saveStatusIndicator" class="save-status-indicator"></span>
                     <button type="submit" class="btn-save-all" id="btnSaveAll">
-                        <i class="bi bi-check-lg"></i> Simpan Konfigurasi
+                        <i class="bi bi-check-lg"></i> Simpan perubahan
                     </button>
                 </div>
             </div>
@@ -247,9 +247,11 @@
     .channel-row-item {
         display: flex;
         align-items: center;
-        gap: 0.625rem;
+        gap: 0.75rem;
         background: #ffffff;
-        padding: 0.25rem 0;
+        padding: 1rem;
+        border: 1px solid #e7ebf2;
+        border-radius: 12px;
         transition: background 0.15s ease;
     }
     .channel-row-item.dragging {
@@ -262,7 +264,26 @@
 
     .field-wrap {
         flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
     }
+    .field-wrap::before {
+        display: block;
+        color: #64748b;
+        font-size: 0.68rem;
+        line-height: 1.2;
+        font-weight: 700;
+        letter-spacing: .035em;
+    }
+    .field-name::before { content: "METODE PEMBAYARAN"; }
+    .field-code::before { content: "KODE CHANNEL"; }
+    .field-account-name::before { content: "NAMA PEMILIK · TRANSFER"; }
+    .field-account-number::before { content: "NOMOR REKENING · TRANSFER"; }
+    .field-provider::before { content: "PROVIDER"; }
+    .field-type::before { content: "TIPE"; }
+    .field-active::before { content: "STATUS"; }
     .field-name {
         flex: 1.25;
         min-width: 140px;
@@ -310,7 +331,7 @@
         color: #334155;
         background-color: #ffffff;
         border: 1px solid #cbd5e1;
-        border-radius: 4px;
+        border-radius: 8px;
         outline: none;
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
@@ -442,16 +463,24 @@
             flex-direction: column;
             gap: 0.75rem;
         }
+        .btn-top-gateway,
+        .btn-add-bank,
+        .btn-save-all { justify-content: center; }
+        .channel-admin-wrapper { max-width: 100%; }
         .channel-row-item {
             flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.75rem;
+            gap: 0.75rem;
+            padding: 0.9rem;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
         }
         .channel-row-item .field-wrap {
             flex: 1 1 calc(50% - 0.5rem);
             min-width: 0;
+        }
+        .channel-row-item .field-name,
+        .channel-row-item .field-provider {
+            flex-basis: 100%;
         }
         .channel-row-item .field-name,
         .channel-row-item .field-code,
@@ -461,6 +490,9 @@
         .channel-row-item .field-type,
         .channel-row-item .field-active {
             flex-basis: calc(50% - 0.5rem);
+        }
+        .channel-row-item .drag-handle-wrap {
+            margin-left: auto;
         }
         .submit-wrap {
             justify-content: space-between;
