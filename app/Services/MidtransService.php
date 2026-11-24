@@ -20,7 +20,7 @@ class MidtransService
 
     /**
      * Configure the SDK from the gateway attached to the selected payment channel.
-     * Live mode is only allowed when the application itself runs in production.
+     * Live mode is selected explicitly in the admin gateway configuration; staging can therefore use Live credentials when an admin intentionally selects them.
      */
     protected function configureGateway(?PaymentGateway $gateway): void
     {

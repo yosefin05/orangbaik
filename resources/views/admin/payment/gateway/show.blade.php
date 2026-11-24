@@ -67,7 +67,7 @@
         <div class="payment-summary__item">
             <span>Environment aplikasi</span>
             <strong>{{ app()->environment() === 'production' ? 'Production' : ucfirst(app()->environment()) }}</strong>
-            <small>{{ $isManual ? 'Tidak menggunakan API provider.' : 'Staging dan local selalu menggunakan Sandbox.' }}</small>
+            <small>{{ $isManual ? 'Tidak menggunakan API provider.' : 'Mode pembayaran dipilih dari pengaturan provider di bawah.' }}</small>
         </div>
         <div class="payment-summary__item">
             <span>Status provider</span>
@@ -128,7 +128,7 @@
                 <div class="payment-method-catalog__heading">
                     <div>
                         <strong>Daftar metode yang bisa ditambahkan</strong>
-                        <p>{{ $isMidtrans ? 'E-wallet yang didukung integrasi Snap. Pastikan metode sudah diaktifkan pada dashboard Midtrans.' : 'Virtual Account yang didukung adapter Flip saat ini. Ketersediaan tetap mengikuti layanan pada akun merchant Flip.' }}</p>
+                        <p>{{ $isMidtrans ? 'E-wallet yang didukung integrasi Snap. Pastikan metode sudah diaktifkan pada dashboard Midtrans.' : 'Virtual Account dan e-wallet Direct API v3. OVO/DANA memerlukan mode Flip Staging atau Production dan aktivasi merchant.' }}</p>
                     </div>
                     <span class="payment-catalog-count">{{ $availableMethods->count() }} tersedia</span>
                 </div>
@@ -137,10 +137,10 @@
                         @foreach ($availableMethods as $method)
                             <article class="payment-catalog-item">
                                 <div class="payment-catalog-item__info">
-                                    <span class="payment-catalog-item__icon"><i class="bi bi-{{ $isMidtrans ? 'wallet2' : 'bank' }}"></i></span>
+                                    <span class="payment-catalog-item__icon"><i class="bi bi-{{ $method['payment_type'] === 'instant' ? 'wallet2' : 'bank' }}"></i></span>
                                     <span>
                                         <strong>{{ $method['name'] }}</strong>
-                                        <small>{{ $isMidtrans ? 'E-Wallet' : 'Virtual Account' }}</small>
+                                        <small>{{ $method['payment_type'] === 'instant' ? 'E-Wallet · Direct API v3' : 'Virtual Account' }}</small>
                                     </span>
                                 </div>
                                 <form action="{{ route('admin.payment.gateway.methods.store', $gateway) }}" method="POST">
@@ -224,19 +224,24 @@
                         <input id="gateway-description" name="description" class="form-control" value="{{ old('description', $gateway->description) }}" maxlength="255" placeholder="Keterangan integrasi untuk admin">
                     </div>
                     <div class="payment-field payment-field--full">
-                        <label class="payment-check">
-                            <input type="checkbox" name="is_production" value="1" {{ old('is_production', data_get($gateway->config, 'is_production')) ? 'checked' : '' }}>
-                            <span>
-                                <strong>Gunakan kredensial Production saat aplikasi berjalan di Production</strong>
-                                <small>Staging, local, dan testing tetap dipaksa memakai Sandbox. Jangan aktifkan sebelum pengujian Sandbox selesai.</small>
-                            </span>
-                        </label>
+                        <label for="gateway-webhook-url">Webhook Notification URL</label>
+                        <input id="gateway-webhook-url" class="form-control" value="{{ route('payment.gateway.webhook', ['gateway' => $gateway->code]) }}" readonly onclick="this.select()">
+                        <small>Salin URL ini ke pengaturan Notification URL / Callback URL di dashboard merchant {{ $gateway->name }}. Pastikan Webhook Token atau Signature Secret Key pada kedua sisi cocok.</small>
+                    </div>
+                    <div class="payment-field payment-field--full">
+                        <label for="credential-mode">Mode pembayaran</label>
+                        <select id="credential-mode" name="credential_mode" class="form-select">
+                            @foreach (($isFlip ? ['sandbox' => 'Sandbox (VA legacy)', 'staging' => 'Flip Staging (Direct API v3)', 'production' => 'Production / Live'] : ['sandbox' => 'Sandbox', 'production' => 'Production / Live']) as $modeValue => $modeLabel)
+                                <option value="{{ $modeValue }}" @selected(old('credential_mode', $gateway->activeCredentialMode()) === $modeValue)>{{ $modeLabel }}</option>
+                            @endforeach
+                        </select>
+                        <small>{{ $isFlip ? 'OVO dan DANA menggunakan Direct API v3 pada Flip Staging atau Production. Saat mode Staging dipilih, Virtual Account tetap memakai kredensial Sandbox legacy.' : 'Production / Live memproses transaksi sungguhan, termasuk jika aplikasi berjalan di staging. Pastikan kredensial dan webhook sesuai environment.' }}</small>
                     </div>
                 </div>
             </section>
 
             @if ($isMidtrans)
-                @foreach (['sandbox' => 'Sandbox', 'production' => 'Production'] as $environment => $label)
+                @foreach (($isFlip ? ['sandbox' => 'Sandbox', 'staging' => 'Flip Staging', 'production' => 'Production'] : ['sandbox' => 'Sandbox', 'production' => 'Production']) as $environment => $label)
                     <section class="payment-panel">
                         <div class="payment-panel__heading">
                             <div>
@@ -262,13 +267,13 @@
                     </section>
                 @endforeach
             @else
-                @foreach (['sandbox' => 'Sandbox', 'production' => 'Production'] as $environment => $label)
+                @foreach (['sandbox' => 'Sandbox', 'staging' => 'Flip Staging', 'production' => 'Production'] as $environment => $label)
                     <section class="payment-panel">
                         <div class="payment-panel__heading">
                             <div>
                                 <span class="payment-eyebrow">{{ strtoupper($environment) }} CREDENTIALS</span>
                                 <h2>{{ $label }}</h2>
-                                <p>{{ $environment === 'sandbox' ? 'Key pengujian Flip. Gunakan akses Sandbox resmi dari Flip.' : 'Key Live Flip untuk transaksi Production.' }}</p>
+                                <p>{{ $environment === 'sandbox' ? 'Kredensial untuk alur Virtual Account legacy pada Sandbox.' : ($environment === 'staging' ? 'Kredensial Direct API v3 dari lingkungan staging Flip yang sudah diberikan ke merchant.' : 'Kredensial Live Flip. Transaksi yang dibuat akan memproses uang sungguhan.' ) }}</p>
                             </div>
                             <span class="payment-env {{ $environment === 'sandbox' ? 'payment-env--sandbox' : 'payment-env--live' }}">{{ $label }}</span>
                         </div>
@@ -284,6 +289,15 @@
                                 </div>
                             @endforeach
                         </div>
+                        @if ($isFlip && $environment === 'staging')
+                            <div class="payment-form-grid mt-3">
+                                <div class="payment-field payment-field--full">
+                                    <label for="staging_base_url">Flip Staging Base URL</label>
+                                    <input id="staging_base_url" name="staging_base_url" type="url" class="form-control" value="{{ old('staging_base_url', data_get($gateway->config, 'staging_base_url')) }}" placeholder="https://domain-staging-dari-flip">
+                                    <small>Masukkan domain staging resmi yang diberikan tim Flip, tanpa path /big_api/v3/pwf/bill.</small>
+                                </div>
+                            </div>
+                        @endif
                     </section>
                 @endforeach
             @endif

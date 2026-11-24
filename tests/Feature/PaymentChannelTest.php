@@ -707,7 +707,7 @@ class PaymentChannelTest extends TestCase
         $this->assertTrue($midtrans->supportsPaymentType('instant'));
         $this->assertFalse($midtrans->supportsPaymentType('va'));
         $this->assertTrue($flip->supportsPaymentType('va'));
-        $this->assertFalse($flip->supportsPaymentType('instant'));
+        $this->assertTrue($flip->supportsPaymentType('instant'));
         $this->assertTrue($manual->supportsPaymentType('transfer'));
     }
 
@@ -747,8 +747,10 @@ class PaymentChannelTest extends TestCase
             ->get(route('admin.payment.gateway.show', $flip))
             ->assertOk()
             ->assertSee('Bank BCA')
-            ->assertSee('Virtual Account yang didukung adapter Flip')
-            ->assertSee('SeaBank Virtual Account');
+            ->assertSee('Virtual Account dan e-wallet Direct API v3')
+            ->assertSee('SeaBank Virtual Account')
+            ->assertSee('OVO')
+            ->assertSee('DANA');
 
         $this->post(route('admin.payment.gateway.methods.store', $flip), [
             'channel_code' => 'seabank',
@@ -763,6 +765,84 @@ class PaymentChannelTest extends TestCase
         $this->assertFalse($channel->is_active);
     }
 
+
+    public function test_flip_ovo_and_dana_are_registered_as_inactive_direct_api_v3_methods(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+
+        foreach (['ovo', 'dana'] as $code) {
+            $this->actingAs($admin)
+                ->post(route('admin.payment.gateway.methods.store', $flip), [
+                    'channel_code' => $code,
+                ])
+                ->assertRedirect(route('admin.payment.gateway.show', $flip))
+                ->assertSessionHas('success');
+
+            $channel = PaymentChannel::where('payment_gateway_id', $flip->id)
+                ->where('channel_code', $code)
+                ->firstOrFail();
+
+            $this->assertSame('instant', $channel->payment_type);
+            $this->assertFalse($channel->is_active);
+        }
+    }
+
+    public function test_flip_direct_api_v3_creates_ovo_payment_with_staging_credentials(): void
+    {
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $flip->update([
+            'config' => PaymentGateway::secureConfigForStorage([
+                'credential_mode' => 'staging',
+                'staging_api_key' => 'test-staging-secret',
+                'staging_webhook_token' => 'test-staging-webhook',
+                'staging_base_url' => 'https://flip-staging.example.test',
+            ]),
+        ]);
+
+        $channel = PaymentChannel::create([
+            'payment_gateway_id' => $flip->id,
+            'name' => 'OVO',
+            'channel_code' => 'ovo',
+            'payment_type' => 'instant',
+            'sort_order' => 99,
+            'is_active' => false,
+        ]);
+        $channel->load('gateway');
+
+        $donasi = $this->createDonasi();
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'payment_gateway_id' => $flip->id,
+            'payment_token' => (string) \Illuminate\Support\Str::uuid(),
+            'order_id' => 'OB-FLIP-V3-' . uniqid(),
+            'payment_type' => 'instant',
+            'transaction_status' => 'pending',
+        ]);
+
+        Http::fake([
+            'https://flip-staging.example.test/big_api/v3/pwf/bill' => Http::response([
+                'payment_url' => 'https://checkout.flip.example.test/pay/123',
+                'bill_payment' => ['id' => 12345],
+            ], 200),
+        ]);
+
+        $result = app(FlipService::class)->createEwalletDirectApiV3($donasi, $pembayaran, $channel);
+
+        $this->assertSame('redirect', $result['type']);
+        $this->assertSame('https://checkout.flip.example.test/pay/123', $result['redirect_url']);
+        $this->assertSame('12345', $pembayaran->fresh()->transaction_id);
+        $this->assertSame('staging', data_get($pembayaran->fresh()->gateway_response, 'credential_mode'));
+
+        Http::assertSent(fn ($request) =>
+            $request->url() === 'https://flip-staging.example.test/big_api/v3/pwf/bill'
+            && $request['sender_bank'] === 'ovo'
+            && $request['sender_bank_type'] === 'wallet_account'
+            && $request['step'] === 'direct_api'
+        );
+    }
+
     public function test_provider_catalog_rejects_methods_not_supported_by_that_provider(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
@@ -771,14 +851,14 @@ class PaymentChannelTest extends TestCase
         $this->actingAs($admin)
             ->from(route('admin.payment.gateway.show', $flip))
             ->post(route('admin.payment.gateway.methods.store', $flip), [
-                'channel_code' => 'ovo',
+                'channel_code' => 'gopay',
             ])
             ->assertRedirect(route('admin.payment.gateway.show', $flip))
             ->assertSessionHas('error');
 
         $this->assertFalse(
             PaymentChannel::where('payment_gateway_id', $flip->id)
-                ->where('channel_code', 'ovo')
+                ->where('channel_code', 'gopay')
                 ->exists()
         );
     }

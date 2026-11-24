@@ -44,6 +44,124 @@ class FlipService
         return $gateway?->isConfigured() ?? false;
     }
 
+
+    /**
+     * Create an OVO/DANA payment with Flip Accept Payment Direct API v3.
+     * Flip v3 E-Wallet is available through the merchant staging environment
+     * or the live endpoint; it is not available on the legacy Sandbox endpoint.
+     */
+    public function createEwalletDirectApiV3(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
+    {
+        $gateway = $channel->gateway;
+        if (!$gateway || !in_array(strtolower($channel->channel_code), ['ovo', 'dana'], true)) {
+            throw new \RuntimeException('Direct API v3 hanya digunakan untuk channel OVO dan DANA milik Flip.');
+        }
+
+        $mode = $gateway->activeCredentialMode();
+        if (!in_array($mode, ['staging', 'production'], true)) {
+            throw new \RuntimeException('OVO dan DANA melalui Flip Direct API v3 memerlukan mode Staging Flip atau Production. API v3 tidak tersedia pada Sandbox.');
+        }
+
+        $apiKey = $gateway->getCredentialForMode('api_key', $mode);
+        $webhookToken = $gateway->getCredentialForMode('webhook_token', $mode);
+        if (blank($apiKey) || blank($webhookToken)) {
+            throw new \RuntimeException('API Secret Key dan Webhook Token Flip untuk mode yang dipilih belum lengkap.');
+        }
+
+        $endpoint = $mode === 'production'
+            ? 'https://bigflip.id/api/v3/pwf/bill'
+            : rtrim((string) $gateway->getConfigValue('staging_base_url'), '/') . '/big_api/v3/pwf/bill';
+
+        if ($mode === 'staging' && blank($gateway->getConfigValue('staging_base_url'))) {
+            throw new \RuntimeException('Staging Base URL Flip belum diisi pada dashboard admin.');
+        }
+
+        $payload = [
+            'title' => 'Donasi: ' . Str::limit($donasi->campaign->judul ?? 'OrangBaik.id', 27),
+            'type' => 'SINGLE',
+            'step' => 'direct_api',
+            'amount' => (int) $donasi->nominal,
+            'sender_name' => $donasi->nama_donatur ?: 'Hamba Allah',
+            'sender_email' => $donasi->email ?? 'donatur@orangbaik.id',
+            'sender_bank' => strtolower($channel->channel_code),
+            'sender_bank_type' => 'wallet_account',
+            'redirect_url' => route('donasi.bayar.instruksi', [
+                'pembayaran' => $pembayaran->id,
+                'token' => $pembayaran->payment_token,
+            ]),
+            'reference_id' => $pembayaran->order_id,
+            'expired_date' => now()->addDay()->format('Y-m-d H:i'),
+        ];
+
+        try {
+            $response = Http::connectTimeout(5)
+                ->timeout(25)
+                ->withBasicAuth($apiKey, '')
+                ->acceptJson()
+                ->asJson()
+                ->post($endpoint, $payload);
+        } catch (\Throwable $exception) {
+            Log::error('Flip Direct API v3 request failed before a confirmed response', [
+                'order_id' => $pembayaran->order_id,
+                'channel' => $channel->channel_code,
+                'mode' => $mode,
+                'exception_class' => get_class($exception),
+            ]);
+
+            throw new \RuntimeException('Flip Direct API v3 tidak dapat dihubungi. Periksa status transaksi di dashboard Flip sebelum mencoba ulang.');
+        }
+
+        if (!$response->successful()) {
+            Log::warning('Flip Direct API v3 rejected payment creation', [
+                'order_id' => $pembayaran->order_id,
+                'channel' => $channel->channel_code,
+                'mode' => $mode,
+                'http_status' => $response->status(),
+            ]);
+
+            throw new \RuntimeException('Flip menolak pembuatan pembayaran e-wallet (HTTP ' . $response->status() . ').');
+        }
+
+        $data = $response->json();
+        $paymentUrl = data_get($data, 'payment_url') ?? data_get($data, 'bill_payment.payment_url');
+        $paymentId = data_get($data, 'bill_payment.id') ?? data_get($data, 'id');
+
+        if (!is_array($data) || blank($paymentUrl) || blank($paymentId)) {
+            Log::error('Flip Direct API v3 returned an incomplete payment response', [
+                'order_id' => $pembayaran->order_id,
+                'mode' => $mode,
+                'http_status' => $response->status(),
+            ]);
+
+            throw new \RuntimeException('Respons Flip Direct API v3 belum memuat ID pembayaran dan payment URL yang diperlukan.');
+        }
+
+        $pembayaran->update([
+            'transaction_id' => (string) $paymentId,
+            'gateway_response' => array_merge($pembayaran->gateway_response ?? [], [
+                'credential_mode' => $mode,
+                'flip_api_version' => 'v3',
+                'flip_flow' => 'direct_api',
+                'flip_payment_id' => $paymentId,
+                'payment_url' => $paymentUrl,
+                'reference_id' => $pembayaran->order_id,
+                'requested_amount' => (int) $donasi->nominal,
+                'sender_bank' => strtolower($channel->channel_code),
+                'sender_bank_type' => 'wallet_account',
+                'expires_at' => data_get($data, 'expired_date') ?? data_get($data, 'bill_payment.expired_date'),
+            ]),
+        ]);
+
+        return [
+            'type' => 'redirect',
+            'provider_type' => 'flip_ewallet',
+            'order_id' => $pembayaran->order_id,
+            'donasi_id' => $donasi->id,
+            'redirect_url' => $paymentUrl,
+            'payment_url' => $paymentUrl,
+        ];
+    }
+
     /**
      * Normalisasi kode bank untuk Flip API.
      */
@@ -91,7 +209,10 @@ class FlipService
             throw new \RuntimeException('Gateway Flip tidak ditemukan.');
         }
 
-        $credentialMode = $gateway->activeCredentialMode();
+        $selectedMode = $gateway->activeCredentialMode();
+        // Flip Direct API v3 staging is used only for OVO/DANA. Keep the existing
+        // VA adapter on its Sandbox credentials while the provider is in staging mode.
+        $credentialMode = $selectedMode === 'staging' ? 'sandbox' : $selectedMode;
         $isProduction = $credentialMode === 'production';
 
         $this->baseUrl = $isProduction
@@ -99,8 +220,8 @@ class FlipService
             : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
         $this->apiKey = $gateway->getCredentialForMode('api_key', $credentialMode);
 
-        if (!$gateway || !$gateway->isConfigured()) {
-            throw new \RuntimeException('Kredensial Flip belum lengkap. Lengkapi API Key dan Webhook Token pada pengaturan gateway.');
+        if (blank($this->apiKey) || blank($gateway->getCredentialForMode('webhook_token', $credentialMode))) {
+            throw new \RuntimeException('Kredensial Flip untuk Virtual Account pada mode yang dipilih belum lengkap.');
         }
 
         $bankCode = self::normalizeBankCode($channel->channel_code);
@@ -164,7 +285,7 @@ class FlipService
             throw new \RuntimeException('Respons Flip tidak valid. Jangan membuat transaksi ulang sebelum memeriksa dashboard Flip.');
         }
 
-        return $this->processSuccessfulFlipResponse($successData, $pembayaran, $donasi, $channel, $bankCode);
+        return $this->processSuccessfulFlipResponse($successData, $pembayaran, $donasi, $channel, $bankCode, $credentialMode);
     }
 
     /**
@@ -187,7 +308,8 @@ class FlipService
         Pembayaran $pembayaran,
         Donasi $donasi,
         PaymentChannel $channel,
-        string $bankCode
+        string $bankCode,
+        string $credentialMode
     ): array {
         // Ekstrak nomor Virtual Account / Rekening dari berbagai kemungkinan format response Flip
         $accountNumber = $data['bill_payment']['receiver_bank_account']['account_number']
@@ -238,7 +360,7 @@ class FlipService
         $pembayaran->update([
             'transaction_id' => (string) $flipId,
             'gateway_response' => array_merge($data, [
-                'credential_mode' => $channel->gateway?->activeCredentialMode() ?? 'sandbox',
+                'credential_mode' => $credentialMode,
                 'flip_id' => $flipId,
                 'link_id' => $data['link_id'] ?? $flipId,
                 'account_number' => $accountNumber,
@@ -307,10 +429,11 @@ class FlipService
 
         // Flip PWF Callback ID fields
         $billLinkId = $data['bill_link_id'] ?? $data['link_id'] ?? null;
-        $paymentId = $data['id'] ?? $data['bill_payment_id'] ?? null;
-        $status = $data['status'] ?? null;
+        $paymentId = $data['id'] ?? $data['bill_payment_id'] ?? data_get($data, 'bill_payment.id') ?? null;
+        $referenceId = $data['reference_id'] ?? data_get($data, 'bill_payment.reference_id') ?? null;
+        $status = $data['status'] ?? data_get($data, 'bill_payment.status') ?? null;
 
-        if ((!$billLinkId && !$paymentId) || !$status) {
+        if ((!$billLinkId && !$paymentId && !$referenceId) || !$status) {
             Log::warning('Flip webhook: data tidak lengkap', ['payload' => $payload]);
             return false;
         }
@@ -320,18 +443,27 @@ class FlipService
          * 3. CARI PEMBAYARAN BERDASARKAN TRANSACTION_ID (FLIP LINK ID ATAU PAYMENT ID)
          * =====================================================
          */
-        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
-            ->where(function ($q) use ($billLinkId, $paymentId) {
-                if ($billLinkId) {
-                    $q->where('transaction_id', (string) $billLinkId);
-                }
-                if ($paymentId) {
-                    $q->orWhere('transaction_id', (string) $paymentId);
-                }
-            })
-            ->first();
+        $pembayaran = null;
+        if ($billLinkId || $paymentId) {
+            $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
+                ->where(function ($q) use ($billLinkId, $paymentId) {
+                    if ($billLinkId) {
+                        $q->where('transaction_id', (string) $billLinkId);
+                    }
+                    if ($paymentId) {
+                        $q->orWhere('transaction_id', (string) $paymentId);
+                    }
+                })
+                ->first();
+        }
 
-        // Fallback pencarian via gateway_response JSON jika transaction_id berbeda
+        // Direct API v3 can identify the transaction by the merchant reference ID.
+        if (!$pembayaran && $referenceId) {
+            $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
+                ->where('order_id', (string) $referenceId)
+                ->first();
+        }
+
         if (!$pembayaran && $billLinkId) {
             $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
                 ->where('gateway_response->link_id', $billLinkId)
