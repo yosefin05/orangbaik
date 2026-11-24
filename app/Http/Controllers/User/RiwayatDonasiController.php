@@ -11,9 +11,16 @@ class RiwayatDonasiController extends Controller
 {
     public function index()
     {
+        $midtransGateway = PaymentGateway::where('code', 'midtrans')->first();
         $user = auth()->user();
         if (!$user) {
-            return view('pages.riwayat-donasi', ['formattedDonations' => [], 'totalDonasi' => 0, 'totalNominal' => 0, 'totalSelesai' => 0]);
+            return view('pages.riwayat-donasi', [
+                'formattedDonations' => [],
+                'totalDonasi' => 0,
+                'totalNominal' => 0,
+                'totalSelesai' => 0,
+                'midtransGateway' => $midtransGateway,
+            ]);
         }
 
         $donasis = Donasi::with(['campaign', 'pembayaran.paymentChannel.gateway'])
@@ -65,7 +72,7 @@ class RiwayatDonasiController extends Controller
         $totalNominal = $formattedDonations->sum('amount_value');
         $totalSelesai = $formattedDonations->where('status_key', 'selesai')->count();
 
-        return view('pages.riwayat-donasi', compact('formattedDonations', 'totalDonasi', 'totalNominal', 'totalSelesai'));
+        return view('pages.riwayat-donasi', compact('formattedDonations', 'totalDonasi', 'totalNominal', 'totalSelesai', 'midtransGateway'));
     }
 
     public function kwitansi(Donasi $donasi)
