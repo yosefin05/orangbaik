@@ -10,13 +10,9 @@
     <section class="page-header">
         <div>
             <h2>Payment Gateway</h2>
-            <p>Kelola provider pembayaran, atur API Key langsung dari panel, dan tambahkan gateway baru secara fleksibel.</p>
+            <p>Kelola kredensial dan status Midtrans, Flip, serta transfer manual. Provider baru memerlukan adapter khusus sebelum dapat digunakan.</p>
         </div>
         <div class="header-actions">
-            <button type="button" class="btn btn-success" onclick="openAddGatewayModal()">
-                <i class="bi bi-plus-lg"></i>
-                Tambah Gateway Baru
-            </button>
             <a href="{{ route('admin.payment.channel.index') }}" class="btn btn-primary">
                 <i class="bi bi-diagram-3"></i>
                 Kelola Channel
@@ -108,7 +104,7 @@
                             <small class="text-success fw-semibold">Kredensial tersedia — perlu pengujian koneksi</small>
                         @else
                             <i class="bi bi-exclamation-circle text-warning"></i>
-                            <small class="text-warning fw-semibold">API Key Belum Diisi</small>
+                            <small class="text-warning fw-semibold">Kredensial wajib belum lengkap</small>
                         @endif
                     </div>
 
