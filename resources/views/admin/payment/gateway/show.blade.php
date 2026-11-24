@@ -123,6 +123,45 @@
                     <p>Aktifkan metode yang ingin ditampilkan di halaman donasi. Metode tersebut juga harus sudah diaktifkan pada dashboard merchant {{ $gateway->name }}. Nomor dan nama rekening tidak perlu diisi di sini.</p>
                 </div>
             </div>
+
+            <div class="payment-method-catalog">
+                <div class="payment-method-catalog__heading">
+                    <div>
+                        <strong>Daftar metode yang bisa ditambahkan</strong>
+                        <p>{{ $isMidtrans ? 'E-wallet yang didukung integrasi Snap. Pastikan metode sudah diaktifkan pada dashboard Midtrans.' : 'Virtual Account yang didukung adapter Flip saat ini. Ketersediaan tetap mengikuti layanan pada akun merchant Flip.' }}</p>
+                    </div>
+                    <span class="payment-catalog-count">{{ $availableMethods->count() }} tersedia</span>
+                </div>
+                @if ($availableMethods->isNotEmpty())
+                    <div class="payment-catalog-grid">
+                        @foreach ($availableMethods as $method)
+                            <article class="payment-catalog-item">
+                                <div class="payment-catalog-item__info">
+                                    <span class="payment-catalog-item__icon"><i class="bi bi-{{ $isMidtrans ? 'wallet2' : 'bank' }}"></i></span>
+                                    <span>
+                                        <strong>{{ $method['name'] }}</strong>
+                                        <small>{{ $isMidtrans ? 'E-Wallet' : 'Virtual Account' }}</small>
+                                    </span>
+                                </div>
+                                <form action="{{ route('admin.payment.gateway.methods.store', $gateway) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="channel_code" value="{{ $method['channel_code'] }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-plus-lg"></i> Tambahkan
+                                    </button>
+                                </form>
+                            </article>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="payment-catalog-empty">
+                        <i class="bi bi-check2-circle"></i>
+                        Semua metode pada katalog adapter sudah terdaftar.
+                    </div>
+                @endif
+                <p class="payment-catalog-note"><i class="bi bi-info-circle"></i> Metode baru ditambahkan dalam keadaan tersembunyi. Setelah memastikan aktivasi di dashboard provider dan kredensial siap, tampilkan melalui kontrol di daftar metode di bawah.</p>
+            </div>
+
             <div class="payment-method-list">
                 @forelse ($channels as $channel)
                     <div class="payment-method-row">
@@ -158,7 +197,7 @@
                     <div class="payment-empty">
                         <i class="bi bi-credit-card"></i>
                         <strong>Belum ada metode yang terdaftar</strong>
-                        <p>Daftar metode pembayaran untuk provider ini belum tersedia.</p>
+                        <p>Tambahkan metode yang dibutuhkan dari katalog di atas. Metode baru akan tersimpan dalam keadaan tersembunyi.</p>
                     </div>
                 @endforelse
             </div>
@@ -307,6 +346,23 @@
 .payment-form-footer p{font-size:11px;color:var(--pd-muted);margin:0;line-height:1.5}
 .payment-form-footer p i{color:#16845b;margin-right:5px}
 .payment-form-footer .btn{min-height:43px;padding:10px 18px;border-radius:9px;white-space:nowrap}
+.payment-method-catalog{padding:18px;margin:0 0 20px;background:#f8faff;border:1px solid #e5ecf7;border-radius:12px}
+.payment-method-catalog__heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.payment-method-catalog__heading strong{display:block;font-size:13px;color:var(--pd-ink)}
+.payment-method-catalog__heading p{margin:4px 0 0;color:var(--pd-muted);font-size:11px;line-height:1.55}
+.payment-catalog-count{flex:none;padding:5px 8px;border-radius:20px;background:#e9f0fb;color:var(--pd-blue);font-size:10px;font-weight:700}
+.payment-catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.payment-catalog-item{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:11px;background:#fff;border:1px solid var(--pd-line);border-radius:10px}
+.payment-catalog-item__info{display:flex;align-items:center;gap:9px;min-width:0}
+.payment-catalog-item__icon{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:9px;background:#edf3fc;color:var(--pd-blue)}
+.payment-catalog-item__info strong,.payment-catalog-item__info small{display:block}
+.payment-catalog-item__info strong{font-size:12px;color:var(--pd-ink);line-height:1.35}
+.payment-catalog-item__info small{margin-top:3px;color:var(--pd-muted);font-size:10px}
+.payment-catalog-item form{margin:0;flex:none}
+.payment-catalog-item .btn{white-space:nowrap;font-size:10px}
+.payment-catalog-empty{display:flex;align-items:center;gap:8px;padding:12px;color:#18794e;font-size:12px;background:#fff;border-radius:9px}
+.payment-catalog-note{display:flex;gap:7px;margin:12px 0 0;color:var(--pd-muted);font-size:10px;line-height:1.5}
+.payment-catalog-note i{color:var(--pd-blue);flex:none}
 .payment-method-list{display:grid;gap:0}
 .payment-method-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;padding:18px 0;border-top:1px solid var(--pd-line)}
 .payment-method-row:first-child{border-top:0;padding-top:0}
@@ -345,6 +401,10 @@
  .payment-panel__heading{flex-direction:column;align-items:stretch}
  .payment-form-footer{flex-direction:column;align-items:stretch}
  .payment-form-footer .btn{width:100%}
+ .payment-method-catalog{padding:14px}
+ .payment-catalog-grid{grid-template-columns:1fr}
+ .payment-catalog-item{align-items:center}
+ .payment-catalog-item .btn{min-height:36px}
  .payment-routing-form{max-width:none}
  .payment-routing-form__controls{align-items:stretch;flex-direction:column}
  .payment-routing-form select,.payment-routing-form .btn{width:100%;max-width:none;min-height:42px}
