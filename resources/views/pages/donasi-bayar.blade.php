@@ -134,21 +134,20 @@
                     </div>
                     <div id="error-payment_channel_id" class="error-text" role="alert" style="display:none;"></div>
 
-                    @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
+                    @if(isset($paymentChannels))
                         @php
                             // Empat kategori; QRIS dipisahkan dari e-wallet meski sama-sama instant.
                             $groupOrder = ['QRIS', 'E-Wallet', 'Virtual Account', 'Transfer Manual'];
 
-                            $grouped = $paymentChannels
-                                ->groupBy(function ($item) {
-                                    if ($item->payment_type === 'transfer') return 'Transfer Manual';
-                                    if ($item->payment_type === 'va') return 'Virtual Account';
-                                    return strtolower($item->channel_code) === 'qris' ? 'QRIS' : 'E-Wallet';
-                                })
-                                ->sortBy(function ($channels, $groupName) use ($groupOrder) {
-                                    $index = array_search($groupName, $groupOrder);
-                                    return $index === false ? count($groupOrder) : $index;
-                                });
+                            $channelsByGroup = $paymentChannels->groupBy(function ($item) {
+                                if ($item->payment_type === 'transfer') return 'Transfer Manual';
+                                if ($item->payment_type === 'va') return 'Virtual Account';
+                                return strtolower($item->channel_code) === 'qris' ? 'QRIS' : 'E-Wallet';
+                            });
+                            // Render empat section secara konsisten, termasuk saat suatu kategori belum aktif.
+                            $grouped = collect($groupOrder)->mapWithKeys(fn ($name) => [
+                                $name => $channelsByGroup->get($name, collect()),
+                            ]);
 
                             $groupIcons = [
                                 'QRIS' => 'bi-qr-code',
@@ -214,7 +213,7 @@
                                     </summary>
 
                                     <div class="channel-row-list">
-                                        @foreach ($groupChannels as $channel)
+                                        @forelse ($groupChannels as $channel)
                                             @php
                                                 $rowIcon = match ($channel->payment_type) {
                                                     'instant' => 'bi-lightning-charge-fill',
@@ -238,7 +237,9 @@
                                                 </span>
                                                 <span class="channel-row-mark" aria-hidden="true"></span>
                                             </label>
-                                        @endforeach
+                                        @empty
+                                            <p class="channel-empty-text">Metode pembayaran dalam kategori ini belum tersedia.</p>
+                                        @endforelse
                                     </div>
                                 </details>
                             @endforeach
