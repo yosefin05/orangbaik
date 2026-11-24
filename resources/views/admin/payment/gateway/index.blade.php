@@ -114,23 +114,27 @@
                 </div>
 
                 <div class="gateway-card__footer">
+                    @php
+                        $gatewayModalData = [
+                            'id' => $gateway->id,
+                            'name' => $gateway->name,
+                            'code' => $gateway->code,
+                            'description' => $gateway->description,
+                            'is_active' => $gateway->is_active,
+                            'config' => [
+                                'is_production' => (bool) $gateway->getConfigValue('is_production', false),
+                                'has_server_key' => $gateway->hasConfigValue('server_key'),
+                                'has_client_key' => $gateway->hasConfigValue('client_key'),
+                                'has_api_key' => $gateway->hasConfigValue('api_key'),
+                                'has_webhook_token' => $gateway->hasConfigValue('webhook_token'),
+                            ],
+                        ];
+                    @endphp
                     @if ($gateway->code !== 'manual')
-                        <button type="button" 
+                        <button type="button"
                             class="btn btn-outline-primary btn-sm"
-                            onclick='openEditConfigModal(@json([
-                                'id' => $gateway->id,
-                                'name' => $gateway->name,
-                                'code' => $gateway->code,
-                                'description' => $gateway->description,
-                                'is_active' => $gateway->is_active,
-                                'config' => [
-                                    'is_production' => (bool) ($gateway->getConfigValue('is_production', false)),
-                                    'has_server_key' => $gateway->hasConfigValue('server_key'),
-                                    'has_client_key' => $gateway->hasConfigValue('client_key'),
-                                    'has_api_key' => $gateway->hasConfigValue('api_key'),
-                                    'has_webhook_token' => $gateway->hasConfigValue('webhook_token'),
-                                ],
-                            ]))'
+                            data-gateway="{{ e(json_encode($gatewayModalData)) }}"
+                            onclick="openEditConfigModal(JSON.parse(this.dataset.gateway))"
                             title="Atur API Key & Pengaturan Gateway">
                             <i class="bi bi-gear-fill"></i>
                             Pengaturan API
