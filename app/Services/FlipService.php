@@ -76,7 +76,7 @@ class FlipService
 
     /**
      * Buat Virtual Account / Bill Payment via Flip API.
-     * Mendukung retry & fallback otomatis agar tidak ada bank yang gagal.
+     * Menggunakan satu request agar kegagalan jaringan tidak membuat bill duplikat.
      *
      * @param  Donasi          $donasi
      * @param  Pembayaran      $pembayaran
@@ -168,7 +168,7 @@ class FlipService
     }
 
     /**
-     * Kirim HTTP POST ke Flip API (dengan fallback endpoint jika 404).
+     * Kirim satu HTTP POST ke endpoint Flip PWF v2.
      */
     protected function sendBillRequest(array $payload)
     {
