@@ -711,4 +711,77 @@ class PaymentChannelTest extends TestCase
         $this->assertTrue($manual->supportsPaymentType('transfer'));
     }
 
+
+    public function test_admin_can_register_midtrans_ewallet_methods_from_provider_catalog(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $midtrans = PaymentGateway::where('code', 'midtrans')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->get(route('admin.payment.gateway.show', $midtrans))
+            ->assertOk()
+            ->assertSee('OVO')
+            ->assertSee('DANA')
+            ->assertSee('ShopeePay')
+            ->assertSee('Daftar metode yang bisa ditambahkan');
+
+        $this->post(route('admin.payment.gateway.methods.store', $midtrans), [
+            'channel_code' => 'ovo',
+        ])->assertRedirect(route('admin.payment.gateway.show', $midtrans))
+            ->assertSessionHas('success');
+
+        $channel = PaymentChannel::where('payment_gateway_id', $midtrans->id)
+            ->where('channel_code', 'ovo')
+            ->firstOrFail();
+
+        $this->assertSame('instant', $channel->payment_type);
+        $this->assertFalse($channel->is_active);
+    }
+
+    public function test_admin_can_register_flip_virtual_account_methods_from_provider_catalog(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->get(route('admin.payment.gateway.show', $flip))
+            ->assertOk()
+            ->assertSee('BCA Virtual Account')
+            ->assertSee('BNI Virtual Account')
+            ->assertSee('Virtual Account yang didukung adapter Flip');
+
+        $this->post(route('admin.payment.gateway.methods.store', $flip), [
+            'channel_code' => 'bca',
+        ])->assertRedirect(route('admin.payment.gateway.show', $flip))
+            ->assertSessionHas('success');
+
+        $channel = PaymentChannel::where('payment_gateway_id', $flip->id)
+            ->where('channel_code', 'bca')
+            ->firstOrFail();
+
+        $this->assertSame('va', $channel->payment_type);
+        $this->assertFalse($channel->is_active);
+    }
+
+    public function test_provider_catalog_rejects_methods_not_supported_by_that_provider(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->from(route('admin.payment.gateway.show', $flip))
+            ->post(route('admin.payment.gateway.methods.store', $flip), [
+                'channel_code' => 'ovo',
+            ])
+            ->assertRedirect(route('admin.payment.gateway.show', $flip))
+            ->assertSessionHas('error');
+
+        $this->assertFalse(
+            PaymentChannel::where('payment_gateway_id', $flip->id)
+                ->where('channel_code', 'ovo')
+                ->exists()
+        );
+    }
+
+
 }
