@@ -396,7 +396,7 @@
 @php
     $hasMidtransChannel = $paymentChannels->contains(fn($ch) => $ch->gateway?->code === 'midtrans');
     $midtransGateway = $paymentChannels->first(fn($ch) => $ch->gateway?->code === 'midtrans')?->gateway;
-    $midtransClientKey = $hasMidtransChannel ? ($midtransGateway?->getConfigValue('client_key') ?? '') : '';
+    $midtransClientKey = $hasMidtransChannel ? ($midtransGateway?->getCredentialForMode('client_key', $midtransGateway->activeCredentialMode()) ?? '') : '';
     $isMidtransProd = $hasMidtransChannel
         && (bool) ($midtransGateway?->getConfigValue('is_production', false))
         && app()->environment('production');
