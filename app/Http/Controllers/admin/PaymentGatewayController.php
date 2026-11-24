@@ -161,13 +161,9 @@ class PaymentGatewayController extends Controller
             'config' => $newConfig,
         ]);
 
-        // Never activate an API gateway solely because a checkbox was submitted.
-        if ($request->boolean('is_active') && $gateway->code === 'manual') {
-            $gateway->update(['is_active' => true]);
-        } elseif (!$request->boolean('is_active')) {
-            $gateway->update(['is_active' => false]);
-        }
-
+        // Configuration edits must never change activation state.
+        // Gateway activation is managed explicitly from the gateway dashboard.
+        
         return redirect()
             ->route('admin.payment.gateway.show', $gateway)
             ->with('success', "Konfigurasi {$gateway->name} berhasil disimpan.");
