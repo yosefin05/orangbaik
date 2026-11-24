@@ -202,6 +202,8 @@ class PaymentChannelController extends Controller
      */
     public function update(Request $request, PaymentChannel $channel)
     {
+        abort_unless($channel->gateway?->code === 'manual', 404);
+
         $request->validate([
             'payment_gateway_id' => 'required|exists:payment_gateways,id',
             'name'               => 'required|string|max:100',
@@ -213,7 +215,10 @@ class PaymentChannelController extends Controller
             'is_active'          => 'nullable|boolean',
         ]);
 
-        $gateway = PaymentGateway::findOrFail($request->payment_gateway_id);
+        $gateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        if ((int) $request->payment_gateway_id !== $gateway->id) {
+            throw ValidationException::withMessages(['payment_gateway_id' => 'Halaman ini khusus untuk rekening transfer manual.']);
+        }
         if (!$gateway->is_active) {
             throw ValidationException::withMessages(['payment_gateway_id' => 'Gateway yang dipilih sedang nonaktif.']);
         }
@@ -257,6 +262,8 @@ class PaymentChannelController extends Controller
      */
     public function destroy(PaymentChannel $channel)
     {
+        abort_unless($channel->gateway?->code === 'manual', 404);
+
         if ($channel->hasTransactions()) {
             $channel->update(['is_active' => false]);
             return redirect()
