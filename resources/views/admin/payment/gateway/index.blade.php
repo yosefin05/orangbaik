@@ -15,7 +15,7 @@
         <div class="header-actions">
             <a href="{{ route('admin.payment.channel.index') }}" class="btn btn-primary">
                 <i class="bi bi-grid-1x2"></i>
-                Metode pembayaran
+                Rekening transfer manual
             </a>
         </div>
     </section>
@@ -90,7 +90,7 @@
 
                 <div class="gateway-card__body">
                     <div class="gateway-stat">
-                        <span class="gateway-stat__label">Total Channel</span>
+                        <span class="gateway-stat__label">{{ $gateway->code === 'manual' ? 'Rekening terdaftar' : 'Metode terdaftar' }}</span>
                         <span class="gateway-stat__value">{{ $gateway->channels_count }}</span>
                     </div>
 
