@@ -212,7 +212,7 @@
     @include('components.footer')
 
     @php
-        $midtransGateway = \App\Models\PaymentGateway::where('code', 'midtrans')->first();
+        $midtransGateway = $midtransGateway ?? null;
         $isMidtransProd = (bool) ($midtransGateway?->getConfigValue('is_production', false))
             && app()->environment('production');
         $midtransClientKey = $midtransGateway?->getConfigValue('client_key')
