@@ -142,4 +142,56 @@ class PaymentGatewaySecurityTest extends TestCase
         $response->assertDontSee('PUBLIC-CLIENT-KEY');
         $response->assertSee('Kredensial tersedia');
     }
+    public function test_saving_provider_configuration_does_not_change_gateway_activation_state(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $gateway = PaymentGateway::create([
+            'name' => 'Midtrans',
+            'code' => 'midtrans',
+            'driver' => 'midtrans',
+            'is_active' => true,
+            'config' => PaymentGateway::secureConfigForStorage([
+                'sandbox_server_key' => 'old-server-key',
+                'sandbox_client_key' => 'old-client-key',
+                'sandbox_signature_secret_key' => 'old-signature-key',
+                'is_production' => false,
+            ]),
+        ]);
+
+        $response = $this->actingAs($admin)->put(route('admin.payment.gateway.update', $gateway), [
+            'name' => 'Midtrans',
+            'description' => 'Updated configuration',
+            'is_production' => '0',
+        ]);
+
+        $response->assertRedirect(route('admin.payment.gateway.show', $gateway));
+        $this->assertTrue($gateway->fresh()->is_active);
+        $this->assertSame('old-server-key', $gateway->fresh()->getCredentialForMode('server_key', 'sandbox'));
+    }
+
+    public function test_provider_detail_page_is_admin_only_and_renders_without_exposing_secrets(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $secret = 'DETAIL-PAGE-SECRET-MUST-STAY-HIDDEN';
+        $gateway = PaymentGateway::create([
+            'name' => 'Midtrans',
+            'code' => 'midtrans',
+            'driver' => 'midtrans',
+            'is_active' => true,
+            'config' => PaymentGateway::secureConfigForStorage([
+                'sandbox_server_key' => $secret,
+                'sandbox_client_key' => 'PUBLIC-KEY-NOT-RENDERED',
+                'sandbox_signature_secret_key' => 'SIGNATURE-NOT-RENDERED',
+            ]),
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.payment.gateway.show', $gateway));
+
+        $response->assertOk();
+        $response->assertSee('Konfigurasi Midtrans');
+        $response->assertDontSee($secret);
+        $response->assertDontSee('PUBLIC-KEY-NOT-RENDERED');
+        $response->assertDontSee('SIGNATURE-NOT-RENDERED');
+    }
+
 }
