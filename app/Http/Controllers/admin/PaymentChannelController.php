@@ -7,6 +7,7 @@ use App\Models\PaymentChannel;
 use App\Models\PaymentGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PaymentChannelController extends Controller
 {
@@ -116,7 +117,7 @@ class PaymentChannelController extends Controller
                 ->with('success', 'Konfigurasi channel berhasil disimpan.');
         } catch (ValidationException $exception) {
             throw $exception;
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             report($exception);
 
             if ($request->wantsJson() || $request->ajax()) {
