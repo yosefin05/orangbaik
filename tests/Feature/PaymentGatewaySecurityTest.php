@@ -17,6 +17,7 @@ class PaymentGatewaySecurityTest extends TestCase
     {
         $serverKey = 'SB-Mid-server-private-test-secret';
         $clientKey = 'SB-Mid-client-public-test-key';
+        $signatureSecret = 'SB-Mid-signature-secret-test';
 
         $gateway = PaymentGateway::create([
             'name' => 'Midtrans',
@@ -26,6 +27,7 @@ class PaymentGatewaySecurityTest extends TestCase
             'config' => PaymentGateway::secureConfigForStorage([
                 'server_key' => $serverKey,
                 'client_key' => $clientKey,
+                'signature_secret_key' => $signatureSecret,
                 'is_production' => false,
             ]),
         ]);
@@ -34,8 +36,10 @@ class PaymentGatewaySecurityTest extends TestCase
 
         $this->assertStringNotContainsString($serverKey, $storedConfig);
         $this->assertStringNotContainsString($clientKey, $storedConfig);
+        $this->assertStringNotContainsString($signatureSecret, $storedConfig);
         $this->assertSame($serverKey, $gateway->getConfigValue('server_key'));
         $this->assertSame($clientKey, $gateway->getConfigValue('client_key'));
+        $this->assertSame($signatureSecret, $gateway->getConfigValue('signature_secret_key'));
         $this->assertTrue($gateway->isConfigured());
     }
 
