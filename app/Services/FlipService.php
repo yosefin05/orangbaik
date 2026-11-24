@@ -53,7 +53,7 @@ class FlipService
 
         return match ($code) {
             'cimb_niaga' => 'cimb',
-            'syariah_mandiri' => 'bsm',
+            'bsi', 'syariah_mandiri' => 'bsm',
             default => $code,
         };
     }
