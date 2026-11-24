@@ -143,11 +143,12 @@ class MidtransService
          * 1. CARI TRANSAKSI DAN GATEWAY PEMILIKNYA
          * =====================================================
          */
-        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
+        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
             ->where('order_id', $orderId)
             ->first();
+        $transactionGateway = $pembayaran?->resolvedGateway();
 
-        if (!$pembayaran || $pembayaran->paymentChannel?->gateway?->code !== 'midtrans') {
+        if (!$pembayaran || $transactionGateway?->code !== 'midtrans') {
             Log::warning('Midtrans webhook: pembayaran tidak ditemukan atau bukan milik Midtrans', ['order_id' => $orderId]);
             return false;
         }
@@ -157,7 +158,7 @@ class MidtransService
          * 2. VERIFIKASI SIGNATURE DENGAN SIGNATURE SECRET KEY GATEWAY TERKAIT
          * =====================================================
          */
-        $gateway = $pembayaran->paymentChannel->gateway;
+        $gateway = $transactionGateway;
         $credentialMode = data_get($pembayaran->gateway_response ?? [], 'credential_mode')
             ?: $gateway->activeCredentialMode();
         $signatureSecretKey = $gateway->getCredentialForMode('signature_secret_key', $credentialMode);
