@@ -24,6 +24,8 @@ class PaymentGateway extends Model
         'production_server_key',
         'production_client_key',
         'production_signature_secret_key',
+        'staging_api_key',
+        'staging_webhook_token',
     ];
 
     protected $fillable = [
@@ -137,7 +139,7 @@ class PaymentGateway extends Model
      */
     public function getCredentialForMode(string $key, string $mode, $default = null)
     {
-        if (!in_array($mode, ['sandbox', 'production'], true)) {
+        if (!in_array($mode, ['sandbox', 'staging', 'production'], true)) {
             return $default;
         }
 
@@ -145,6 +147,10 @@ class PaymentGateway extends Model
         $modeValue = $this->getConfigValue($modeKey);
         if (filled($modeValue)) {
             return $modeValue;
+        }
+
+        if ($mode === 'staging') {
+            return $default;
         }
 
         $legacyMode = (bool) $this->getConfigValue('is_production', false)
@@ -171,6 +177,17 @@ class PaymentGateway extends Model
 
     public function activeCredentialMode(): string
     {
+        $configuredMode = $this->getConfigValue('credential_mode');
+
+        if ($this->code === 'flip' && in_array($configuredMode, ['sandbox', 'staging', 'production'], true)) {
+            return $configuredMode;
+        }
+
+        if ($this->code === 'midtrans' && in_array($configuredMode, ['sandbox', 'production'], true)) {
+            return $configuredMode;
+        }
+
+        // Backwards compatibility for installations using the original checkbox.
         $wantsProduction = (bool) $this->getConfigValue('is_production', false);
         return $wantsProduction && app()->environment('production') ? 'production' : 'sandbox';
     }
@@ -188,7 +205,8 @@ class PaymentGateway extends Model
                 && filled($this->getCredentialForMode('client_key', $mode))
                 && filled($this->getCredentialForMode('signature_secret_key', $mode)),
             'flip' => filled($this->getCredentialForMode('api_key', $mode))
-                && filled($this->getCredentialForMode('webhook_token', $mode)),
+                && filled($this->getCredentialForMode('webhook_token', $mode))
+                && ($mode !== 'staging' || filled($this->getConfigValue('staging_base_url'))),
             default => false,
         };
     }
