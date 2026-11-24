@@ -54,18 +54,18 @@ class FlipService
     {
         $gateway = $channel->gateway;
         if (!$gateway || !in_array(strtolower($channel->channel_code), ['ovo', 'dana'], true)) {
-            throw new \\RuntimeException('Direct API v3 hanya digunakan untuk channel OVO dan DANA milik Flip.');
+            throw new \RuntimeException('Direct API v3 hanya digunakan untuk channel OVO dan DANA milik Flip.');
         }
 
         $mode = $gateway->activeCredentialMode();
         if (!in_array($mode, ['staging', 'production'], true)) {
-            throw new \\RuntimeException('OVO dan DANA melalui Flip Direct API v3 memerlukan mode Staging Flip atau Production. API v3 tidak tersedia pada Sandbox.');
+            throw new \RuntimeException('OVO dan DANA melalui Flip Direct API v3 memerlukan mode Staging Flip atau Production. API v3 tidak tersedia pada Sandbox.');
         }
 
         $apiKey = $gateway->getCredentialForMode('api_key', $mode);
         $webhookToken = $gateway->getCredentialForMode('webhook_token', $mode);
         if (blank($apiKey) || blank($webhookToken)) {
-            throw new \\RuntimeException('API Secret Key dan Webhook Token Flip untuk mode yang dipilih belum lengkap.');
+            throw new \RuntimeException('API Secret Key dan Webhook Token Flip untuk mode yang dipilih belum lengkap.');
         }
 
         $endpoint = $mode === 'production'
@@ -73,7 +73,7 @@ class FlipService
             : rtrim((string) $gateway->getConfigValue('staging_base_url'), '/') . '/big_api/v3/pwf/bill';
 
         if ($mode === 'staging' && blank($gateway->getConfigValue('staging_base_url'))) {
-            throw new \\RuntimeException('Staging Base URL Flip belum diisi pada dashboard admin.');
+            throw new \RuntimeException('Staging Base URL Flip belum diisi pada dashboard admin.');
         }
 
         $payload = [
@@ -100,7 +100,7 @@ class FlipService
                 ->acceptJson()
                 ->asJson()
                 ->post($endpoint, $payload);
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             Log::error('Flip Direct API v3 request failed before a confirmed response', [
                 'order_id' => $pembayaran->order_id,
                 'channel' => $channel->channel_code,
@@ -108,7 +108,7 @@ class FlipService
                 'exception_class' => get_class($exception),
             ]);
 
-            throw new \\RuntimeException('Flip Direct API v3 tidak dapat dihubungi. Periksa status transaksi di dashboard Flip sebelum mencoba ulang.');
+            throw new \RuntimeException('Flip Direct API v3 tidak dapat dihubungi. Periksa status transaksi di dashboard Flip sebelum mencoba ulang.');
         }
 
         if (!$response->successful()) {
@@ -119,7 +119,7 @@ class FlipService
                 'http_status' => $response->status(),
             ]);
 
-            throw new \\RuntimeException('Flip menolak pembuatan pembayaran e-wallet (HTTP ' . $response->status() . ').');
+            throw new \RuntimeException('Flip menolak pembuatan pembayaran e-wallet (HTTP ' . $response->status() . ').');
         }
 
         $data = $response->json();
@@ -133,7 +133,7 @@ class FlipService
                 'http_status' => $response->status(),
             ]);
 
-            throw new \\RuntimeException('Respons Flip Direct API v3 belum memuat ID pembayaran dan payment URL yang diperlukan.');
+            throw new \RuntimeException('Respons Flip Direct API v3 belum memuat ID pembayaran dan payment URL yang diperlukan.');
         }
 
         $pembayaran->update([
@@ -209,7 +209,10 @@ class FlipService
             throw new \RuntimeException('Gateway Flip tidak ditemukan.');
         }
 
-        $credentialMode = $gateway->activeCredentialMode();
+        $selectedMode = $gateway->activeCredentialMode();
+        // Flip Direct API v3 staging is used only for OVO/DANA. Keep the existing
+        // VA adapter on its Sandbox credentials while the provider is in staging mode.
+        $credentialMode = $selectedMode === 'staging' ? 'sandbox' : $selectedMode;
         $isProduction = $credentialMode === 'production';
 
         $this->baseUrl = $isProduction
@@ -217,8 +220,8 @@ class FlipService
             : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
         $this->apiKey = $gateway->getCredentialForMode('api_key', $credentialMode);
 
-        if (!$gateway || !$gateway->isConfigured()) {
-            throw new \RuntimeException('Kredensial Flip belum lengkap. Lengkapi API Key dan Webhook Token pada pengaturan gateway.');
+        if (blank($this->apiKey) || blank($gateway->getCredentialForMode('webhook_token', $credentialMode))) {
+            throw new \RuntimeException('Kredensial Flip untuk Virtual Account pada mode yang dipilih belum lengkap.');
         }
 
         $bankCode = self::normalizeBankCode($channel->channel_code);
