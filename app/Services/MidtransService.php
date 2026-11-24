@@ -24,8 +24,8 @@ class MidtransService
      */
     protected function configureGateway(?PaymentGateway $gateway): void
     {
-        $serverKey = $gateway?->getConfigValue('server_key') ?: config('payment.midtrans.server_key');
-        $clientKey = $gateway?->getConfigValue('client_key') ?: config('payment.midtrans.client_key');
+        $serverKey = $gateway?->getConfigValue('server_key') ?: config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
+        $clientKey = $gateway?->getConfigValue('client_key') ?: config('midtrans.clientKey') ?: config('payment.midtrans.client_key');
         $isProduction = (bool) ($gateway?->getConfigValue('is_production', false) ?? config('payment.midtrans.is_production', false));
 
         if (!app()->environment('production')) {
