@@ -133,5 +133,7 @@ Route::middleware(['auth', 'admin'])
                 ->name('channel.sort');
             Route::patch('/channel/{channel}/toggle', [PaymentChannelController::class, 'toggleActive'])
                 ->name('channel.toggle');
+            Route::patch('/channel/{channel}/routing', [PaymentChannelController::class, 'updateRouting'])
+                ->name('channel.routing');
         });
     });

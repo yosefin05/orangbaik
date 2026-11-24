@@ -129,6 +129,17 @@
                         <div class="payment-method-row__main">
                             <strong>{{ $channel->name }}</strong>
                             <span>{{ $channel->payment_type_label }} · Kode {{ strtoupper($channel->channel_code) }}</span>
+                            <form action="{{ route('admin.payment.channel.routing', $channel) }}" method="POST" class="payment-routing-form">
+                                @csrf
+                                @method('PATCH')
+                                <label class="visually-hidden" for="routing-{{ $channel->id }}">Provider {{ $channel->name }}</label>
+                                <select id="routing-{{ $channel->id }}" name="payment_gateway_id" class="form-select form-select-sm">
+                                    @foreach ($routingOptions as $routingOption)
+                                        <option value="{{ $routingOption->id }}" @selected($channel->payment_gateway_id === $routingOption->id) @disabled(!$routingOption->supportsPaymentType($channel->payment_type))>{{ $routingOption->name }}{{ $routingOption->supportsPaymentType($channel->payment_type) ? '' : ' · belum mendukung' }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Simpan routing</button>
+                            </form>
                         </div>
                         <span class="payment-status {{ $channel->is_active ? 'is-active' : 'is-inactive' }}"><span></span>{{ $channel->is_active ? 'Ditampilkan' : 'Disembunyikan' }}</span>
                         <form action="{{ route('admin.payment.channel.toggle', $channel) }}" method="POST">

@@ -134,28 +134,28 @@
                     </div>
                     <div id="error-payment_channel_id" class="error-text" role="alert" style="display:none;"></div>
 
-                    @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
+                    @if(isset($paymentChannels))
                         @php
-                            // Dikelompokkan berdasarkan tipe pembayaran: E-Wallet, Virtual Account, lainnya.
-                            $paymentTypeLabels = [
-                                'instant' => 'E-Wallet',
-                                'va' => 'Virtual Account',
-                            ];
+                            // Empat kategori; QRIS dipisahkan dari e-wallet meski sama-sama instant.
+                            $groupOrder = ['QRIS', 'E-Wallet', 'Virtual Account', 'Transfer Manual'];
 
-                            $groupOrder = ['E-Wallet', 'Virtual Account', 'Transfer Manual'];
-
-                            $grouped = $paymentChannels
-                                ->groupBy(function ($item) use ($paymentTypeLabels) {
-                                    return $paymentTypeLabels[$item->payment_type] ?? 'Transfer Manual';
-                                })
-                                ->sortBy(function ($channels, $groupName) use ($groupOrder) {
-                                    $index = array_search($groupName, $groupOrder);
-                                    return $index === false ? count($groupOrder) : $index;
-                                });
+                            $channelsByGroup = $paymentChannels->groupBy(function ($item) {
+                                if ($item->payment_type === 'transfer') return 'Transfer Manual';
+                                if ($item->payment_type === 'va') return 'Virtual Account';
+                                return strtolower($item->channel_code) === 'qris' ? 'QRIS' : 'E-Wallet';
+                            });
+                            // Render empat section secara konsisten, termasuk saat suatu kategori belum aktif.
+                            $grouped = collect($groupOrder)->mapWithKeys(fn ($name) => [
+                                $name => $channelsByGroup->get($name, collect()),
+                            ]);
+                            $firstAvailableChannelId = $paymentChannels->first()?->id;
+                            $firstNonEmptyGroup = $grouped->search(fn ($channels) => $channels->isNotEmpty());
 
                             $groupIcons = [
+                                'QRIS' => 'bi-qr-code',
                                 'E-Wallet' => 'bi-wallet2',
                                 'Virtual Account' => 'bi-bank2',
+                                'Transfer Manual' => 'bi-bank',
                             ];
 
                             // Pencocokan logo berdasarkan nama channel (aset di public/images/payment-logos).
@@ -204,7 +204,7 @@
                         {{-- Tiap kategori = accordion native <details>; hanya satu terbuka (diatur JS). --}}
                         <div class="channel-groups-wrapper">
                             @foreach ($grouped as $groupName => $groupChannels)
-                                <details class="channel-group" {{ $loop->first ? 'open' : '' }}>
+                                <details class="channel-group" {{ $loop->index === $firstNonEmptyGroup ? 'open' : '' }}>
                                     <summary class="group-heading">
                                         <span class="group-heading-icon">
                                             <i class="bi {{ $groupIcons[$groupName] ?? 'bi-credit-card-2-front' }}" aria-hidden="true"></i>
@@ -215,7 +215,7 @@
                                     </summary>
 
                                     <div class="channel-row-list">
-                                        @foreach ($groupChannels as $channel)
+                                        @forelse ($groupChannels as $channel)
                                             @php
                                                 $rowIcon = match ($channel->payment_type) {
                                                     'instant' => 'bi-lightning-charge-fill',
@@ -225,7 +225,7 @@
                                                 $logoSlug = $findLogoSlug($channel->name);
                                             @endphp
                                             <label class="channel-row">
-                                                <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" data-name="{{ $channel->name }}" {{ $loop->parent->first && $loop->first ? 'checked' : '' }}>
+                                                <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" data-name="{{ $channel->name }}" {{ $channel->id === $firstAvailableChannelId ? 'checked' : '' }}>
                                                 <span class="channel-row-icon">
                                                     @if ($logoSlug)
                                                         <img src="{{ asset('images/payment-logos/' . $logoSlug . '.svg') }}" alt="" loading="lazy">
@@ -239,7 +239,9 @@
                                                 </span>
                                                 <span class="channel-row-mark" aria-hidden="true"></span>
                                             </label>
-                                        @endforeach
+                                        @empty
+                                            <p class="channel-empty-text">Metode pembayaran dalam kategori ini belum tersedia.</p>
+                                        @endforelse
                                     </div>
                                 </details>
                             @endforeach

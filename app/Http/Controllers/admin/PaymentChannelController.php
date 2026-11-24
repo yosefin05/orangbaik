@@ -278,6 +278,23 @@ class PaymentChannelController extends Controller
             ->with('success', "Payment channel \"{$channel->name}\" berhasil dihapus.");
     }
 
+    /** Ubah provider untuk transaksi baru; transaksi lama memakai snapshot gateway. */
+    public function updateRouting(Request $request, PaymentChannel $channel)
+    {
+        $request->validate(['payment_gateway_id' => 'required|integer|exists:payment_gateways,id']);
+        $target = PaymentGateway::findOrFail($request->integer('payment_gateway_id'));
+        if (!$target->supportsPaymentType($channel->payment_type)) {
+            return back()->with('error', 'Provider tersebut belum mendukung kategori metode pembayaran ini.');
+        }
+        if (!$target->is_active || ($target->code !== 'manual' && !$target->isConfigured())) {
+            return back()->with('error', 'Aktifkan dan lengkapi konfigurasi provider terlebih dahulu.');
+        }
+
+        $channel->update(['payment_gateway_id' => $target->id]);
+        return redirect()->route('admin.payment.gateway.show', $target)
+            ->with('success', 'Routing berhasil diperbarui. Transaksi baru akan menggunakan provider ini.');
+    }
+
     /**
      * Toggle status aktif/nonaktif channel.
      */

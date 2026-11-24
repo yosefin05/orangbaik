@@ -144,3 +144,15 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Obtain the authorized merchant/account owner's review and approval before entering Live credentials or enabling Production payments.
 
 **Status:** WIP — do not merge or enable real-money payments yet.
+
+
+## 24 November 2026 — Payment Method Routing (PR #12)
+
+- Pisahkan kategori metode donasi menjadi QRIS, E-Wallet, Virtual Account, dan Transfer Manual.
+- Tambahkan deklarasi kapabilitas metode pada provider agar routing hanya dapat diarahkan ke adapter yang mendukung tipe pembayaran terkait.
+- Tambahkan pengaturan routing provider pada detail Payment Gateway.
+- Simpan snapshot gateway pada setiap transaksi dan backfill transaksi lama dari channel yang digunakan, sehingga perubahan routing tidak mengubah kepemilikan webhook transaksi lama.
+- Tambahkan regression test untuk snapshot gateway transaksi dan kapabilitas provider.
+- Default yang dipertahankan: QRIS/E-Wallet melalui Midtrans, Virtual Account melalui Flip, Transfer Manual melalui rekening manual.
+- Halaman donasi selalu menampilkan keempat section dan otomatis membuka kategori pertama yang memiliki metode aktif.
+- Belum dilakukan pengujian koneksi API provider atau transaksi Sandbox/Production.

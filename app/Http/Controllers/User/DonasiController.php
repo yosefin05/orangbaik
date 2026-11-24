@@ -61,7 +61,8 @@ class DonasiController extends Controller
             ->get()
             ->filter(fn ($channel) => $channel->gateway
                 && $channel->gateway->is_active
-                && ($channel->gateway->code === 'manual' || $channel->gateway->isConfigured()))
+                && ($channel->gateway->code === 'manual' || $channel->gateway->isConfigured())
+                && $channel->gateway->supportsPaymentType($channel->payment_type))
             ->values();
 
         return view('pages.donasi-bayar', compact(
@@ -140,6 +141,10 @@ class DonasiController extends Controller
             ], 422);
         }
 
+        if (!$channel->gateway->supportsPaymentType($channel->payment_type)) {
+            return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak didukung oleh provider yang dipilih.'], 422);
+        }
+
         // Flip Accept Payment v2 requires a bill amount of at least Rp10.000.
         if ($channel->gateway->code === 'flip' && $nominal < 10000) {
             return response()->json([
@@ -194,6 +199,7 @@ class DonasiController extends Controller
             $pembayaran = Pembayaran::create([
                 'donasi_id'          => $donasi->id,
                 'payment_channel_id' => $channel->id,
+                'payment_gateway_id' => $channel->payment_gateway_id,
                 'payment_token'      => (string) \Illuminate\Support\Str::uuid(),
                 'order_id'           => $orderId,
                 'payment_type'       => $channel->payment_type ?? 'instant',
@@ -438,7 +444,7 @@ return response()->json(array_merge([
                 ->with('warning', 'Pembayaran donasi #' . $pembayaran->order_id . ' sudah ' . $pembayaran->status_label . '.');
         }
 
-        $gatewayCode = $pembayaran->paymentChannel?->gateway?->code;
+        $gatewayCode = $pembayaran->resolvedGateway()?->code;
 
         // Untuk Midtrans: kembalikan snap_token yang sudah ada
         if ($gatewayCode === 'midtrans' && !empty($pembayaran->snap_token)) {

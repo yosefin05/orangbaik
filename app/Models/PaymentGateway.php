@@ -57,6 +57,17 @@ class PaymentGateway extends Model
         return $query->where('is_active', true);
     }
 
+    /** Payment capabilities exposed by the currently implemented provider adapters. */
+    public function supportsPaymentType(string $paymentType): bool
+    {
+        return in_array($paymentType, match ($this->code) {
+            'midtrans' => ['instant'],
+            'flip' => ['va'],
+            'manual' => ['transfer'],
+            default => [],
+        }, true);
+    }
+
     /**
      * Encrypt secret values before persisting them inside the JSON config column.
      * The prefix allows safe backwards compatibility with legacy plaintext values.

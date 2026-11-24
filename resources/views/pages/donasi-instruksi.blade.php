@@ -267,7 +267,7 @@
 
     @if ($hasSnapPay)
         @php
-            $midtransGateway = $pembayaran->paymentChannel?->gateway;
+            $midtransGateway = $pembayaran->resolvedGateway();
             $isMidtransProd = (bool) ($midtransGateway?->getConfigValue('is_production', false))
                 && app()->environment('production');
             $midtransClientKey = $midtransGateway?->getCredentialForMode('client_key', $midtransGateway->activeCredentialMode()) ?? '';
