@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('page-title', 'Tambah Payment Channel')
+@section('page-title', 'Tambah Rekening Transfer Manual')
 
 @section('content')
 
     <section class="page-header">
         <div>
             <h2>Tambah Payment Channel</h2>
-            <p>Tambahkan metode pembayaran baru untuk donatur.</p>
+            <p>Tambahkan rekening tujuan transfer manual untuk donatur.</p>
         </div>
         <a href="{{ route('admin.payment.channel.index') }}" class="btn btn-outline">
             <i class="bi bi-arrow-left"></i>
@@ -39,55 +39,8 @@
                     @enderror
                 </div>
 
-                {{-- Payment Gateway --}}
-                <div class="form-group">
-                    <label for="payment_gateway_id" class="form-label">
-                        Payment Gateway <span class="required">*</span>
-                    </label>
-                    <select
-                        id="payment_gateway_id"
-                        name="payment_gateway_id"
-                        class="form-control @error('payment_gateway_id') is-invalid @enderror"
-                        required>
-                        <option value="">— Pilih Gateway —</option>
-                        @foreach ($gateways as $gateway)
-                            <option value="{{ $gateway->id }}"
-                                data-code="{{ $gateway->code }}"
-                                {{ old('payment_gateway_id') == $gateway->id ? 'selected' : '' }}>
-                                {{ $gateway->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('payment_gateway_id')
-                        <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- Payment Type --}}
-                <div class="form-group">
-                    <label for="payment_type" class="form-label">
-                        Tipe Pembayaran <span class="required">*</span>
-                    </label>
-                    <select
-                        id="payment_type"
-                        name="payment_type"
-                        class="form-control @error('payment_type') is-invalid @enderror"
-                        required>
-                        <option value="">— Pilih Tipe —</option>
-                        <option value="instant"  {{ old('payment_type') === 'instant' ? 'selected' : '' }}>
-                            Instant (QRIS, E-Wallet)
-                        </option>
-                        <option value="va"       {{ old('payment_type') === 'va' ? 'selected' : '' }}>
-                            Virtual Account
-                        </option>
-                        <option value="transfer" {{ old('payment_type') === 'transfer' ? 'selected' : '' }}>
-                            Transfer Manual
-                        </option>
-                    </select>
-                    @error('payment_type')
-                        <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
-                </div>
+                <input type="hidden" name="payment_gateway_id" value="{{ $gateways->first()->id }}">
+                <input type="hidden" name="payment_type" value="transfer">
 
                 {{-- Channel Code --}}
                 <div class="form-group">
