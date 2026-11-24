@@ -28,6 +28,7 @@ class PaymentGatewayController extends Controller
 
         $gateway->loadCount('channels');
         $channels = $gateway->channels()->orderBy('sort_order')->get();
+        $routingOptions = PaymentGateway::whereIn('code', ['midtrans', 'flip', 'manual'])->orderBy('id')->get();
 
         $credentialFlags = [];
         foreach ([
@@ -39,7 +40,7 @@ class PaymentGatewayController extends Controller
             $credentialFlags[$key] = $gateway->hasConfigValue($key);
         }
 
-        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags'));
+        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags', 'routingOptions'));
     }
 
     public function store(Request $request)
