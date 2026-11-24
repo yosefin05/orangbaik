@@ -134,14 +134,14 @@ class FlipService
 
         try {
             $response = $this->sendBillRequest($requestPayload);
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             Log::error('Flip bill request failed before a confirmed response', [
                 'bank' => $bankCode,
                 'order_id' => $pembayaran->order_id,
                 'exception_class' => get_class($exception),
             ]);
 
-            throw new \\RuntimeException('Flip tidak dapat dihubungi. Periksa koneksi dan status transaksi sebelum mencoba kembali.');
+            throw new \RuntimeException('Flip tidak dapat dihubungi. Periksa koneksi dan status transaksi sebelum mencoba kembali.');
         }
 
         if (!$response->successful()) {
@@ -151,7 +151,7 @@ class FlipService
                 'http_status' => $response->status(),
             ]);
 
-            throw new \\RuntimeException('Flip menolak pembuatan pembayaran (HTTP ' . $response->status() . ').');
+            throw new \RuntimeException('Flip menolak pembuatan pembayaran (HTTP ' . $response->status() . ').');
         }
 
         $successData = $response->json();
@@ -161,7 +161,7 @@ class FlipService
                 'http_status' => $response->status(),
             ]);
 
-            throw new \\RuntimeException('Respons Flip tidak valid. Jangan membuat transaksi ulang sebelum memeriksa dashboard Flip.');
+            throw new \RuntimeException('Respons Flip tidak valid. Jangan membuat transaksi ulang sebelum memeriksa dashboard Flip.');
         }
 
         return $this->processSuccessfulFlipResponse($successData, $pembayaran, $donasi, $channel, $bankCode);
@@ -383,10 +383,17 @@ class FlipService
          */
         $internalStatus = match (strtoupper($status)) {
             'SUCCESSFUL', 'SETTLEMENT', 'PAID' => 'settlement',
-            'FAILED', 'CANCELLED' => 'failed',
-            'EXPIRED' => 'expired',
-            default => 'pending',
+            'FAILED' => 'failed',
+            'CANCELLED', 'EXPIRED' => 'expired',
+            default => null,
         };
+
+        if ($internalStatus === null) {
+            Log::warning('Flip webhook ditolak: status tidak dikenal.', [
+                'order_id' => $pembayaran->order_id,
+            ]);
+            return false;
+        }
 
         /*
          * =====================================================
