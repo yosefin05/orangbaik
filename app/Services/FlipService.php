@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Donasi;
 use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
+use App\Models\PaymentGateway;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -38,7 +39,7 @@ class FlipService
     /**
      * Configuration readiness belongs to the selected database gateway.
      */
-    public function isConfigured(?\\App\\Models\\PaymentGateway $gateway = null): bool
+    public function isConfigured(?PaymentGateway $gateway = null): bool
     {
         return $gateway?->isConfigured() ?? false;
     }
