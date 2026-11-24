@@ -124,78 +124,44 @@ class FlipService
             'sender_phone_number' => $donasi->no_hp ?? '08123456789',
         ];
 
-        // 1. Coba request dengan bank spesifik (step = 3)
-        $attempts = [
-            // Attempt 1: Tipe yang ditentukan (VA untuk 8 bank, bank_account untuk Muamalat)
-            array_merge($basePayload, [
-                'step' => 3,
-                'sender_bank' => $bankCode,
-                'sender_bank_type' => $senderBankType,
-            ]),
-        ];
-
-        // Attempt 2: Jika tipe awal adalah VA tapi gagal (misal BCA di sandbox/tier tertentu), fallback ke bank_account
-        if ($senderBankType === 'virtual_account') {
-            $attempts[] = array_merge($basePayload, [
-                'step' => 3,
-                'sender_bank' => $bankCode,
-                'sender_bank_type' => 'bank_account',
-            ]);
-        }
-
-        // Attempt 3: Jika CIMB atau BSI memiliki kode alternatif di beberapa versi API Flip
-        if ($bankCode === 'cimb') {
-            $attempts[] = array_merge($basePayload, [
-                'step' => 3,
-                'sender_bank' => 'cimb_niaga',
-                'sender_bank_type' => 'virtual_account',
-            ]);
-        } elseif ($bankCode === 'bsi') {
-            $attempts[] = array_merge($basePayload, [
-                'step' => 3,
-                'sender_bank' => 'bsm',
-                'sender_bank_type' => 'virtual_account',
-            ]);
-        }
-
-        // Attempt 4: Fallback terakhir: Buat Bill umum (step = 2) tanpa mengunci bank spesifik
-        $attempts[] = array_merge($basePayload, [
-            'step' => 2,
+        // Create exactly one bill per donation. Do not retry a non-idempotent create
+        // request after timeouts or ambiguous provider responses.
+        $requestPayload = array_merge($basePayload, [
+            'step' => 3,
+            'sender_bank' => $bankCode,
+            'sender_bank_type' => $senderBankType,
         ]);
 
-        $response = null;
-        $successData = null;
-        $lastError = null;
-
-        foreach ($attempts as $index => $payload) {
-            try {
-                $response = $this->sendBillRequest($payload);
-
-                if ($response->successful()) {
-                    $successData = $response->json();
-                    break;
-                }
-
-                $lastError = $response->json('message') ?? $response->body();
-                Log::warning('Flip attempt ' . ($index + 1) . ' failed', [
-                    'bank' => $bankCode,
-                    'status' => $response->status(),
-                    'error' => $lastError,
-                    'order_id' => $pembayaran->order_id,
-                ]);
-            } catch (\Exception $e) {
-                $lastError = $e->getMessage();
-                Log::warning('Flip attempt ' . ($index + 1) . ' exception: ' . $e->getMessage());
-            }
-        }
-
-        if (!$successData) {
-            Log::error('Semua percobaan pembuatan transaksi Flip gagal', [
+        try {
+            $response = $this->sendBillRequest($requestPayload);
+        } catch (\\Throwable $exception) {
+            Log::error('Flip bill request failed before a confirmed response', [
                 'bank' => $bankCode,
                 'order_id' => $pembayaran->order_id,
-                'error' => $lastError,
+                'exception_class' => get_class($exception),
             ]);
-            throw new \Exception('Gagal membuat transaksi Flip (' . $bankCode . '): ' . $lastError);
+
+            throw new \\RuntimeException('Flip tidak dapat dihubungi. Periksa koneksi dan status transaksi sebelum mencoba kembali.');
+        }
+
+        if (!$response->successful()) {
+            Log::warning('Flip rejected bill creation request', [
+                'bank' => $bankCode,
+                'order_id' => $pembayaran->order_id,
+                'http_status' => $response->status(),
+            ]);
+
+            throw new \\RuntimeException('Flip menolak pembuatan pembayaran (HTTP ' . $response->status() . ').');
+        }
+
+        $successData = $response->json();
+        if (!is_array($successData) || empty($successData)) {
+            Log::error('Flip returned an invalid bill creation response', [
+                'order_id' => $pembayaran->order_id,
+                'http_status' => $response->status(),
+            ]);
+
+            throw new \\RuntimeException('Respons Flip tidak valid. Jangan membuat transaksi ulang sebelum memeriksa dashboard Flip.');
         }
 
         return $this->processSuccessfulFlipResponse($successData, $pembayaran, $donasi, $channel, $bankCode);
@@ -206,17 +172,11 @@ class FlipService
      */
     protected function sendBillRequest(array $payload)
     {
-        $response = Http::withBasicAuth($this->apiKey, '')
+        return Http::connectTimeout(5)
+            ->timeout(20)
+            ->withBasicAuth($this->apiKey, '')
             ->asForm()
             ->post($this->baseUrl . '/v2/pwf/bill', $payload);
-
-        if ($response->status() === 404) {
-            $response = Http::withBasicAuth($this->apiKey, '')
-                ->asForm()
-                ->post($this->baseUrl . '/bill', $payload);
-        }
-
-        return $response;
     }
 
     /**
