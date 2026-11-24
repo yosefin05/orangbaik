@@ -29,73 +29,104 @@ class PaymentChannelController extends Controller
      */
     public function batchUpdate(Request $request)
     {
-        $channelsData = $request->input('channels', []);
-        $deletedIds   = $request->input('deleted_ids', []);
+        $request->validate([
+            'channels' => 'nullable|array',
+            'channels.*.id' => 'nullable|integer|exists:payment_channels,id',
+            'channels.*.payment_gateway_id' => 'required|integer|exists:payment_gateways,id',
+            'channels.*.name' => 'required|string|max:100',
+            'channels.*.channel_code' => 'required|string|max:50',
+            'channels.*.account_name' => 'nullable|string|max:100',
+            'channels.*.account_number' => 'nullable|string|max:50',
+            'channels.*.payment_type' => 'required|in:instant,va,transfer',
+            'deleted_ids' => 'nullable|array',
+            'deleted_ids.*' => 'integer|exists:payment_channels,id',
+        ]);
 
-        DB::beginTransaction();
         try {
-            // 1. Proses penghapusan baris yang dihapus oleh admin
-            if (!empty($deletedIds)) {
-                foreach ($deletedIds as $delId) {
-                    $channel = PaymentChannel::find($delId);
-                    if ($channel) {
-                        if ($channel->hasTransactions()) {
-                            // Soft-disable jika sudah ada transaksi
-                            $channel->update(['is_active' => false]);
-                        } else {
-                            $channel->delete();
-                        }
+            DB::transaction(function () use ($request): void {
+                foreach ($request->input('deleted_ids', []) as $deletedId) {
+                    $channel = PaymentChannel::query()->lockForUpdate()->find($deletedId);
+                    if (!$channel) {
+                        continue;
+                    }
+
+                    if ($channel->hasTransactions()) {
+                        $channel->update(['is_active' => false]);
+                    } else {
+                        $channel->delete();
                     }
                 }
-            }
 
-            // 2. Proses update / insert setiap baris
-            foreach ($channelsData as $index => $item) {
-                if (empty($item['name']) || empty($item['channel_code'])) {
-                    continue; // Skip baris kosong
+                foreach ($request->input('channels', []) as $index => $item) {
+                    $gateway = PaymentGateway::findOrFail($item['payment_gateway_id']);
+                    if (!$gateway->is_active) {
+                        throw ValidationException::withMessages([
+                            "channels.{$index}.payment_gateway_id" => 'Pilih gateway yang aktif.',
+                        ]);
+                    }
+
+                    $paymentType = $gateway->code === 'manual' ? 'transfer' : ($item['payment_type'] ?? 'instant');
+                    if ($gateway->code === 'manual' && (blank($item['account_name'] ?? null) || blank($item['account_number'] ?? null))) {
+                        throw ValidationException::withMessages([
+                            "channels.{$index}.account_number" => 'Nama pemilik dan nomor rekening wajib diisi untuk transfer manual.',
+                        ]);
+                    }
+
+                    $payload = [
+                        'payment_gateway_id' => $gateway->id,
+                        'name' => trim($item['name']),
+                        'channel_code' => trim($item['channel_code']),
+                        'account_name' => $item['account_name'] ?? null,
+                        'account_number' => $item['account_number'] ?? null,
+                        'payment_type' => $paymentType,
+                        'sort_order' => $index + 1,
+                    ];
+
+                    $channel = !empty($item['id'])
+                        ? PaymentChannel::query()->lockForUpdate()->findOrFail($item['id'])
+                        : new PaymentChannel();
+
+                    if ($channel->exists && $channel->hasTransactions()) {
+                        foreach (['payment_gateway_id', 'channel_code', 'account_name', 'account_number', 'payment_type'] as $immutableField) {
+                            if ((string) $channel->{$immutableField} !== (string) $payload[$immutableField]) {
+                                throw ValidationException::withMessages([
+                                    "channels.{$index}.{$immutableField}" => 'Channel ini sudah memiliki riwayat transaksi. Nonaktifkan lalu buat channel baru agar riwayat pembayaran tetap akurat.',
+                                ]);
+                            }
+                        }
+                    }
+
+                    $channel->fill($payload);
+                    if (!$channel->exists) {
+                        $channel->is_active = true;
+                    }
+                    $channel->save();
                 }
-
-                $channelId = $item['id'] ?? null;
-                $payload = [
-                    'payment_gateway_id' => $item['payment_gateway_id'],
-                    'name'               => $item['name'],
-                    'channel_code'       => $item['channel_code'],
-                    'account_name'       => $item['account_name'] ?? null,
-                    'account_number'     => $item['account_number'] ?? null,
-                    'payment_type'       => $item['payment_type'] ?? 'instant',
-                    'sort_order'         => $index + 1,
-                    'is_active'          => isset($item['is_active']) ? (bool)$item['is_active'] : true,
-                ];
-
-                if ($channelId && PaymentChannel::where('id', $channelId)->exists()) {
-                    PaymentChannel::where('id', $channelId)->update($payload);
-                } else {
-                    PaymentChannel::create($payload);
-                }
-            }
-
-            DB::commit();
+            });
 
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Konfigurasi payment channel berhasil disimpan!',
+                    'message' => 'Konfigurasi channel berhasil disimpan.',
                 ]);
             }
 
             return redirect()
                 ->route('admin.payment.channel.index')
-                ->with('success', 'Konfigurasi payment channel berhasil disimpan.');
+                ->with('success', 'Konfigurasi channel berhasil disimpan.');
+        } catch (ValidationException $exception) {
+            throw $exception;
+        } catch (\\Throwable $exception) {
+            report($exception);
 
-        } catch (\Exception $e) {
-            DB::rollBack();
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Gagal menyimpan: ' . $e->getMessage(),
+                    'message' => 'Konfigurasi gagal disimpan. Periksa kembali data dan coba lagi.',
                 ], 500);
             }
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+
+            return back()->withInput()->with('error', 'Konfigurasi gagal disimpan. Tidak ada perubahan yang diterapkan.');
         }
     }
 
