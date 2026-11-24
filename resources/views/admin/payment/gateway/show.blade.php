@@ -133,22 +133,26 @@
                                 @csrf
                                 @method('PATCH')
                                 <label class="visually-hidden" for="routing-{{ $channel->id }}">Provider {{ $channel->name }}</label>
-                                <select id="routing-{{ $channel->id }}" name="payment_gateway_id" class="form-select form-select-sm">
+                                <div class="payment-routing-form__controls">
+                                    <select id="routing-{{ $channel->id }}" name="payment_gateway_id" class="form-select">
                                     @foreach ($routingOptions as $routingOption)
                                         <option value="{{ $routingOption->id }}" @selected($channel->payment_gateway_id === $routingOption->id) @disabled(!$routingOption->supportsPaymentType($channel->payment_type))>{{ $routingOption->name }}{{ $routingOption->supportsPaymentType($channel->payment_type) ? '' : ' · belum mendukung' }}</option>
                                     @endforeach
                                 </select>
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Simpan routing</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Simpan routing</button>
+                                </div>
                             </form>
                         </div>
-                        <span class="payment-status {{ $channel->is_active ? 'is-active' : 'is-inactive' }}"><span></span>{{ $channel->is_active ? 'Ditampilkan' : 'Disembunyikan' }}</span>
-                        <form action="{{ route('admin.payment.channel.toggle', $channel) }}" method="POST">
+                        <div class="payment-method-row__actions">
+                            <span class="payment-status {{ $channel->is_active ? 'is-active' : 'is-inactive' }}"><span></span>{{ $channel->is_active ? 'Ditampilkan' : 'Disembunyikan' }}</span>
+                            <form action="{{ route('admin.payment.channel.toggle', $channel) }}" method="POST">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn btn-sm {{ $channel->is_active ? 'btn-outline-secondary' : 'btn-outline-primary' }}" @disabled(!$isConfigured || !$gateway->is_active) title="Aktifkan gateway dan lengkapi kredensial terlebih dahulu">
                                 {{ $channel->is_active ? 'Sembunyikan' : 'Tampilkan' }}
                             </button>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 @empty
                     <div class="payment-empty">
@@ -259,6 +263,7 @@
 @push('styles')
 <style>
 .payment-detail{--pd-blue:#3365af;--pd-ink:#172b4d;--pd-muted:#667085;--pd-line:#e7ebf2;max-width:1180px;margin:0 auto;color:var(--pd-ink)}
+.payment-detail *{box-sizing:border-box}
 .payment-back{display:inline-flex;align-items:center;gap:8px;color:var(--pd-muted);text-decoration:none;font-size:13px;font-weight:600;margin-bottom:22px}
 .payment-back:hover{color:var(--pd-blue)}
 .payment-detail__header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:22px}
@@ -266,39 +271,88 @@
 .payment-provider__icon{width:54px;height:54px;display:grid;place-items:center;flex:none;border-radius:15px;background:#edf3fc;color:var(--pd-blue);font-size:24px}
 .payment-eyebrow{display:block;color:#8490a3;font-size:10px;font-weight:750;letter-spacing:.12em;margin-bottom:6px}
 .payment-provider h1{font-size:26px;line-height:1.2;letter-spacing:-.04em;margin:0;color:var(--pd-ink)}
-.payment-provider p,.payment-panel__heading p,.payment-next-step p{color:var(--pd-muted);font-size:13px;line-height:1.65;margin:6px 0 0}
-.payment-header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.payment-header-actions form{margin:0}.payment-security-note{display:flex;align-items:flex-start;gap:8px;color:var(--pd-muted);font-size:11px;line-height:1.55;margin:0 2px 16px}.payment-security-note i{color:var(--pd-blue);margin-top:1px}.payment-status{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.payment-provider p,.payment-panel__heading p{color:var(--pd-muted);font-size:13px;line-height:1.65;margin:6px 0 0;max-width:760px}
+.payment-header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.payment-header-actions form,.payment-method-row form{margin:0}
+.payment-security-note{display:flex;align-items:flex-start;gap:8px;color:var(--pd-muted);font-size:11px;line-height:1.55;margin:0 2px 16px}
+.payment-security-note i{color:var(--pd-blue);margin-top:1px}
+.payment-status{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
 .payment-status>span{width:7px;height:7px;border-radius:50%;background:currentColor}
-.payment-status.is-active{background:#eaf7ef;color:#18794e}.payment-status.is-inactive{background:#f1f3f6;color:#667085}
+.payment-status.is-active{background:#eaf7ef;color:#18794e}
+.payment-status.is-inactive{background:#f1f3f6;color:#667085}
 .payment-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
-.payment-summary__item{padding:17px 18px;background:#fff;border:1px solid var(--pd-line);border-radius:13px}
-.payment-summary__item span,.payment-summary__item small{display:block;color:var(--pd-muted);font-size:11px}
-.payment-summary__item strong{display:block;margin:7px 0 4px;font-size:15px;color:var(--pd-ink)}
+.payment-summary__item{min-width:0;padding:17px 18px;background:#fff;border:1px solid var(--pd-line);border-radius:13px}
+.payment-summary__item span,.payment-summary__item small{display:block;color:var(--pd-muted);font-size:11px;line-height:1.5}
+.payment-summary__item strong{display:block;margin:7px 0 4px;font-size:15px;line-height:1.4;color:var(--pd-ink)}
 .payment-panel{background:#fff;border:1px solid var(--pd-line);border-radius:15px;padding:24px;margin-bottom:16px;box-shadow:0 3px 14px rgba(20,40,80,.025)}
 .payment-panel__heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
-.payment-panel__heading h2,.payment-next-step h2{font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0;color:var(--pd-ink)}
+.payment-panel__heading h2{font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0;color:var(--pd-ink)}
 .payment-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}
-.payment-field{min-width:0}.payment-field--full{grid-column:1/-1}
+.payment-field{min-width:0}
+.payment-field--full{grid-column:1/-1}
 .payment-field>label{display:block;font-size:12px;font-weight:650;color:#344054;margin-bottom:7px}
 .payment-field>label span{font-size:10px;color:#98a2b3;font-weight:500;margin-left:4px}
-.payment-field .form-control{min-height:44px;border:1px solid #d9e0ea;border-radius:9px;padding:10px 12px;font-size:13px;box-shadow:none}
+.payment-field .form-control{width:100%;min-height:44px;border:1px solid #d9e0ea;border-radius:9px;padding:10px 12px;font-size:13px;box-shadow:none}
 .payment-field .form-control:focus{border-color:var(--pd-blue);box-shadow:0 0 0 3px rgba(51,101,175,.11)}
 .payment-field small{display:block;color:#8a94a6;font-size:10px;line-height:1.5;margin-top:6px}
 .payment-env{font-size:10px;font-weight:750;letter-spacing:.04em;padding:6px 9px;border-radius:7px;white-space:nowrap}
-.payment-env--sandbox{color:#245aa5;background:#edf4ff}.payment-env--live{color:#946200;background:#fff5df}
+.payment-env--sandbox{color:#245aa5;background:#edf4ff}
+.payment-env--live{color:#946200;background:#fff5df}
 .payment-check{display:flex!important;align-items:flex-start;gap:10px;padding:13px;border:1px solid var(--pd-line);border-radius:10px;cursor:pointer}
 .payment-check input{margin-top:3px;accent-color:var(--pd-blue)}
-.payment-check strong,.payment-check small{display:block}.payment-check strong{font-size:12px;color:#344054}.payment-check small{font-size:11px;color:var(--pd-muted);line-height:1.5;margin-top:4px}
+.payment-check strong,.payment-check small{display:block}
+.payment-check strong{font-size:12px;color:#344054}
+.payment-check small{font-size:11px;color:var(--pd-muted);line-height:1.5;margin-top:4px}
 .payment-form-footer{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:4px 2px 22px}
 .payment-form-footer p{font-size:11px;color:var(--pd-muted);margin:0;line-height:1.5}
 .payment-form-footer p i{color:#16845b;margin-right:5px}
 .payment-form-footer .btn{min-height:43px;padding:10px 18px;border-radius:9px;white-space:nowrap}
-.payment-next-step{display:flex;align-items:center;justify-content:space-between;gap:18px}
-.payment-method-list{display:grid;gap:0}.payment-method-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--pd-line)}.payment-method-row__main{display:grid;gap:4px;flex:1;min-width:0}.payment-method-row__main strong{font-size:13px;color:var(--pd-ink)}.payment-method-row__main span{font-size:11px;color:var(--pd-muted)}.payment-method-row form{margin:0}.payment-bank-list{display:grid;gap:10px}
+.payment-method-list{display:grid;gap:0}
+.payment-method-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;padding:18px 0;border-top:1px solid var(--pd-line)}
+.payment-method-row:first-child{border-top:0;padding-top:0}
+.payment-method-row__main{display:grid;gap:6px;min-width:0}
+.payment-method-row__main>strong{font-size:14px;line-height:1.4;color:var(--pd-ink)}
+.payment-method-row__main>span{font-size:11px;color:var(--pd-muted)}
+.payment-routing-form{display:grid;gap:7px;margin-top:5px!important;max-width:440px}
+.payment-routing-form__controls{display:flex;align-items:center;gap:8px;min-width:0}
+.payment-routing-form select{min-width:0;max-width:250px;min-height:36px;border:1px solid #d9e0ea;border-radius:8px;padding:6px 10px;font-size:12px;color:#344054;background-color:#fff}
+.payment-routing-form .btn{min-height:36px;white-space:nowrap;border-radius:8px;font-size:11px;font-weight:650}
+.payment-method-row__actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.payment-method-row__actions .btn{white-space:nowrap}
+.payment-bank-list{display:grid;gap:10px}
 .payment-bank{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid var(--pd-line);border-radius:11px}
-.payment-bank__icon{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:#f2f5fa;color:var(--pd-blue);font-size:18px}
-.payment-bank__main{display:grid;gap:3px;flex:1;min-width:0}.payment-bank__main strong{font-size:13px}.payment-bank__main span{font-size:11px;color:var(--pd-muted)}.payment-bank__main code{font-size:12px;color:var(--pd-ink)}
-.payment-empty{display:grid;justify-items:center;text-align:center;padding:30px 15px;color:var(--pd-muted)}.payment-empty>i{font-size:27px;color:var(--pd-blue);margin-bottom:10px}.payment-empty strong{color:var(--pd-ink);font-size:14px}.payment-empty p{font-size:12px;margin:6px 0 14px}
-@media(max-width:700px){.payment-method-row{flex-wrap:wrap}.payment-method-row form{width:100%}.payment-method-row form .btn{width:100%}.payment-detail__header{align-items:flex-start}.payment-header-actions{align-items:flex-end;flex-direction:column}.payment-provider{align-items:flex-start;gap:12px}.payment-provider__icon{width:44px;height:44px;font-size:20px}.payment-provider h1{font-size:22px}.payment-summary{grid-template-columns:1fr}.payment-panel{padding:18px 15px}.payment-form-grid{grid-template-columns:1fr}.payment-field--full{grid-column:auto}.payment-panel__heading,.payment-next-step{flex-direction:column;align-items:stretch}.payment-form-footer{flex-direction:column;align-items:stretch}.payment-form-footer .btn{width:100%}.payment-bank{align-items:flex-start;flex-wrap:wrap}.payment-bank .payment-status{margin-left:53px}}
+.payment-bank__icon{width:40px;height:40px;display:grid;place-items:center;flex:none;border-radius:10px;background:#f2f5fa;color:var(--pd-blue);font-size:18px}
+.payment-bank__main{display:grid;gap:3px;flex:1;min-width:0}
+.payment-bank__main strong{font-size:13px}
+.payment-bank__main span{font-size:11px;color:var(--pd-muted)}
+.payment-bank__main code{font-size:12px;color:var(--pd-ink);overflow-wrap:anywhere}
+.payment-empty{display:grid;justify-items:center;text-align:center;padding:34px 18px;color:var(--pd-muted)}
+.payment-empty>i{font-size:27px;color:var(--pd-blue);margin-bottom:10px}
+.payment-empty strong{color:var(--pd-ink);font-size:14px}
+.payment-empty p{font-size:12px;line-height:1.6;margin:6px 0 14px}
+@media(max-width:900px){.payment-summary{grid-template-columns:1fr 1fr}.payment-method-row{grid-template-columns:1fr;gap:12px}.payment-method-row__actions{justify-content:flex-start}}
+@media(max-width:640px){
+ .payment-detail__header{align-items:flex-start;flex-direction:column}
+ .payment-header-actions{width:100%;justify-content:space-between}
+ .payment-provider{align-items:flex-start;gap:12px}
+ .payment-provider__icon{width:44px;height:44px;font-size:20px}
+ .payment-provider h1{font-size:22px}
+ .payment-summary{grid-template-columns:1fr;gap:9px}
+ .payment-summary__item{padding:14px 15px}
+ .payment-panel{padding:19px 15px;border-radius:12px}
+ .payment-form-grid{grid-template-columns:1fr;gap:15px}
+ .payment-field--full{grid-column:auto}
+ .payment-panel__heading{flex-direction:column;align-items:stretch}
+ .payment-form-footer{flex-direction:column;align-items:stretch}
+ .payment-form-footer .btn{width:100%}
+ .payment-routing-form{max-width:none}
+ .payment-routing-form__controls{align-items:stretch;flex-direction:column}
+ .payment-routing-form select,.payment-routing-form .btn{width:100%;max-width:none;min-height:42px}
+ .payment-method-row__actions{justify-content:space-between}
+ .payment-method-row__actions form{flex:1}
+ .payment-method-row__actions form .btn{width:100%}
+ .payment-bank{align-items:flex-start;flex-wrap:wrap;padding:13px}
+ .payment-bank .payment-status{margin-left:53px}
+}
 </style>
 @endpush
