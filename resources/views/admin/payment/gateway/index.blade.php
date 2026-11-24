@@ -141,16 +141,11 @@
                             ],
                         ];
                     @endphp
-                    @if ($gateway->code !== 'manual')
-                        <button type="button"
-                            class="btn btn-outline-primary btn-sm"
-                            data-gateway="{{ e(json_encode($gatewayModalData)) }}"
-                            onclick="openEditConfigModal(JSON.parse(this.dataset.gateway))"
-                            title="Atur API Key & Pengaturan Gateway">
-                            <i class="bi bi-gear-fill"></i>
-                            Pengaturan API
-                        </button>
-                    @endif
+                    <a href="{{ route('admin.payment.gateway.show', $gateway) }}"
+                        class="btn btn-primary btn-sm">
+                        <i class="bi bi-sliders"></i>
+                        Kelola konfigurasi
+                    </a>
 
                     <form action="{{ route('admin.payment.gateway.toggle', $gateway) }}"
                         method="POST"
