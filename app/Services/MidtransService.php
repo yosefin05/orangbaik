@@ -97,7 +97,7 @@ class MidtransService
             return $snapToken;
         } catch (\Exception $e) {
             Log::error('Midtrans Snap Error', [
-                'message'  => $e->getMessage(),
+                'exception_class' => get_class($e),
                 'order_id' => $pembayaran->order_id,
                 'donasi_id' => $donasi->id,
             ]);
@@ -134,7 +134,7 @@ class MidtransService
 
         // Pastikan data penting tersedia
         if (!$orderId || !$statusCode || !$grossAmount || !$signatureKey) {
-            Log::warning('Midtrans webhook: data tidak lengkap', ['payload' => $payload]);
+            Log::warning('Midtrans webhook: data tidak lengkap', ['payload_keys' => array_keys($payload)]);
             return false;
         }
 
