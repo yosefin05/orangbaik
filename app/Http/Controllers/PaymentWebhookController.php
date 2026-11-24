@@ -45,7 +45,7 @@ class PaymentWebhookController extends Controller
 
         } catch (\Exception $e) {
             Log::error("Payment webhook error for gateway: {$gateway}", [
-                'error' => $e->getMessage(),
+                'exception_class' => get_class($e),
             ]);
 
             return response()->json(['success' => false, 'message' => 'Webhook processing failed.'], 500);
