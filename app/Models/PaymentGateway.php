@@ -62,7 +62,7 @@ class PaymentGateway extends Model
     {
         return in_array($paymentType, match ($this->code) {
             'midtrans' => ['instant'],
-            'flip' => ['va'],
+            'flip' => ['va', 'instant'],
             'manual' => ['transfer'],
             default => [],
         }, true);
