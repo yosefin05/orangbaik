@@ -12,6 +12,7 @@ class PaymentGateway extends Model
         'api_key',
         'server_key',
         'client_key',
+        'signature_secret_key',
         'webhook_token',
     ];
 
@@ -85,6 +86,8 @@ class PaymentGateway extends Model
             return match ($key) {
                 'server_key' => config('midtrans.serverKey') ?: config('payment.midtrans.server_key', $default),
                 'client_key' => config('midtrans.clientKey') ?: config('payment.midtrans.client_key', $default),
+                // Legacy Midtrans accounts used Server Key to verify notifications before 28 Oct 2026.
+                'signature_secret_key' => config('midtrans.signatureSecretKey') ?: config('payment.midtrans.signature_secret_key') ?: $this->getConfigValue('server_key', $default),
                 'is_production' => config('midtrans.isProduction', config('payment.midtrans.is_production', $default)),
                 default => $default,
             };
