@@ -66,6 +66,51 @@ class PaymentGatewaySecurityTest extends TestCase
         $this->assertTrue($gateway->fresh()->isConfigured());
     }
 
+    public function test_environment_specific_credentials_never_fall_back_across_modes(): void
+    {
+        $gateway = PaymentGateway::create([
+            'name' => 'Midtrans',
+            'code' => 'midtrans',
+            'driver' => 'midtrans',
+            'is_active' => false,
+            'config' => PaymentGateway::secureConfigForStorage([
+                'is_production' => false,
+                'sandbox_server_key' => 'SB-server-key',
+                'sandbox_client_key' => 'SB-client-key',
+                'sandbox_signature_secret_key' => 'SB-signature-key',
+                'production_server_key' => 'LIVE-server-key',
+                'production_client_key' => 'LIVE-client-key',
+                'production_signature_secret_key' => 'LIVE-signature-key',
+            ]),
+        ]);
+
+        $this->assertSame('SB-server-key', $gateway->getCredentialForMode('server_key', 'sandbox'));
+        $this->assertSame('SB-client-key', $gateway->getCredentialForMode('client_key', 'sandbox'));
+        $this->assertSame('SB-signature-key', $gateway->getCredentialForMode('signature_secret_key', 'sandbox'));
+        $this->assertSame('LIVE-server-key', $gateway->getCredentialForMode('server_key', 'production'));
+        $this->assertSame('LIVE-client-key', $gateway->getCredentialForMode('client_key', 'production'));
+        $this->assertSame('LIVE-signature-key', $gateway->getCredentialForMode('signature_secret_key', 'production'));
+    }
+
+    public function test_legacy_credentials_are_only_available_for_their_configured_mode(): void
+    {
+        $gateway = PaymentGateway::create([
+            'name' => 'Midtrans',
+            'code' => 'midtrans',
+            'driver' => 'midtrans',
+            'is_active' => false,
+            'config' => PaymentGateway::secureConfigForStorage([
+                'is_production' => true,
+                'server_key' => 'LEGACY-LIVE-server-key',
+                'client_key' => 'LEGACY-LIVE-client-key',
+            ]),
+        ]);
+
+        $this->assertNull($gateway->getCredentialForMode('server_key', 'sandbox'));
+        $this->assertSame('LEGACY-LIVE-server-key', $gateway->getCredentialForMode('server_key', 'production'));
+        $this->assertSame('LEGACY-LIVE-server-key', $gateway->getCredentialForMode('signature_secret_key', 'production'));
+    }
+
     public function test_manager_rejects_provider_without_a_dedicated_adapter(): void
     {
         $this->expectException(InvalidArgumentException::class);
