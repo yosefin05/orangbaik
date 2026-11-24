@@ -29,19 +29,18 @@ class FlipService
 
     public function __construct()
     {
-        $isProduction = config('payment.flip.is_production', false);
-        $this->baseUrl = $isProduction
-            ? (config('payment.flip.base_url_production') ?? 'https://bigflip.id/api')
-            : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
-        $this->apiKey = config('payment.flip.api_key');
+        // Credentials are resolved from the selected PaymentGateway per transaction.
+        // Never preload a live key from environment config into a Sandbox request.
+        $this->baseUrl = config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api';
+        $this->apiKey = null;
     }
 
     /**
-     * Cek apakah Flip sudah dikonfigurasi (API Key tersedia).
+     * Configuration readiness belongs to the selected database gateway.
      */
-    public function isConfigured(): bool
+    public function isConfigured(?\\App\\Models\\PaymentGateway $gateway = null): bool
     {
-        return !empty($this->apiKey);
+        return $gateway?->isConfigured() ?? false;
     }
 
     /**
