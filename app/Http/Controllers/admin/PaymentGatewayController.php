@@ -42,6 +42,7 @@ class PaymentGatewayController extends Controller
             'production_server_key', 'production_client_key', 'production_signature_secret_key',
             'sandbox_api_key', 'production_api_key',
             'sandbox_webhook_token', 'production_webhook_token',
+            'staging_api_key', 'staging_webhook_token',
         ] as $key) {
             $credentialFlags[$key] = $gateway->hasConfigValue($key);
         }
@@ -64,6 +65,8 @@ class PaymentGatewayController extends Controller
                 ['name' => 'ShopeePay', 'channel_code' => 'shopeepay', 'payment_type' => 'instant'],
             ],
             'flip' => [
+                ['name' => 'OVO', 'channel_code' => 'ovo', 'payment_type' => 'instant'],
+                ['name' => 'DANA', 'channel_code' => 'dana', 'payment_type' => 'instant'],
                 ['name' => 'BCA Virtual Account', 'channel_code' => 'bca', 'payment_type' => 'va'],
                 ['name' => 'BNI Virtual Account', 'channel_code' => 'bni', 'payment_type' => 'va'],
                 ['name' => 'BRI Virtual Account', 'channel_code' => 'bri', 'payment_type' => 'va'],
@@ -135,6 +138,10 @@ class PaymentGatewayController extends Controller
             'production_api_key' => 'nullable|string|max:500',
             'sandbox_webhook_token' => 'nullable|string|max:500',
             'production_webhook_token' => 'nullable|string|max:500',
+            'staging_api_key' => 'nullable|string|max:500',
+            'staging_webhook_token' => 'nullable|string|max:500',
+            'staging_base_url' => 'nullable|url|max:255',
+            'credential_mode' => 'nullable|in:sandbox,staging,production',
             'endpoint_url' => 'prohibited',
             'is_production' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
@@ -204,6 +211,10 @@ class PaymentGatewayController extends Controller
             'production_api_key' => 'nullable|string|max:500',
             'sandbox_webhook_token' => 'nullable|string|max:500',
             'production_webhook_token' => 'nullable|string|max:500',
+            'staging_api_key' => 'nullable|string|max:500',
+            'staging_webhook_token' => 'nullable|string|max:500',
+            'staging_base_url' => 'nullable|url|max:255',
+            'credential_mode' => 'nullable|in:sandbox,staging,production',
             'endpoint_url' => 'prohibited',
             'is_production' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
@@ -217,13 +228,24 @@ class PaymentGatewayController extends Controller
             'sandbox_server_key', 'sandbox_client_key', 'sandbox_signature_secret_key',
             'production_server_key', 'production_client_key', 'production_signature_secret_key',
             'sandbox_api_key', 'production_api_key', 'sandbox_webhook_token', 'production_webhook_token',
+            'staging_api_key', 'staging_webhook_token',
         ] as $secretKey) {
             if ($request->filled($secretKey)) {
                 $newConfig[$secretKey] = $request->input($secretKey);
             }
         }
 
-        $newConfig['is_production'] = $request->boolean('is_production');
+        $requestedMode = $request->input('credential_mode');
+        if ($gateway->code === 'midtrans' && $requestedMode === 'staging') {
+            return back()->withInput()->with('error', 'Midtrans hanya mendukung mode Sandbox atau Production.');
+        }
+        if (filled($requestedMode)) {
+            $newConfig['credential_mode'] = $requestedMode;
+            $newConfig['is_production'] = $requestedMode === 'production';
+        }
+        if ($gateway->code === 'flip' && $request->filled('staging_base_url')) {
+            $newConfig['staging_base_url'] = rtrim($request->input('staging_base_url'), '/');
+        }
         $newConfig = PaymentGateway::secureConfigForStorage($newConfig);
 
         $gateway->update([
