@@ -237,7 +237,7 @@ class MidtransService
             'payment_type'       => $paymentType,
             'transaction_id'     => $transactionId,
             'transaction_status' => $internalStatus,
-            'gateway_response'   => $payload, // simpan raw response untuk audit
+            'gateway_response'   => array_merge($pembayaran->gateway_response ?? [], $payload), // preserve credential mode and callback audit
         ];
 
         if ($internalStatus === 'settlement') {
