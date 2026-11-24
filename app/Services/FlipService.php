@@ -372,7 +372,7 @@ class FlipService
 
         // Fallback pencarian via gateway_response JSON jika transaction_id berbeda
         if (!$pembayaran && $billLinkId) {
-            $pembayaran = Pembayaran::with('donasi')
+            $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
                 ->where('gateway_response->link_id', $billLinkId)
                 ->first();
         }
