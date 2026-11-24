@@ -677,4 +677,38 @@ class PaymentChannelTest extends TestCase
         $response->assertDontSee('Nomor rekening');
     }
 
+    public function test_payment_gateway_snapshot_preserves_original_provider_after_channel_routing_changes(): void
+    {
+        $donasi = $this->createDonasi();
+        $midtrans = PaymentGateway::where('code', 'midtrans')->firstOrFail();
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $channel = PaymentChannel::where('channel_code', 'qris')->firstOrFail();
+
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'payment_gateway_id' => $midtrans->id,
+            'order_id' => 'OB-ROUTING-SNAPSHOT-' . uniqid(),
+            'transaction_status' => 'pending',
+        ]);
+
+        $channel->update(['payment_gateway_id' => $flip->id]);
+
+        $this->assertSame('midtrans', $pembayaran->fresh()->resolvedGateway()->code);
+        $this->assertSame('flip', $channel->fresh()->gateway->code);
+    }
+
+    public function test_gateway_payment_type_capabilities_match_current_adapters(): void
+    {
+        $midtrans = PaymentGateway::where('code', 'midtrans')->firstOrFail();
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $manual = PaymentGateway::where('code', 'manual')->firstOrFail();
+
+        $this->assertTrue($midtrans->supportsPaymentType('instant'));
+        $this->assertFalse($midtrans->supportsPaymentType('va'));
+        $this->assertTrue($flip->supportsPaymentType('va'));
+        $this->assertFalse($flip->supportsPaymentType('instant'));
+        $this->assertTrue($manual->supportsPaymentType('transfer'));
+    }
+
 }
