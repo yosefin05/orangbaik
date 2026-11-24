@@ -109,3 +109,37 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Menambahkan `tests/Feature/ManualTransferExpirationTest.php` untuk akses admin, audit metadata, penolakan gateway non-manual, status terminal, dan akses non-admin. Test belum dieksekusi pada branch ini.
 - Audit awal code-level didokumentasikan di `AUDIT_REVIEW_2026-11-23.md`. Temuan prioritas meliputi generic webhook yang belum aman/route tidak cocok, sanitizer rich text custom yang belum cukup kuat untuk konten raw HTML, inkonsistensi status capture, total nominal riwayat donor yang mencakup transaksi non-settlement, pagination/performa pencarian, dan header mobile kategori yang menyembunyikan search.
 - Belum ada merge ke main, deployment staging, migration staging, atau perubahan database runtime.
+
+---
+
+## 24 November 2026 — Payment Gateway Hardening (WIP / PR #8)
+
+**Branch:** `feat/payment-gateway-hardening`  
+**Pull request:** https://github.com/yosefin05/orangbaik/pull/8  
+**Scope:** staging-safe code changes only. No production deployment, live credentials, or production database changes.
+
+### Changes implemented
+- Encrypt newly saved Midtrans/Flip gateway secrets before storing them in the gateway JSON configuration.
+- Stop returning raw gateway credentials in the admin page's JavaScript payload; secret inputs are blank and preserve existing credentials unless replaced.
+- Route Midtrans and Flip service configuration through the selected database gateway record, with non-production environments forced to Sandbox.
+- Require both Midtrans keys and both Flip API/webhook credentials before a gateway is considered configured.
+- Reject unsupported provider adapters instead of silently using a generic API driver.
+- Align the dynamic payment webhook route and return generic errors to webhook callers.
+- Tighten callback checks for gateway ownership, signature/token, known statuses, amount integrity, and terminal-state idempotency.
+- Remove automatic retries for Flip bill creation because ambiguous network failures could otherwise create duplicate bills.
+- Add manual transfer account-holder and account-number fields; protect bank/provider identity fields once a channel has transaction history.
+- Hide unconfigured payment channels from the donor checkout and enforce Flip's documented Rp10.000 minimum.
+
+### Verification
+- GitHub Actions: frontend build and the selected manual-transfer, fundraiser-referral, donor WhatsApp, payment gateway security, payment channel, and webhook regression test groups passed on the latest PR commit.
+- This is not an end-to-end provider certification. No merchant Sandbox or Live credentials have been tested.
+
+### Remaining before merge / production
+- Review and complete the Flip Accept Payment v3 migration. Official Flip documentation marks v2 as deprecated.
+- Separate Sandbox and Live credentials so changing the mode cannot accidentally pair the wrong key set.
+- Add/verify provider-specific connection tests and exact webhook callback setup for each provider.
+- Run Midtrans Sandbox and Flip supported test-mode payment flows, including callback delivery, duplicate callbacks, expiry, amount mismatch, and settlement verification.
+- Obtain the authorized merchant/account owner's review and approval before any Live credentials or Production activation.
+- Complete final UI review for gateway settings and manual bank channel CRUD.
+
+**Status:** WIP — do not merge or enable real-money payments yet.
