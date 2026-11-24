@@ -58,7 +58,11 @@ class DonasiController extends Controller
         // Ambil payment channel aktif, urutkan berdasarkan sort_order, load gateway
         $paymentChannels = PaymentChannel::with('gateway')
             ->active()
-            ->get();
+            ->get()
+            ->filter(fn ($channel) => $channel->gateway
+                && $channel->gateway->is_active
+                && ($channel->gateway->code === 'manual' || $channel->gateway->isConfigured()))
+            ->values();
 
         return view('pages.donasi-bayar', compact(
             'campaign',
@@ -126,6 +130,23 @@ class DonasiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Metode pembayaran yang dipilih sedang tidak tersedia.',
+            ], 422);
+        }
+
+        if ($channel->gateway->code !== 'manual' && !$channel->gateway->isConfigured()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Metode pembayaran ini belum dikonfigurasi sepenuhnya oleh admin.',
+            ], 422);
+        }
+
+        // Flip Accept Payment v2 requires a bill amount of at least Rp10.000.
+        if ($channel->gateway->code === 'flip' && $nominal < 10000) {
+            return response()->json([
+                'success' => false,
+                'errors' => [
+                    'nominal' => ['Minimal nominal untuk pembayaran Flip adalah Rp10.000.'],
+                ],
             ], 422);
         }
 
