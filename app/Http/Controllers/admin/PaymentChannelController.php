@@ -39,6 +39,7 @@ class PaymentChannelController extends Controller
             'channels.*.account_name' => 'nullable|string|max:100',
             'channels.*.account_number' => 'nullable|string|max:50',
             'channels.*.payment_type' => 'required|in:instant,va,transfer',
+            'channels.*.is_active' => 'nullable|boolean',
             'deleted_ids' => 'nullable|array',
             'deleted_ids.*' => 'integer|exists:payment_channels,id',
         ]);
@@ -80,6 +81,9 @@ class PaymentChannelController extends Controller
                         'account_name' => $item['account_name'] ?? null,
                         'account_number' => $item['account_number'] ?? null,
                         'payment_type' => $paymentType,
+                        'is_active' => ($gateway->code === 'manual' || $gateway->isConfigured())
+                            ? filter_var($item['is_active'] ?? false, FILTER_VALIDATE_BOOLEAN)
+                            : false,
                         'sort_order' => $index + 1,
                     ];
 
