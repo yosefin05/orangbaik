@@ -37,7 +37,7 @@ class FlipDriver implements PaymentDriverInterface
         $vaData = $this->service->createVirtualAccount($donasi, $pembayaran, $channel);
 
         return [
-            'type'           => 'virtual_account',
+            'type'           => $channel->payment_type === 'instant' ? 'ewallet' : 'virtual_account',
             'order_id'       => $pembayaran->order_id,
             'donasi_id'      => $donasi->id,
             'bank_name'      => $channel->name,
