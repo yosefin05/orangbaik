@@ -87,17 +87,17 @@ class FlipService
     public function createVirtualAccount(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
     {
         $gateway = $channel->gateway;
-        $isProduction = (bool) ($gateway?->getConfigValue('is_production', false) ?? false);
-
-        // Staging, local, and test environments must never send live-money requests.
-        if (!app()->environment('production')) {
-            $isProduction = false;
+        if (!$gateway) {
+            throw new \\RuntimeException('Gateway Flip tidak ditemukan.');
         }
+
+        $credentialMode = $gateway->activeCredentialMode();
+        $isProduction = $credentialMode === 'production';
 
         $this->baseUrl = $isProduction
             ? (config('payment.flip.base_url_production') ?? 'https://bigflip.id/api')
             : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
-        $this->apiKey = $gateway?->getConfigValue('api_key') ?: config('payment.flip.api_key');
+        $this->apiKey = $gateway->getCredentialForMode('api_key', $credentialMode);
 
         if (!$gateway || !$gateway->isConfigured()) {
             throw new \RuntimeException('Kredensial Flip belum lengkap. Lengkapi API Key dan Webhook Token pada pengaturan gateway.');
@@ -238,6 +238,7 @@ class FlipService
         $pembayaran->update([
             'transaction_id' => (string) $flipId,
             'gateway_response' => array_merge($data, [
+                'credential_mode' => $channel->gateway?->activeCredentialMode() ?? 'sandbox',
                 'flip_id' => $flipId,
                 'link_id' => $data['link_id'] ?? $flipId,
                 'account_number' => $accountNumber,
@@ -356,7 +357,9 @@ class FlipService
             return false;
         }
 
-        $expectedToken = $gateway->getConfigValue('webhook_token');
+        $credentialMode = data_get($pembayaran->gateway_response ?? [], 'credential_mode')
+            ?: $gateway->activeCredentialMode();
+        $expectedToken = $gateway->getCredentialForMode('webhook_token', $credentialMode);
         $receivedToken = !empty($token) ? $token : ($payload['token'] ?? '');
 
         if (blank($expectedToken) || blank($receivedToken) || !hash_equals((string) $expectedToken, (string) $receivedToken)) {
