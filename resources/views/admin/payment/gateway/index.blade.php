@@ -101,7 +101,7 @@
                             <small class="text-blue fw-semibold">Transfer Manual Yayasan</small>
                         @elseif ($isConfigured)
                             <i class="bi bi-shield-check text-success"></i>
-                            <small class="text-success fw-semibold">Kredensial tersimpan</small>
+                            <small class="text-success fw-semibold">Kredensial tersedia</small>
                         @else
                             <i class="bi bi-exclamation-circle text-warning"></i>
                             <small class="text-warning fw-semibold">Kredensial wajib belum lengkap</small>
