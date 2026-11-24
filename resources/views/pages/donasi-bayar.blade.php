@@ -395,8 +395,11 @@
 <!-- Midtrans Snap — hanya dimuat jika gateway Midtrans aktif -->
 @php
     $hasMidtransChannel = $paymentChannels->contains(fn($ch) => $ch->gateway?->code === 'midtrans');
-    $midtransClientKey  = $hasMidtransChannel ? config('payment.midtrans.client_key', config('midtrans.clientKey', '')) : '';
-    $isMidtransProd     = $hasMidtransChannel && config('payment.midtrans.is_production', false);
+    $midtransGateway = $paymentChannels->first(fn($ch) => $ch->gateway?->code === 'midtrans')?->gateway;
+    $midtransClientKey = $hasMidtransChannel ? ($midtransGateway?->getConfigValue('client_key') ?? '') : '';
+    $isMidtransProd = $hasMidtransChannel
+        && (bool) ($midtransGateway?->getConfigValue('is_production', false))
+        && app()->environment('production');
 @endphp
 @if ($hasMidtransChannel && !empty($midtransClientKey))
     <script type="text/javascript"
