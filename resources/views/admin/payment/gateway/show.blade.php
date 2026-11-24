@@ -134,7 +134,7 @@
                         <form action="{{ route('admin.payment.channel.toggle', $channel) }}" method="POST">
                             @csrf
                             @method('PATCH')
-                            <button type="submit" class="btn btn-sm {{ $channel->is_active ? 'btn-outline-secondary' : 'btn-outline-primary' }}" {{ !$isConfigured || !$gateway->is_active ? 'disabled title=Belum dapat diaktifkan sebelum gateway aktif dan kredensial lengkap' : '' }}>
+                            <button type="submit" class="btn btn-sm {{ $channel->is_active ? 'btn-outline-secondary' : 'btn-outline-primary' }}" @disabled(!$isConfigured || !$gateway->is_active) title="Aktifkan gateway dan lengkapi kredensial terlebih dahulu">
                                 {{ $channel->is_active ? 'Sembunyikan' : 'Tampilkan' }}
                             </button>
                         </form>
