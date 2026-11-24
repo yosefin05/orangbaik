@@ -320,7 +320,7 @@ class FlipService
          * 3. CARI PEMBAYARAN BERDASARKAN TRANSACTION_ID (FLIP LINK ID ATAU PAYMENT ID)
          * =====================================================
          */
-        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
+        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
             ->where(function ($q) use ($billLinkId, $paymentId) {
                 if ($billLinkId) {
                     $q->where('transaction_id', (string) $billLinkId);
@@ -351,7 +351,7 @@ class FlipService
          * 4. VERIFIKASI TOKEN SESUAI GATEWAY TRANSAKSI
          * =====================================================
          */
-        $gateway = $pembayaran->paymentChannel?->gateway;
+        $gateway = $pembayaran->resolvedGateway();
         if (!$gateway || $gateway->code !== 'flip') {
             Log::warning('Flip webhook ditolak: transaksi bukan milik gateway Flip.');
             return false;
