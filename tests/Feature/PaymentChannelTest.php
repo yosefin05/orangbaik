@@ -815,14 +815,14 @@ class PaymentChannelTest extends TestCase
             'donasi_id' => $donasi->id,
             'payment_channel_id' => $channel->id,
             'payment_gateway_id' => $flip->id,
-            'payment_token' => (string) \\Illuminate\\Support\\Str::uuid(),
+            'payment_token' => (string) \Illuminate\Support\Str::uuid(),
             'order_id' => 'OB-FLIP-V3-' . uniqid(),
             'payment_type' => 'instant',
             'transaction_status' => 'pending',
         ]);
 
         Http::fake([
-            'flip-staging.example.test/big_api/v3/pwf/bill' => Http::response([
+            'https://flip-staging.example.test/big_api/v3/pwf/bill' => Http::response([
                 'payment_url' => 'https://checkout.flip.example.test/pay/123',
                 'bill_payment' => ['id' => 12345],
             ], 200),
