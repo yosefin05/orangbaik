@@ -105,7 +105,7 @@
                             <small class="text-blue fw-semibold">Transfer Manual Yayasan</small>
                         @elseif ($isConfigured)
                             <i class="bi bi-shield-check text-success"></i>
-                            <small class="text-success fw-semibold">API Key Terkonfigurasi & Siap</small>
+                            <small class="text-success fw-semibold">Kredensial tersedia — perlu pengujian koneksi</small>
                         @else
                             <i class="bi bi-exclamation-circle text-warning"></i>
                             <small class="text-warning fw-semibold">API Key Belum Diisi</small>
@@ -121,7 +121,20 @@
                     @if ($gateway->code !== 'manual')
                         <button type="button" 
                             class="btn btn-outline-primary btn-sm"
-                            onclick='openEditConfigModal(@json($gateway))'
+                            onclick='openEditConfigModal(@json([
+                                'id' => $gateway->id,
+                                'name' => $gateway->name,
+                                'code' => $gateway->code,
+                                'description' => $gateway->description,
+                                'is_active' => $gateway->is_active,
+                                'config' => [
+                                    'is_production' => (bool) ($gateway->getConfigValue('is_production', false)),
+                                    'has_server_key' => $gateway->hasConfigValue('server_key'),
+                                    'has_client_key' => $gateway->hasConfigValue('client_key'),
+                                    'has_api_key' => $gateway->hasConfigValue('api_key'),
+                                    'has_webhook_token' => $gateway->hasConfigValue('webhook_token'),
+                                ],
+                            ]))'
                             title="Atur API Key & Pengaturan Gateway">
                             <i class="bi bi-gear-fill"></i>
                             Pengaturan API
@@ -170,7 +183,7 @@
         <i class="bi bi-shield-lock-fill"></i>
         <div>
             <strong>Konfigurasi Fleksibel & Modular (Driver Pattern)</strong>
-            <p>Anda dapat mengedit API Key langsung dari modal pengaturan di atas atau melalui file <code>.env</code>. Webhook universal untuk semua gateway tersedia di: <code>POST /payment/{gateway}/webhook</code>.</p>
+            <p>Atur kredensial melalui panel ini. Nilai rahasia tidak ditampilkan kembali setelah disimpan. Status kredensial bukan bukti bahwa transaksi sudah berhasil; lakukan pengujian Sandbox sebelum mengaktifkan pembayaran.</p>
         </div>
     </div>
 
@@ -268,11 +281,11 @@
                     <div id="midtransFields" style="display:none;">
                         <div class="form-group mb-3">
                             <label class="form-label">Midtrans Server Key <span class="text-danger">*</span></label>
-                            <input type="text" name="server_key" id="editServerKey" class="form-control" placeholder="SB-Mid-server-xxxx">
+                            <input type="password" autocomplete="new-password" name="server_key" id="editServerKey" class="form-control" placeholder="SB-Mid-server-xxxx">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Midtrans Client Key</label>
-                            <input type="text" name="client_key" id="editClientKey" class="form-control" placeholder="SB-Mid-client-xxxx">
+                            <input type="password" autocomplete="new-password" name="client_key" id="editClientKey" class="form-control" placeholder="SB-Mid-client-xxxx">
                         </div>
                     </div>
 
@@ -280,12 +293,12 @@
                     <div id="flipFields" style="display:none;">
                         <div class="form-group mb-3">
                             <label class="form-label">Flip Secret API Key <span class="text-danger">*</span></label>
-                            <input type="text" name="api_key" id="editFlipApiKey" class="form-control" placeholder="Masukkan Secret Key Flip">
+                            <input type="password" autocomplete="new-password" name="api_key" id="editFlipApiKey" class="form-control" placeholder="Masukkan Secret Key Flip">
                             <small class="text-muted">Didapatkan dari Dashboard Big Flip > API Integration.</small>
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Flip Webhook Token (X-CALLBACK-TOKEN)</label>
-                            <input type="text" name="webhook_token" id="editFlipWebhookToken" class="form-control" placeholder="Token verifikasi webhook Flip">
+                            <input type="password" autocomplete="new-password" name="webhook_token" id="editFlipWebhookToken" class="form-control" placeholder="Token verifikasi webhook Flip">
                         </div>
                     </div>
 
@@ -293,11 +306,11 @@
                     <div id="genericFields" style="display:none;">
                         <div class="form-group mb-3">
                             <label class="form-label">API Key / Secret Key</label>
-                            <input type="text" name="api_key" id="editGenericApiKey" class="form-control" placeholder="API Secret Key">
+                            <input type="password" autocomplete="new-password" name="api_key" id="editGenericApiKey" class="form-control" placeholder="API Secret Key">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Webhook Token / Signature Key</label>
-                            <input type="text" name="webhook_token" id="editGenericWebhookToken" class="form-control" placeholder="Token Webhook">
+                            <input type="password" autocomplete="new-password" name="webhook_token" id="editGenericWebhookToken" class="form-control" placeholder="Token Webhook">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">API Endpoint URL</label>
@@ -617,16 +630,16 @@ function openEditConfigModal(gateway) {
 
     if (gateway.code === 'midtrans') {
         midtransFields.style.display = 'block';
-        document.getElementById('editServerKey').value = config.server_key || '';
-        document.getElementById('editClientKey').value = config.client_key || '';
+        document.getElementById('editServerKey').value = '';\n        document.getElementById('editServerKey').placeholder = config.has_server_key ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Server Key';
+        document.getElementById('editClientKey').value = '';\n        document.getElementById('editClientKey').placeholder = config.has_client_key ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Client Key';
     } else if (gateway.code === 'flip') {
         flipFields.style.display = 'block';
-        document.getElementById('editFlipApiKey').value = config.api_key || '';
-        document.getElementById('editFlipWebhookToken').value = config.webhook_token || '';
+        document.getElementById('editFlipApiKey').value = '';\n        document.getElementById('editFlipApiKey').placeholder = config.has_api_key ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Secret Key Flip';
+        document.getElementById('editFlipWebhookToken').value = '';\n        document.getElementById('editFlipWebhookToken').placeholder = config.has_webhook_token ? 'Token tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Webhook Token';
     } else {
         genericFields.style.display = 'block';
-        document.getElementById('editGenericApiKey').value = config.api_key || config.server_key || '';
-        document.getElementById('editGenericWebhookToken').value = config.webhook_token || '';
+        document.getElementById('editGenericApiKey').value = '';\n        document.getElementById('editGenericApiKey').placeholder = config.has_api_key ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : 'Masukkan API Key';
+        document.getElementById('editGenericWebhookToken').value = '';\n        document.getElementById('editGenericWebhookToken').placeholder = config.has_webhook_token ? 'Token tersimpan — isi hanya jika ingin mengganti' : 'Masukkan Webhook Token';
         document.getElementById('editEndpointUrl').value = config.endpoint_url || '';
     }
 
