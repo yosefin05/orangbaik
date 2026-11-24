@@ -148,6 +148,7 @@
                             $grouped = collect($groupOrder)->mapWithKeys(fn ($name) => [
                                 $name => $channelsByGroup->get($name, collect()),
                             ]);
+                            $firstAvailableChannelId = $paymentChannels->first()?->id;
 
                             $groupIcons = [
                                 'QRIS' => 'bi-qr-code',
@@ -223,7 +224,7 @@
                                                 $logoSlug = $findLogoSlug($channel->name);
                                             @endphp
                                             <label class="channel-row">
-                                                <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" data-name="{{ $channel->name }}" {{ $loop->parent->first && $loop->first ? 'checked' : '' }}>
+                                                <input type="radio" name="payment_channel_id" value="{{ $channel->id }}" data-name="{{ $channel->name }}" {{ $channel->id === $firstAvailableChannelId ? 'checked' : '' }}>
                                                 <span class="channel-row-icon">
                                                     @if ($logoSlug)
                                                         <img src="{{ asset('images/payment-logos/' . $logoSlug . '.svg') }}" alt="" loading="lazy">
