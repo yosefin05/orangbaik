@@ -14,9 +14,13 @@ return new class extends Migration
                 ->constrained('payment_gateways')->restrictOnDelete();
         });
 
-        DB::table('pembayaran')
-            ->join('payment_channels', 'payment_channels.id', '=', 'pembayaran.payment_channel_id')
-            ->update(['pembayaran.payment_gateway_id' => DB::raw('payment_channels.payment_gateway_id')]);
+        // Some focused legacy test fixtures create a minimal payment_channels table.
+        // Production/staging schemas have the provider FK; only backfill when it exists.
+        if (Schema::hasTable('payment_channels') && Schema::hasColumn('payment_channels', 'payment_gateway_id')) {
+            DB::table('pembayaran')
+                ->join('payment_channels', 'payment_channels.id', '=', 'pembayaran.payment_channel_id')
+                ->update(['pembayaran.payment_gateway_id' => DB::raw('payment_channels.payment_gateway_id')]);
+        }
     }
 
     public function down(): void
