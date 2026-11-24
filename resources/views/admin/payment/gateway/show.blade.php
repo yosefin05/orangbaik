@@ -230,7 +230,7 @@
                                 <option value="{{ $modeValue }}" @selected(old('credential_mode', $gateway->activeCredentialMode()) === $modeValue)>{{ $modeLabel }}</option>
                             @endforeach
                         </select>
-                        <small>{{ $isFlip ? 'OVO dan DANA menggunakan Direct API v3 pada Flip Staging atau Production. Virtual Account tetap menggunakan alur VA yang sudah tersedia.' : 'Production / Live memproses transaksi sungguhan, termasuk jika aplikasi berjalan di staging. Pastikan kredensial dan webhook sesuai environment.' }}</small>
+                        <small>{{ $isFlip ? 'OVO dan DANA menggunakan Direct API v3 pada Flip Staging atau Production. Saat mode Staging dipilih, Virtual Account tetap memakai kredensial Sandbox legacy.' : 'Production / Live memproses transaksi sungguhan, termasuk jika aplikasi berjalan di staging. Pastikan kredensial dan webhook sesuai environment.' }}</small>
                     </div>
                 </div>
             </section>
