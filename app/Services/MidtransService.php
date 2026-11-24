@@ -24,13 +24,14 @@ class MidtransService
      */
     protected function configureGateway(?PaymentGateway $gateway): void
     {
-        $serverKey = $gateway?->getConfigValue('server_key') ?: config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
-        $clientKey = $gateway?->getConfigValue('client_key') ?: config('midtrans.clientKey') ?: config('payment.midtrans.client_key');
-        $isProduction = (bool) ($gateway?->getConfigValue('is_production', false) ?? config('payment.midtrans.is_production', false));
-
-        if (!app()->environment('production')) {
-            $isProduction = false;
+        if (!$gateway) {
+            throw new \\RuntimeException('Gateway Midtrans tidak ditemukan.');
         }
+
+        $mode = $gateway->activeCredentialMode();
+        $serverKey = $gateway->getCredentialForMode('server_key', $mode);
+        $clientKey = $gateway->getCredentialForMode('client_key', $mode);
+        $isProduction = $mode === 'production';
 
         if (blank($serverKey) || blank($clientKey)) {
             throw new \RuntimeException('Kredensial Midtrans belum lengkap. Lengkapi Server Key dan Client Key.');
@@ -86,7 +87,12 @@ class MidtransService
             $snapToken = Snap::getSnapToken($params);
 
             // Simpan snap token ke pembayaran
-            $pembayaran->update(['snap_token' => $snapToken]);
+            $pembayaran->update([
+                'snap_token' => $snapToken,
+                'gateway_response' => array_merge($pembayaran->gateway_response ?? [], [
+                    'credential_mode' => $channel->gateway->activeCredentialMode(),
+                ]),
+            ]);
 
             return $snapToken;
         } catch (\Exception $e) {
@@ -104,10 +110,15 @@ class MidtransService
      */
     public function isConfigured(?PaymentGateway $gateway = null): bool
     {
-        $serverKey = $gateway?->getConfigValue('server_key') ?: config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
-        $clientKey = $gateway?->getConfigValue('client_key') ?: config('midtrans.clientKey') ?: config('payment.midtrans.client_key');
+        if (!$gateway) {
+            return false;
+        }
 
-        return filled($serverKey) && filled($clientKey);
+        $mode = $gateway->activeCredentialMode();
+
+        return filled($gateway->getCredentialForMode('server_key', $mode))
+            && filled($gateway->getCredentialForMode('client_key', $mode))
+            && filled($gateway->getCredentialForMode('signature_secret_key', $mode));
     }
 
     /**
@@ -147,14 +158,16 @@ class MidtransService
          * =====================================================
          */
         $gateway = $pembayaran->paymentChannel->gateway;
-        $serverKey = $gateway->getConfigValue('server_key');
+        $credentialMode = data_get($pembayaran->gateway_response ?? [], 'credential_mode')
+            ?: $gateway->activeCredentialMode();
+        $signatureSecretKey = $gateway->getCredentialForMode('signature_secret_key', $credentialMode);
 
-        if (blank($serverKey)) {
-            Log::critical('Midtrans webhook ditolak: Server Key gateway belum dikonfigurasi.');
+        if (blank($signatureSecretKey)) {
+            Log::critical('Midtrans webhook ditolak: Signature Secret Key gateway belum dikonfigurasi.');
             return false;
         }
 
-        $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+        $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $signatureSecretKey);
 
         if (!hash_equals($expectedSignature, (string) $signatureKey)) {
             Log::warning('Midtrans webhook: signature tidak valid', ['order_id' => $orderId]);
