@@ -64,7 +64,7 @@
                 {{-- Account Name --}}
                 <div class="form-group" id="account-name-group">
                     <label for="account_name" class="form-label">
-                        Nama Rekening / Akun
+                        Nama pemilik rekening
                     </label>
                     <input
                         type="text"
@@ -73,7 +73,7 @@
                         class="form-control @error('account_name') is-invalid @enderror"
                         value="{{ old('account_name') }}"
                         placeholder="Contoh: OrangBaik" required>
-                    <small class="form-hint">Opsional. Diisi untuk Virtual Account dan Transfer Manual.</small>
+                    <small class="form-hint">Wajib diisi sesuai nama pemilik rekening pada buku tabungan.</small>
                     @error('account_name')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
@@ -91,7 +91,7 @@
                         class="form-control @error('account_number') is-invalid @enderror"
                         value="{{ old('account_number') }}"
                         placeholder="Contoh: 1234567890" required>
-                    <small class="form-hint">Opsional. Diisi hanya untuk Transfer Manual.</small>
+                    <small class="form-hint">Wajib diisi untuk transfer manual.</small>
                     @error('account_number')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
