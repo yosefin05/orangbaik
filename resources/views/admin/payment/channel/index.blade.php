@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('page-title', 'Bank Account / Payment Channel')
+@section('page-title', 'Metode Pembayaran')
 
 @section('content')
 
@@ -8,12 +8,12 @@
 
         <div class="channel-page-header">
             <div>
-                <h1 class="channel-title">Bank Account</h1>
-                <p class="channel-subtitle">Konfigurasi metode pembayaran, kode channel/no. rekening, payment gateway/provider, dan tipe pembayaran.</p>
+                <h1 class="channel-title">Metode Pembayaran</h1>
+                <p class="channel-subtitle">Kelola rekening transfer manual dan channel pembayaran provider dalam satu daftar.</p>
             </div>
             <div class="header-actions">
                 <a href="{{ route('admin.payment.gateway.index') }}" class="btn-top-gateway">
-                    <i class="bi bi-gear-wide-connected"></i> Gateway Status
+                    <i class="bi bi-arrow-left"></i> Kembali ke Payment
                 </a>
             </div>
         </div>
@@ -84,7 +84,7 @@
                                 name="channels[{{ $index }}][name]"
                                 value="{{ $channel->name }}"
                                 class="form-input"
-                                placeholder="Nama Bank / E-Wallet (misal: Bank BCA)"
+                                placeholder="Nama metode pembayaran"
                                 required
                             >
                         </div>
@@ -96,7 +96,7 @@
                                 name="channels[{{ $index }}][channel_code]"
                                 value="{{ $channel->channel_code }}"
                                 class="form-input"
-                                placeholder="Kode bank/provider (contoh: bsi)"
+                                placeholder="Kode channel / bank"
                                 required
                             >
                         </div>
@@ -105,12 +105,12 @@
                         <div class="field-wrap field-account-name">
                             <input type="text" name="channels[{{ $index }}][account_name]"
                                 value="{{ $channel->account_name }}" class="form-input"
-                                placeholder="Nama pemilik rekening">
+                                placeholder="Nama pemilik (khusus transfer)">
                         </div>
                         <div class="field-wrap field-account-number">
                             <input type="text" name="channels[{{ $index }}][account_number]"
                                 value="{{ $channel->account_number }}" class="form-input"
-                                placeholder="Nomor rekening">
+                                placeholder="Nomor rekening (khusus transfer)">
                         </div>
 
                         {{-- 3. Provider / Payment Gateway --}}
@@ -164,13 +164,13 @@
             {{-- Bottom Actions --}}
             <div class="bottom-actions-row">
                 <button type="button" id="btnAddBank" class="btn-add-bank">
-                    + Add Bank
+                    <i class="bi bi-plus-lg"></i> Tambah metode
                 </button>
 
                 <div class="submit-wrap">
                     <span id="saveStatusIndicator" class="save-status-indicator"></span>
                     <button type="submit" class="btn-save-all" id="btnSaveAll">
-                        <i class="bi bi-check-lg"></i> Simpan Konfigurasi
+                        <i class="bi bi-check-lg"></i> Simpan perubahan
                     </button>
                 </div>
             </div>
