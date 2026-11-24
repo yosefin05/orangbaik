@@ -30,6 +30,16 @@ class PaymentGatewayController extends Controller
             'client_key' => 'nullable|string|max:500',
             'signature_secret_key' => 'nullable|string|max:500',
             'webhook_token' => 'nullable|string|max:500',
+            'sandbox_server_key' => 'nullable|string|max:500',
+            'sandbox_client_key' => 'nullable|string|max:500',
+            'sandbox_signature_secret_key' => 'nullable|string|max:500',
+            'production_server_key' => 'nullable|string|max:500',
+            'production_client_key' => 'nullable|string|max:500',
+            'production_signature_secret_key' => 'nullable|string|max:500',
+            'sandbox_api_key' => 'nullable|string|max:500',
+            'production_api_key' => 'nullable|string|max:500',
+            'sandbox_webhook_token' => 'nullable|string|max:500',
+            'production_webhook_token' => 'nullable|string|max:500',
             'endpoint_url' => 'prohibited',
             'is_production' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
@@ -48,6 +58,16 @@ class PaymentGatewayController extends Controller
             'client_key' => $request->input('client_key'),
             'signature_secret_key' => $request->input('signature_secret_key'),
             'webhook_token' => $request->input('webhook_token'),
+            'sandbox_server_key' => $request->input('sandbox_server_key'),
+            'sandbox_client_key' => $request->input('sandbox_client_key'),
+            'sandbox_signature_secret_key' => $request->input('sandbox_signature_secret_key'),
+            'production_server_key' => $request->input('production_server_key'),
+            'production_client_key' => $request->input('production_client_key'),
+            'production_signature_secret_key' => $request->input('production_signature_secret_key'),
+            'sandbox_api_key' => $request->input('sandbox_api_key'),
+            'production_api_key' => $request->input('production_api_key'),
+            'sandbox_webhook_token' => $request->input('sandbox_webhook_token'),
+            'production_webhook_token' => $request->input('production_webhook_token'),
             'is_production' => $request->boolean('is_production'),
         ]);
 
@@ -86,7 +106,12 @@ class PaymentGatewayController extends Controller
         $existingConfig = $gateway->config ?? [];
         $newConfig = $existingConfig;
 
-        foreach (['api_key', 'server_key', 'client_key', 'signature_secret_key', 'webhook_token'] as $secretKey) {
+        foreach ([
+            'api_key', 'server_key', 'client_key', 'signature_secret_key', 'webhook_token',
+            'sandbox_server_key', 'sandbox_client_key', 'sandbox_signature_secret_key',
+            'production_server_key', 'production_client_key', 'production_signature_secret_key',
+            'sandbox_api_key', 'production_api_key', 'sandbox_webhook_token', 'production_webhook_token',
+        ] as $secretKey) {
             if ($request->filled($secretKey)) {
                 $newConfig[$secretKey] = $request->input($secretKey);
             }
