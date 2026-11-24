@@ -59,7 +59,7 @@ class PaymentGatewayManager
             'midtrans' => app(MidtransDriver::class),
             'flip'     => app(FlipDriver::class),
             'manual'   => app(ManualTransferDriver::class),
-            default    => throw new InvalidArgumentException("Payment gateway adapter belum didukung: {$code}\"),
+            default    => throw new InvalidArgumentException("Payment gateway adapter belum didukung: {$code}"),
         };
     }
 
