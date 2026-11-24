@@ -67,6 +67,10 @@ class FlipService
     {
         $code = strtolower(trim($bankCode));
 
+        if (in_array($code, ['ovo', 'dana', 'qris', 'shopeepay_app', 'linkaja'], true)) {
+            return 'wallet_account';
+        }
+
         if ($code === 'muamalat') {
             return 'bank_account';
         }
