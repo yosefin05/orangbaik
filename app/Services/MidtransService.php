@@ -7,6 +7,7 @@ use Midtrans\Snap;
 use App\Models\Donasi;
 use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
+use App\Models\PaymentGateway;
 use Illuminate\Support\Facades\Log;
 
 class MidtransService
@@ -32,7 +33,7 @@ class MidtransService
         }
 
         if (blank($serverKey) || blank($clientKey)) {
-            throw new \\RuntimeException('Kredensial Midtrans belum lengkap. Lengkapi Server Key dan Client Key.');
+            throw new \RuntimeException('Kredensial Midtrans belum lengkap. Lengkapi Server Key dan Client Key.');
         }
 
         Config::$serverKey = $serverKey;
@@ -50,7 +51,7 @@ class MidtransService
     public function createTransaction(Donasi $donasi, Pembayaran $pembayaran, ?PaymentChannel $channel = null)
     {
         if (!$channel || $channel->gateway?->code !== 'midtrans') {
-            throw new \\RuntimeException('Channel pembayaran tidak terhubung ke gateway Midtrans.');
+            throw new \RuntimeException('Channel pembayaran tidak terhubung ke gateway Midtrans.');
         }
 
         $this->configureGateway($channel->gateway);
