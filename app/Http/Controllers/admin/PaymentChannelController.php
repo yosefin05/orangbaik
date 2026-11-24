@@ -99,7 +99,9 @@ class PaymentChannelController extends Controller
 
                     $channel->fill($payload);
                     if (!$channel->exists) {
-                        $channel->is_active = true;
+                        $channel->is_active = $gateway->code === 'manual' || $gateway->isConfigured();
+                    } elseif ($gateway->code !== 'manual' && !$gateway->isConfigured()) {
+                        $channel->is_active = false;
                     }
                     $channel->save();
                 }
@@ -236,7 +238,9 @@ class PaymentChannelController extends Controller
         $channel->update(array_merge($sensitiveChanges, [
             'name' => $request->name,
             'sort_order' => $request->sort_order ?? $channel->sort_order,
-            'is_active' => $request->boolean('is_active', $channel->is_active),
+            'is_active' => ($gateway->code === 'manual' || $gateway->isConfigured())
+                ? $request->boolean('is_active', $channel->is_active)
+                : false,
         ]));
 
         return redirect()
