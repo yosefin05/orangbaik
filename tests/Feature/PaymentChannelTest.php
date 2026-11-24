@@ -749,7 +749,7 @@ class PaymentChannelTest extends TestCase
             ->get(route('admin.payment.gateway.show', $flip))
             ->assertOk()
             ->assertSee('Bank BCA')
-            ->assertSee('Virtual Account yang didukung adapter Flip')
+            ->assertSee('Metode pembayaran yang didukung adapter Flip')
             ->assertSee('SeaBank Virtual Account')
             ->assertSee('OVO')
             ->assertSee('DANA');
