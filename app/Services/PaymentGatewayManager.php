@@ -7,7 +7,6 @@ use App\Models\PaymentGateway;
 use App\Services\PaymentGateways\MidtransDriver;
 use App\Services\PaymentGateways\FlipDriver;
 use App\Services\PaymentGateways\ManualTransferDriver;
-use App\Services\PaymentGateways\GenericApiDriver;
 use InvalidArgumentException;
 
 /**
@@ -60,7 +59,7 @@ class PaymentGatewayManager
             'midtrans' => app(MidtransDriver::class),
             'flip'     => app(FlipDriver::class),
             'manual'   => app(ManualTransferDriver::class),
-            default    => throw new InvalidArgumentException(\"Payment gateway adapter belum didukung: {$code}\"),
+            default    => throw new InvalidArgumentException("Payment gateway adapter belum didukung: {$code}\"),
         };
     }
 
