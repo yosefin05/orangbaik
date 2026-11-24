@@ -180,3 +180,12 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Tidak ada migration, perubahan skema database, kredensial, atau transaksi existing.
 - Menambahkan feature tests untuk katalog, pendaftaran Midtrans/Flip, dan penolakan metode yang tidak sesuai provider.
 - Belum ada koneksi API provider atau transaksi Sandbox/Production yang diuji.
+
+### [2026-11-24] Payment Dashboard Modes & Flip Direct API v3
+- **Status**: IMPLEMENTED ON REVIEW BRANCH; automated verification pending; merchant staging/live API verification not performed.
+- Dashboard admin menambahkan pemilihan mode kredensial eksplisit: Midtrans Sandbox/Production dan Flip Sandbox/Flip Staging/Production. Mode Production dapat dipilih secara eksplisit pada staging, tetapi tidak diaktifkan otomatis.
+- Kredensial Flip Direct API v3 untuk staging (API Secret Key dan Webhook Token) disimpan terenkripsi. Staging Base URL disimpan sebagai konfigurasi non-rahasia dan digunakan untuk endpoint /big_api/v3/pwf/bill; endpoint Production memakai https://bigflip.id/api/v3/pwf/bill.
+- Channel Flip OVO/DANA memakai sender_bank_type=wallet_account dan request step=direct_api; channel Virtual Account tetap memakai adapter legacy yang sudah ada. Saat mode Flip Staging dipilih, VA tetap memakai kredensial Sandbox legacy.
+- Response Direct API v3 menyimpan payment ID, payment URL, referensi order, dan snapshot credential mode. Webhook mendukung lookup ID pembayaran/referensi order serta mempertahankan validasi token, status, nominal, dan idempotensi.
+- Tidak ada migration, perubahan skema database, pengubahan kredensial, aktivasi channel, atau transaksi Live. Tidak ada panggilan API provider nyata; hanya pengujian HTTP fake yang disiapkan.
+- Live mode memproses uang sungguhan. Tetap nonaktif sampai admin pemilik akun merchant memverifikasi kredensial, endpoint, webhook, dan kesiapan operasional.
