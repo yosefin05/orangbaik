@@ -114,6 +114,8 @@ Route::middleware(['auth', 'admin'])
             // Payment Gateway (CRUD + toggle status + config)
             Route::get('/gateway', [PaymentGatewayController::class, 'index'])
                 ->name('gateway.index');
+            Route::get('/gateway/{gateway}', [PaymentGatewayController::class, 'show'])
+                ->name('gateway.show');
             Route::post('/gateway', [PaymentGatewayController::class, 'store'])
                 ->name('gateway.store');
             Route::put('/gateway/{gateway}', [PaymentGatewayController::class, 'update'])

@@ -18,6 +18,30 @@ class PaymentGatewayController extends Controller
         return view('admin.payment.gateway.index', compact('gateways'));
     }
 
+    /**
+     * Dedicated configuration workspace for each built-in payment provider.
+     * Secrets are never passed to the view; only presence flags are exposed.
+     */
+    public function show(PaymentGateway $gateway)
+    {
+        abort_unless(in_array($gateway->code, ['midtrans', 'flip', 'manual'], true), 404);
+
+        $gateway->loadCount('channels');
+        $channels = $gateway->channels()->orderBy('sort_order')->get();
+
+        $credentialFlags = [];
+        foreach ([
+            'sandbox_server_key', 'sandbox_client_key', 'sandbox_signature_secret_key',
+            'production_server_key', 'production_client_key', 'production_signature_secret_key',
+            'sandbox_api_key', 'production_api_key',
+            'sandbox_webhook_token', 'production_webhook_token',
+        ] as $key) {
+            $credentialFlags[$key] = $gateway->hasConfigValue($key);
+        }
+
+        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -137,16 +161,12 @@ class PaymentGatewayController extends Controller
             'config' => $newConfig,
         ]);
 
-        // Never activate an API gateway solely because a checkbox was submitted.
-        if ($request->boolean('is_active') && $gateway->code === 'manual') {
-            $gateway->update(['is_active' => true]);
-        } elseif (!$request->boolean('is_active')) {
-            $gateway->update(['is_active' => false]);
-        }
-
+        // Configuration edits must never change activation state.
+        // Gateway activation is managed explicitly from the gateway dashboard.
+        
         return redirect()
-            ->route('admin.payment.gateway.index')
-            ->with('success', "Konfigurasi {$gateway->name} tersimpan. Status aktivasi tidak berubah otomatis.");
+            ->route('admin.payment.gateway.show', $gateway)
+            ->with('success', "Konfigurasi {$gateway->name} berhasil disimpan.");
     }
 
     public function destroy(PaymentGateway $gateway)
