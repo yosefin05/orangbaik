@@ -180,3 +180,13 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Tidak ada migration, perubahan skema database, kredensial, atau transaksi existing.
 - Menambahkan feature tests untuk katalog, pendaftaran Midtrans/Flip, dan penolakan metode yang tidak sesuai provider.
 - Belum ada koneksi API provider atau transaksi Sandbox/Production yang diuji.
+
+
+### [2026-11-24] Flip OVO & DANA E-Wallet Routing
+- **Status**: IMPLEMENTED ON REVIEW BRANCH; automated verification pending; merchant API verification not performed.
+- Menambahkan kapabilitas provider Flip untuk kategori E-Wallet (`instant`) selain Virtual Account.
+- Katalog provider Flip kini menyediakan OVO dan DANA. Keduanya didaftarkan sebagai channel `instant` dan tetap nonaktif secara default.
+- `FlipService` memetakan kode OVO/DANA ke `sender_bank_type=wallet_account`; kode VA tetap memakai `virtual_account`. Driver mengembalikan tipe transaksi `ewallet` untuk channel Flip kategori instant.
+- Alur memakai endpoint Accept Payment PWF v2 Flow 3 yang sudah dipakai adapter saat ini. Dokumentasi daftar metode Flip menyebut OVO/DANA sebagai `wallet_account`; dokumentasi v2 menandai API deprecated, sedangkan API v3 terbaru masih memerlukan akses staging Flip dan belum tersedia di Sandbox.
+- Test feature diperluas untuk kapabilitas `instant`, pemetaan wallet account, katalog, dan pendaftaran OVO/DANA dalam keadaan tersembunyi.
+- Belum ada panggilan API Flip, transaksi Sandbox/Live, callback merchant, perubahan kredensial, atau aktivasi metode pada staging/production.
