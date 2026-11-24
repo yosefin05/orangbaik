@@ -104,8 +104,8 @@ class MidtransService
      */
     public function isConfigured(?PaymentGateway $gateway = null): bool
     {
-        $serverKey = $gateway?->getConfigValue('server_key') ?: config('payment.midtrans.server_key');
-        $clientKey = $gateway?->getConfigValue('client_key') ?: config('payment.midtrans.client_key');
+        $serverKey = $gateway?->getConfigValue('server_key') ?: config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
+        $clientKey = $gateway?->getConfigValue('client_key') ?: config('midtrans.clientKey') ?: config('payment.midtrans.client_key');
 
         return filled($serverKey) && filled($clientKey);
     }
