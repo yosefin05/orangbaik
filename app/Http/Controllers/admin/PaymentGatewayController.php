@@ -71,7 +71,7 @@ class PaymentGatewayController extends Controller
                 ['name' => 'Permata Virtual Account', 'channel_code' => 'permata', 'payment_type' => 'va'],
                 ['name' => 'CIMB Niaga Virtual Account', 'channel_code' => 'cimb', 'payment_type' => 'va'],
                 ['name' => 'Danamon Virtual Account', 'channel_code' => 'danamon', 'payment_type' => 'va'],
-                ['name' => 'BSI Virtual Account', 'channel_code' => 'bsm', 'payment_type' => 'va'],
+                ['name' => 'BSI Virtual Account', 'channel_code' => 'bsi', 'payment_type' => 'va'],
                 ['name' => 'SeaBank Virtual Account', 'channel_code' => 'seabank', 'payment_type' => 'va'],
             ],
             default => [],
