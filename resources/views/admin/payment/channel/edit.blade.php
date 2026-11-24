@@ -72,7 +72,7 @@
 
                 {{-- Account Name --}}
                 <div class="form-group">
-                    <label for="account_name" class="form-label">Nama Rekening / Akun</label>
+                    <label for="account_name" class="form-label">Nama pemilik rekening</label>
                     <input
                         type="text"
                         id="account_name"
@@ -95,7 +95,7 @@
                         class="form-control @error('account_number') is-invalid @enderror"
                         value="{{ old('account_number', $channel->account_number) }}"
                         placeholder="Contoh: 1234567890" required>
-                    <small class="form-hint">Diisi hanya untuk Transfer Manual.</small>
+                    <small class="form-hint">Wajib diisi untuk transfer manual.</small>
                     @error('account_number')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
