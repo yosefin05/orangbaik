@@ -34,6 +34,10 @@ class FlipDriver implements PaymentDriverInterface
 
     public function createTransaction(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
     {
+        if ($channel->payment_type === 'instant') {
+            return $this->service->createEwalletDirectApiV3($donasi, $pembayaran, $channel);
+        }
+
         $vaData = $this->service->createVirtualAccount($donasi, $pembayaran, $channel);
 
         return [
