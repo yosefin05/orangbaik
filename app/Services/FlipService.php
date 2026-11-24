@@ -440,18 +440,21 @@ class FlipService
          * 3. CARI PEMBAYARAN BERDASARKAN TRANSACTION_ID (FLIP LINK ID ATAU PAYMENT ID)
          * =====================================================
          */
-        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
-            ->where(function ($q) use ($billLinkId, $paymentId) {
-                if ($billLinkId) {
-                    $q->where('transaction_id', (string) $billLinkId);
-                }
-                if ($paymentId) {
-                    $q->orWhere('transaction_id', (string) $paymentId);
-                }
-            })
-            ->first();
+        $pembayaran = null;
+        if ($billLinkId || $paymentId) {
+            $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
+                ->where(function ($q) use ($billLinkId, $paymentId) {
+                    if ($billLinkId) {
+                        $q->where('transaction_id', (string) $billLinkId);
+                    }
+                    if ($paymentId) {
+                        $q->orWhere('transaction_id', (string) $paymentId);
+                    }
+                })
+                ->first();
+        }
 
-        // Fallback pencarian via gateway_response JSON jika transaction_id berbeda
+        // Direct API v3 can identify the transaction by the merchant reference ID.
         if (!$pembayaran && $referenceId) {
             $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
                 ->where('order_id', (string) $referenceId)
