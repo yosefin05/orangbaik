@@ -626,4 +626,55 @@ class PaymentChannelTest extends TestCase
             return $viewCampaign->terkumpul == 100000 && $viewCampaign->donasi_count == 1;
         });
     }
+    public function test_admin_manual_account_page_only_lists_manual_transfer_accounts(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->get(route('admin.payment.channel.index'));
+
+        $response->assertOk();
+        $response->assertSee('Rekening tujuan donasi');
+        $response->assertSee('Nama pemilik rekening');
+        $response->assertDontSee('GoPay');
+        $response->assertDontSee('Virtual Account');
+    }
+
+    public function test_manual_account_batch_endpoint_cannot_edit_provider_channels(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $providerChannel = PaymentChannel::where('channel_code', 'qris')->firstOrFail();
+
+        $response = $this->actingAs($admin)->post(route('admin.payment.channel.batch'), [
+            'channels' => [
+                [
+                    'id' => $providerChannel->id,
+                    'name' => 'QRIS',
+                    'channel_code' => 'qris',
+                    'account_name' => 'Not a bank account',
+                    'account_number' => '000000',
+                    'payment_type' => 'transfer',
+                    'is_active' => '1',
+                ],
+            ],
+        ]);
+
+        $response->assertSessionHasErrors();
+        $this->assertSame('QRIS', $providerChannel->fresh()->name);
+        $this->assertNull($providerChannel->fresh()->account_number);
+    }
+
+    public function test_provider_detail_manages_methods_without_manual_bank_account_fields(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $midtrans = PaymentGateway::where('code', 'midtrans')->firstOrFail();
+
+        $response = $this->actingAs($admin)->get(route('admin.payment.gateway.show', $midtrans));
+
+        $response->assertOk();
+        $response->assertSee('Metode yang ditampilkan di OrangBaik');
+        $response->assertSee('dashboard merchant Midtrans');
+        $response->assertDontSee('Nama pemilik rekening');
+        $response->assertDontSee('Nomor rekening');
+    }
+
 }

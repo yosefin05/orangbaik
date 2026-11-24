@@ -1,673 +1,118 @@
 @extends('layouts.admin')
 
-@section('page-title', 'Metode Pembayaran')
+@section('page-title', 'Rekening Transfer Manual')
 
 @section('content')
+<div class="manual-accounts">
+    <a href="{{ route('admin.payment.gateway.index') }}" class="manual-back"><i class="bi bi-arrow-left"></i> Kembali ke Pengaturan Pembayaran</a>
 
-    <div class="channel-admin-wrapper">
-
-        <div class="channel-page-header">
-            <div>
-                <h1 class="channel-title">Metode Pembayaran</h1>
-                <p class="channel-subtitle">Kelola rekening transfer manual dan channel pembayaran provider dalam satu daftar.</p>
-            </div>
-            <div class="header-actions">
-                <a href="{{ route('admin.payment.gateway.index') }}" class="btn-top-gateway">
-                    <i class="bi bi-arrow-left"></i> Kembali ke Payment
-                </a>
-            </div>
+    <header class="manual-header">
+        <div>
+            <span class="manual-eyebrow">TRANSFER MANUAL</span>
+            <h1>Rekening tujuan donasi</h1>
+            <p>Kelola rekening milik OrangBaik yang akan ditampilkan kepada donatur saat memilih transfer manual.</p>
         </div>
+        <a href="{{ route('admin.payment.channel.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Tambah rekening</a>
+    </header>
 
-        @if (session('success'))
-            <div class="alert-box alert-success">
-                <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
-            </div>
-        @endif
+    @if (session('success')) <div class="alert alert-success">{{ session('success') }}</div> @endif
+    @if (session('warning')) <div class="alert alert-warning">{{ session('warning') }}</div> @endif
+    @if (session('error')) <div class="alert alert-danger">{{ session('error') }}</div> @endif
+    @if ($errors->any())
+        <div class="alert alert-danger"><strong>Periksa kembali data rekening.</strong><ul class="mb-0 mt-2">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+    @endif
 
-        @if (session('warning'))
-            <div class="alert-box alert-warning">
-                <i class="bi bi-exclamation-triangle-fill"></i> {{ session('warning') }}
-            </div>
-        @endif
+    <div class="manual-notice"><i class="bi bi-info-circle"></i><span>Halaman ini hanya untuk rekening transfer manual. Midtrans dan Flip menggunakan kredensial serta metode pembayaran yang diatur melalui akun masing-masing provider.</span></div>
 
-        @if (session('error'))
-            <div class="alert-box alert-danger">
-                <i class="bi bi-x-circle-fill"></i> {{ session('error') }}
-            </div>
-        @endif
-
-        {{-- Datalist untuk autocomplete saran nama bank / e-wallet --}}
-        <datalist id="commonBankList">
-            <option value="Bank BCA">
-            <option value="Bank Syariah (BSI)">
-            <option value="Bank BNI">
-            <option value="Bank Mandiri">
-            <option value="Bank BRI">
-            <option value="Bank Mega Syariah">
-            <option value="Bank Jatim Syariah">
-            <option value="Permata Bank">
-            <option value="Bank Muamalat">
-            <option value="Bank CIMB Niaga">
-            <option value="Bank Danamon">
-            <option value="Bank Artha Graha">
-            <option value="Bank BJB">
-            <option value="Bank BJB Syariah">
-            <option value="Bank Nagari">
-            <option value="Bank Sumsel Babel">
-            <option value="Bank Jago">
-            <option value="SeaBank">
-            <option value="QRIS">
-            <option value="GoPay">
-            <option value="ShopeePay">
-            <option value="DANA">
-            <option value="OVO">
-            <option value="LinkAja">
-            <option value="Flip Transfer">
-        </datalist>
-
-        <form action="{{ route('admin.payment.channel.batch') }}" method="POST" id="channelBatchForm">
-            @csrf
-
-            <div id="deletedIdsContainer"></div>
-
-            <div class="channel-repeater-container" id="channelList">
-
-                @forelse ($channels as $index => $channel)
-                    <div class="channel-row-item" data-id="{{ $channel->id }}">
-                        <input type="hidden" name="channels[{{ $index }}][id]" value="{{ $channel->id }}" class="channel-id-input">
-
-                        {{-- 1. Nama Payment Method / Bank (Input Text + Datalist Autocomplete) --}}
-                        <div class="field-wrap field-name">
-                            <input
-                                type="text"
-                                list="commonBankList"
-                                name="channels[{{ $index }}][name]"
-                                value="{{ $channel->name }}"
-                                class="form-input"
-                                placeholder="Nama metode pembayaran"
-                                required
-                            >
+    <form action="{{ route('admin.payment.channel.batch') }}" method="POST" id="manualAccountForm">
+        @csrf
+        <div id="deletedIdsContainer"></div>
+        <div class="manual-account-list">
+            @forelse ($channels as $index => $channel)
+                <article class="manual-account" data-account>
+                    <input type="hidden" name="channels[{{ $index }}][id]" value="{{ $channel->id }}">
+                    <input type="hidden" name="channels[{{ $index }}][channel_code]" value="{{ $channel->channel_code }}">
+                    <input type="hidden" name="channels[{{ $index }}][payment_type]" value="transfer">
+                    <div class="manual-account__top">
+                        <div class="manual-bank-icon"><i class="bi bi-bank"></i></div>
+                        <div class="manual-account__identity">
+                            <strong>{{ $channel->name }}</strong>
+                            <span>{{ $channel->is_active ? 'Ditampilkan kepada donatur' : 'Tidak ditampilkan kepada donatur' }}</span>
                         </div>
-
-                        {{-- 2. Code / No Rekening --}}
-                        <div class="field-wrap field-code">
-                            <input
-                                type="text"
-                                name="channels[{{ $index }}][channel_code]"
-                                value="{{ $channel->channel_code }}"
-                                class="form-input"
-                                placeholder="Kode channel / bank"
-                                required
-                            >
+                        <label class="manual-toggle">
+                            <input type="hidden" name="channels[{{ $index }}][is_active]" value="0">
+                            <input type="checkbox" name="channels[{{ $index }}][is_active]" value="1" {{ $channel->is_active ? 'checked' : '' }}>
+                            <span>Aktif</span>
+                        </label>
+                    </div>
+                    <div class="manual-fields">
+                        <div>
+                            <label>Nama bank / rekening</label>
+                            <input class="form-control" name="channels[{{ $index }}][name]" value="{{ $channel->name }}" required maxlength="100">
                         </div>
-
-                        {{-- Data rekening transfer manual --}}
-                        <div class="field-wrap field-account-name">
-                            <input type="text" name="channels[{{ $index }}][account_name]"
-                                value="{{ $channel->account_name }}" class="form-input"
-                                placeholder="Nama pemilik (khusus transfer)">
+                        <div>
+                            <label>Nama pemilik rekening</label>
+                            <input class="form-control" name="channels[{{ $index }}][account_name]" value="{{ $channel->account_name }}" required maxlength="100">
                         </div>
-                        <div class="field-wrap field-account-number">
-                            <input type="text" name="channels[{{ $index }}][account_number]"
-                                value="{{ $channel->account_number }}" class="form-input"
-                                placeholder="Nomor rekening (khusus transfer)">
-                        </div>
-
-                        {{-- 3. Provider / Payment Gateway --}}
-                        <div class="field-wrap field-provider">
-                            <select name="channels[{{ $index }}][payment_gateway_id]" class="form-input custom-select">
-                                @foreach ($gateways as $gateway)
-                                    <option value="{{ $gateway->id }}" {{ $channel->payment_gateway_id == $gateway->id ? 'selected' : '' }}>
-                                        {{ $gateway->code === 'manual' ? 'Transfer Manual Yayasan' : $gateway->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- 4. Payment Type (Instant / Transfer / VA) --}}
-                        <div class="field-wrap field-type">
-                            <select name="channels[{{ $index }}][payment_type]" class="form-input custom-select">
-                                <option value="instant" {{ $channel->payment_type === 'instant' ? 'selected' : '' }}>Instant</option>
-                                <option value="transfer" {{ $channel->payment_type === 'transfer' ? 'selected' : '' }}>Transfer</option>
-                                <option value="va" {{ $channel->payment_type === 'va' ? 'selected' : '' }}>VA</option>
-                            </select>
-                        </div>
-
-                        <div class="field-wrap field-active">
-                            <label class="channel-active-label">
-                                <input type="hidden" name="channels[{{ $index }}][is_active]" value="0">
-                                <input type="checkbox" name="channels[{{ $index }}][is_active]" value="1" {{ $channel->is_active ? 'checked' : '' }}>
-                                <span>Aktif</span>
-                            </label>
-                        </div>
-
-                        {{-- 5. Drag Handle --}}
-                        <div class="drag-handle-wrap" title="Drag untuk mengubah urutan">
-                            <svg viewBox="0 0 24 24" class="drag-icon" width="22" height="22">
-                                <path fill="#5b9bd5" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/>
-                            </svg>
-                        </div>
-
-                        {{-- 6. Delete Row Button --}}
-                        <div class="delete-btn-wrap">
-                            <button type="button" class="btn-row-delete" title="Hapus channel">
-                                <span>&minus;</span>
-                            </button>
+                        <div>
+                            <label>Nomor rekening</label>
+                            <input class="form-control" name="channels[{{ $index }}][account_number]" value="{{ $channel->account_number }}" required maxlength="50">
                         </div>
                     </div>
-                @empty
-                    {{-- Row default jika kosong --}}
-                @endforelse
-
-            </div>
-
-            {{-- Bottom Actions --}}
-            <div class="bottom-actions-row">
-                <button type="button" id="btnAddBank" class="btn-add-bank">
-                    <i class="bi bi-plus-lg"></i> Tambah metode
-                </button>
-
-                <div class="submit-wrap">
-                    <span id="saveStatusIndicator" class="save-status-indicator"></span>
-                    <button type="submit" class="btn-save-all" id="btnSaveAll">
-                        <i class="bi bi-check-lg"></i> Simpan perubahan
-                    </button>
+                    <div class="manual-account__actions">
+                        <a href="{{ route('admin.payment.channel.edit', $channel) }}">Edit detail</a>
+                        <button type="button" class="manual-remove" data-remove>Hapus rekening</button>
+                    </div>
+                </article>
+            @empty
+                <div class="manual-empty">
+                    <i class="bi bi-bank"></i>
+                    <strong>Belum ada rekening transfer manual</strong>
+                    <p>Tambahkan rekening resmi OrangBaik agar donatur dapat melakukan transfer langsung.</p>
                 </div>
+            @endforelse
+        </div>
+
+        @if ($channels->isNotEmpty())
+            <div class="manual-savebar">
+                <span>Perubahan status dan detail rekening belum disimpan.</span>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check2"></i> Simpan perubahan</button>
             </div>
-
-        </form>
-
-    </div>
-
+        @endif
+    </form>
+</div>
 @endsection
 
 @push('styles')
 <style>
-    .channel-admin-wrapper {
-        max-width: 900px;
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    }
-
-    .channel-page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    .channel-title {
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: #212529;
-        margin: 0;
-    }
-    .channel-subtitle {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin: 0.25rem 0 0;
-    }
-    .btn-top-gateway {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: #f8fafc;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        color: #374151;
-        text-decoration: none;
-        font-size: 0.8125rem;
-        font-weight: 600;
-    }
-    .btn-top-gateway:hover {
-        background: #e2e8f0;
-    }
-
-    .alert-box {
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        margin-bottom: 1.25rem;
-        font-size: 0.875rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-    .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-    .alert-danger  { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-
-    /* Repeater List */
-    .channel-repeater-container {
-        display: flex;
-        flex-direction: column;
-        gap: 0.625rem;
-        margin-bottom: 1.25rem;
-    }
-
-    .channel-row-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        background: #ffffff;
-        padding: 1rem;
-        border: 1px solid #e7ebf2;
-        border-radius: 12px;
-        transition: background 0.15s ease;
-    }
-    .channel-row-item.dragging {
-        opacity: 0.45;
-        background: #f1f5f9;
-    }
-    .channel-row-item.drag-over {
-        border-top: 2px solid #3b82f6;
-    }
-
-    .field-wrap {
-        flex: 1;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-    .field-wrap::before {
-        display: block;
-        color: #64748b;
-        font-size: 0.68rem;
-        line-height: 1.2;
-        font-weight: 700;
-        letter-spacing: .035em;
-    }
-    .field-name::before { content: "METODE PEMBAYARAN"; }
-    .field-code::before { content: "KODE CHANNEL"; }
-    .field-account-name::before { content: "NAMA PEMILIK · TRANSFER"; }
-    .field-account-number::before { content: "NOMOR REKENING · TRANSFER"; }
-    .field-provider::before { content: "PROVIDER"; }
-    .field-type::before { content: "TIPE"; }
-    .field-active::before { content: "STATUS"; }
-    .field-name {
-        flex: 1.25;
-        min-width: 140px;
-    }
-    .field-code {
-        flex: 1;
-        min-width: 110px;
-    }
-    .field-account-name {
-        flex: 1.1;
-        min-width: 130px;
-    }
-    .field-account-number {
-        flex: 1;
-        min-width: 120px;
-    }
-    .field-provider {
-        flex: 1.1;
-        min-width: 125px;
-    }
-    .field-type {
-        flex: 0.9;
-        min-width: 95px;
-    }
-    .field-active {
-        flex: 0 0 72px;
-        min-width: 72px;
-    }
-    .channel-active-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        min-height: 38px;
-        font-size: 0.8rem;
-        color: #475569;
-        white-space: nowrap;
-    }
-
-    .form-input {
-        width: 100%;
-        box-sizing: border-box;
-        height: 38px;
-        padding: 0.375rem 0.625rem;
-        font-size: 0.875rem;
-        color: #334155;
-        background-color: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        outline: none;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .form-input:focus {
-        border-color: #5b9bd5;
-        box-shadow: 0 0 0 2px rgba(91, 155, 213, 0.2);
-    }
-
-    .custom-select {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 0.6rem center;
-        background-size: 11px 9px;
-        padding-right: 1.75rem;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        cursor: pointer;
-    }
-
-    /* Drag Handle */
-    .drag-handle-wrap {
-        width: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: grab;
-        user-select: none;
-        flex-shrink: 0;
-    }
-    .drag-handle-wrap:active {
-        cursor: grabbing;
-    }
-    .drag-icon {
-        opacity: 0.85;
-    }
-    .drag-handle-wrap:hover .drag-icon {
-        opacity: 1;
-    }
-
-    /* Delete Button (Red box with minus) */
-    .delete-btn-wrap {
-        width: 38px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .btn-row-delete {
-        width: 38px;
-        height: 38px;
-        background-color: #ea4335;
-        border: 1px solid #d93025;
-        border-radius: 4px;
-        color: #ffffff;
-        font-size: 1.35rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        line-height: 1;
-        transition: background-color 0.15s ease;
-    }
-    .btn-row-delete:hover {
-        background-color: #d93025;
-    }
-
-    /* Bottom Actions */
-    .bottom-actions-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 1.25rem;
-        padding-top: 1rem;
-        border-top: 1px solid #e2e8f0;
-    }
-
-    .btn-add-bank {
-        background: #ffffff;
-        border: 1.5px solid #4a6cf7;
-        color: #4a6cf7;
-        padding: 0.45rem 1.125rem;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s ease;
-    }
-    .btn-add-bank:hover {
-        background: #4a6cf7;
-        color: #ffffff;
-    }
-
-    .submit-wrap {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    .save-status-indicator {
-        font-size: 0.8125rem;
-        font-weight: 500;
-    }
-    .save-status-indicator.saving { color: #f59e0b; }
-    .save-status-indicator.saved  { color: #16a34a; }
-    .save-status-indicator.error  { color: #dc2626; }
-
-    .btn-save-all {
-        background: #16a34a;
-        color: #ffffff;
-        border: none;
-        padding: 0.5rem 1.25rem;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.375rem;
-    }
-    .btn-save-all:hover {
-        background: #15803d;
-    }
-
-    @media (max-width: 768px) {
-        .channel-page-header,
-        .bottom-actions-row {
-            align-items: stretch;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        .btn-top-gateway,
-        .btn-add-bank,
-        .btn-save-all { justify-content: center; }
-        .channel-admin-wrapper { max-width: 100%; }
-        .channel-row-item {
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            padding: 0.9rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-        }
-        .channel-row-item .field-wrap {
-            flex: 1 1 calc(50% - 0.5rem);
-            min-width: 0;
-        }
-        .channel-row-item .field-name,
-        .channel-row-item .field-provider {
-            flex-basis: 100%;
-        }
-        .channel-row-item .field-name,
-        .channel-row-item .field-code,
-        .channel-row-item .field-account-name,
-        .channel-row-item .field-account-number,
-        .channel-row-item .field-provider,
-        .channel-row-item .field-type,
-        .channel-row-item .field-active {
-            flex-basis: calc(50% - 0.5rem);
-        }
-        .channel-row-item .drag-handle-wrap {
-            margin-left: auto;
-        }
-        .submit-wrap {
-            justify-content: space-between;
-        }
-    }
+.manual-accounts{max-width:1000px;color:#172b4d}.manual-back{display:inline-flex;gap:8px;align-items:center;color:#667085;text-decoration:none;font-size:13px;font-weight:600;margin-bottom:20px}.manual-back:hover{color:#3365af}
+.manual-header{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:22px}.manual-eyebrow{font-size:10px;letter-spacing:.12em;font-weight:800;color:#8290a5}.manual-header h1{font-size:25px;letter-spacing:-.04em;margin:5px 0;color:#172b4d}.manual-header p{font-size:13px;color:#667085;margin:0;max-width:600px;line-height:1.6}
+.manual-notice{display:flex;gap:10px;align-items:flex-start;padding:13px 15px;border:1px solid #dbe7f7;background:#f5f8fd;border-radius:10px;color:#52647d;font-size:12px;line-height:1.6;margin-bottom:16px}.manual-notice i{color:#3365af;font-size:15px}
+.manual-account-list{display:grid;gap:12px}.manual-account{background:#fff;border:1px solid #e7ebf2;border-radius:13px;padding:18px 20px}.manual-account__top{display:flex;align-items:center;gap:12px;margin-bottom:17px}.manual-bank-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:#edf3fc;color:#3365af;font-size:18px}.manual-account__identity{display:grid;gap:4px;flex:1;min-width:0}.manual-account__identity strong{font-size:14px}.manual-account__identity span{font-size:11px;color:#8994a6}.manual-toggle{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;color:#52647d;white-space:nowrap}.manual-toggle input{accent-color:#3365af;width:16px;height:16px}
+.manual-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.manual-fields label{display:block;font-size:11px;font-weight:650;color:#526075;margin-bottom:6px}.manual-fields .form-control{height:41px;border:1px solid #dce2eb;border-radius:8px;font-size:12px;box-shadow:none}.manual-fields .form-control:focus{border-color:#3365af;box-shadow:0 0 0 3px #3365af18}.manual-account__actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #eff1f5}.manual-account__actions a,.manual-remove{font-size:11px;font-weight:650;text-decoration:none}.manual-account__actions a{color:#3365af}.manual-remove{border:0;background:transparent;color:#c03939;padding:0}.manual-savebar{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px 2px}.manual-savebar>span{font-size:11px;color:#8994a6}.manual-empty{display:grid;justify-items:center;text-align:center;padding:45px 20px;background:#fff;border:1px dashed #d5dce7;border-radius:12px;color:#667085}.manual-empty i{font-size:28px;color:#3365af;margin-bottom:12px}.manual-empty strong{font-size:14px;color:#172b4d}.manual-empty p{font-size:12px;margin:6px 0 0}
+@media(max-width:700px){.manual-header{align-items:stretch;flex-direction:column}.manual-header .btn{width:100%}.manual-fields{grid-template-columns:1fr}.manual-account{padding:15px}.manual-account__top{flex-wrap:wrap}.manual-savebar{align-items:stretch;flex-direction:column}.manual-savebar .btn{width:100%}}
 </style>
 @endpush
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const channelList = document.getElementById('channelList');
-    const btnAddBank  = document.getElementById('btnAddBank');
-    const deletedContainer = document.getElementById('deletedIdsContainer');
-
-    const gatewaysOptions = `
-        @foreach ($gateways as $g)
-            <option value="{{ $g->id }}">{{ $g->name }}</option>
-        @endforeach
-    `;
-
-    // 1. Tambah Row Baru (+ Add Bank)
-    btnAddBank.addEventListener('click', function () {
-        const nextIndex = channelList.querySelectorAll('.channel-row-item').length;
-
-        const row = document.createElement('div');
-        row.className = 'channel-row-item';
-        row.innerHTML = `
-            <input type="hidden" name="channels[${nextIndex}][id]" value="" class="channel-id-input">
-
-            <div class="field-wrap field-name">
-                <input
-                    type="text"
-                    list="commonBankList"
-                    name="channels[${nextIndex}][name]"
-                    value=""
-                    class="form-input"
-                    placeholder="Nama Bank / E-Wallet (misal: Bank BCA)"
-                    required
-                >
-            </div>
-
-            <div class="field-wrap field-code">
-                <input
-                    type="text"
-                    name="channels[${nextIndex}][channel_code]"
-                    value=""
-                    class="form-input"
-                    placeholder="Code / No Rekening"
-                    required
-                >
-            </div>
-
-            <div class="field-wrap field-account-name">
-                <input type="text" name="channels[${nextIndex}][account_name]" value=""
-                    class="form-input" placeholder="Nama pemilik rekening">
-            </div>
-
-            <div class="field-wrap field-account-number">
-                <input type="text" name="channels[${nextIndex}][account_number]" value=""
-                    class="form-input" placeholder="Nomor rekening">
-            </div>
-
-            <div class="field-wrap field-provider">
-                <select name="channels[${nextIndex}][payment_gateway_id]" class="form-input custom-select">
-                    ${gatewaysOptions}
-                </select>
-            </div>
-
-            <div class="field-wrap field-type">
-                <select name="channels[${nextIndex}][payment_type]" class="form-input custom-select">
-                    <option value="instant">Instant</option>
-                    <option value="transfer">Transfer</option>
-                    <option value="va">VA</option>
-                </select>
-            </div>
-
-            <div class="field-wrap field-active">
-                <label class="channel-active-label">
-                    <input type="hidden" name="channels[${nextIndex}][is_active]" value="0">
-                    <input type="checkbox" name="channels[${nextIndex}][is_active]" value="1" checked>
-                    <span>Aktif</span>
-                </label>
-            </div>
-
-            <div class="drag-handle-wrap" title="Drag untuk mengubah urutan">
-                <svg viewBox="0 0 24 24" class="drag-icon" width="22" height="22">
-                    <path fill="#5b9bd5" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/>
-                </svg>
-            </div>
-
-            <div class="delete-btn-wrap">
-                <button type="button" class="btn-row-delete" title="Hapus channel">
-                    <span>&minus;</span>
-                </button>
-            </div>
-        `;
-
-        channelList.appendChild(row);
-        initRowEvents(row);
-        reindexRows();
-        row.querySelector('.field-name input').focus();
-    });
-
-    // 2. Event Handler untuk setiap baris (Delete & Drag)
-    function initRowEvents(row) {
-        // Delete button
-        const deleteBtn = row.querySelector('.btn-row-delete');
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', function () {
-                const idInput = row.querySelector('.channel-id-input');
-                if (idInput && idInput.value) {
-                    const hiddenDel = document.createElement('input');
-                    hiddenDel.type = 'hidden';
-                    hiddenDel.name = 'deleted_ids[]';
-                    hiddenDel.value = idInput.value;
-                    deletedContainer.appendChild(hiddenDel);
-                }
-                row.remove();
-                reindexRows();
-            });
-        }
-
-        // Drag and Drop
-        row.draggable = true;
-
-        row.addEventListener('dragstart', function (e) {
-            dragSrc = this;
-            this.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        });
-
-        row.addEventListener('dragend', function () {
-            this.classList.remove('dragging');
-            channelList.querySelectorAll('.channel-row-item').forEach(r => r.classList.remove('drag-over'));
-        });
-
-        row.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            channelList.querySelectorAll('.channel-row-item').forEach(r => r.classList.remove('drag-over'));
-            if (this !== dragSrc) this.classList.add('drag-over');
-        });
-
-        row.addEventListener('drop', function (e) {
-            e.preventDefault();
-            if (this === dragSrc) return;
-
-            const rows = [...channelList.querySelectorAll('.channel-row-item')];
-            const srcIdx  = rows.indexOf(dragSrc);
-            const destIdx = rows.indexOf(this);
-
-            if (srcIdx < destIdx) {
-                this.after(dragSrc);
-            } else {
-                this.before(dragSrc);
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('manualAccountForm');
+    const deleted = document.getElementById('deletedIdsContainer');
+    form?.querySelectorAll('[data-remove]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const card = button.closest('[data-account]');
+            const id = card?.querySelector('input[name$="[id]"]')?.value;
+            if (id) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'deleted_ids[]';
+                input.value = id;
+                deleted.appendChild(input);
             }
-
-            reindexRows();
+            card?.remove();
         });
-    }
-
-    let dragSrc = null;
-    channelList.querySelectorAll('.channel-row-item').forEach(initRowEvents);
-
-    // 3. Re-index nama array inputs
-    function reindexRows() {
-        channelList.querySelectorAll('.channel-row-item').forEach((row, idx) => {
-            row.querySelectorAll('input, select').forEach(input => {
-                if (input.name) {
-                    input.name = input.name.replace(/channels\[\d+\]/, `channels[${idx}]`);
-                }
-            });
-        });
-    }
+    });
 });
 </script>
 @endpush
