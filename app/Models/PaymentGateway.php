@@ -14,6 +14,16 @@ class PaymentGateway extends Model
         'client_key',
         'signature_secret_key',
         'webhook_token',
+        'sandbox_api_key',
+        'production_api_key',
+        'sandbox_webhook_token',
+        'production_webhook_token',
+        'sandbox_server_key',
+        'sandbox_client_key',
+        'sandbox_signature_secret_key',
+        'production_server_key',
+        'production_client_key',
+        'production_signature_secret_key',
     ];
 
     protected $fillable = [
@@ -111,14 +121,63 @@ class PaymentGateway extends Model
     }
 
     /**
+     * Resolve a credential only for the requested environment.
+     * Legacy unscoped credentials are accepted only for the mode they were configured for.
+     */
+    public function getCredentialForMode(string $key, string $mode, $default = null)
+    {
+        if (!in_array($mode, ['sandbox', 'production'], true)) {
+            return $default;
+        }
+
+        $modeKey = $mode . '_' . $key;
+        $modeValue = $this->getConfigValue($modeKey);
+        if (filled($modeValue)) {
+            return $modeValue;
+        }
+
+        $legacyMode = (bool) $this->getConfigValue('is_production', false)
+            ? 'production'
+            : 'sandbox';
+
+        if ($legacyMode !== $mode) {
+            return $default;
+        }
+
+        $legacyValue = $this->getConfigValue($key);
+        if (filled($legacyValue)) {
+            return $legacyValue;
+        }
+
+        // Midtrans accounts created before the 28 Oct 2026 key split used Server Key
+        // as the notification-signature secret. Keep this fallback only for legacy config.
+        if ($this->code === 'midtrans' && $key === 'signature_secret_key') {
+            return $this->getConfigValue('server_key', $default);
+        }
+
+        return $default;
+    }
+
+    public function activeCredentialMode(): string
+    {
+        $wantsProduction = (bool) $this->getConfigValue('is_production', false);
+        return $wantsProduction && app()->environment('production') ? 'production' : 'sandbox';
+    }
+
+    /**
      * Credential presence only; this is deliberately not a "ready" or connectivity check.
      */
     public function isConfigured(): bool
     {
+        $mode = $this->activeCredentialMode();
+
         return match ($this->code) {
             'manual' => true,
-            'midtrans' => $this->hasConfigValue('server_key') && $this->hasConfigValue('client_key'),
-            'flip' => $this->hasConfigValue('api_key') && $this->hasConfigValue('webhook_token'),
+            'midtrans' => filled($this->getCredentialForMode('server_key', $mode))
+                && filled($this->getCredentialForMode('client_key', $mode))
+                && filled($this->getCredentialForMode('signature_secret_key', $mode)),
+            'flip' => filled($this->getCredentialForMode('api_key', $mode))
+                && filled($this->getCredentialForMode('webhook_token', $mode)),
             default => false,
         };
     }
