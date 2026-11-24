@@ -224,6 +224,11 @@
                         <input id="gateway-description" name="description" class="form-control" value="{{ old('description', $gateway->description) }}" maxlength="255" placeholder="Keterangan integrasi untuk admin">
                     </div>
                     <div class="payment-field payment-field--full">
+                        <label for="gateway-webhook-url">Webhook Notification URL</label>
+                        <input id="gateway-webhook-url" class="form-control" value="{{ route('payment.gateway.webhook', ['gateway' => $gateway->code]) }}" readonly onclick="this.select()">
+                        <small>Salin URL ini ke pengaturan Notification URL / Callback URL di dashboard merchant {{ $gateway->name }}. Pastikan Webhook Token atau Signature Secret Key pada kedua sisi cocok.</small>
+                    </div>
+                    <div class="payment-field payment-field--full">
                         <label for="credential-mode">Mode pembayaran</label>
                         <select id="credential-mode" name="credential_mode" class="form-select">
                             @foreach (($isFlip ? ['sandbox' => 'Sandbox (VA legacy)', 'staging' => 'Flip Staging (Direct API v3)', 'production' => 'Production / Live'] : ['sandbox' => 'Sandbox', 'production' => 'Production / Live']) as $modeValue => $modeLabel)
