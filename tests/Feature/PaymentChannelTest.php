@@ -707,7 +707,9 @@ class PaymentChannelTest extends TestCase
         $this->assertTrue($midtrans->supportsPaymentType('instant'));
         $this->assertFalse($midtrans->supportsPaymentType('va'));
         $this->assertTrue($flip->supportsPaymentType('va'));
-        $this->assertFalse($flip->supportsPaymentType('instant'));
+        $this->assertTrue($flip->supportsPaymentType('instant'));
+        $this->assertSame('wallet_account', FlipService::determineSenderBankType('ovo'));
+        $this->assertSame('wallet_account', FlipService::determineSenderBankType('dana'));
         $this->assertTrue($manual->supportsPaymentType('transfer'));
     }
 
@@ -748,7 +750,9 @@ class PaymentChannelTest extends TestCase
             ->assertOk()
             ->assertSee('Bank BCA')
             ->assertSee('Virtual Account yang didukung adapter Flip')
-            ->assertSee('SeaBank Virtual Account');
+            ->assertSee('SeaBank Virtual Account')
+            ->assertSee('OVO')
+            ->assertSee('DANA');
 
         $this->post(route('admin.payment.gateway.methods.store', $flip), [
             'channel_code' => 'seabank',
@@ -761,6 +765,20 @@ class PaymentChannelTest extends TestCase
 
         $this->assertSame('va', $channel->payment_type);
         $this->assertFalse($channel->is_active);
+
+        foreach (['ovo', 'dana'] as $walletCode) {
+            $this->post(route('admin.payment.gateway.methods.store', $flip), [
+                'channel_code' => $walletCode,
+            ])->assertRedirect(route('admin.payment.gateway.show', $flip))
+                ->assertSessionHas('success');
+
+            $wallet = PaymentChannel::where('payment_gateway_id', $flip->id)
+                ->where('channel_code', $walletCode)
+                ->firstOrFail();
+
+            $this->assertSame('instant', $wallet->payment_type);
+            $this->assertFalse($wallet->is_active);
+        }
     }
 
     public function test_provider_catalog_rejects_methods_not_supported_by_that_provider(): void
