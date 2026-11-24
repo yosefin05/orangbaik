@@ -86,6 +86,19 @@ class FlipService
      */
     public function createVirtualAccount(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
     {
+        $gateway = $channel->gateway;
+        $isProduction = (bool) ($gateway?->getConfigValue('is_production', false) ?? false);
+
+        // Staging, local, and test environments must never send live-money requests.
+        if (!app()->environment('production')) {
+            $isProduction = false;
+        }
+
+        $this->baseUrl = $isProduction
+            ? (config('payment.flip.base_url_production') ?? 'https://bigflip.id/api')
+            : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
+        $this->apiKey = $gateway?->getConfigValue('api_key') ?: config('payment.flip.api_key');
+
         if (!$this->isConfigured()) {
             throw new \Exception('Flip belum dikonfigurasi. Tambahkan FLIP_API_KEY di file .env.');
         }
@@ -312,19 +325,6 @@ class FlipService
          * 1. VERIFIKASI TOKEN (FAIL-CLOSED)
          * =====================================================
          */
-        $expectedToken = config('payment.flip.webhook_token');
-
-        if (empty($expectedToken)) {
-            Log::critical('Flip webhook ditolak: FLIP_WEBHOOK_TOKEN belum dikonfigurasi (fail-closed).');
-            return false;
-        }
-
-        $receivedToken = !empty($token) ? $token : ($payload['token'] ?? '');
-        if (empty($receivedToken) || !hash_equals($expectedToken, (string) $receivedToken)) {
-            Log::warning('Flip webhook ditolak: token tidak cocok atau tidak disertakan.');
-            return false;
-        }
-
         /*
          * =====================================================
          * 2. PARSE PAYLOAD DARI FLIP
@@ -359,7 +359,7 @@ class FlipService
          * 3. CARI PEMBAYARAN BERDASARKAN TRANSACTION_ID (FLIP LINK ID ATAU PAYMENT ID)
          * =====================================================
          */
-        $pembayaran = Pembayaran::with('donasi')
+        $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
             ->where(function ($q) use ($billLinkId, $paymentId) {
                 if ($billLinkId) {
                     $q->where('transaction_id', (string) $billLinkId);
@@ -387,10 +387,29 @@ class FlipService
 
         /*
          * =====================================================
-         * 4. CEGAH ROLLBACK STATUS (IDEMPOTENT)
+         * 4. VERIFIKASI TOKEN SESUAI GATEWAY TRANSAKSI
          * =====================================================
          */
-        if ($pembayaran->transaction_status === 'settlement') {
+        $gateway = $pembayaran->paymentChannel?->gateway;
+        if (!$gateway || $gateway->code !== 'flip') {
+            Log::warning('Flip webhook ditolak: transaksi bukan milik gateway Flip.');
+            return false;
+        }
+
+        $expectedToken = $gateway->getConfigValue('webhook_token');
+        $receivedToken = !empty($token) ? $token : ($payload['token'] ?? '');
+
+        if (blank($expectedToken) || blank($receivedToken) || !hash_equals((string) $expectedToken, (string) $receivedToken)) {
+            Log::warning('Flip webhook ditolak: token tidak cocok atau tidak dikonfigurasi.');
+            return false;
+        }
+
+        /*
+         * =====================================================
+         * 5. CEGAH PERUBAHAN STATUS TERMINAL (IDEMPOTENT)
+         * =====================================================
+         */
+        if (in_array($pembayaran->transaction_status, ['settlement', 'failed', 'expired', 'expire'], true)) {
             Log::info('Flip webhook: transaksi sudah settlement (idempotent skip)', [
                 'order_id' => $pembayaran->order_id,
             ]);
@@ -419,6 +438,13 @@ class FlipService
             $callbackAmount = isset($data['amount'])
                 ? (int) $data['amount']
                 : (isset($data['bill_payment']['amount']) ? (int) $data['bill_payment']['amount'] : null);
+
+            if ($callbackAmount === null) {
+                Log::error('Flip webhook settlement ditolak: nominal callback tidak tersedia.', [
+                    'order_id' => $pembayaran->order_id,
+                ]);
+                return false;
+            }
 
             if ($callbackAmount !== null) {
                 $savedUniqueCode = (int) ($pembayaran->gateway_response['unique_code'] ?? 0);
