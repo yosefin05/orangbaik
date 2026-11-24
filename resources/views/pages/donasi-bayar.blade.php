@@ -136,17 +136,14 @@
 
                     @if(isset($paymentChannels) && $paymentChannels->isNotEmpty())
                         @php
-                            // Dikelompokkan berdasarkan tipe pembayaran: E-Wallet, Virtual Account, lainnya.
-                            $paymentTypeLabels = [
-                                'instant' => 'E-Wallet',
-                                'va' => 'Virtual Account',
-                            ];
-
-                            $groupOrder = ['E-Wallet', 'Virtual Account', 'Transfer Manual'];
+                            // Empat kategori; QRIS dipisahkan dari e-wallet meski sama-sama instant.
+                            $groupOrder = ['QRIS', 'E-Wallet', 'Virtual Account', 'Transfer Manual'];
 
                             $grouped = $paymentChannels
-                                ->groupBy(function ($item) use ($paymentTypeLabels) {
-                                    return $paymentTypeLabels[$item->payment_type] ?? 'Transfer Manual';
+                                ->groupBy(function ($item) {
+                                    if ($item->payment_type === 'transfer') return 'Transfer Manual';
+                                    if ($item->payment_type === 'va') return 'Virtual Account';
+                                    return strtolower($item->channel_code) === 'qris' ? 'QRIS' : 'E-Wallet';
                                 })
                                 ->sortBy(function ($channels, $groupName) use ($groupOrder) {
                                     $index = array_search($groupName, $groupOrder);
@@ -154,8 +151,10 @@
                                 });
 
                             $groupIcons = [
+                                'QRIS' => 'bi-qr-code',
                                 'E-Wallet' => 'bi-wallet2',
                                 'Virtual Account' => 'bi-bank2',
+                                'Transfer Manual' => 'bi-bank',
                             ];
 
                             // Pencocokan logo berdasarkan nama channel (aset di public/images/payment-logos).
