@@ -652,6 +652,7 @@ class PaymentChannelTest extends TestCase
                     'channel_code' => 'qris',
                     'account_name' => 'Not a bank account',
                     'account_number' => '000000',
+                    'payment_type' => 'transfer',
                     'is_active' => '1',
                 ],
             ],
