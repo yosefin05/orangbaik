@@ -13,10 +13,12 @@ use App\Models\User;
 use App\Services\FlipService;
 use App\Services\MidtransService;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SecurityHardeningAuditTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * Skenario 1: Dokumen individu tidak boleh berstatus publik untuk pengunjung (isPublicForVisitor)
      */

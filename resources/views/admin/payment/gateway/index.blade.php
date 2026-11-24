@@ -10,13 +10,9 @@
     <section class="page-header">
         <div>
             <h2>Payment Gateway</h2>
-            <p>Kelola provider pembayaran, atur API Key langsung dari panel, dan tambahkan gateway baru secara fleksibel.</p>
+            <p>Kelola kredensial dan status Midtrans, Flip, serta transfer manual. Provider baru memerlukan adapter khusus sebelum dapat digunakan.</p>
         </div>
         <div class="header-actions">
-            <button type="button" class="btn btn-success" onclick="openAddGatewayModal()">
-                <i class="bi bi-plus-lg"></i>
-                Tambah Gateway Baru
-            </button>
             <a href="{{ route('admin.payment.channel.index') }}" class="btn btn-primary">
                 <i class="bi bi-diagram-3"></i>
                 Kelola Channel
@@ -105,10 +101,10 @@
                             <small class="text-blue fw-semibold">Transfer Manual Yayasan</small>
                         @elseif ($isConfigured)
                             <i class="bi bi-shield-check text-success"></i>
-                            <small class="text-success fw-semibold">API Key Terkonfigurasi & Siap</small>
+                            <small class="text-success fw-semibold">Kredensial tersedia — perlu pengujian koneksi</small>
                         @else
                             <i class="bi bi-exclamation-circle text-warning"></i>
-                            <small class="text-warning fw-semibold">API Key Belum Diisi</small>
+                            <small class="text-warning fw-semibold">Kredensial wajib belum lengkap</small>
                         @endif
                     </div>
 
@@ -118,10 +114,38 @@
                 </div>
 
                 <div class="gateway-card__footer">
+                    @php
+                        $gatewayModalData = [
+                            'id' => $gateway->id,
+                            'name' => $gateway->name,
+                            'code' => $gateway->code,
+                            'description' => $gateway->description,
+                            'is_active' => $gateway->is_active,
+                            'config' => [
+                                'is_production' => (bool) $gateway->getConfigValue('is_production', false),
+                                'has_server_key' => $gateway->hasConfigValue('server_key'),
+                                'has_client_key' => $gateway->hasConfigValue('client_key'),
+                                'has_signature_secret_key' => $gateway->hasConfigValue('signature_secret_key'),
+                                'has_sandbox_server_key' => $gateway->hasConfigValue('sandbox_server_key'),
+                                'has_sandbox_client_key' => $gateway->hasConfigValue('sandbox_client_key'),
+                                'has_sandbox_signature_secret_key' => $gateway->hasConfigValue('sandbox_signature_secret_key'),
+                                'has_production_server_key' => $gateway->hasConfigValue('production_server_key'),
+                                'has_production_client_key' => $gateway->hasConfigValue('production_client_key'),
+                                'has_production_signature_secret_key' => $gateway->hasConfigValue('production_signature_secret_key'),
+                                'has_sandbox_api_key' => $gateway->hasConfigValue('sandbox_api_key'),
+                                'has_production_api_key' => $gateway->hasConfigValue('production_api_key'),
+                                'has_sandbox_webhook_token' => $gateway->hasConfigValue('sandbox_webhook_token'),
+                                'has_production_webhook_token' => $gateway->hasConfigValue('production_webhook_token'),
+                                'has_api_key' => $gateway->hasConfigValue('api_key'),
+                                'has_webhook_token' => $gateway->hasConfigValue('webhook_token'),
+                            ],
+                        ];
+                    @endphp
                     @if ($gateway->code !== 'manual')
-                        <button type="button" 
+                        <button type="button"
                             class="btn btn-outline-primary btn-sm"
-                            onclick='openEditConfigModal(@json($gateway))'
+                            data-gateway="{{ e(json_encode($gatewayModalData)) }}"
+                            onclick="openEditConfigModal(JSON.parse(this.dataset.gateway))"
                             title="Atur API Key & Pengaturan Gateway">
                             <i class="bi bi-gear-fill"></i>
                             Pengaturan API
@@ -170,7 +194,7 @@
         <i class="bi bi-shield-lock-fill"></i>
         <div>
             <strong>Konfigurasi Fleksibel & Modular (Driver Pattern)</strong>
-            <p>Anda dapat mengedit API Key langsung dari modal pengaturan di atas atau melalui file <code>.env</code>. Webhook universal untuk semua gateway tersedia di: <code>POST /payment/{gateway}/webhook</code>.</p>
+            <p>Atur kredensial melalui panel ini. Nilai rahasia tidak ditampilkan kembali setelah disimpan. Status kredensial bukan bukti bahwa transaksi sudah berhasil; lakukan pengujian Sandbox sebelum mengaktifkan pembayaran.</p>
         </div>
     </div>
 
@@ -264,28 +288,63 @@
                         <input type="text" name="name" id="editName" class="form-control" required>
                     </div>
 
-                    {{-- Fields khusus Midtrans --}}
+                    {{-- Midtrans credentials dipisahkan per environment --}}
                     <div id="midtransFields" style="display:none;">
+                        <div class="alert alert-info">
+                            Simpan key Sandbox dan Production pada kolom terpisah. Server Key dan Signature Secret Key memiliki fungsi berbeda pada akun Midtrans terbaru.
+                        </div>
+                        <h6>Sandbox (untuk staging dan pengujian)</h6>
                         <div class="form-group mb-3">
-                            <label class="form-label">Midtrans Server Key <span class="text-danger">*</span></label>
-                            <input type="text" name="server_key" id="editServerKey" class="form-control" placeholder="SB-Mid-server-xxxx">
+                            <label class="form-label">Sandbox Server Key</label>
+                            <input type="password" autocomplete="new-password" name="sandbox_server_key" id="editSandboxServerKey" class="form-control">
                         </div>
                         <div class="form-group mb-3">
-                            <label class="form-label">Midtrans Client Key</label>
-                            <input type="text" name="client_key" id="editClientKey" class="form-control" placeholder="SB-Mid-client-xxxx">
+                            <label class="form-label">Sandbox Client Key</label>
+                            <input type="password" autocomplete="new-password" name="sandbox_client_key" id="editSandboxClientKey" class="form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Sandbox Signature Secret Key</label>
+                            <input type="password" autocomplete="new-password" name="sandbox_signature_secret_key" id="editSandboxSignatureKey" class="form-control">
+                        </div>
+                        <hr>
+                        <h6>Production (untuk server Production saja)</h6>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Production Server Key</label>
+                            <input type="password" autocomplete="new-password" name="production_server_key" id="editProductionServerKey" class="form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Production Client Key</label>
+                            <input type="password" autocomplete="new-password" name="production_client_key" id="editProductionClientKey" class="form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Production Signature Secret Key</label>
+                            <input type="password" autocomplete="new-password" name="production_signature_secret_key" id="editProductionSignatureKey" class="form-control">
                         </div>
                     </div>
 
-                    {{-- Fields khusus Flip --}}
+                    {{-- Flip credentials dipisahkan per environment --}}
                     <div id="flipFields" style="display:none;">
+                        <div class="alert alert-info">
+                            Gunakan key dan callback token yang sesuai dengan environment. Integrasi Accept Payment v3 memerlukan akses staging dari tim Flip.
+                        </div>
+                        <h6>Sandbox</h6>
                         <div class="form-group mb-3">
-                            <label class="form-label">Flip Secret API Key <span class="text-danger">*</span></label>
-                            <input type="text" name="api_key" id="editFlipApiKey" class="form-control" placeholder="Masukkan Secret Key Flip">
-                            <small class="text-muted">Didapatkan dari Dashboard Big Flip > API Integration.</small>
+                            <label class="form-label">Sandbox API Secret Key</label>
+                            <input type="password" autocomplete="new-password" name="sandbox_api_key" id="editSandboxFlipApiKey" class="form-control">
                         </div>
                         <div class="form-group mb-3">
-                            <label class="form-label">Flip Webhook Token (X-CALLBACK-TOKEN)</label>
-                            <input type="text" name="webhook_token" id="editFlipWebhookToken" class="form-control" placeholder="Token verifikasi webhook Flip">
+                            <label class="form-label">Sandbox Webhook Token</label>
+                            <input type="password" autocomplete="new-password" name="sandbox_webhook_token" id="editSandboxFlipWebhookToken" class="form-control">
+                        </div>
+                        <hr>
+                        <h6>Production</h6>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Production API Secret Key</label>
+                            <input type="password" autocomplete="new-password" name="production_api_key" id="editProductionFlipApiKey" class="form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Production Webhook Token</label>
+                            <input type="password" autocomplete="new-password" name="production_webhook_token" id="editProductionFlipWebhookToken" class="form-control">
                         </div>
                     </div>
 
@@ -293,11 +352,11 @@
                     <div id="genericFields" style="display:none;">
                         <div class="form-group mb-3">
                             <label class="form-label">API Key / Secret Key</label>
-                            <input type="text" name="api_key" id="editGenericApiKey" class="form-control" placeholder="API Secret Key">
+                            <input type="password" autocomplete="new-password" name="api_key" id="editGenericApiKey" class="form-control" placeholder="API Secret Key">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Webhook Token / Signature Key</label>
-                            <input type="text" name="webhook_token" id="editGenericWebhookToken" class="form-control" placeholder="Token Webhook">
+                            <input type="password" autocomplete="new-password" name="webhook_token" id="editGenericWebhookToken" class="form-control" placeholder="Token Webhook">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">API Endpoint URL</label>
@@ -312,7 +371,8 @@
 
                     <div class="form-check mb-2">
                         <input type="checkbox" name="is_production" value="1" id="editProdCheck" class="form-check-input">
-                        <label for="editProdCheck" class="form-check-label">Mode Production (Live)</label>
+                        <label for="editProdCheck" class="form-check-label">Pilih kredensial Production saat aplikasi berjalan di server Production</label>
+                        <small class="form-text text-muted">Staging/local/testing tetap dipaksa memakai Sandbox. Centang ini tidak otomatis mengaktifkan gateway.</small>
                     </div>
 
                     <div class="form-check">
@@ -598,7 +658,6 @@ function closeAddGatewayModal() {
 function openEditConfigModal(gateway) {
     document.getElementById('modalGatewayName').textContent = gateway.name;
     document.getElementById('editConfigForm').action = `/admin/payment/gateway/${gateway.id}`;
-    
     document.getElementById('editName').value = gateway.name || '';
     document.getElementById('editDesc').value = gateway.description || '';
     document.getElementById('editActiveCheck').checked = !!gateway.is_active;
@@ -606,28 +665,30 @@ function openEditConfigModal(gateway) {
     const config = gateway.config || {};
     document.getElementById('editProdCheck').checked = !!config.is_production;
 
-    // Toggle fields based on gateway code
-    const midtransFields = document.getElementById('midtransFields');
-    const flipFields     = document.getElementById('flipFields');
-    const genericFields  = document.getElementById('genericFields');
+    ['midtransFields', 'flipFields', 'genericFields'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
+    });
 
-    midtransFields.style.display = 'none';
-    flipFields.style.display     = 'none';
-    genericFields.style.display  = 'none';
+    const placeholders = (id, exists, label) => {
+        const field = document.getElementById(id);
+        field.value = '';
+        field.placeholder = exists ? 'Kredensial tersimpan — isi hanya jika ingin mengganti' : label;
+    };
 
     if (gateway.code === 'midtrans') {
-        midtransFields.style.display = 'block';
-        document.getElementById('editServerKey').value = config.server_key || '';
-        document.getElementById('editClientKey').value = config.client_key || '';
+        document.getElementById('midtransFields').style.display = 'block';
+        placeholders('editSandboxServerKey', config.has_sandbox_server_key, 'Sandbox Server Key');
+        placeholders('editSandboxClientKey', config.has_sandbox_client_key, 'Sandbox Client Key');
+        placeholders('editSandboxSignatureKey', config.has_sandbox_signature_secret_key, 'Sandbox Signature Secret Key');
+        placeholders('editProductionServerKey', config.has_production_server_key, 'Production Server Key');
+        placeholders('editProductionClientKey', config.has_production_client_key, 'Production Client Key');
+        placeholders('editProductionSignatureKey', config.has_production_signature_secret_key, 'Production Signature Secret Key');
     } else if (gateway.code === 'flip') {
-        flipFields.style.display = 'block';
-        document.getElementById('editFlipApiKey').value = config.api_key || '';
-        document.getElementById('editFlipWebhookToken').value = config.webhook_token || '';
-    } else {
-        genericFields.style.display = 'block';
-        document.getElementById('editGenericApiKey').value = config.api_key || config.server_key || '';
-        document.getElementById('editGenericWebhookToken').value = config.webhook_token || '';
-        document.getElementById('editEndpointUrl').value = config.endpoint_url || '';
+        document.getElementById('flipFields').style.display = 'block';
+        placeholders('editSandboxFlipApiKey', config.has_sandbox_api_key, 'Sandbox API Secret Key');
+        placeholders('editSandboxFlipWebhookToken', config.has_sandbox_webhook_token, 'Sandbox Webhook Token');
+        placeholders('editProductionFlipApiKey', config.has_production_api_key, 'Production API Secret Key');
+        placeholders('editProductionFlipWebhookToken', config.has_production_webhook_token, 'Production Webhook Token');
     }
 
     document.getElementById('editConfigModal').style.display = 'flex';

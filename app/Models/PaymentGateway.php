@@ -3,9 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
+use Throwable;
 
 class PaymentGateway extends Model
 {
+    private const SECRET_CONFIG_KEYS = [
+        'api_key',
+        'server_key',
+        'client_key',
+        'signature_secret_key',
+        'webhook_token',
+        'sandbox_api_key',
+        'production_api_key',
+        'sandbox_webhook_token',
+        'production_webhook_token',
+        'sandbox_server_key',
+        'sandbox_client_key',
+        'sandbox_signature_secret_key',
+        'production_server_key',
+        'production_client_key',
+        'production_signature_secret_key',
+    ];
+
     protected $fillable = [
         'name',
         'code',
@@ -17,20 +37,14 @@ class PaymentGateway extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
-        'config'    => 'array',
+        'config' => 'array',
     ];
 
-    /**
-     * Payment channels yang menggunakan gateway ini.
-     */
     public function channels()
     {
         return $this->hasMany(PaymentChannel::class);
     }
 
-    /**
-     * Payment channels yang aktif.
-     */
     public function activeChannels()
     {
         return $this->hasMany(PaymentChannel::class)
@@ -38,66 +52,133 @@ class PaymentGateway extends Model
             ->orderBy('sort_order');
     }
 
-    /**
-     * Scope: hanya gateway aktif.
-     */
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
     /**
-     * Ambil nilai konfigurasi tertentu dari database atau fallback ke .env/config.
+     * Encrypt secret values before persisting them inside the JSON config column.
+     * The prefix allows safe backwards compatibility with legacy plaintext values.
      */
-    public function getConfigValue(string $key, $default = null)
+    public static function secureConfigForStorage(array $config): array
     {
-        if (isset($this->config[$key]) && $this->config[$key] !== '') {
-            return $this->config[$key];
+        foreach (self::SECRET_CONFIG_KEYS as $key) {
+            $value = $config[$key] ?? null;
+
+            if (is_string($value) && $value !== '' && !str_starts_with($value, 'encrypted:v1:')) {
+                $config[$key] = 'encrypted:v1:' . Crypt::encryptString($value);
+            }
         }
 
-        // Fallback ke config file
+        return $config;
+    }
+
+    public function getConfigValue(string $key, $default = null)
+    {
+        $value = data_get($this->config ?? [], $key);
+
+        if ($value !== null && $value !== '') {
+            if (in_array($key, self::SECRET_CONFIG_KEYS, true) && is_string($value) && str_starts_with($value, 'encrypted:v1:')) {
+                try {
+                    return Crypt::decryptString(substr($value, strlen('encrypted:v1:')));
+                } catch (Throwable $exception) {
+                    report($exception);
+                    return $default;
+                }
+            }
+
+            return $value;
+        }
+
+        // Legacy environment fallback remains for existing installations during migration.
         if ($this->code === 'midtrans') {
             return match ($key) {
-                'server_key'    => config('payment.midtrans.server_key', $default),
-                'client_key'    => config('payment.midtrans.client_key', $default),
-                'is_production' => config('payment.midtrans.is_production', $default),
-                default         => $default,
+                'server_key' => config('midtrans.serverKey') ?: config('payment.midtrans.server_key', $default),
+                'client_key' => config('midtrans.clientKey') ?: config('payment.midtrans.client_key', $default),
+                // Legacy Midtrans accounts used Server Key to verify notifications before 28 Oct 2026.
+                'signature_secret_key' => config('midtrans.signatureSecretKey') ?: config('payment.midtrans.signature_secret_key') ?: $this->getConfigValue('server_key', $default),
+                'is_production' => config('midtrans.isProduction', config('payment.midtrans.is_production', $default)),
+                default => $default,
             };
         }
 
         if ($this->code === 'flip') {
             return match ($key) {
-                'api_key'       => config('payment.flip.api_key', $default),
+                'api_key' => config('payment.flip.api_key', $default),
                 'webhook_token' => config('payment.flip.webhook_token', $default),
                 'is_production' => config('payment.flip.is_production', $default),
-                default         => $default,
+                default => $default,
             };
         }
 
         return $default;
     }
 
+    public function hasConfigValue(string $key): bool
+    {
+        return filled($this->getConfigValue($key));
+    }
+
     /**
-     * Cek apakah API Key / kredensial gateway sudah terkonfigurasi.
+     * Resolve a credential only for the requested environment.
+     * Legacy unscoped credentials are accepted only for the mode they were configured for.
+     */
+    public function getCredentialForMode(string $key, string $mode, $default = null)
+    {
+        if (!in_array($mode, ['sandbox', 'production'], true)) {
+            return $default;
+        }
+
+        $modeKey = $mode . '_' . $key;
+        $modeValue = $this->getConfigValue($modeKey);
+        if (filled($modeValue)) {
+            return $modeValue;
+        }
+
+        $legacyMode = (bool) $this->getConfigValue('is_production', false)
+            ? 'production'
+            : 'sandbox';
+
+        if ($legacyMode !== $mode) {
+            return $default;
+        }
+
+        $legacyValue = $this->getConfigValue($key);
+        if (filled($legacyValue)) {
+            return $legacyValue;
+        }
+
+        // Midtrans accounts created before the 28 Oct 2026 key split used Server Key
+        // as the notification-signature secret. Keep this fallback only for legacy config.
+        if ($this->code === 'midtrans' && $key === 'signature_secret_key') {
+            return $this->getConfigValue('server_key', $default);
+        }
+
+        return $default;
+    }
+
+    public function activeCredentialMode(): string
+    {
+        $wantsProduction = (bool) $this->getConfigValue('is_production', false);
+        return $wantsProduction && app()->environment('production') ? 'production' : 'sandbox';
+    }
+
+    /**
+     * Credential presence only; this is deliberately not a "ready" or connectivity check.
      */
     public function isConfigured(): bool
     {
-        if ($this->code === 'manual') {
-            return true;
-        }
+        $mode = $this->activeCredentialMode();
 
-        if ($this->code === 'midtrans') {
-            $key = $this->getConfigValue('server_key');
-            return !empty($key);
-        }
-
-        if ($this->code === 'flip') {
-            $key = $this->getConfigValue('api_key');
-            return !empty($key);
-        }
-
-        // Untuk gateway custom
-        $apiKey = $this->getConfigValue('api_key') ?? $this->getConfigValue('server_key');
-        return !empty($apiKey);
+        return match ($this->code) {
+            'manual' => true,
+            'midtrans' => filled($this->getCredentialForMode('server_key', $mode))
+                && filled($this->getCredentialForMode('client_key', $mode))
+                && filled($this->getCredentialForMode('signature_secret_key', $mode)),
+            'flip' => filled($this->getCredentialForMode('api_key', $mode))
+                && filled($this->getCredentialForMode('webhook_token', $mode)),
+            default => false,
+        };
     }
 }

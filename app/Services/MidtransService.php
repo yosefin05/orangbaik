@@ -7,17 +7,41 @@ use Midtrans\Snap;
 use App\Models\Donasi;
 use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
+use App\Models\PaymentGateway;
 use Illuminate\Support\Facades\Log;
 
 class MidtransService
 {
     public function __construct()
     {
-        Config::$serverKey    = config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
-        Config::$clientKey    = config('midtrans.clientKey') ?: config('payment.midtrans.client_key');
-        Config::$isProduction = config('midtrans.isProduction') ?? config('payment.midtrans.is_production', false);
-        Config::$isSanitized  = config('midtrans.isSanitized') ?? config('payment.midtrans.is_sanitized', true);
-        Config::$is3ds        = config('midtrans.is3ds') ?? config('payment.midtrans.is_3ds', true);
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+    }
+
+    /**
+     * Configure the SDK from the gateway attached to the selected payment channel.
+     * Live mode is only allowed when the application itself runs in production.
+     */
+    protected function configureGateway(?PaymentGateway $gateway): void
+    {
+        if (!$gateway) {
+            throw new \RuntimeException('Gateway Midtrans tidak ditemukan.');
+        }
+
+        $mode = $gateway->activeCredentialMode();
+        $serverKey = $gateway->getCredentialForMode('server_key', $mode);
+        $clientKey = $gateway->getCredentialForMode('client_key', $mode);
+        $isProduction = $mode === 'production';
+
+        if (blank($serverKey) || blank($clientKey) || blank($gateway->getCredentialForMode('signature_secret_key', $mode))) {
+            throw new \RuntimeException('Kredensial Midtrans belum lengkap. Lengkapi Server Key dan Client Key.');
+        }
+
+        Config::$serverKey = $serverKey;
+        Config::$clientKey = $clientKey;
+        Config::$isProduction = $isProduction;
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
     }
 
     /**
@@ -27,6 +51,12 @@ class MidtransService
      */
     public function createTransaction(Donasi $donasi, Pembayaran $pembayaran, ?PaymentChannel $channel = null)
     {
+        if (!$channel || $channel->gateway?->code !== 'midtrans') {
+            throw new \RuntimeException('Channel pembayaran tidak terhubung ke gateway Midtrans.');
+        }
+
+        $this->configureGateway($channel->gateway);
+
         $params = [
             'transaction_details' => [
                 'order_id'     => $pembayaran->order_id,
@@ -57,12 +87,17 @@ class MidtransService
             $snapToken = Snap::getSnapToken($params);
 
             // Simpan snap token ke pembayaran
-            $pembayaran->update(['snap_token' => $snapToken]);
+            $pembayaran->update([
+                'snap_token' => $snapToken,
+                'gateway_response' => array_merge($pembayaran->gateway_response ?? [], [
+                    'credential_mode' => $channel->gateway->activeCredentialMode(),
+                ]),
+            ]);
 
             return $snapToken;
         } catch (\Exception $e) {
             Log::error('Midtrans Snap Error', [
-                'message'  => $e->getMessage(),
+                'exception_class' => get_class($e),
                 'order_id' => $pembayaran->order_id,
                 'donasi_id' => $donasi->id,
             ]);
@@ -73,9 +108,17 @@ class MidtransService
     /**
      * Cek apakah Midtrans sudah dikonfigurasi (Server Key tersedia).
      */
-    public function isConfigured(): bool
+    public function isConfigured(?PaymentGateway $gateway = null): bool
     {
-        return !empty(config('midtrans.serverKey')) || !empty(config('payment.midtrans.server_key'));
+        if (!$gateway) {
+            return false;
+        }
+
+        $mode = $gateway->activeCredentialMode();
+
+        return filled($gateway->getCredentialForMode('server_key', $mode))
+            && filled($gateway->getCredentialForMode('client_key', $mode))
+            && filled($gateway->getCredentialForMode('signature_secret_key', $mode));
     }
 
     /**
@@ -91,39 +134,43 @@ class MidtransService
 
         // Pastikan data penting tersedia
         if (!$orderId || !$statusCode || !$grossAmount || !$signatureKey) {
-            Log::warning('Midtrans webhook: data tidak lengkap', ['payload' => $payload]);
+            Log::warning('Midtrans webhook: data tidak lengkap', ['payload_keys' => array_keys($payload)]);
             return false;
         }
 
         /*
          * =====================================================
-         * 1. VERIFIKASI SIGNATURE MIDTRANS (FAIL-CLOSED)
-         * =====================================================
-         */
-        $serverKey = config('midtrans.serverKey') ?: config('payment.midtrans.server_key');
-        if (empty($serverKey)) {
-            Log::critical('Midtrans webhook ditolak: MIDTRANS_SERVER_KEY belum dikonfigurasi (fail-closed).');
-            return false;
-        }
-
-        $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
-
-        if (!hash_equals($expectedSignature, $signatureKey)) {
-            Log::warning('Midtrans webhook: signature tidak valid', ['order_id' => $orderId]);
-            return false;
-        }
-
-        /*
-         * =====================================================
-         * 2. CARI DATA PEMBAYARAN
+         * 1. CARI TRANSAKSI DAN GATEWAY PEMILIKNYA
          * =====================================================
          */
         $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
             ->where('order_id', $orderId)
             ->first();
 
-        if (!$pembayaran) {
-            Log::warning('Midtrans webhook: pembayaran tidak ditemukan', ['order_id' => $orderId]);
+        if (!$pembayaran || $pembayaran->paymentChannel?->gateway?->code !== 'midtrans') {
+            Log::warning('Midtrans webhook: pembayaran tidak ditemukan atau bukan milik Midtrans', ['order_id' => $orderId]);
+            return false;
+        }
+
+        /*
+         * =====================================================
+         * 2. VERIFIKASI SIGNATURE DENGAN SIGNATURE SECRET KEY GATEWAY TERKAIT
+         * =====================================================
+         */
+        $gateway = $pembayaran->paymentChannel->gateway;
+        $credentialMode = data_get($pembayaran->gateway_response ?? [], 'credential_mode')
+            ?: $gateway->activeCredentialMode();
+        $signatureSecretKey = $gateway->getCredentialForMode('signature_secret_key', $credentialMode);
+
+        if (blank($signatureSecretKey)) {
+            Log::critical('Midtrans webhook ditolak: Signature Secret Key gateway belum dikonfigurasi.');
+            return false;
+        }
+
+        $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $signatureSecretKey);
+
+        if (!hash_equals($expectedSignature, (string) $signatureKey)) {
+            Log::warning('Midtrans webhook: signature tidak valid', ['order_id' => $orderId]);
             return false;
         }
 
@@ -132,8 +179,8 @@ class MidtransService
          * 3. CEGAH ROLLBACK — STATUS SETTLEMENT TIDAK BOLEH MUNDUR
          * =====================================================
          */
-        if ($pembayaran->transaction_status === 'settlement') {
-            Log::info('Midtrans webhook: transaksi sudah settlement (idempotent skip)', ['order_id' => $orderId]);
+        if (in_array($pembayaran->transaction_status, ['settlement', 'failed', 'expired', 'expire'], true)) {
+            Log::info('Midtrans webhook: transaksi sudah berstatus terminal (idempotent skip)', ['order_id' => $orderId]);
             return true;
         }
 
@@ -154,8 +201,13 @@ class MidtransService
             'pending'    => 'pending',
             'deny', 'cancel' => 'failed',
             'expire'     => 'expired',
-            default      => $rawStatus ?? 'pending',
+            default      => null,
         };
+
+        if ($internalStatus === null) {
+            Log::warning('Midtrans webhook: status transaksi tidak dikenal', ['order_id' => $orderId, 'status' => $rawStatus]);
+            return false;
+        }
 
         /*
          * =====================================================
@@ -185,7 +237,7 @@ class MidtransService
             'payment_type'       => $paymentType,
             'transaction_id'     => $transactionId,
             'transaction_status' => $internalStatus,
-            'gateway_response'   => $payload, // simpan raw response untuk audit
+            'gateway_response'   => array_merge($pembayaran->gateway_response ?? [], $payload), // preserve credential mode and callback audit
         ];
 
         if ($internalStatus === 'settlement') {

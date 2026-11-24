@@ -96,9 +96,21 @@
                                 name="channels[{{ $index }}][channel_code]"
                                 value="{{ $channel->channel_code }}"
                                 class="form-input"
-                                placeholder="Code / No Rekening"
+                                placeholder="Kode bank/provider (contoh: bsi)"
                                 required
                             >
+                        </div>
+
+                        {{-- Data rekening transfer manual --}}
+                        <div class="field-wrap field-account-name">
+                            <input type="text" name="channels[{{ $index }}][account_name]"
+                                value="{{ $channel->account_name }}" class="form-input"
+                                placeholder="Nama pemilik rekening">
+                        </div>
+                        <div class="field-wrap field-account-number">
+                            <input type="text" name="channels[{{ $index }}][account_number]"
+                                value="{{ $channel->account_number }}" class="form-input"
+                                placeholder="Nomor rekening">
                         </div>
 
                         {{-- 3. Provider / Payment Gateway --}}
@@ -106,7 +118,7 @@
                             <select name="channels[{{ $index }}][payment_gateway_id]" class="form-input custom-select">
                                 @foreach ($gateways as $gateway)
                                     <option value="{{ $gateway->id }}" {{ $channel->payment_gateway_id == $gateway->id ? 'selected' : '' }}>
-                                        {{ $gateway->code === 'manual' ? ($channel->account_name ?: "Dompet Al Qur'an") : $gateway->name }}
+                                        {{ $gateway->code === 'manual' ? 'Transfer Manual Yayasan' : $gateway->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -119,6 +131,14 @@
                                 <option value="transfer" {{ $channel->payment_type === 'transfer' ? 'selected' : '' }}>Transfer</option>
                                 <option value="va" {{ $channel->payment_type === 'va' ? 'selected' : '' }}>VA</option>
                             </select>
+                        </div>
+
+                        <div class="field-wrap field-active">
+                            <label class="channel-active-label">
+                                <input type="hidden" name="channels[{{ $index }}][is_active]" value="0">
+                                <input type="checkbox" name="channels[{{ $index }}][is_active]" value="1" {{ $channel->is_active ? 'checked' : '' }}>
+                                <span>Aktif</span>
+                            </label>
                         </div>
 
                         {{-- 5. Drag Handle --}}
@@ -251,13 +271,34 @@
         flex: 1;
         min-width: 110px;
     }
-    .field-provider {
-        flex: 1.25;
+    .field-account-name {
+        flex: 1.1;
         min-width: 130px;
+    }
+    .field-account-number {
+        flex: 1;
+        min-width: 120px;
+    }
+    .field-provider {
+        flex: 1.1;
+        min-width: 125px;
     }
     .field-type {
         flex: 0.9;
         min-width: 95px;
+    }
+    .field-active {
+        flex: 0 0 72px;
+        min-width: 72px;
+    }
+    .channel-active-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        min-height: 38px;
+        font-size: 0.8rem;
+        color: #475569;
+        white-space: nowrap;
     }
 
     .form-input {
@@ -393,6 +434,38 @@
     .btn-save-all:hover {
         background: #15803d;
     }
+
+    @media (max-width: 768px) {
+        .channel-page-header,
+        .bottom-actions-row {
+            align-items: stretch;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .channel-row-item {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+        .channel-row-item .field-wrap {
+            flex: 1 1 calc(50% - 0.5rem);
+            min-width: 0;
+        }
+        .channel-row-item .field-name,
+        .channel-row-item .field-code,
+        .channel-row-item .field-account-name,
+        .channel-row-item .field-account-number,
+        .channel-row-item .field-provider,
+        .channel-row-item .field-type,
+        .channel-row-item .field-active {
+            flex-basis: calc(50% - 0.5rem);
+        }
+        .submit-wrap {
+            justify-content: space-between;
+        }
+    }
 </style>
 @endpush
 
@@ -441,6 +514,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 >
             </div>
 
+            <div class="field-wrap field-account-name">
+                <input type="text" name="channels[${nextIndex}][account_name]" value=""
+                    class="form-input" placeholder="Nama pemilik rekening">
+            </div>
+
+            <div class="field-wrap field-account-number">
+                <input type="text" name="channels[${nextIndex}][account_number]" value=""
+                    class="form-input" placeholder="Nomor rekening">
+            </div>
+
             <div class="field-wrap field-provider">
                 <select name="channels[${nextIndex}][payment_gateway_id]" class="form-input custom-select">
                     ${gatewaysOptions}
@@ -453,6 +536,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     <option value="transfer">Transfer</option>
                     <option value="va">VA</option>
                 </select>
+            </div>
+
+            <div class="field-wrap field-active">
+                <label class="channel-active-label">
+                    <input type="hidden" name="channels[${nextIndex}][is_active]" value="0">
+                    <input type="checkbox" name="channels[${nextIndex}][is_active]" value="1" checked>
+                    <span>Aktif</span>
+                </label>
             </div>
 
             <div class="drag-handle-wrap" title="Drag untuk mengubah urutan">
