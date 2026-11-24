@@ -262,7 +262,7 @@
                     </section>
                 @endforeach
             @else
-                @foreach (['sandbox' => 'Sandbox', 'production' => 'Production'] as $environment => $label)
+                @foreach (['sandbox' => 'Sandbox', 'staging' => 'Flip Staging', 'production' => 'Production'] as $environment => $label)
                     <section class="payment-panel">
                         <div class="payment-panel__heading">
                             <div>
