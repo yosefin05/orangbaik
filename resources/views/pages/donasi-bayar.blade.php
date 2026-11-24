@@ -149,6 +149,7 @@
                                 $name => $channelsByGroup->get($name, collect()),
                             ]);
                             $firstAvailableChannelId = $paymentChannels->first()?->id;
+                            $firstNonEmptyGroup = $grouped->search(fn ($channels) => $channels->isNotEmpty());
 
                             $groupIcons = [
                                 'QRIS' => 'bi-qr-code',
@@ -203,7 +204,7 @@
                         {{-- Tiap kategori = accordion native <details>; hanya satu terbuka (diatur JS). --}}
                         <div class="channel-groups-wrapper">
                             @foreach ($grouped as $groupName => $groupChannels)
-                                <details class="channel-group" {{ $loop->first ? 'open' : '' }}>
+                                <details class="channel-group" {{ $loop->index === $firstNonEmptyGroup ? 'open' : '' }}>
                                     <summary class="group-heading">
                                         <span class="group-heading-icon">
                                             <i class="bi {{ $groupIcons[$groupName] ?? 'bi-credit-card-2-front' }}" aria-hidden="true"></i>
