@@ -28,6 +28,7 @@ class PaymentGatewayController extends Controller
             'api_key' => 'nullable|string|max:500',
             'server_key' => 'nullable|string|max:500',
             'client_key' => 'nullable|string|max:500',
+            'signature_secret_key' => 'nullable|string|max:500',
             'webhook_token' => 'nullable|string|max:500',
             'endpoint_url' => 'prohibited',
             'is_production' => 'nullable|boolean',
@@ -45,6 +46,7 @@ class PaymentGatewayController extends Controller
             'api_key' => $request->input('api_key'),
             'server_key' => $request->input('server_key'),
             'client_key' => $request->input('client_key'),
+            'signature_secret_key' => $request->input('signature_secret_key'),
             'webhook_token' => $request->input('webhook_token'),
             'is_production' => $request->boolean('is_production'),
         ]);
@@ -84,7 +86,7 @@ class PaymentGatewayController extends Controller
         $existingConfig = $gateway->config ?? [];
         $newConfig = $existingConfig;
 
-        foreach (['api_key', 'server_key', 'client_key', 'webhook_token'] as $secretKey) {
+        foreach (['api_key', 'server_key', 'client_key', 'signature_secret_key', 'webhook_token'] as $secretKey) {
             if ($request->filled($secretKey)) {
                 $newConfig[$secretKey] = $request->input($secretKey);
             }
