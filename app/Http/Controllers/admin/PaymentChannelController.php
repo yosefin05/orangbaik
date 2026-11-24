@@ -283,9 +283,7 @@ class PaymentChannelController extends Controller
     {
         $request->validate(['payment_gateway_id' => 'required|integer|exists:payment_gateways,id']);
         $target = PaymentGateway::findOrFail($request->integer('payment_gateway_id'));
-        $supportedTypes = ['midtrans' => ['instant'], 'flip' => ['va'], 'manual' => ['transfer']];
-
-        if (!in_array($channel->payment_type, $supportedTypes[$target->code] ?? [], true)) {
+        if (!$target->supportsPaymentType($channel->payment_type)) {
             return back()->with('error', 'Provider tersebut belum mendukung kategori metode pembayaran ini.');
         }
         if (!$target->is_active || ($target->code !== 'manual' && !$target->isConfigured())) {
