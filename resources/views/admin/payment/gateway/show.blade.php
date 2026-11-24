@@ -128,7 +128,7 @@
                 <div class="payment-method-catalog__heading">
                     <div>
                         <strong>Daftar metode yang bisa ditambahkan</strong>
-                        <p>{{ $isMidtrans ? 'E-wallet yang didukung integrasi Snap. Pastikan metode sudah diaktifkan pada dashboard Midtrans.' : 'Virtual Account yang didukung adapter Flip saat ini. Ketersediaan tetap mengikuti layanan pada akun merchant Flip.' }}</p>
+                        <p>{{ $isMidtrans ? 'E-wallet yang didukung integrasi Snap. Pastikan metode sudah diaktifkan pada dashboard Midtrans.' : 'Metode pembayaran yang didukung adapter Flip saat ini. Ketersediaan tetap mengikuti layanan pada akun merchant Flip.' }}</p>
                     </div>
                     <span class="payment-catalog-count">{{ $availableMethods->count() }} tersedia</span>
                 </div>
