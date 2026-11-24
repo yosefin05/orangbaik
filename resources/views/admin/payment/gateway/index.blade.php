@@ -10,12 +10,12 @@
     <section class="page-header">
         <div>
             <h2>Payment Gateway</h2>
-            <p>Kelola kredensial dan status Midtrans, Flip, serta transfer manual. Provider baru memerlukan adapter khusus sebelum dapat digunakan.</p>
+            <p>Kelola integrasi pembayaran dan metode pembayaran dari satu tempat. Setiap provider memiliki pengaturan yang terpisah.</p>
         </div>
         <div class="header-actions">
             <a href="{{ route('admin.payment.channel.index') }}" class="btn btn-primary">
-                <i class="bi bi-diagram-3"></i>
-                Kelola Channel
+                <i class="bi bi-grid-1x2"></i>
+                Metode pembayaran
             </a>
         </div>
     </section>
@@ -101,7 +101,7 @@
                             <small class="text-blue fw-semibold">Transfer Manual Yayasan</small>
                         @elseif ($isConfigured)
                             <i class="bi bi-shield-check text-success"></i>
-                            <small class="text-success fw-semibold">Kredensial tersedia — perlu pengujian koneksi</small>
+                            <small class="text-success fw-semibold">Kredensial tersimpan</small>
                         @else
                             <i class="bi bi-exclamation-circle text-warning"></i>
                             <small class="text-warning fw-semibold">Kredensial wajib belum lengkap</small>
@@ -114,55 +114,10 @@
                 </div>
 
                 <div class="gateway-card__footer">
-                    @php
-                        $gatewayModalData = [
-                            'id' => $gateway->id,
-                            'name' => $gateway->name,
-                            'code' => $gateway->code,
-                            'description' => $gateway->description,
-                            'is_active' => $gateway->is_active,
-                            'config' => [
-                                'is_production' => (bool) $gateway->getConfigValue('is_production', false),
-                                'has_server_key' => $gateway->hasConfigValue('server_key'),
-                                'has_client_key' => $gateway->hasConfigValue('client_key'),
-                                'has_signature_secret_key' => $gateway->hasConfigValue('signature_secret_key'),
-                                'has_sandbox_server_key' => $gateway->hasConfigValue('sandbox_server_key'),
-                                'has_sandbox_client_key' => $gateway->hasConfigValue('sandbox_client_key'),
-                                'has_sandbox_signature_secret_key' => $gateway->hasConfigValue('sandbox_signature_secret_key'),
-                                'has_production_server_key' => $gateway->hasConfigValue('production_server_key'),
-                                'has_production_client_key' => $gateway->hasConfigValue('production_client_key'),
-                                'has_production_signature_secret_key' => $gateway->hasConfigValue('production_signature_secret_key'),
-                                'has_sandbox_api_key' => $gateway->hasConfigValue('sandbox_api_key'),
-                                'has_production_api_key' => $gateway->hasConfigValue('production_api_key'),
-                                'has_sandbox_webhook_token' => $gateway->hasConfigValue('sandbox_webhook_token'),
-                                'has_production_webhook_token' => $gateway->hasConfigValue('production_webhook_token'),
-                                'has_api_key' => $gateway->hasConfigValue('api_key'),
-                                'has_webhook_token' => $gateway->hasConfigValue('webhook_token'),
-                            ],
-                        ];
-                    @endphp
                     <a href="{{ route('admin.payment.gateway.show', $gateway) }}"
                         class="btn btn-primary btn-sm">
                         <i class="bi bi-sliders"></i>
                         Kelola konfigurasi
-                    </a>
-
-                    <form action="{{ route('admin.payment.gateway.toggle', $gateway) }}"
-                        method="POST"
-                        onsubmit="return confirm('{{ $gateway->is_active ? 'Nonaktifkan' : 'Aktifkan' }} gateway {{ $gateway->name }}?')">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit"
-                            class="btn {{ $gateway->is_active ? 'btn-outline-danger' : 'btn-outline-success' }} btn-sm">
-                            <i class="bi bi-{{ $gateway->is_active ? 'pause-circle' : 'play-circle' }}"></i>
-                            {{ $gateway->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                        </button>
-                    </form>
-
-                    <a href="{{ route('admin.payment.channel.index') }}"
-                        class="btn btn-outline btn-sm">
-                        <i class="bi bi-list-ul"></i>
-                        Channel
                     </a>
 
                     @if (!in_array($gateway->code, ['midtrans', 'flip', 'manual']) && $gateway->channels_count === 0)
