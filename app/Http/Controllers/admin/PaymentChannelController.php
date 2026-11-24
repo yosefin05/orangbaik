@@ -176,7 +176,9 @@ class PaymentChannelController extends Controller
             'account_number' => $request->account_number,
             'payment_type' => $gateway->code === 'manual' ? 'transfer' : $request->payment_type,
             'sort_order' => $request->sort_order ?? ($maxSort + 1),
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => ($gateway->code === 'manual' || $gateway->isConfigured())
+                ? $request->boolean('is_active', true)
+                : false,
         ]);
 
         return redirect()
