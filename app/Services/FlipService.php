@@ -282,7 +282,7 @@ class FlipService
             throw new \RuntimeException('Respons Flip tidak valid. Jangan membuat transaksi ulang sebelum memeriksa dashboard Flip.');
         }
 
-        return $this->processSuccessfulFlipResponse($successData, $pembayaran, $donasi, $channel, $bankCode);
+        return $this->processSuccessfulFlipResponse($successData, $pembayaran, $donasi, $channel, $bankCode, $credentialMode);
     }
 
     /**
@@ -305,7 +305,8 @@ class FlipService
         Pembayaran $pembayaran,
         Donasi $donasi,
         PaymentChannel $channel,
-        string $bankCode
+        string $bankCode,
+        string $credentialMode
     ): array {
         // Ekstrak nomor Virtual Account / Rekening dari berbagai kemungkinan format response Flip
         $accountNumber = $data['bill_payment']['receiver_bank_account']['account_number']
@@ -356,7 +357,7 @@ class FlipService
         $pembayaran->update([
             'transaction_id' => (string) $flipId,
             'gateway_response' => array_merge($data, [
-                'credential_mode' => $channel->gateway?->activeCredentialMode() ?? 'sandbox',
+                'credential_mode' => $credentialMode,
                 'flip_id' => $flipId,
                 'link_id' => $data['link_id'] ?? $flipId,
                 'account_number' => $accountNumber,
