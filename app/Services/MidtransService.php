@@ -33,7 +33,7 @@ class MidtransService
         $clientKey = $gateway->getCredentialForMode('client_key', $mode);
         $isProduction = $mode === 'production';
 
-        if (blank($serverKey) || blank($clientKey)) {
+        if (blank($serverKey) || blank($clientKey) || blank($gateway->getCredentialForMode('signature_secret_key', $mode))) {
             throw new \RuntimeException('Kredensial Midtrans belum lengkap. Lengkapi Server Key dan Client Key.');
         }
 
@@ -154,7 +154,7 @@ class MidtransService
 
         /*
          * =====================================================
-         * 2. VERIFIKASI SIGNATURE DENGAN SERVER KEY GATEWAY TERKAIT
+         * 2. VERIFIKASI SIGNATURE DENGAN SIGNATURE SECRET KEY GATEWAY TERKAIT
          * =====================================================
          */
         $gateway = $pembayaran->paymentChannel->gateway;
