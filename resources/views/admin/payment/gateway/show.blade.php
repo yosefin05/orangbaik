@@ -71,8 +71,8 @@
         </div>
         <div class="payment-summary__item">
             <span>Status provider</span>
-            <strong>{{ $gateway->is_active ? 'Siap digunakan' : 'Tidak menerima pembayaran' }}</strong>
-            <small>Status aktif/nonaktif berlaku untuk seluruh channel provider ini.</small>
+            <strong>{{ $gateway->is_active ? ($isManual ? 'Aktif' : 'Aktif · belum diverifikasi') : 'Tidak menerima pembayaran' }}</strong>
+            <small>Status aktif hanya mengizinkan gateway menerima alur pembayaran; koneksi dan webhook tetap perlu diverifikasi.</small>
         </div>
     </div>
 
