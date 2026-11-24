@@ -663,4 +663,18 @@ class PaymentChannelTest extends TestCase
         $this->assertNull($providerChannel->fresh()->account_number);
     }
 
+    public function test_provider_detail_manages_methods_without_manual_bank_account_fields(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $midtrans = PaymentGateway::where('code', 'midtrans')->firstOrFail();
+
+        $response = $this->actingAs($admin)->get(route('admin.payment.gateway.show', $midtrans));
+
+        $response->assertOk();
+        $response->assertSee('Metode yang ditampilkan di OrangBaik');
+        $response->assertSee('dashboard merchant Midtrans');
+        $response->assertDontSee('Nama pemilik rekening');
+        $response->assertDontSee('Nomor rekening');
+    }
+
 }
