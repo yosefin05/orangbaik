@@ -1542,3 +1542,31 @@
         transition: none !important;
     }
 }
+
+/* ============================================================
+   MOBILE TOPBAR — lebih ringkas dan satu baris
+============================================================ */
+@media (max-width: 768px) {
+    .payment-topbar-inner {
+        height: calc(48px + env(safe-area-inset-top, 0px));
+        gap: var(--space-2);
+    }
+
+    .payment-topbar-back {
+        width: 36px;
+        height: 36px;
+    }
+
+    .payment-topbar-text {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .payment-topbar-title {
+        overflow: hidden;
+        font-size: var(--fs-xs);
+        line-height: 1.2;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
