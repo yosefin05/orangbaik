@@ -3,9 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
+use Throwable;
 
 class PaymentGateway extends Model
 {
+    private const SECRET_CONFIG_KEYS = [
+        'api_key',
+        'server_key',
+        'client_key',
+        'webhook_token',
+    ];
+
     protected $fillable = [
         'name',
         'code',
@@ -17,20 +26,14 @@ class PaymentGateway extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
-        'config'    => 'array',
+        'config' => 'array',
     ];
 
-    /**
-     * Payment channels yang menggunakan gateway ini.
-     */
     public function channels()
     {
         return $this->hasMany(PaymentChannel::class);
     }
 
-    /**
-     * Payment channels yang aktif.
-     */
     public function activeChannels()
     {
         return $this->hasMany(PaymentChannel::class)
@@ -38,66 +41,82 @@ class PaymentGateway extends Model
             ->orderBy('sort_order');
     }
 
-    /**
-     * Scope: hanya gateway aktif.
-     */
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
     /**
-     * Ambil nilai konfigurasi tertentu dari database atau fallback ke .env/config.
+     * Encrypt secret values before persisting them inside the JSON config column.
+     * The prefix allows safe backwards compatibility with legacy plaintext values.
      */
-    public function getConfigValue(string $key, $default = null)
+    public static function secureConfigForStorage(array $config): array
     {
-        if (isset($this->config[$key]) && $this->config[$key] !== '') {
-            return $this->config[$key];
+        foreach (self::SECRET_CONFIG_KEYS as $key) {
+            $value = $config[$key] ?? null;
+
+            if (is_string($value) && $value !== '' && !str_starts_with($value, 'encrypted:v1:')) {
+                $config[$key] = 'encrypted:v1:' . Crypt::encryptString($value);
+            }
         }
 
-        // Fallback ke config file
+        return $config;
+    }
+
+    public function getConfigValue(string $key, $default = null)
+    {
+        $value = data_get($this->config ?? [], $key);
+
+        if ($value !== null && $value !== '') {
+            if (in_array($key, self::SECRET_CONFIG_KEYS, true) && is_string($value) && str_starts_with($value, 'encrypted:v1:')) {
+                try {
+                    return Crypt::decryptString(substr($value, strlen('encrypted:v1:')));
+                } catch (Throwable $exception) {
+                    report($exception);
+                    return $default;
+                }
+            }
+
+            return $value;
+        }
+
+        // Legacy environment fallback remains for existing installations during migration.
         if ($this->code === 'midtrans') {
             return match ($key) {
-                'server_key'    => config('payment.midtrans.server_key', $default),
-                'client_key'    => config('payment.midtrans.client_key', $default),
+                'server_key' => config('payment.midtrans.server_key', $default),
+                'client_key' => config('payment.midtrans.client_key', $default),
                 'is_production' => config('payment.midtrans.is_production', $default),
-                default         => $default,
+                default => $default,
             };
         }
 
         if ($this->code === 'flip') {
             return match ($key) {
-                'api_key'       => config('payment.flip.api_key', $default),
+                'api_key' => config('payment.flip.api_key', $default),
                 'webhook_token' => config('payment.flip.webhook_token', $default),
                 'is_production' => config('payment.flip.is_production', $default),
-                default         => $default,
+                default => $default,
             };
         }
 
         return $default;
     }
 
+    public function hasConfigValue(string $key): bool
+    {
+        return filled($this->getConfigValue($key));
+    }
+
     /**
-     * Cek apakah API Key / kredensial gateway sudah terkonfigurasi.
+     * Credential presence only; this is deliberately not a "ready" or connectivity check.
      */
     public function isConfigured(): bool
     {
-        if ($this->code === 'manual') {
-            return true;
-        }
-
-        if ($this->code === 'midtrans') {
-            $key = $this->getConfigValue('server_key');
-            return !empty($key);
-        }
-
-        if ($this->code === 'flip') {
-            $key = $this->getConfigValue('api_key');
-            return !empty($key);
-        }
-
-        // Untuk gateway custom
-        $apiKey = $this->getConfigValue('api_key') ?? $this->getConfigValue('server_key');
-        return !empty($apiKey);
+        return match ($this->code) {
+            'manual' => true,
+            'midtrans' => $this->hasConfigValue('server_key') && $this->hasConfigValue('client_key'),
+            'flip' => $this->hasConfigValue('api_key') && $this->hasConfigValue('webhook_token'),
+            default => false,
+        };
     }
 }
