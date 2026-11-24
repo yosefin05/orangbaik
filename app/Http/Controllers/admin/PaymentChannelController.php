@@ -51,7 +51,7 @@ class PaymentChannelController extends Controller
             DB::transaction(function () use ($request, $manualGateway): void {
                 foreach ($request->input('deleted_ids', []) as $deletedId) {
                     $channel = PaymentChannel::query()->lockForUpdate()->find($deletedId);
-                    if (!$channel || $channel->payment_gateway_id !== $manualGateway->id) {
+                    if (!$channel || (int) $channel->payment_gateway_id !== (int) $manualGateway->id) {
                         throw ValidationException::withMessages(['deleted_ids' => 'Hanya rekening transfer manual yang dapat dikelola dari halaman ini.']);
                     }
 
@@ -84,7 +84,7 @@ class PaymentChannelController extends Controller
                         ? PaymentChannel::query()->lockForUpdate()->findOrFail($item['id'])
                         : new PaymentChannel();
 
-                    if ($channel->exists && $channel->payment_gateway_id !== $manualGateway->id) {
+                    if ($channel->exists && (int) $channel->payment_gateway_id !== (int) $manualGateway->id) {
                         throw ValidationException::withMessages([
                             "channels.{$index}.id" => 'Channel provider tidak dapat diedit dari pengelolaan rekening manual.',
                         ]);
