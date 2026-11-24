@@ -247,9 +247,11 @@
     .channel-row-item {
         display: flex;
         align-items: center;
-        gap: 0.625rem;
+        gap: 0.75rem;
         background: #ffffff;
-        padding: 0.25rem 0;
+        padding: 1rem;
+        border: 1px solid #e7ebf2;
+        border-radius: 12px;
         transition: background 0.15s ease;
     }
     .channel-row-item.dragging {
@@ -262,7 +264,26 @@
 
     .field-wrap {
         flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
     }
+    .field-wrap::before {
+        display: block;
+        color: #64748b;
+        font-size: 0.68rem;
+        line-height: 1.2;
+        font-weight: 700;
+        letter-spacing: .035em;
+    }
+    .field-name::before { content: "METODE PEMBAYARAN"; }
+    .field-code::before { content: "KODE CHANNEL"; }
+    .field-account-name::before { content: "NAMA PEMILIK · TRANSFER"; }
+    .field-account-number::before { content: "NOMOR REKENING · TRANSFER"; }
+    .field-provider::before { content: "PROVIDER"; }
+    .field-type::before { content: "TIPE"; }
+    .field-active::before { content: "STATUS"; }
     .field-name {
         flex: 1.25;
         min-width: 140px;
@@ -310,7 +331,7 @@
         color: #334155;
         background-color: #ffffff;
         border: 1px solid #cbd5e1;
-        border-radius: 4px;
+        border-radius: 8px;
         outline: none;
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
@@ -442,16 +463,24 @@
             flex-direction: column;
             gap: 0.75rem;
         }
+        .btn-top-gateway,
+        .btn-add-bank,
+        .btn-save-all { justify-content: center; }
+        .channel-admin-wrapper { max-width: 100%; }
         .channel-row-item {
             flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.75rem;
+            gap: 0.75rem;
+            padding: 0.9rem;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
         }
         .channel-row-item .field-wrap {
             flex: 1 1 calc(50% - 0.5rem);
             min-width: 0;
+        }
+        .channel-row-item .field-name,
+        .channel-row-item .field-provider {
+            flex-basis: 100%;
         }
         .channel-row-item .field-name,
         .channel-row-item .field-code,
@@ -461,6 +490,9 @@
         .channel-row-item .field-type,
         .channel-row-item .field-active {
             flex-basis: calc(50% - 0.5rem);
+        }
+        .channel-row-item .drag-handle-wrap {
+            margin-left: auto;
         }
         .submit-wrap {
             justify-content: space-between;
