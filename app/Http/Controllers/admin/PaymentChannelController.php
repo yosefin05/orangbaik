@@ -156,17 +156,25 @@ class PaymentChannelController extends Controller
             'is_active'          => 'nullable|boolean',
         ]);
 
+        $gateway = PaymentGateway::findOrFail($request->payment_gateway_id);
+        if (!$gateway->is_active) {
+            throw ValidationException::withMessages(['payment_gateway_id' => 'Gateway yang dipilih sedang nonaktif.']);
+        }
+        if ($gateway->code === 'manual' && (blank($request->account_name) || blank($request->account_number))) {
+            throw ValidationException::withMessages(['account_number' => 'Nama pemilik dan nomor rekening wajib diisi untuk transfer manual.']);
+        }
+
         $maxSort = PaymentChannel::max('sort_order') ?? 0;
 
         PaymentChannel::create([
-            'payment_gateway_id' => $request->payment_gateway_id,
-            'name'               => $request->name,
-            'channel_code'       => $request->channel_code,
-            'account_name'       => $request->account_name,
-            'account_number'     => $request->account_number,
-            'payment_type'       => $request->payment_type,
-            'sort_order'         => $request->sort_order ?? ($maxSort + 1),
-            'is_active'          => $request->boolean('is_active', true),
+            'payment_gateway_id' => $gateway->id,
+            'name' => $request->name,
+            'channel_code' => $request->channel_code,
+            'account_name' => $request->account_name,
+            'account_number' => $request->account_number,
+            'payment_type' => $gateway->code === 'manual' ? 'transfer' : $request->payment_type,
+            'sort_order' => $request->sort_order ?? ($maxSort + 1),
+            'is_active' => $request->boolean('is_active', true),
         ]);
 
         return redirect()
@@ -199,16 +207,37 @@ class PaymentChannelController extends Controller
             'is_active'          => 'nullable|boolean',
         ]);
 
-        $channel->update([
-            'payment_gateway_id' => $request->payment_gateway_id,
-            'name'               => $request->name,
-            'channel_code'       => $request->channel_code,
-            'account_name'       => $request->account_name,
-            'account_number'     => $request->account_number,
-            'payment_type'       => $request->payment_type,
-            'sort_order'         => $request->sort_order ?? $channel->sort_order,
-            'is_active'          => $request->boolean('is_active', $channel->is_active),
-        ]);
+        $gateway = PaymentGateway::findOrFail($request->payment_gateway_id);
+        if (!$gateway->is_active) {
+            throw ValidationException::withMessages(['payment_gateway_id' => 'Gateway yang dipilih sedang nonaktif.']);
+        }
+        if ($gateway->code === 'manual' && (blank($request->account_name) || blank($request->account_number))) {
+            throw ValidationException::withMessages(['account_number' => 'Nama pemilik dan nomor rekening wajib diisi untuk transfer manual.']);
+        }
+
+        $sensitiveChanges = [
+            'payment_gateway_id' => $gateway->id,
+            'channel_code' => $request->channel_code,
+            'account_name' => $request->account_name,
+            'account_number' => $request->account_number,
+            'payment_type' => $gateway->code === 'manual' ? 'transfer' : $request->payment_type,
+        ];
+
+        if ($channel->hasTransactions()) {
+            foreach ($sensitiveChanges as $field => $value) {
+                if ((string) $channel->{$field} !== (string) $value) {
+                    throw ValidationException::withMessages([
+                        $field => 'Channel ini sudah memiliki riwayat transaksi. Nonaktifkan lalu buat channel baru untuk mengganti detail rekening/provider.',
+                    ]);
+                }
+            }
+        }
+
+        $channel->update(array_merge($sensitiveChanges, [
+            'name' => $request->name,
+            'sort_order' => $request->sort_order ?? $channel->sort_order,
+            'is_active' => $request->boolean('is_active', $channel->is_active),
+        ]));
 
         return redirect()
             ->route('admin.payment.channel.index')
@@ -239,6 +268,10 @@ class PaymentChannelController extends Controller
      */
     public function toggleActive(PaymentChannel $channel)
     {
+        if (!$channel->is_active && (!$channel->gateway?->is_active || ($channel->gateway->code !== 'manual' && !$channel->gateway->isConfigured()))) {
+            return back()->with('error', 'Gateway belum aktif atau belum memiliki kredensial wajib.');
+        }
+
         $channel->update(['is_active' => !$channel->is_active]);
         $status = $channel->is_active ? 'diaktifkan' : 'dinonaktifkan';
         return back()->with('success', "Channel \"{$channel->name}\" berhasil {$status}.");
