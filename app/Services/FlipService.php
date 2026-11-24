@@ -99,8 +99,8 @@ class FlipService
             : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
         $this->apiKey = $gateway?->getConfigValue('api_key') ?: config('payment.flip.api_key');
 
-        if (!$this->isConfigured()) {
-            throw new \Exception('Flip belum dikonfigurasi. Tambahkan FLIP_API_KEY di file .env.');
+        if (!$gateway || !$gateway->isConfigured()) {
+            throw new \RuntimeException('Kredensial Flip belum lengkap. Lengkapi API Key dan Webhook Token pada pengaturan gateway.');
         }
 
         $bankCode = self::normalizeBankCode($channel->channel_code);
