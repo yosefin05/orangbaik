@@ -167,3 +167,16 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Perubahan hanya pada Blade/CSS; tidak mengubah route, model, database, credential, maupun perilaku transaksi.
 - GitHub Actions run `45324987199` berhasil: build frontend dan seluruh kelompok regression test lulus. Ini tidak menggantikan inspeksi visual.
 - Belum dilakukan inspeksi visual pada browser staging; perlu review viewport desktop/mobile setelah deployment staging.
+
+
+### [2026-11-24] Provider Method Catalog & Registration
+- **Status**: IMPLEMENTED ON REVIEW BRANCH; automated verification pending.
+- Menambahkan katalog metode pada halaman konfigurasi provider agar admin dapat melihat metode yang didukung adapter dan mendaftarkannya langsung tanpa mengisi kode channel secara manual.
+- Midtrans catalog: GoPay, OVO, DANA, dan ShopeePay sebagai E-Wallet. Metode yang sudah terdaftar tidak ditampilkan kembali pada daftar penambahan; QRIS yang sudah ada tetap dipertahankan.
+- Flip catalog: BCA, BNI, BRI, Mandiri, Permata, CIMB Niaga, Danamon, BSI, dan SeaBank Virtual Account.
+- Metode baru selalu dibuat nonaktif/tersembunyi. Admin harus memastikan aktivasi pada dashboard merchant dan kesiapan kredensial sebelum menampilkannya kepada donatur.
+- Katalog merupakan daftar kemampuan adapter yang didukung, bukan pembacaan langsung atas status aktivasi akun merchant. Midtrans Snap tetap mengikuti metode yang benar-benar diaktifkan di merchant dashboard.
+- Menyesuaikan kode bank BSI Flip agar memakai identifier bsm sesuai dokumentasi Accept Payment Flip.
+- Tidak ada migration, perubahan skema database, kredensial, atau transaksi existing.
+- Menambahkan feature tests untuk katalog, pendaftaran Midtrans/Flip, dan penolakan metode yang tidak sesuai provider.
+- Belum ada koneksi API provider atau transaksi Sandbox/Production yang diuji.

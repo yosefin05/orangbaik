@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PaymentGateway;
+use App\Models\PaymentChannel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -29,6 +30,11 @@ class PaymentGatewayController extends Controller
         $gateway->loadCount('channels');
         $channels = $gateway->channels()->orderBy('sort_order')->get();
         $routingOptions = PaymentGateway::whereIn('code', ['midtrans', 'flip', 'manual'])->orderBy('id')->get();
+        $methodCatalog = $this->methodCatalogFor($gateway->code);
+        $registeredCodes = $channels->pluck('channel_code')->map(fn ($code) => strtolower($code))->all();
+        $availableMethods = collect($methodCatalog)
+            ->reject(fn ($method) => in_array($method['channel_code'], $registeredCodes, true))
+            ->values();
 
         $credentialFlags = [];
         foreach ([
@@ -40,7 +46,71 @@ class PaymentGatewayController extends Controller
             $credentialFlags[$key] = $gateway->hasConfigValue($key);
         }
 
-        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags', 'routingOptions'));
+        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags', 'routingOptions', 'availableMethods'));
+    }
+
+
+    /**
+     * Built-in methods supported by the current provider adapters.
+     * This catalog does not inspect live merchant-account activation.
+     */
+    private function methodCatalogFor(string $provider): array
+    {
+        return match ($provider) {
+            'midtrans' => [
+                ['name' => 'GoPay', 'channel_code' => 'gopay', 'payment_type' => 'instant'],
+                ['name' => 'OVO', 'channel_code' => 'ovo', 'payment_type' => 'instant'],
+                ['name' => 'DANA', 'channel_code' => 'dana', 'payment_type' => 'instant'],
+                ['name' => 'ShopeePay', 'channel_code' => 'shopeepay', 'payment_type' => 'instant'],
+            ],
+            'flip' => [
+                ['name' => 'BCA Virtual Account', 'channel_code' => 'bca', 'payment_type' => 'va'],
+                ['name' => 'BNI Virtual Account', 'channel_code' => 'bni', 'payment_type' => 'va'],
+                ['name' => 'BRI Virtual Account', 'channel_code' => 'bri', 'payment_type' => 'va'],
+                ['name' => 'Mandiri Virtual Account', 'channel_code' => 'mandiri', 'payment_type' => 'va'],
+                ['name' => 'Permata Virtual Account', 'channel_code' => 'permata', 'payment_type' => 'va'],
+                ['name' => 'CIMB Niaga Virtual Account', 'channel_code' => 'cimb', 'payment_type' => 'va'],
+                ['name' => 'Danamon Virtual Account', 'channel_code' => 'danamon', 'payment_type' => 'va'],
+                ['name' => 'BSI Virtual Account', 'channel_code' => 'bsi', 'payment_type' => 'va'],
+                ['name' => 'SeaBank Virtual Account', 'channel_code' => 'seabank', 'payment_type' => 'va'],
+            ],
+            default => [],
+        };
+    }
+
+    /**
+     * Register one built-in method in OrangBaik. New methods start hidden until
+     * an admin explicitly enables them after provider-side activation.
+     */
+    public function registerMethod(Request $request, PaymentGateway $gateway)
+    {
+        abort_unless(in_array($gateway->code, ['midtrans', 'flip'], true), 404);
+
+        $request->validate(['channel_code' => 'required|string|max:50']);
+
+        $method = collect($this->methodCatalogFor($gateway->code))
+            ->firstWhere('channel_code', strtolower($request->input('channel_code')));
+
+        if (!$method) {
+            return back()->with('error', 'Metode tersebut tidak tersedia pada katalog adapter provider ini.');
+        }
+
+        if ($gateway->channels()->where('channel_code', $method['channel_code'])->exists()) {
+            return back()->with('warning', 'Metode tersebut sudah terdaftar pada provider ini.');
+        }
+
+        PaymentChannel::create([
+            'payment_gateway_id' => $gateway->id,
+            'name' => $method['name'],
+            'channel_code' => $method['channel_code'],
+            'payment_type' => $method['payment_type'],
+            'sort_order' => ((int) $gateway->channels()->max('sort_order')) + 1,
+            'is_active' => false,
+        ]);
+
+        return redirect()
+            ->route('admin.payment.gateway.show', $gateway)
+            ->with('success', $method['name'] . ' berhasil ditambahkan. Aktifkan metode pada dashboard merchant sebelum menampilkannya kepada donatur.');
     }
 
     public function store(Request $request)
