@@ -83,9 +83,9 @@ class PaymentGateway extends Model
         // Legacy environment fallback remains for existing installations during migration.
         if ($this->code === 'midtrans') {
             return match ($key) {
-                'server_key' => config('payment.midtrans.server_key', $default),
-                'client_key' => config('payment.midtrans.client_key', $default),
-                'is_production' => config('payment.midtrans.is_production', $default),
+                'server_key' => config('midtrans.serverKey') ?: config('payment.midtrans.server_key', $default),
+                'client_key' => config('midtrans.clientKey') ?: config('payment.midtrans.client_key', $default),
+                'is_production' => config('midtrans.isProduction', config('payment.midtrans.is_production', $default)),
                 default => $default,
             };
         }
