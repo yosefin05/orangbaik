@@ -52,8 +52,10 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 // PAYMENT WEBHOOKS (PUBLIC - Dynamic & Modular Gateway Webhooks)
 // ============================================================
 Route::prefix('payment')->group(function () {
-    // Dynamic universal webhook endpoint for any gateway
-    Route::post('/webhook', [PaymentWebhookController::class, 'handle']);
+    // Dynamic webhook endpoint: provider code is part of the URL.
+    Route::post('/{gateway}/webhook', [PaymentWebhookController::class, 'handle'])
+        ->where('gateway', '[a-z0-9-]+')
+        ->name('payment.gateway.webhook');
 
     // Dedicated / legacy aliases
     Route::post('/midtrans/webhook', [MidtransController::class, 'notification'])->name('payment.midtrans.webhook');
