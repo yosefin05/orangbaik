@@ -215,8 +215,7 @@
         $midtransGateway = $midtransGateway ?? null;
         $isMidtransProd = (bool) ($midtransGateway?->getConfigValue('is_production', false))
             && app()->environment('production');
-        $midtransClientKey = $midtransGateway?->getConfigValue('client_key')
-            ?: config('history.midtrans.client_key', config('midtrans.clientKey', ''));
+        $midtransClientKey = $midtransGateway?->getCredentialForMode('client_key', $midtransGateway->activeCredentialMode()) ?? '';
     @endphp
     @if (!empty($midtransClientKey))
         <script src="{{ $isMidtransProd ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
