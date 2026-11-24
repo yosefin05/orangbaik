@@ -25,7 +25,7 @@ class MidtransService
     protected function configureGateway(?PaymentGateway $gateway): void
     {
         if (!$gateway) {
-            throw new \\RuntimeException('Gateway Midtrans tidak ditemukan.');
+            throw new \RuntimeException('Gateway Midtrans tidak ditemukan.');
         }
 
         $mode = $gateway->activeCredentialMode();
