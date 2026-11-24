@@ -135,7 +135,7 @@
                                 <label class="visually-hidden" for="routing-{{ $channel->id }}">Provider {{ $channel->name }}</label>
                                 <select id="routing-{{ $channel->id }}" name="payment_gateway_id" class="form-select form-select-sm">
                                     @foreach ($routingOptions as $routingOption)
-                                        <option value="{{ $routingOption->id }}" @selected($channel->payment_gateway_id === $routingOption->id)>{{ $routingOption->name }}</option>
+                                        <option value="{{ $routingOption->id }}" @selected($channel->payment_gateway_id === $routingOption->id) @disabled(!$routingOption->supportsPaymentType($channel->payment_type))>{{ $routingOption->name }}{{ $routingOption->supportsPaymentType($channel->payment_type) ? '' : ' · belum mendukung' }}</option>
                                     @endforeach
                                 </select>
                                 <button type="submit" class="btn btn-sm btn-outline-primary">Simpan routing</button>
