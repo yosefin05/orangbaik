@@ -12,6 +12,7 @@ class Pembayaran extends Model
     protected $fillable = [
         'donasi_id',
         'payment_channel_id',
+        'payment_gateway_id',
         'payment_token',
         'order_id',
         'snap_token',
@@ -49,6 +50,17 @@ class Pembayaran extends Model
         return $this->belongsTo(PaymentChannel::class);
     }
 
+    /** Gateway yang dipakai saat transaksi dibuat; tidak berubah saat routing metode diubah. */
+    public function paymentGateway()
+    {
+        return $this->belongsTo(PaymentGateway::class, 'payment_gateway_id');
+    }
+
+    public function resolvedGateway(): ?PaymentGateway
+    {
+        return $this->paymentGateway ?? $this->paymentChannel?->gateway;
+    }
+
     /**
      * Label status pembayaran untuk tampilan ke donatur.
      */
@@ -84,7 +96,7 @@ class Pembayaran extends Model
      */
     public function isManualTransfer(): bool
     {
-        return $this->paymentChannel?->gateway?->code === 'manual';
+        return $this->resolvedGateway()?->code === 'manual';
     }
 
     /**
