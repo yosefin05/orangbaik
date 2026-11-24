@@ -42,9 +42,20 @@
                 <p>{{ $isMidtrans ? 'Kelola kredensial dan koneksi Midtrans.' : ($isFlip ? 'Kelola kredensial dan koneksi Flip.' : 'Kelola rekening tujuan dan metode transfer manual OrangBaik.') }}</p>
             </div>
         </div>
-        <span class="payment-status {{ $gateway->is_active ? 'is-active' : 'is-inactive' }}">
-            <span></span>{{ $gateway->is_active ? 'Aktif' : 'Nonaktif' }}
-        </span>
+        <div class="payment-header-actions">
+            <span class="payment-status {{ $gateway->is_active ? 'is-active' : 'is-inactive' }}">
+                <span></span>{{ $gateway->is_active ? 'Aktif' : 'Nonaktif' }}
+            </span>
+            <form action="{{ route('admin.payment.gateway.toggle', $gateway) }}" method="POST"
+                onsubmit="return confirm('{{ $gateway->is_active ? 'Nonaktifkan' : 'Aktifkan' }} {{ $gateway->name }}?')">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn {{ $gateway->is_active ? 'btn-outline-danger' : 'btn-outline-success' }} btn-sm">
+                    <i class="bi bi-{{ $gateway->is_active ? 'pause-circle' : 'play-circle' }}"></i>
+                    {{ $gateway->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                </button>
+            </form>
+        </div>
     </header>
 
     <div class="payment-summary">
@@ -59,9 +70,9 @@
             <small>{{ $isManual ? 'Tidak menggunakan API provider.' : 'Staging dan local selalu menggunakan Sandbox.' }}</small>
         </div>
         <div class="payment-summary__item">
-            <span>Payment channel</span>
-            <strong>{{ $gateway->channels_count }}</strong>
-            <small>Metode pembayaran yang terhubung</small>
+            <span>Status provider</span>
+            <strong>{{ $gateway->is_active ? 'Siap digunakan' : 'Tidak menerima pembayaran' }}</strong>
+            <small>Status aktif/nonaktif berlaku untuk seluruh channel provider ini.</small>
         </div>
     </div>
 
@@ -195,14 +206,7 @@
             </div>
         </form>
 
-        <section class="payment-panel payment-next-step">
-            <div>
-                <span class="payment-eyebrow">NEXT STEP</span>
-                <h2>Payment channel</h2>
-                <p>Setelah kredensial tersimpan, periksa channel yang menggunakan provider ini. Pengujian koneksi API akan ditambahkan setelah endpoint dan autentikasi resmi provider diverifikasi.</p>
-            </div>
-            <a href="{{ route('admin.payment.channel.index') }}" class="btn btn-outline-primary">Kelola channel <i class="bi bi-arrow-right"></i></a>
-        </section>
+        <p class="payment-security-note"><i class="bi bi-info-circle"></i> Pengujian koneksi API belum tersedia. Status kredensial tersimpan tidak berarti koneksi provider sudah terverifikasi.</p>
     @endif
 </div>
 @endsection
@@ -218,7 +222,7 @@
 .payment-eyebrow{display:block;color:#8490a3;font-size:10px;font-weight:750;letter-spacing:.12em;margin-bottom:6px}
 .payment-provider h1{font-size:26px;line-height:1.2;letter-spacing:-.04em;margin:0;color:var(--pd-ink)}
 .payment-provider p,.payment-panel__heading p,.payment-next-step p{color:var(--pd-muted);font-size:13px;line-height:1.65;margin:6px 0 0}
-.payment-status{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.payment-header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.payment-header-actions form{margin:0}.payment-security-note{display:flex;align-items:flex-start;gap:8px;color:var(--pd-muted);font-size:11px;line-height:1.55;margin:0 2px 16px}.payment-security-note i{color:var(--pd-blue);margin-top:1px}.payment-status{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
 .payment-status>span{width:7px;height:7px;border-radius:50%;background:currentColor}
 .payment-status.is-active{background:#eaf7ef;color:#18794e}.payment-status.is-inactive{background:#f1f3f6;color:#667085}
 .payment-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
@@ -250,6 +254,6 @@
 .payment-bank__icon{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:#f2f5fa;color:var(--pd-blue);font-size:18px}
 .payment-bank__main{display:grid;gap:3px;flex:1;min-width:0}.payment-bank__main strong{font-size:13px}.payment-bank__main span{font-size:11px;color:var(--pd-muted)}.payment-bank__main code{font-size:12px;color:var(--pd-ink)}
 .payment-empty{display:grid;justify-items:center;text-align:center;padding:30px 15px;color:var(--pd-muted)}.payment-empty>i{font-size:27px;color:var(--pd-blue);margin-bottom:10px}.payment-empty strong{color:var(--pd-ink);font-size:14px}.payment-empty p{font-size:12px;margin:6px 0 14px}
-@media(max-width:700px){.payment-detail__header{align-items:flex-start}.payment-provider{align-items:flex-start;gap:12px}.payment-provider__icon{width:44px;height:44px;font-size:20px}.payment-provider h1{font-size:22px}.payment-summary{grid-template-columns:1fr}.payment-panel{padding:18px 15px}.payment-form-grid{grid-template-columns:1fr}.payment-field--full{grid-column:auto}.payment-panel__heading,.payment-next-step{flex-direction:column;align-items:stretch}.payment-form-footer{flex-direction:column;align-items:stretch}.payment-form-footer .btn{width:100%}.payment-bank{align-items:flex-start;flex-wrap:wrap}.payment-bank .payment-status{margin-left:53px}}
+@media(max-width:700px){.payment-detail__header{align-items:flex-start}.payment-header-actions{align-items:flex-end;flex-direction:column}.payment-provider{align-items:flex-start;gap:12px}.payment-provider__icon{width:44px;height:44px;font-size:20px}.payment-provider h1{font-size:22px}.payment-summary{grid-template-columns:1fr}.payment-panel{padding:18px 15px}.payment-form-grid{grid-template-columns:1fr}.payment-field--full{grid-column:auto}.payment-panel__heading,.payment-next-step{flex-direction:column;align-items:stretch}.payment-form-footer{flex-direction:column;align-items:stretch}.payment-form-footer .btn{width:100%}.payment-bank{align-items:flex-start;flex-wrap:wrap}.payment-bank .payment-status{margin-left:53px}}
 </style>
 @endpush
