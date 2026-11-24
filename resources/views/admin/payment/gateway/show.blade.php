@@ -115,6 +115,40 @@
             @endif
         </section>
     @else
+        <section class="payment-panel">
+            <div class="payment-panel__heading">
+                <div>
+                    <span class="payment-eyebrow">PAYMENT METHODS</span>
+                    <h2>Metode yang ditampilkan di OrangBaik</h2>
+                    <p>Aktifkan metode yang ingin ditampilkan di halaman donasi. Metode tersebut juga harus sudah diaktifkan pada dashboard merchant {{ $gateway->name }}. Nomor dan nama rekening tidak perlu diisi di sini.</p>
+                </div>
+            </div>
+            <div class="payment-method-list">
+                @forelse ($channels as $channel)
+                    <div class="payment-method-row">
+                        <div class="payment-method-row__main">
+                            <strong>{{ $channel->name }}</strong>
+                            <span>{{ $channel->payment_type_label }} · Kode {{ strtoupper($channel->channel_code) }}</span>
+                        </div>
+                        <span class="payment-status {{ $channel->is_active ? 'is-active' : 'is-inactive' }}"><span></span>{{ $channel->is_active ? 'Ditampilkan' : 'Disembunyikan' }}</span>
+                        <form action="{{ route('admin.payment.channel.toggle', $channel) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-sm {{ $channel->is_active ? 'btn-outline-secondary' : 'btn-outline-primary' }}" {{ !$isConfigured || !$gateway->is_active ? 'disabled title=Belum dapat diaktifkan sebelum gateway aktif dan kredensial lengkap' : '' }}>
+                                {{ $channel->is_active ? 'Sembunyikan' : 'Tampilkan' }}
+                            </button>
+                        </form>
+                    </div>
+                @empty
+                    <div class="payment-empty">
+                        <i class="bi bi-credit-card"></i>
+                        <strong>Belum ada metode yang terdaftar</strong>
+                        <p>Daftar metode pembayaran untuk provider ini belum tersedia.</p>
+                    </div>
+                @endforelse
+            </div>
+        </section>
+
         <form action="{{ route('admin.payment.gateway.update', $gateway) }}" method="POST" class="payment-config-form">
             @csrf
             @method('PUT')
@@ -249,11 +283,11 @@
 .payment-form-footer p i{color:#16845b;margin-right:5px}
 .payment-form-footer .btn{min-height:43px;padding:10px 18px;border-radius:9px;white-space:nowrap}
 .payment-next-step{display:flex;align-items:center;justify-content:space-between;gap:18px}
-.payment-bank-list{display:grid;gap:10px}
+.payment-method-list{display:grid;gap:0}.payment-method-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--pd-line)}.payment-method-row__main{display:grid;gap:4px;flex:1;min-width:0}.payment-method-row__main strong{font-size:13px;color:var(--pd-ink)}.payment-method-row__main span{font-size:11px;color:var(--pd-muted)}.payment-method-row form{margin:0}.payment-bank-list{display:grid;gap:10px}
 .payment-bank{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid var(--pd-line);border-radius:11px}
 .payment-bank__icon{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:#f2f5fa;color:var(--pd-blue);font-size:18px}
 .payment-bank__main{display:grid;gap:3px;flex:1;min-width:0}.payment-bank__main strong{font-size:13px}.payment-bank__main span{font-size:11px;color:var(--pd-muted)}.payment-bank__main code{font-size:12px;color:var(--pd-ink)}
 .payment-empty{display:grid;justify-items:center;text-align:center;padding:30px 15px;color:var(--pd-muted)}.payment-empty>i{font-size:27px;color:var(--pd-blue);margin-bottom:10px}.payment-empty strong{color:var(--pd-ink);font-size:14px}.payment-empty p{font-size:12px;margin:6px 0 14px}
-@media(max-width:700px){.payment-detail__header{align-items:flex-start}.payment-header-actions{align-items:flex-end;flex-direction:column}.payment-provider{align-items:flex-start;gap:12px}.payment-provider__icon{width:44px;height:44px;font-size:20px}.payment-provider h1{font-size:22px}.payment-summary{grid-template-columns:1fr}.payment-panel{padding:18px 15px}.payment-form-grid{grid-template-columns:1fr}.payment-field--full{grid-column:auto}.payment-panel__heading,.payment-next-step{flex-direction:column;align-items:stretch}.payment-form-footer{flex-direction:column;align-items:stretch}.payment-form-footer .btn{width:100%}.payment-bank{align-items:flex-start;flex-wrap:wrap}.payment-bank .payment-status{margin-left:53px}}
+@media(max-width:700px){.payment-method-row{flex-wrap:wrap}.payment-method-row form{width:100%}.payment-method-row form .btn{width:100%}.payment-detail__header{align-items:flex-start}.payment-header-actions{align-items:flex-end;flex-direction:column}.payment-provider{align-items:flex-start;gap:12px}.payment-provider__icon{width:44px;height:44px;font-size:20px}.payment-provider h1{font-size:22px}.payment-summary{grid-template-columns:1fr}.payment-panel{padding:18px 15px}.payment-form-grid{grid-template-columns:1fr}.payment-field--full{grid-column:auto}.payment-panel__heading,.payment-next-step{flex-direction:column;align-items:stretch}.payment-form-footer{flex-direction:column;align-items:stretch}.payment-form-footer .btn{width:100%}.payment-bank{align-items:flex-start;flex-wrap:wrap}.payment-bank .payment-status{margin-left:53px}}
 </style>
 @endpush
