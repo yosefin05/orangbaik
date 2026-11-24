@@ -119,27 +119,28 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 **Scope:** staging-safe code changes only. No production deployment, live credentials, or production database changes.
 
 ### Changes implemented
-- Encrypt newly saved Midtrans/Flip gateway secrets before storing them in the gateway JSON configuration.
-- Stop returning raw gateway credentials in the admin page's JavaScript payload; secret inputs are blank and preserve existing credentials unless replaced.
-- Route Midtrans and Flip service configuration through the selected database gateway record, with non-production environments forced to Sandbox.
-- Require both Midtrans keys and both Flip API/webhook credentials before a gateway is considered configured.
+- Encrypt new and existing Midtrans/Flip secrets at rest using Laravel Crypt; retain backwards-compatible decryption for legacy values.
+- Keep secrets out of admin page payloads and logs; secret inputs stay blank and preserve existing values unless replaced.
+- Separate Sandbox and Production credentials for Midtrans (Server Key, Client Key, Signature Secret Key) and Flip (API Secret Key, webhook token).
+- Resolve credentials according to the transaction's environment. Local, testing, and staging environments are forced to Sandbox; the selected environment is retained in the payment record for webhook verification.
+- Verify Midtrans notifications using the separate Signature Secret Key, with a legacy fallback for older Midtrans configurations where Server Key and signature secret were the same.
 - Reject unsupported provider adapters instead of silently using a generic API driver.
 - Align the dynamic payment webhook route and return generic errors to webhook callers.
 - Tighten callback checks for gateway ownership, signature/token, known statuses, amount integrity, and terminal-state idempotency.
 - Remove automatic retries for Flip bill creation because ambiguous network failures could otherwise create duplicate bills.
-- Add manual transfer account-holder and account-number fields; protect bank/provider identity fields once a channel has transaction history.
-- Hide unconfigured payment channels from the donor checkout and enforce Flip's documented Rp10.000 minimum.
+- Add manual transfer account-holder and account-number fields, a channel active toggle, and safeguards against changing bank/provider identity after transaction history exists.
+- Hide unconfigured payment channels from donor checkout and enforce Flip's documented Rp10.000 minimum.
+- Expand CI to run regression checks on feature branch pushes as well as pull requests.
 
 ### Verification
-- GitHub Actions: frontend build and the selected manual-transfer, fundraiser-referral, donor WhatsApp, payment gateway security, payment channel, and webhook regression test groups passed on the latest PR commit.
-- This is not an end-to-end provider certification. No merchant Sandbox or Live credentials have been tested.
+- Latest GitHub Actions run on commit `fe2c304e2a71a23665283bac66e6fb2d6e122484`: frontend build, manual-transfer expiry, fundraiser referral, donor WhatsApp expiry, gateway security, payment channel, and webhook regression groups all passed.
+- These are automated regression tests, not an end-to-end provider certification. No merchant Sandbox or Live credentials have been tested.
 
 ### Remaining before merge / production
-- Review and complete the Flip Accept Payment v3 migration. Official Flip documentation marks v2 as deprecated.
-- Separate Sandbox and Live credentials so changing the mode cannot accidentally pair the wrong key set.
-- Add/verify provider-specific connection tests and exact webhook callback setup for each provider.
-- Run Midtrans Sandbox and Flip supported test-mode payment flows, including callback delivery, duplicate callbacks, expiry, amount mismatch, and settlement verification.
-- Obtain the authorized merchant/account owner's review and approval before any Live credentials or Production activation.
-- Complete final UI review for gateway settings and manual bank channel CRUD.
+- Flip Accept Payment v3 is documented but currently only available in Flip's staging environment; obtain staging access from the Flip PIC/B2B integration team before implementing and testing the v3 adapter. Keep the existing v2 flow isolated until that migration can be validated.
+- Add provider-specific connectivity tests and verify exact callback setup with the merchant dashboards.
+- Run Midtrans Sandbox and Flip's supported test-mode flows, including callback delivery, duplicate callbacks, expiry, amount mismatch, and settlement verification.
+- Finish audit logging for gateway/channel changes and complete final admin UI review.
+- Obtain the authorized merchant/account owner's review and approval before entering Live credentials or enabling Production payments.
 
 **Status:** WIP — do not merge or enable real-money payments yet.
