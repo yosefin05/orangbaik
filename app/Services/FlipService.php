@@ -88,7 +88,7 @@ class FlipService
     {
         $gateway = $channel->gateway;
         if (!$gateway) {
-            throw new \\RuntimeException('Gateway Flip tidak ditemukan.');
+            throw new \RuntimeException('Gateway Flip tidak ditemukan.');
         }
 
         $credentialMode = $gateway->activeCredentialMode();
