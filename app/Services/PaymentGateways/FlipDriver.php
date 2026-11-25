@@ -38,22 +38,28 @@ class FlipDriver implements PaymentDriverInterface
             return $this->service->createEwalletDirectApiV3($donasi, $pembayaran, $channel);
         }
 
-        $vaData = $this->service->createVirtualAccount($donasi, $pembayaran, $channel);
+        if ($channel->payment_type === 'va') {
+            $vaData = $this->service->createVirtualAccount($donasi, $pembayaran, $channel);
 
-        return [
-            'type'           => 'virtual_account',
-            'order_id'       => $pembayaran->order_id,
-            'donasi_id'      => $donasi->id,
-            'bank_name'      => $channel->name,
-            'account_number' => $vaData['account_number'] ?? null,
-            'account_name'   => $vaData['account_name'] ?? $channel->account_name ?? 'OrangBaik',
-            'amount'         => $vaData['amount'] ?? $donasi->nominal,
-            'expired_at'     => $vaData['expired_date'] ?? null,
-            'redirect_url'   => route('donasi.bayar.instruksi', [
-                'pembayaran' => $pembayaran->id,
-                'token'      => $pembayaran->payment_token,
-            ]),
-        ];
+            return [
+                'type'           => 'virtual_account',
+                'provider_type'  => 'flip_direct_api',
+                'order_id'       => $pembayaran->order_id,
+                'donasi_id'      => $donasi->id,
+                'bank_name'      => $channel->name,
+                'account_number' => $vaData['account_number'] ?? null,
+                'account_name'   => $vaData['account_name'] ?? $channel->account_name ?? 'OrangBaik',
+                'amount'         => $vaData['amount'] ?? $donasi->nominal,
+                'expired_at'     => $vaData['expired_date'] ?? null,
+                'payment_url'    => $vaData['payment_url'] ?? null,
+                'redirect_url'   => route('donasi.bayar.instruksi', [
+                    'pembayaran' => $pembayaran->id,
+                    'token'      => $pembayaran->payment_token,
+                ]),
+            ];
+        }
+
+        throw new \\RuntimeException('Tipe channel pembayaran ini tidak didukung oleh Flip.');
     }
 
 
