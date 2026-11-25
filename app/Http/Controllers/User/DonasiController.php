@@ -145,14 +145,24 @@ class DonasiController extends Controller
             return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak didukung oleh provider yang dipilih.'], 422);
         }
 
-        // Flip Accept Payment v2 requires a bill amount of at least Rp10.000.
-        if ($channel->gateway->code === 'flip' && $nominal < 10000) {
-            return response()->json([
-                'success' => false,
-                'errors' => [
-                    'nominal' => ['Minimal nominal untuk pembayaran Flip adalah Rp10.000.'],
-                ],
-            ], 422);
+        // Flip Direct API v3 has method-specific minimums:
+        // E-Wallet and QRIS: Rp1.000; Virtual Account: Rp10.000.
+        if ($channel->gateway->code === 'flip') {
+            $flipMinimum = in_array(strtolower($channel->channel_code), ['ovo', 'dana', 'qris'], true)
+                ? 1000
+                : 10000;
+
+            if ($nominal < $flipMinimum) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => [
+                        'nominal' => [
+                            'Minimal nominal untuk metode pembayaran ini adalah Rp' .
+                            number_format($flipMinimum, 0, ',', '.') . '.',
+                        ],
+                    ],
+                ], 422);
+            }
         }
 
         // ============================================================
