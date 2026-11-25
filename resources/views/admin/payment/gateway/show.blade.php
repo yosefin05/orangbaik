@@ -128,7 +128,7 @@
                 <div class="payment-method-catalog__heading">
                     <div>
                         <strong>Daftar metode yang bisa ditambahkan</strong>
-                        <p>{{ $isMidtrans ? 'E-wallet yang didukung integrasi Snap. Pastikan metode sudah diaktifkan pada dashboard Midtrans.' : 'Virtual Account dan e-wallet Direct API v3. OVO/DANA memerlukan mode Flip Staging atau Production dan aktivasi merchant.' }}</p>
+                        <p>{{ $isMidtrans ? 'E-wallet yang didukung integrasi Snap. Pastikan metode sudah diaktifkan pada dashboard Midtrans.' : 'Virtual Account, OVO, DANA, dan QRIS melalui Direct API v3. Semua metode memerlukan mode Flip Staging atau Production serta aktivasi merchant.' }}</p>
                     </div>
                     <span class="payment-catalog-count">{{ $availableMethods->count() }} tersedia</span>
                 </div>
