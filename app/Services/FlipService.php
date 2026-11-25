@@ -69,6 +69,20 @@ class FlipService
     }
 
     /**
+     * Normalize channel identifiers to Flip's documented bank codes.
+     */
+    public static function normalizeBankCode(string $channelCode): string
+    {
+        $code = strtolower(trim($channelCode));
+
+        return match ($code) {
+            'cimb_niaga' => 'cimb',
+            'bsi', 'syariah_mandiri' => 'bsm',
+            default => $code,
+        };
+    }
+
+    /**
      * Create a Virtual Account payment through Flip Accept Payment Direct API v3.
      */
     public function createVirtualAccount(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
@@ -136,7 +150,7 @@ class FlipService
         if ($mode === 'production') {
             $endpoint = 'https://bigflip.id/api/v3/pwf/bill';
         } else {
-            $stagingBaseUrl = trim((string) $gateway->getConfigValue('staging_base_url'));
+            $stagingBaseUrl = rtrim(trim((string) $gateway->getConfigValue('staging_base_url')), '/');
             $parts = parse_url($stagingBaseUrl);
 
             if (
