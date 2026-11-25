@@ -189,3 +189,17 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Response Direct API v3 menyimpan payment ID, payment URL, referensi order, dan snapshot credential mode. Webhook mendukung lookup ID pembayaran/referensi order serta mempertahankan validasi token, status, nominal, dan idempotensi.
 - Tidak ada migration, perubahan skema database, pengubahan kredensial, aktivasi channel, atau transaksi Live. Tidak ada panggilan API provider nyata; hanya pengujian HTTP fake yang disiapkan.
 - Live mode memproses uang sungguhan. Tetap nonaktif sampai admin pemilik akun merchant memverifikasi kredensial, endpoint, webhook, dan kesiapan operasional.
+
+
+### [2026-11-25] Flip Accept Payment Direct API v3 Consolidation
+- **Status**: IMPLEMENTED ON REVIEW BRANCH; CI and merchant staging verification pending.
+- Mengonsolidasikan pembuatan bill OVO, DANA, QRIS, dan Virtual Account melalui endpoint Direct API v3; tidak lagi mengirim VA melalui endpoint PWF v2.
+- Menambahkan QRIS ke katalog metode Flip. Channel baru tetap nonaktif sampai admin mengaktifkannya setelah konfirmasi aktivasi merchant.
+- Menyesuaikan batas minimum provider: E-Wallet/QRIS Rp1.000 dan Virtual Account Rp10.000; batas minimum donasi global/campaign tetap berlaku.
+- Menyimpan link_id sebagai transaction_id string dan bill_payment.id secara terpisah di gateway_response; parsing JSON memakai JSON_BIGINT_AS_STRING untuk menjaga ID 19 digit.
+- Menyesuaikan parser respons Direct API v3 untuk nomor VA, account_holder, payment_url, dan qr_code_data.
+- Memperkuat webhook: token diverifikasi berdasarkan mode kredensial transaksi, ID bill/payment dan reference_id dicocokkan, nominal settlement wajib cocok, callback tidak menimpa metadata internal, payload mentah tidak dicatat, serta pembaruan status memakai row lock dan terminal-state protection.
+- Memperbaiki readiness Flip Staging agar tidak mewajibkan kredensial Sandbox legacy ketika staging v3 sudah dikonfigurasi.
+- Menambahkan regression tests untuk pembuatan OVO, QRIS, VA v3, kesiapan konfigurasi staging, dan callback v3.
+- Tidak ada migration, perubahan skema database, kredensial, callback WordPress, aktivasi channel, deployment, atau transaksi Live.
+- **Batas verifikasi**: test otomatis harus lulus terlebih dahulu; koneksi Flip staging dan callback settlement tetap harus diverifikasi dengan akun merchant resmi sebelum perubahan diaktifkan pada staging/production.
