@@ -155,16 +155,17 @@ class FlipService
             $stagingHost = is_array($parts)
                 ? strtolower((string) ($parts['host'] ?? ''))
                 : '';
-            $isFlipHost = $stagingHost === 'flip.id'
-                || $stagingHost === 'bigflip.id'
-                || str_ends_with($stagingHost, '.flip.id')
-                || str_ends_with($stagingHost, '.bigflip.id');
+            $isIpAddress = filter_var($stagingHost, FILTER_VALIDATE_IP) !== false;
 
             if (
                 blank($stagingBaseUrl) ||
                 !is_array($parts) ||
                 strtolower($parts['scheme'] ?? '') !== 'https' ||
-                !$isFlipHost ||
+                blank($stagingHost) ||
+                $isIpAddress ||
+                in_array($stagingHost, ['localhost'], true) ||
+                str_ends_with($stagingHost, '.local') ||
+                str_ends_with($stagingHost, '.internal') ||
                 isset($parts['port']) && (int) $parts['port'] !== 443 ||
                 isset($parts['user']) ||
                 isset($parts['pass']) ||
