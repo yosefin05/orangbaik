@@ -152,7 +152,9 @@ class FlipService
         } else {
             $stagingBaseUrl = rtrim(trim((string) $gateway->getConfigValue('staging_base_url')), '/');
             $parts = parse_url($stagingBaseUrl);
-            $stagingHost = strtolower((string) ($parts['host'] ?? ''));
+            $stagingHost = is_array($parts)
+                ? strtolower((string) ($parts['host'] ?? ''))
+                : '';
             $isFlipHost = $stagingHost === 'flip.id'
                 || $stagingHost === 'bigflip.id'
                 || str_ends_with($stagingHost, '.flip.id')
@@ -235,7 +237,7 @@ class FlipService
             );
         }
 
-        $data = $response->json();
+        $data = json_decode($response->body(), true, 512, JSON_BIGINT_AS_STRING);
         $linkId = data_get($data, 'link_id');
         $paymentId = data_get($data, 'bill_payment.id');
         $paymentUrl = data_get($data, 'payment_url');
@@ -341,7 +343,7 @@ class FlipService
 
         if (isset($payload['data'])) {
             if (is_string($payload['data'])) {
-                $decoded = json_decode($payload['data'], true);
+                $decoded = json_decode($payload['data'], true, 512, JSON_BIGINT_AS_STRING);
                 if (is_array($decoded)) {
                     $data = $decoded;
                 }
