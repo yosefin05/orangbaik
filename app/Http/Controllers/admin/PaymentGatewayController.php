@@ -67,6 +67,7 @@ class PaymentGatewayController extends Controller
             'flip' => [
                 ['name' => 'OVO', 'channel_code' => 'ovo', 'payment_type' => 'instant'],
                 ['name' => 'DANA', 'channel_code' => 'dana', 'payment_type' => 'instant'],
+                ['name' => 'QRIS', 'channel_code' => 'qris', 'payment_type' => 'instant'],
                 ['name' => 'BCA Virtual Account', 'channel_code' => 'bca', 'payment_type' => 'va'],
                 ['name' => 'BNI Virtual Account', 'channel_code' => 'bni', 'payment_type' => 'va'],
                 ['name' => 'BRI Virtual Account', 'channel_code' => 'bri', 'payment_type' => 'va'],
