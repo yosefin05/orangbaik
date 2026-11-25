@@ -255,20 +255,34 @@ class PaymentChannelTest extends TestCase
         $donasi = $this->createDonasi();
         $channel = PaymentChannel::where('payment_gateway_id', PaymentGateway::where('code', 'flip')->first()->id)->first();
 
-        $flipId = '987654';
+        $flipId = '2502091430251230005';
+        $paymentId = 'PGPWF10117309708599318549';
+        $orderId = 'OB-FLIP-' . time();
         $pembayaran = Pembayaran::create([
             'donasi_id'          => $donasi->id,
             'payment_channel_id' => $channel->id,
-            'order_id'           => 'OB-FLIP-' . time(),
+            'order_id'           => $orderId,
             'transaction_id'     => $flipId,
             'payment_type'       => 'va',
             'transaction_status' => 'pending',
+            'gateway_response'   => [
+                'credential_mode' => 'sandbox',
+                'flip_api_version' => 'v3',
+                'link_id' => $flipId,
+                'flip_payment_id' => $paymentId,
+                'unique_code' => 0,
+            ],
         ]);
 
         $payload = [
-            'id'     => $flipId,
-            'amount' => 50000,
-            'status' => 'SUCCESSFUL',
+            'token' => 'test-flip-token',
+            'data' => json_encode([
+                'id' => $paymentId,
+                'bill_link_id' => $flipId,
+                'reference_id' => $orderId,
+                'amount' => 50000,
+                'status' => 'SUCCESSFUL',
+            ]),
         ];
 
         $service = new FlipService();
@@ -747,10 +761,11 @@ class PaymentChannelTest extends TestCase
             ->get(route('admin.payment.gateway.show', $flip))
             ->assertOk()
             ->assertSee('Bank BCA')
-            ->assertSee('Virtual Account dan e-wallet Direct API v3')
+            ->assertSee('Virtual Account, OVO, DANA, dan QRIS melalui Direct API v3')
             ->assertSee('SeaBank Virtual Account')
             ->assertSee('OVO')
-            ->assertSee('DANA');
+            ->assertSee('DANA')
+            ->assertSee('QRIS');
 
         $this->post(route('admin.payment.gateway.methods.store', $flip), [
             'channel_code' => 'seabank',
@@ -766,12 +781,12 @@ class PaymentChannelTest extends TestCase
     }
 
 
-    public function test_flip_ovo_and_dana_are_registered_as_inactive_direct_api_v3_methods(): void
+    public function test_flip_ovo_dana_and_qris_are_registered_as_inactive_direct_api_v3_methods(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
 
-        foreach (['ovo', 'dana'] as $code) {
+        foreach (['ovo', 'dana', 'qris'] as $code) {
             $this->actingAs($admin)
                 ->post(route('admin.payment.gateway.methods.store', $flip), [
                     'channel_code' => $code,
@@ -796,7 +811,7 @@ class PaymentChannelTest extends TestCase
                 'credential_mode' => 'staging',
                 'staging_api_key' => 'test-staging-secret',
                 'staging_webhook_token' => 'test-staging-webhook',
-                'staging_base_url' => 'https://flip-staging.example.test',
+                'staging_base_url' => 'https://staging.flip.id',
             ]),
         ]);
 
@@ -822,9 +837,18 @@ class PaymentChannelTest extends TestCase
         ]);
 
         Http::fake([
-            'https://flip-staging.example.test/big_api/v3/pwf/bill' => Http::response([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => Http::response([
+                'link_id' => '2502091430251230005',
                 'payment_url' => 'https://checkout.flip.example.test/pay/123',
-                'bill_payment' => ['id' => 12345],
+                'bill_payment' => [
+                    'id' => 'PGPWF10117309708599318549',
+                    'amount' => 50000,
+                    'unique_code' => 0,
+                    'receiver_bank_account' => [
+                        'account_number' => null,
+                        'account_holder' => 'Budi Santoso',
+                    ],
+                ],
             ], 200),
         ]);
 
@@ -832,15 +856,160 @@ class PaymentChannelTest extends TestCase
 
         $this->assertSame('redirect', $result['type']);
         $this->assertSame('https://checkout.flip.example.test/pay/123', $result['redirect_url']);
-        $this->assertSame('12345', $pembayaran->fresh()->transaction_id);
+        $this->assertSame('2502091430251230005', $pembayaran->fresh()->transaction_id);
+        $this->assertSame('PGPWF10117309708599318549', data_get($pembayaran->fresh()->gateway_response, 'flip_payment_id'));
         $this->assertSame('staging', data_get($pembayaran->fresh()->gateway_response, 'credential_mode'));
 
         Http::assertSent(fn ($request) =>
-            $request->url() === 'https://flip-staging.example.test/big_api/v3/pwf/bill'
+            $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
             && $request['sender_bank'] === 'ovo'
             && $request['sender_bank_type'] === 'wallet_account'
             && $request['step'] === 'direct_api'
         );
+    }
+
+    public function test_flip_direct_api_v3_creates_qris_payment_with_staging_credentials(): void
+    {
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $flip->update([
+            'config' => PaymentGateway::secureConfigForStorage([
+                'credential_mode' => 'staging',
+                'staging_api_key' => 'test-staging-secret',
+                'staging_webhook_token' => 'test-staging-webhook',
+                'staging_base_url' => 'https://staging.flip.id',
+            ]),
+        ]);
+
+        $channel = PaymentChannel::create([
+            'payment_gateway_id' => $flip->id,
+            'name' => 'QRIS',
+            'channel_code' => 'qris',
+            'payment_type' => 'instant',
+            'sort_order' => 99,
+            'is_active' => false,
+        ]);
+        $channel->load('gateway');
+
+        $donasi = $this->createDonasi();
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'payment_gateway_id' => $flip->id,
+            'payment_token' => (string) \Illuminate\Support\Str::uuid(),
+            'order_id' => 'OB-FLIP-QRIS-' . uniqid(),
+            'payment_type' => 'instant',
+            'transaction_status' => 'pending',
+        ]);
+
+        Http::fake([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => Http::response([
+                'link_id' => '2502091430251230006',
+                'payment_url' => 'https://checkout.flip.example.test/qris/123',
+                'bill_payment' => [
+                    'id' => 'PGPWF10117309708599318550',
+                    'amount' => 50000,
+                    'unique_code' => 0,
+                    'receiver_bank_account' => [
+                        'account_number' => null,
+                        'account_holder' => 'Budi Santoso',
+                        'qr_code_data' => '000201010212...',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $result = app(FlipService::class)->createEwalletDirectApiV3($donasi, $pembayaran, $channel);
+
+        $this->assertSame('redirect', $result['type']);
+        $this->assertSame('flip_qris', $result['provider_type']);
+        $this->assertSame('000201010212...', $result['qr_code_data']);
+        $this->assertSame('2502091430251230006', $pembayaran->fresh()->transaction_id);
+
+        Http::assertSent(fn ($request) =>
+            $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
+            && $request['sender_bank'] === 'qris'
+            && $request['sender_bank_type'] === 'wallet_account'
+            && $request['step'] === 'direct_api'
+        );
+    }
+
+    public function test_flip_direct_api_v3_creates_virtual_account_using_staging_credentials(): void
+    {
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $flip->update([
+            'config' => PaymentGateway::secureConfigForStorage([
+                'credential_mode' => 'staging',
+                'staging_api_key' => 'test-staging-secret',
+                'staging_webhook_token' => 'test-staging-webhook',
+                'staging_base_url' => 'https://staging.flip.id',
+            ]),
+        ]);
+
+        $channel = PaymentChannel::create([
+            'payment_gateway_id' => $flip->id,
+            'name' => 'BCA Virtual Account',
+            'channel_code' => 'bca',
+            'payment_type' => 'va',
+            'sort_order' => 99,
+            'is_active' => false,
+        ]);
+        $channel->load('gateway');
+
+        $donasi = $this->createDonasi();
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'payment_gateway_id' => $flip->id,
+            'payment_token' => (string) \Illuminate\Support\Str::uuid(),
+            'order_id' => 'OB-FLIP-VA-' . uniqid(),
+            'payment_type' => 'va',
+            'transaction_status' => 'pending',
+        ]);
+
+        Http::fake([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => Http::response([
+                'link_id' => '2502091430251230007',
+                'payment_url' => 'https://checkout.flip.example.test/va/123',
+                'expired_date' => '2026-11-26 20:00',
+                'bill_payment' => [
+                    'id' => 'PGPWF10117309708599318551',
+                    'amount' => 50000,
+                    'unique_code' => 0,
+                    'receiver_bank_account' => [
+                        'account_number' => '1900800000106689',
+                        'account_holder' => 'Budi Santoso',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $result = app(FlipService::class)->createVirtualAccount($donasi, $pembayaran, $channel);
+
+        $this->assertSame('1900800000106689', $result['account_number']);
+        $this->assertSame('Budi Santoso', $result['account_name']);
+        $this->assertSame('2502091430251230007', $pembayaran->fresh()->transaction_id);
+
+        Http::assertSent(fn ($request) =>
+            $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
+            && $request['sender_bank'] === 'bca'
+            && $request['sender_bank_type'] === 'virtual_account'
+            && $request['step'] === 'direct_api'
+        );
+    }
+
+    public function test_flip_staging_configuration_does_not_require_legacy_sandbox_credentials(): void
+    {
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $flip->update([
+            'config' => PaymentGateway::secureConfigForStorage([
+                'credential_mode' => 'staging',
+                'staging_api_key' => 'test-staging-secret',
+                'staging_webhook_token' => 'test-staging-webhook',
+                'staging_base_url' => 'https://staging.flip.id',
+            ]),
+        ]);
+
+        $this->assertTrue($flip->fresh()->isConfigured());
     }
 
     public function test_provider_catalog_rejects_methods_not_supported_by_that_provider(): void
