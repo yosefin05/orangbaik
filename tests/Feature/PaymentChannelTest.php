@@ -761,7 +761,7 @@ class PaymentChannelTest extends TestCase
             ->get(route('admin.payment.gateway.show', $flip))
             ->assertOk()
             ->assertSee('Bank BCA')
-            ->assertSee('Virtual Account dan e-wallet Direct API v3')
+            ->assertSee('Virtual Account, OVO, DANA, dan QRIS melalui Direct API v3')
             ->assertSee('SeaBank Virtual Account')
             ->assertSee('OVO')
             ->assertSee('DANA')
