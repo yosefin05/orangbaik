@@ -811,7 +811,7 @@ class PaymentChannelTest extends TestCase
                 'credential_mode' => 'staging',
                 'staging_api_key' => 'test-staging-secret',
                 'staging_webhook_token' => 'test-staging-webhook',
-                'staging_base_url' => 'https://flip-staging.example.test',
+                'staging_base_url' => 'https://staging.flip.id',
             ]),
         ]);
 
@@ -837,7 +837,7 @@ class PaymentChannelTest extends TestCase
         ]);
 
         Http::fake([
-            'https://flip-staging.example.test/big_api/v3/pwf/bill' => Http::response([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => Http::response([
                 'link_id' => '2502091430251230005',
                 'payment_url' => 'https://checkout.flip.example.test/pay/123',
                 'bill_payment' => [
@@ -861,7 +861,7 @@ class PaymentChannelTest extends TestCase
         $this->assertSame('staging', data_get($pembayaran->fresh()->gateway_response, 'credential_mode'));
 
         Http::assertSent(fn ($request) =>
-            $request->url() === 'https://flip-staging.example.test/big_api/v3/pwf/bill'
+            $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
             && $request['sender_bank'] === 'ovo'
             && $request['sender_bank_type'] === 'wallet_account'
             && $request['step'] === 'direct_api'
@@ -876,7 +876,7 @@ class PaymentChannelTest extends TestCase
                 'credential_mode' => 'staging',
                 'staging_api_key' => 'test-staging-secret',
                 'staging_webhook_token' => 'test-staging-webhook',
-                'staging_base_url' => 'https://flip-staging.example.test',
+                'staging_base_url' => 'https://staging.flip.id',
             ]),
         ]);
 
@@ -902,7 +902,7 @@ class PaymentChannelTest extends TestCase
         ]);
 
         Http::fake([
-            'https://flip-staging.example.test/big_api/v3/pwf/bill' => Http::response([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => Http::response([
                 'link_id' => '2502091430251230006',
                 'payment_url' => 'https://checkout.flip.example.test/qris/123',
                 'bill_payment' => [
@@ -926,7 +926,7 @@ class PaymentChannelTest extends TestCase
         $this->assertSame('2502091430251230006', $pembayaran->fresh()->transaction_id);
 
         Http::assertSent(fn ($request) =>
-            $request->url() === 'https://flip-staging.example.test/big_api/v3/pwf/bill'
+            $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
             && $request['sender_bank'] === 'qris'
             && $request['sender_bank_type'] === 'wallet_account'
             && $request['step'] === 'direct_api'
@@ -941,7 +941,7 @@ class PaymentChannelTest extends TestCase
                 'credential_mode' => 'staging',
                 'staging_api_key' => 'test-staging-secret',
                 'staging_webhook_token' => 'test-staging-webhook',
-                'staging_base_url' => 'https://flip-staging.example.test',
+                'staging_base_url' => 'https://staging.flip.id',
             ]),
         ]);
 
@@ -967,7 +967,7 @@ class PaymentChannelTest extends TestCase
         ]);
 
         Http::fake([
-            'https://flip-staging.example.test/big_api/v3/pwf/bill' => Http::response([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => Http::response([
                 'link_id' => '2502091430251230007',
                 'payment_url' => 'https://checkout.flip.example.test/va/123',
                 'expired_date' => '2026-11-26 20:00',
@@ -990,7 +990,7 @@ class PaymentChannelTest extends TestCase
         $this->assertSame('2502091430251230007', $pembayaran->fresh()->transaction_id);
 
         Http::assertSent(fn ($request) =>
-            $request->url() === 'https://flip-staging.example.test/big_api/v3/pwf/bill'
+            $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
             && $request['sender_bank'] === 'bca'
             && $request['sender_bank_type'] === 'virtual_account'
             && $request['step'] === 'direct_api'
@@ -1005,7 +1005,7 @@ class PaymentChannelTest extends TestCase
                 'credential_mode' => 'staging',
                 'staging_api_key' => 'test-staging-secret',
                 'staging_webhook_token' => 'test-staging-webhook',
-                'staging_base_url' => 'https://flip-staging.example.test',
+                'staging_base_url' => 'https://staging.flip.id',
             ]),
         ]);
 
