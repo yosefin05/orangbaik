@@ -59,7 +59,7 @@ class FlipDriver implements PaymentDriverInterface
             ];
         }
 
-        throw new \\RuntimeException('Tipe channel pembayaran ini tidak didukung oleh Flip.');
+        throw new \RuntimeException('Tipe channel pembayaran ini tidak didukung oleh Flip.');
     }
 
 
