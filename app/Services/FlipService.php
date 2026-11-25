@@ -207,6 +207,7 @@ class FlipService
                 ->withBasicAuth($apiKey, '')
                 ->acceptJson()
                 ->asJson()
+                ->withOptions(['allow_redirects' => false])
                 ->post($endpoint, $payload);
         } catch (\Throwable $exception) {
             Log::error('Flip Direct API v3 request failed before a confirmed response', [
@@ -227,10 +228,6 @@ class FlipService
                 'channel' => $bankCode,
                 'mode' => $mode,
                 'http_status' => $response->status(),
-                'provider_error' => Str::limit(
-                    (string) (data_get($response->json(), 'message') ?? data_get($response->json(), 'errors.0.message') ?? 'No provider message'),
-                    250
-                ),
             ]);
 
             throw new \RuntimeException(
