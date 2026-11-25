@@ -255,20 +255,34 @@ class PaymentChannelTest extends TestCase
         $donasi = $this->createDonasi();
         $channel = PaymentChannel::where('payment_gateway_id', PaymentGateway::where('code', 'flip')->first()->id)->first();
 
-        $flipId = '987654';
+        $flipId = '2502091430251230005';
+        $paymentId = 'PGPWF10117309708599318549';
+        $orderId = 'OB-FLIP-' . time();
         $pembayaran = Pembayaran::create([
             'donasi_id'          => $donasi->id,
             'payment_channel_id' => $channel->id,
-            'order_id'           => 'OB-FLIP-' . time(),
+            'order_id'           => $orderId,
             'transaction_id'     => $flipId,
             'payment_type'       => 'va',
             'transaction_status' => 'pending',
+            'gateway_response'   => [
+                'credential_mode' => 'sandbox',
+                'flip_api_version' => 'v3',
+                'link_id' => $flipId,
+                'flip_payment_id' => $paymentId,
+                'unique_code' => 0,
+            ],
         ]);
 
         $payload = [
-            'id'     => $flipId,
-            'amount' => 50000,
-            'status' => 'SUCCESSFUL',
+            'token' => 'test-flip-token',
+            'data' => json_encode([
+                'id' => $paymentId,
+                'bill_link_id' => $flipId,
+                'reference_id' => $orderId,
+                'amount' => 50000,
+                'status' => 'SUCCESSFUL',
+            ]),
         ];
 
         $service = new FlipService();
