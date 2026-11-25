@@ -7,6 +7,7 @@ use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
 use App\Models\PaymentGateway;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -46,51 +47,135 @@ class FlipService
 
 
     /**
-     * Create an OVO/DANA payment with Flip Accept Payment Direct API v3.
-     * Flip v3 E-Wallet is available through the merchant staging environment
-     * or the live endpoint; it is not available on the legacy Sandbox endpoint.
+     * Create OVO, DANA, or QRIS payment through Flip Accept Payment Direct API v3.
+     * Staging and Production are supported; the legacy Sandbox endpoint is not.
      */
     public function createEwalletDirectApiV3(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
     {
         $gateway = $channel->gateway;
-        if (!$gateway || !in_array(strtolower($channel->channel_code), ['ovo', 'dana'], true)) {
-            throw new \RuntimeException('Direct API v3 hanya digunakan untuk channel OVO dan DANA milik Flip.');
+        $bankCode = strtolower(trim($channel->channel_code));
+
+        if (!$gateway || $gateway->code !== 'flip' || !in_array($bankCode, ['ovo', 'dana', 'qris'], true)) {
+            throw new \RuntimeException('Direct API v3 hanya mendukung OVO, DANA, dan QRIS melalui gateway Flip.');
         }
 
+        return $this->createDirectApiV3Bill(
+            $donasi,
+            $pembayaran,
+            $channel,
+            $bankCode,
+            'wallet_account'
+        );
+    }
+
+    /**
+     * Create a Virtual Account payment through Flip Accept Payment Direct API v3.
+     */
+    public function createVirtualAccount(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
+    {
+        $gateway = $channel->gateway;
+
+        if (!$gateway || $gateway->code !== 'flip' || $channel->payment_type !== 'va') {
+            throw new \RuntimeException('Channel Virtual Account tidak valid untuk gateway Flip.');
+        }
+
+        $bankCode = self::normalizeBankCode($channel->channel_code);
+        $supportedBanks = [
+            'bca', 'bni', 'bri', 'bsm', 'mandiri',
+            'permata', 'cimb', 'danamon', 'seabank',
+        ];
+
+        if (!in_array($bankCode, $supportedBanks, true)) {
+            throw new \RuntimeException('Bank Virtual Account ini belum didukung oleh integrasi Flip Direct API v3.');
+        }
+
+        return $this->createDirectApiV3Bill(
+            $donasi,
+            $pembayaran,
+            $channel,
+            $bankCode,
+            'virtual_account'
+        );
+    }
+
+    /**
+     * Shared, single-attempt Direct API v3 bill creation.
+     * No automatic retries are performed because Create Bill is non-idempotent.
+     */
+    protected function createDirectApiV3Bill(
+        Donasi $donasi,
+        Pembayaran $pembayaran,
+        PaymentChannel $channel,
+        string $bankCode,
+        string $senderBankType
+    ): array {
+        $gateway = $channel->gateway;
         $mode = $gateway->activeCredentialMode();
+
         if (!in_array($mode, ['staging', 'production'], true)) {
-            throw new \RuntimeException('OVO dan DANA melalui Flip Direct API v3 memerlukan mode Staging Flip atau Production. API v3 tidak tersedia pada Sandbox.');
+            throw new \RuntimeException('Flip Direct API v3 hanya tersedia pada mode Staging atau Production.');
+        }
+
+        $minimumAmount = $senderBankType === 'virtual_account' ? 10000 : 1000;
+        $amount = (int) $donasi->nominal;
+
+        if ($amount < $minimumAmount) {
+            throw new \RuntimeException(
+                'Nominal minimum untuk metode pembayaran ini adalah Rp' .
+                number_format($minimumAmount, 0, ',', '.') . '.'
+            );
         }
 
         $apiKey = $gateway->getCredentialForMode('api_key', $mode);
         $webhookToken = $gateway->getCredentialForMode('webhook_token', $mode);
+
         if (blank($apiKey) || blank($webhookToken)) {
-            throw new \RuntimeException('API Secret Key dan Webhook Token Flip untuk mode yang dipilih belum lengkap.');
+            throw new \RuntimeException('API Key dan Webhook Token Flip untuk mode yang dipilih belum lengkap.');
         }
 
-        $endpoint = $mode === 'production'
-            ? 'https://bigflip.id/api/v3/pwf/bill'
-            : rtrim((string) $gateway->getConfigValue('staging_base_url'), '/') . '/big_api/v3/pwf/bill';
+        if ($mode === 'production') {
+            $endpoint = 'https://bigflip.id/api/v3/pwf/bill';
+        } else {
+            $stagingBaseUrl = trim((string) $gateway->getConfigValue('staging_base_url'));
+            $parts = parse_url($stagingBaseUrl);
 
-        if ($mode === 'staging' && blank($gateway->getConfigValue('staging_base_url'))) {
-            throw new \RuntimeException('Staging Base URL Flip belum diisi pada dashboard admin.');
+            if (
+                blank($stagingBaseUrl) ||
+                !is_array($parts) ||
+                strtolower($parts['scheme'] ?? '') !== 'https' ||
+                blank($parts['host'] ?? null) ||
+                isset($parts['user']) ||
+                isset($parts['pass']) ||
+                isset($parts['query']) ||
+                isset($parts['fragment']) ||
+                isset($parts['path']) && $parts['path'] !== ''
+            ) {
+                throw new \RuntimeException('Staging Base URL Flip tidak valid. Gunakan origin HTTPS staging yang diberikan Flip tanpa path tambahan.');
+            }
+
+            $endpoint = rtrim($stagingBaseUrl, '/') . '/big_api/v3/pwf/bill';
         }
+
+        $title = 'Donasi ' . $pembayaran->order_id . ' - ' .
+            Str::limit($donasi->campaign->judul ?? 'OrangBaik.id', 35);
 
         $payload = [
-            'title' => 'Donasi: ' . Str::limit($donasi->campaign->judul ?? 'OrangBaik.id', 27),
+            'title' => Str::limit($title, 80),
             'type' => 'SINGLE',
             'step' => 'direct_api',
-            'amount' => (int) $donasi->nominal,
-            'sender_name' => $donasi->nama_donatur ?: 'Hamba Allah',
-            'sender_email' => $donasi->email ?? 'donatur@orangbaik.id',
-            'sender_bank' => strtolower($channel->channel_code),
-            'sender_bank_type' => 'wallet_account',
+            'amount' => $amount,
+            'sender_name' => Str::limit($donasi->nama_donatur ?: 'Hamba Allah', 100),
+            'sender_email' => $donasi->email ?: 'donatur+' . strtolower($pembayaran->order_id) . '@orangbaik.id',
+            'sender_bank' => $bankCode,
+            'sender_bank_type' => $senderBankType,
+            'reference_id' => $pembayaran->order_id,
             'redirect_url' => route('donasi.bayar.instruksi', [
                 'pembayaran' => $pembayaran->id,
                 'token' => $pembayaran->payment_token,
             ]),
-            'reference_id' => $pembayaran->order_id,
             'expired_date' => now()->addDay()->format('Y-m-d H:i'),
+            'is_address_required' => false,
+            'is_phone_number_required' => false,
         ];
 
         try {
@@ -103,319 +188,137 @@ class FlipService
         } catch (\Throwable $exception) {
             Log::error('Flip Direct API v3 request failed before a confirmed response', [
                 'order_id' => $pembayaran->order_id,
-                'channel' => $channel->channel_code,
+                'channel' => $bankCode,
                 'mode' => $mode,
                 'exception_class' => get_class($exception),
             ]);
 
-            throw new \RuntimeException('Flip Direct API v3 tidak dapat dihubungi. Periksa status transaksi di dashboard Flip sebelum mencoba ulang.');
+            throw new \RuntimeException(
+                'Flip tidak dapat dihubungi. Periksa dashboard Flip sebelum mencoba ulang agar tidak membuat tagihan ganda.'
+            );
         }
 
         if (!$response->successful()) {
-            Log::warning('Flip Direct API v3 rejected payment creation', [
+            Log::warning('Flip Direct API v3 rejected bill creation', [
                 'order_id' => $pembayaran->order_id,
-                'channel' => $channel->channel_code,
+                'channel' => $bankCode,
                 'mode' => $mode,
                 'http_status' => $response->status(),
+                'provider_error' => Str::limit(
+                    (string) (data_get($response->json(), 'message') ?? data_get($response->json(), 'errors.0.message') ?? 'No provider message'),
+                    250
+                ),
             ]);
 
-            throw new \RuntimeException('Flip menolak pembuatan pembayaran e-wallet (HTTP ' . $response->status() . ').');
+            throw new \RuntimeException(
+                'Flip menolak pembuatan pembayaran (HTTP ' . $response->status() . ').'
+            );
         }
 
         $data = $response->json();
-        $paymentUrl = data_get($data, 'payment_url') ?? data_get($data, 'bill_payment.payment_url');
-        $paymentId = data_get($data, 'bill_payment.id') ?? data_get($data, 'id');
+        $linkId = data_get($data, 'link_id');
+        $paymentId = data_get($data, 'bill_payment.id');
+        $paymentUrl = data_get($data, 'payment_url');
 
-        if (!is_array($data) || blank($paymentUrl) || blank($paymentId)) {
-            Log::error('Flip Direct API v3 returned an incomplete payment response', [
+        if (!is_array($data) || blank($linkId) || blank($paymentId) || blank($paymentUrl)) {
+            Log::error('Flip Direct API v3 returned an incomplete bill response', [
                 'order_id' => $pembayaran->order_id,
+                'channel' => $bankCode,
                 'mode' => $mode,
                 'http_status' => $response->status(),
             ]);
 
-            throw new \RuntimeException('Respons Flip Direct API v3 belum memuat ID pembayaran dan payment URL yang diperlukan.');
+            throw new \RuntimeException(
+                'Respons Flip belum lengkap. Jangan membuat transaksi ulang sebelum memeriksa dashboard Flip.'
+            );
         }
 
-        $pembayaran->update([
-            'transaction_id' => (string) $paymentId,
-            'gateway_response' => array_merge($pembayaran->gateway_response ?? [], [
-                'credential_mode' => $mode,
-                'flip_api_version' => 'v3',
-                'flip_flow' => 'direct_api',
-                'flip_payment_id' => $paymentId,
-                'payment_url' => $paymentUrl,
-                'reference_id' => $pembayaran->order_id,
-                'requested_amount' => (int) $donasi->nominal,
-                'sender_bank' => strtolower($channel->channel_code),
-                'sender_bank_type' => 'wallet_account',
-                'expires_at' => data_get($data, 'expired_date') ?? data_get($data, 'bill_payment.expired_date'),
-            ]),
-        ]);
+        $billPayment = data_get($data, 'bill_payment', []);
+        $receiver = data_get($billPayment, 'receiver_bank_account', []);
 
-        return [
-            'type' => 'redirect',
-            'provider_type' => 'flip_ewallet',
-            'order_id' => $pembayaran->order_id,
-            'donasi_id' => $donasi->id,
-            'redirect_url' => $paymentUrl,
+        $accountNumber = data_get($receiver, 'account_number');
+        $accountName = data_get($receiver, 'account_holder');
+        $qrCodeData = data_get($receiver, 'qr_code_data');
+
+        if ($senderBankType === 'virtual_account' && blank($accountNumber)) {
+            Log::error('Flip VA v3 response missing virtual account number', [
+                'order_id' => $pembayaran->order_id,
+                'channel' => $bankCode,
+            ]);
+
+            throw new \RuntimeException(
+                'Flip belum mengembalikan nomor Virtual Account. Periksa dashboard Flip sebelum mencoba ulang.'
+            );
+        }
+
+        if ($bankCode === 'qris' && blank($qrCodeData) && blank($paymentUrl)) {
+            throw new \RuntimeException('Flip belum mengembalikan QRIS atau tautan pembayaran yang valid.');
+        }
+
+        $uniqueCode = (int) data_get($billPayment, 'unique_code', 0);
+        $finalAmount = (int) data_get($billPayment, 'amount', $amount);
+
+        $gatewayResponse = array_merge($pembayaran->gateway_response ?? [], [
+            'credential_mode' => $mode,
+            'flip_api_version' => 'v3',
+            'flip_flow' => 'direct_api',
+            'flip_id' => (string) $linkId,
+            'link_id' => (string) $linkId,
+            'flip_payment_id' => (string) $paymentId,
             'payment_url' => $paymentUrl,
-        ];
-    }
-
-    /**
-     * Normalisasi kode bank untuk Flip API.
-     */
-    public static function normalizeBankCode(string $channelCode): string
-    {
-        $code = strtolower(trim($channelCode));
-
-        return match ($code) {
-            'cimb_niaga' => 'cimb',
-            'bsi', 'syariah_mandiri' => 'bsm',
-            default => $code,
-        };
-    }
-
-    /**
-     * Menentukan tipe bank default pada Flip:
-     * - Bank dengan Virtual Account: bca, bni, bri, bsi, mandiri, permata, cimb, danamon.
-     * - Bank Muamalat di Flip menggunakan bank_account (transfer bank unik).
-     */
-    public static function determineSenderBankType(string $bankCode): string
-    {
-        $code = strtolower(trim($bankCode));
-
-        if ($code === 'muamalat') {
-            return 'bank_account';
-        }
-
-        return 'virtual_account';
-    }
-
-    /**
-     * Buat Virtual Account / Bill Payment via Flip API.
-     * Menggunakan satu request agar kegagalan jaringan tidak membuat bill duplikat.
-     *
-     * @param  Donasi          $donasi
-     * @param  Pembayaran      $pembayaran
-     * @param  PaymentChannel  $channel
-     * @return array  Data pembayaran dari Flip
-     * @throws \Exception jika Flip belum dikonfigurasi atau semua request gagal
-     */
-    public function createVirtualAccount(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
-    {
-        $gateway = $channel->gateway;
-        if (!$gateway) {
-            throw new \RuntimeException('Gateway Flip tidak ditemukan.');
-        }
-
-        $selectedMode = $gateway->activeCredentialMode();
-        // Flip Direct API v3 staging is used only for OVO/DANA. Keep the existing
-        // VA adapter on its Sandbox credentials while the provider is in staging mode.
-        $credentialMode = $selectedMode === 'staging' ? 'sandbox' : $selectedMode;
-        $isProduction = $credentialMode === 'production';
-
-        $this->baseUrl = $isProduction
-            ? (config('payment.flip.base_url_production') ?? 'https://bigflip.id/api')
-            : (config('payment.flip.base_url_sandbox') ?? 'https://bigflip.id/big_sandbox_api');
-        $this->apiKey = $gateway->getCredentialForMode('api_key', $credentialMode);
-
-        if (blank($this->apiKey) || blank($gateway->getCredentialForMode('webhook_token', $credentialMode))) {
-            throw new \RuntimeException('Kredensial Flip untuk Virtual Account pada mode yang dipilih belum lengkap.');
-        }
-
-        $bankCode = self::normalizeBankCode($channel->channel_code);
-        $senderBankType = self::determineSenderBankType($bankCode);
-        $title = 'Donasi: ' . Str::limit($donasi->campaign->judul ?? 'OrangBaik.id', 27);
-
-        // Siapkan base payload
-        $basePayload = [
-            'title' => $title,
-            'type' => 'SINGLE',
-            'amount' => (int) $donasi->nominal,
-            'expired_date' => now()->addDays(1)->format('Y-m-d H:i'),
-            'redirect_url' => route('donasi.bayar.instruksi', [
-                'pembayaran' => $pembayaran->id,
-                'token' => $pembayaran->payment_token,
-            ]),
-            'is_address_required' => 0,
-            'is_phone_number_required' => 0,
-            'sender_name' => $donasi->nama_donatur ?: 'Hamba Allah',
-            'sender_email' => $donasi->email ?? 'donatur@orangbaik.id',
-            'sender_phone_number' => $donasi->no_hp ?? '08123456789',
-        ];
-
-        // Create exactly one bill per donation. Do not retry a non-idempotent create
-        // request after timeouts or ambiguous provider responses.
-        $requestPayload = array_merge($basePayload, [
-            'step' => 3,
+            'reference_id' => $pembayaran->order_id,
+            'requested_amount' => $amount,
+            'final_amount' => $finalAmount,
+            'unique_code' => $uniqueCode,
             'sender_bank' => $bankCode,
             'sender_bank_type' => $senderBankType,
-        ]);
-
-        try {
-            $response = $this->sendBillRequest($requestPayload);
-        } catch (\Throwable $exception) {
-            Log::error('Flip bill request failed before a confirmed response', [
-                'bank' => $bankCode,
-                'order_id' => $pembayaran->order_id,
-                'exception_class' => get_class($exception),
-            ]);
-
-            throw new \RuntimeException('Flip tidak dapat dihubungi. Periksa koneksi dan status transaksi sebelum mencoba kembali.');
-        }
-
-        if (!$response->successful()) {
-            Log::warning('Flip rejected bill creation request', [
-                'bank' => $bankCode,
-                'order_id' => $pembayaran->order_id,
-                'http_status' => $response->status(),
-            ]);
-
-            throw new \RuntimeException('Flip menolak pembuatan pembayaran (HTTP ' . $response->status() . ').');
-        }
-
-        $successData = $response->json();
-        if (!is_array($successData) || empty($successData)) {
-            Log::error('Flip returned an invalid bill creation response', [
-                'order_id' => $pembayaran->order_id,
-                'http_status' => $response->status(),
-            ]);
-
-            throw new \RuntimeException('Respons Flip tidak valid. Jangan membuat transaksi ulang sebelum memeriksa dashboard Flip.');
-        }
-
-        return $this->processSuccessfulFlipResponse($successData, $pembayaran, $donasi, $channel, $bankCode, $credentialMode);
-    }
-
-    /**
-     * Kirim satu HTTP POST ke endpoint Flip PWF v2.
-     */
-    protected function sendBillRequest(array $payload)
-    {
-        return Http::connectTimeout(5)
-            ->timeout(20)
-            ->withBasicAuth($this->apiKey, '')
-            ->asForm()
-            ->post($this->baseUrl . '/v2/pwf/bill', $payload);
-    }
-
-    /**
-     * Proses parsing response sukses dari Flip dan simpan ke Pembayaran.
-     */
-    protected function processSuccessfulFlipResponse(
-        array $data,
-        Pembayaran $pembayaran,
-        Donasi $donasi,
-        PaymentChannel $channel,
-        string $bankCode,
-        string $credentialMode
-    ): array {
-        // Ekstrak nomor Virtual Account / Rekening dari berbagai kemungkinan format response Flip
-        $accountNumber = $data['bill_payment']['receiver_bank_account']['account_number']
-            ?? $data['bill_payment']['account_number']
-            ?? $data['bill_payment']['virtual_account_number']
-            ?? $data['bill_payment']['va_number']
-            ?? $data['receiver_bank_account']['account_number']
-            ?? $data['virtual_account_number']
-            ?? $data['account_number']
-            ?? $data['va_number']
-            ?? null;
-
-        // Ekstrak nama rekening penerima
-        $accountName = $data['bill_payment']['receiver_bank_account']['account_name']
-            ?? $data['receiver_bank_account']['account_name']
-            ?? $data['account_name']
-            ?? $channel->account_name
-            ?? 'OrangBaik.id / Flip';
-
-        // URL pembayaran Flip (PWF Link)
-        $linkUrl = $data['link_url']
-            ?? $data['url']
-            ?? null;
-
-        $paymentUrl = $data['payment_url']
-            ?? $linkUrl;
-
-        // Flip Sandbox v2 kadang mengembalikan URL tanpa scheme.
-            // Normalisasi agar browser tidak menganggapnya sebagai relative URL.
-        if ($paymentUrl && !preg_match('#^https?://#i', $paymentUrl)) {
-            $paymentUrl = 'https://' . $paymentUrl;
-        }
-
-        // Flip ID / Link ID
-        $flipId = $data['link_id']
-            ?? $data['id']
-            ?? $data['bill_payment']['id']
-            ?? null;
-
-        // Total nominal (jika Flip menambahkan kode unik untuk transfer)
-        $finalAmount = $data['bill_payment']['amount']
-            ?? $data['amount']
-            ?? (int) $donasi->nominal;
-
-        $uniqueCode = $data['bill_payment']['unique_code'] ?? 0;
-
-        // Simpan transaction_id dari Flip dan gateway response
-        $pembayaran->update([
-            'transaction_id' => (string) $flipId,
-            'gateway_response' => array_merge($data, [
-                'credential_mode' => $credentialMode,
-                'flip_id' => $flipId,
-                'link_id' => $data['link_id'] ?? $flipId,
-                'account_number' => $accountNumber,
-                'account_name' => $accountName,
-                'link_url' => $linkUrl,
-                'payment_url' => $paymentUrl,
-                'final_amount' => $finalAmount,
-                'unique_code' => $uniqueCode,
-            ]),
-        ]);
-
-        Log::info('Flip payment created successfully', [
-            'order_id' => $pembayaran->order_id,
-            'flip_id' => $flipId,
-            'bank_code' => $bankCode,
             'account_number' => $accountNumber,
-            'amount' => $finalAmount,
+            'account_name' => $accountName,
+            'qr_code_data' => $qrCodeData,
+            'expires_at' => data_get($data, 'expired_date'),
+        ]);
+
+        $pembayaran->update([
+            // Flip link_id is the bill identifier used by the v3 Get Payment API and callbacks.
+            'transaction_id' => (string) $linkId,
+            'gateway_response' => $gatewayResponse,
+        ]);
+
+        Log::info('Flip Direct API v3 bill created', [
+            'order_id' => $pembayaran->order_id,
+            'link_id' => (string) $linkId,
+            'payment_id' => (string) $paymentId,
+            'channel' => $bankCode,
+            'mode' => $mode,
         ]);
 
         return [
-            'id' => $flipId,
+            'type' => $senderBankType === 'virtual_account' ? 'virtual_account' : 'redirect',
+            'provider_type' => $bankCode === 'qris' ? 'flip_qris' : 'flip_direct_api',
+            'order_id' => $pembayaran->order_id,
+            'donasi_id' => $donasi->id,
+            'bank_code' => $bankCode,
             'account_number' => $accountNumber,
             'account_name' => $accountName,
-            'bank_code' => $bankCode,
-            'link_url' => $linkUrl,
+            'qr_code_data' => $qrCodeData,
             'payment_url' => $paymentUrl,
-            'expired_date' => $data['expired_date'] ?? null,
+            'redirect_url' => $paymentUrl,
             'amount' => $finalAmount,
             'unique_code' => $uniqueCode,
+            'expired_date' => data_get($data, 'expired_date'),
         ];
     }
 
     /**
-     * Menangani webhook callback dari Flip.
-     * Flip mengirim POST request dengan header X-CALLBACK-TOKEN atau token di payload.
+     * Process Flip Accept Payment callbacks.
      *
-     * @param  string  $token    Nilai dari header X-CALLBACK-TOKEN
-     * @param  array   $payload  Body request dari Flip
-     * @return bool
+     * The callback token is verified against the credential mode stored with
+     * the payment. Raw callback payloads are never written to application logs.
      */
     public function handleWebhook(string $token, array $payload): bool
     {
-        /*
-         * =====================================================
-         * 1. VERIFIKASI TOKEN (FAIL-CLOSED)
-         * =====================================================
-         */
-        /*
-         * =====================================================
-         * 2. PARSE PAYLOAD DARI FLIP
-         * Flip dapat mengirim data dalam form-encoded 'data' JSON string
-         * atau langsung sebagai payload JSON.
-         * =====================================================
-         */
         $data = $payload;
+
         if (isset($payload['data'])) {
             if (is_string($payload['data'])) {
                 $decoded = json_decode($payload['data'], true);
@@ -427,96 +330,106 @@ class FlipService
             }
         }
 
-        // Flip PWF Callback ID fields
-        $billLinkId = $data['bill_link_id'] ?? $data['link_id'] ?? null;
-        $paymentId = $data['id'] ?? $data['bill_payment_id'] ?? data_get($data, 'bill_payment.id') ?? null;
-        $referenceId = $data['reference_id'] ?? data_get($data, 'bill_payment.reference_id') ?? null;
-        $status = $data['status'] ?? data_get($data, 'bill_payment.status') ?? null;
+        $billLinkId = isset($data['bill_link_id']) ? (string) $data['bill_link_id'] : null;
+        $paymentId = isset($data['id']) ? (string) $data['id'] : (
+            isset($data['bill_payment_id']) ? (string) $data['bill_payment_id'] : null
+        );
+        $referenceId = isset($data['reference_id']) ? (string) $data['reference_id'] : null;
+        $status = strtoupper(trim((string) ($data['status'] ?? '')));
 
-        if ((!$billLinkId && !$paymentId && !$referenceId) || !$status) {
-            Log::warning('Flip webhook: data tidak lengkap', ['payload' => $payload]);
+        if ((!$billLinkId && !$paymentId && !$referenceId) || $status === '') {
+            Log::warning('Flip webhook rejected: required identifiers or status are missing.', [
+                'has_bill_link_id' => filled($billLinkId),
+                'has_payment_id' => filled($paymentId),
+                'has_reference_id' => filled($referenceId),
+                'has_status' => $status !== '',
+            ]);
             return false;
         }
 
-        /*
-         * =====================================================
-         * 3. CARI PEMBAYARAN BERDASARKAN TRANSACTION_ID (FLIP LINK ID ATAU PAYMENT ID)
-         * =====================================================
-         */
-        $pembayaran = null;
-        if ($billLinkId || $paymentId) {
-            $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
-                ->where(function ($q) use ($billLinkId, $paymentId) {
-                    if ($billLinkId) {
-                        $q->where('transaction_id', (string) $billLinkId);
-                    }
-                    if ($paymentId) {
-                        $q->orWhere('transaction_id', (string) $paymentId);
-                    }
-                })
-                ->first();
-        }
+        $pembayaran = Pembayaran::with([
+            'donasi',
+            'paymentChannel.gateway',
+            'paymentGateway',
+        ])->where(function ($query) use ($billLinkId, $paymentId, $referenceId) {
+            if ($billLinkId) {
+                $query->orWhere('transaction_id', $billLinkId)
+                    ->orWhere('gateway_response->link_id', $billLinkId);
+            }
 
-        // Direct API v3 can identify the transaction by the merchant reference ID.
-        if (!$pembayaran && $referenceId) {
-            $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway', 'paymentGateway'])
-                ->where('order_id', (string) $referenceId)
-                ->first();
-        }
+            if ($paymentId) {
+                $query->orWhere('gateway_response->flip_payment_id', $paymentId)
+                    ->orWhere('transaction_id', $paymentId);
+            }
 
-        if (!$pembayaran && $billLinkId) {
-            $pembayaran = Pembayaran::with(['donasi', 'paymentChannel.gateway'])
-                ->where('gateway_response->link_id', $billLinkId)
-                ->first();
-        }
+            if ($referenceId) {
+                $query->orWhere('order_id', $referenceId);
+            }
+        })->first();
 
         if (!$pembayaran) {
-            Log::warning('Flip webhook: pembayaran tidak ditemukan', [
+            Log::warning('Flip webhook rejected: payment record not found.', [
                 'bill_link_id' => $billLinkId,
                 'payment_id' => $paymentId,
+                'reference_id_present' => filled($referenceId),
             ]);
             return false;
         }
 
-        /*
-         * =====================================================
-         * 4. VERIFIKASI TOKEN SESUAI GATEWAY TRANSAKSI
-         * =====================================================
-         */
         $gateway = $pembayaran->resolvedGateway();
+
         if (!$gateway || $gateway->code !== 'flip') {
-            Log::warning('Flip webhook ditolak: transaksi bukan milik gateway Flip.');
-            return false;
-        }
-
-        $credentialMode = data_get($pembayaran->gateway_response ?? [], 'credential_mode')
-            ?: $gateway->activeCredentialMode();
-        $expectedToken = $gateway->getCredentialForMode('webhook_token', $credentialMode);
-        $receivedToken = !empty($token) ? $token : ($payload['token'] ?? '');
-
-        if (blank($expectedToken) || blank($receivedToken) || !hash_equals((string) $expectedToken, (string) $receivedToken)) {
-            Log::warning('Flip webhook ditolak: token tidak cocok atau tidak dikonfigurasi.');
-            return false;
-        }
-
-        /*
-         * =====================================================
-         * 5. CEGAH PERUBAHAN STATUS TERMINAL (IDEMPOTENT)
-         * =====================================================
-         */
-        if (in_array($pembayaran->transaction_status, ['settlement', 'failed', 'expired', 'expire'], true)) {
-            Log::info('Flip webhook: transaksi sudah settlement (idempotent skip)', [
+            Log::warning('Flip webhook rejected: matched transaction does not belong to Flip.', [
                 'order_id' => $pembayaran->order_id,
             ]);
-            return true;
+            return false;
         }
 
-        /*
-         * =====================================================
-         * 5. MAP STATUS FLIP → STATUS INTERNAL (pending, settlement, failed, expired)
-         * =====================================================
-         */
-        $internalStatus = match (strtoupper($status)) {
+        $gatewayResponse = $pembayaran->gateway_response ?? [];
+        $credentialMode = data_get($gatewayResponse, 'credential_mode')
+            ?: $gateway->activeCredentialMode();
+
+        $expectedToken = $gateway->getCredentialForMode('webhook_token', $credentialMode);
+        $receivedToken = $token !== '' ? $token : (string) ($payload['token'] ?? '');
+
+        if (
+            blank($expectedToken) ||
+            blank($receivedToken) ||
+            !hash_equals((string) $expectedToken, (string) $receivedToken)
+        ) {
+            Log::warning('Flip webhook rejected: callback token mismatch.', [
+                'order_id' => $pembayaran->order_id,
+                'credential_mode' => $credentialMode,
+            ]);
+            return false;
+        }
+
+        // Cross-check every supplied identifier against the stored transaction.
+        $storedLinkId = data_get($gatewayResponse, 'link_id');
+        $storedPaymentId = data_get($gatewayResponse, 'flip_payment_id');
+
+        if ($billLinkId && $storedLinkId && !hash_equals((string) $storedLinkId, $billLinkId)) {
+            Log::warning('Flip webhook rejected: bill link ID mismatch.', [
+                'order_id' => $pembayaran->order_id,
+            ]);
+            return false;
+        }
+
+        if ($paymentId && $storedPaymentId && !hash_equals((string) $storedPaymentId, $paymentId)) {
+            Log::warning('Flip webhook rejected: payment ID mismatch.', [
+                'order_id' => $pembayaran->order_id,
+            ]);
+            return false;
+        }
+
+        if ($referenceId && !hash_equals((string) $pembayaran->order_id, $referenceId)) {
+            Log::warning('Flip webhook rejected: merchant reference mismatch.', [
+                'order_id' => $pembayaran->order_id,
+            ]);
+            return false;
+        }
+
+        $internalStatus = match ($status) {
             'SUCCESSFUL', 'SETTLEMENT', 'PAID' => 'settlement',
             'FAILED' => 'failed',
             'CANCELLED', 'EXPIRED' => 'expired',
@@ -524,67 +437,95 @@ class FlipService
         };
 
         if ($internalStatus === null) {
-            Log::warning('Flip webhook ditolak: status tidak dikenal.', [
+            Log::warning('Flip webhook rejected: unknown payment status.', [
                 'order_id' => $pembayaran->order_id,
+                'status' => $status,
             ]);
             return false;
         }
 
-        /*
-         * =====================================================
-         * 5.5. VALIDASI INTEGRITAS AMOUNT
-         * =====================================================
-         */
-        if ($internalStatus === 'settlement') {
-            $expectedNominal = (int) ($pembayaran->donasi?->nominal ?? 0);
-            $callbackAmount = isset($data['amount'])
-                ? (int) $data['amount']
-                : (isset($data['bill_payment']['amount']) ? (int) $data['bill_payment']['amount'] : null);
+        // Terminal states cannot be reversed by a later or out-of-order callback.
+        if (in_array($pembayaran->transaction_status, ['settlement', 'failed', 'expired', 'expire'], true)) {
+            return $pembayaran->transaction_status === $internalStatus
+                || ($pembayaran->transaction_status === 'expire' && $internalStatus === 'expired');
+        }
 
-            if ($callbackAmount === null) {
-                Log::error('Flip webhook settlement ditolak: nominal callback tidak tersedia.', [
+        if ($internalStatus === 'settlement') {
+            $expectedAmount = (int) ($pembayaran->donasi?->nominal ?? 0);
+            $callbackAmount = isset($data['amount']) ? (int) $data['amount'] : null;
+            $savedUniqueCode = (int) data_get($gatewayResponse, 'unique_code', 0);
+
+            if ($callbackAmount === null || $expectedAmount <= 0) {
+                Log::error('Flip webhook settlement rejected: amount is missing.', [
                     'order_id' => $pembayaran->order_id,
                 ]);
                 return false;
             }
 
-            if ($callbackAmount !== null) {
-                $savedUniqueCode = (int) ($pembayaran->gateway_response['unique_code'] ?? 0);
-                $isMatching = ($callbackAmount === $expectedNominal) ||
-                    ($savedUniqueCode > 0 && $callbackAmount === ($expectedNominal + $savedUniqueCode));
+            $amountMatches = $callbackAmount === $expectedAmount
+                || ($savedUniqueCode > 0 && $callbackAmount === ($expectedAmount + $savedUniqueCode));
 
-                if (!$isMatching) {
-                    Log::error('Flip webhook: nominal tidak sesuai (Amount Integrity Mismatch)', [
-                        'bill_link_id' => $billLinkId,
-                        'payment_id' => $paymentId,
-                        'expected_amount' => $expectedNominal,
-                        'callback_amount' => $callbackAmount,
-                        'order_id' => $pembayaran->order_id,
-                    ]);
-                    return false;
-                }
+            if (!$amountMatches) {
+                Log::error('Flip webhook settlement rejected: amount mismatch.', [
+                    'order_id' => $pembayaran->order_id,
+                    'expected_amount' => $expectedAmount,
+                    'callback_amount' => $callbackAmount,
+                ]);
+                return false;
             }
         }
 
-        $updateData = [
-            'transaction_status' => $internalStatus,
-            'gateway_response' => array_merge($pembayaran->gateway_response ?? [], $data),
+        // Store only the callback fields needed for audit; never overwrite our
+        // credential mode, reference, bill ID, or other internal gateway metadata.
+        $gatewayResponse['last_callback'] = [
+            'payment_id' => $paymentId,
+            'bill_link_id' => $billLinkId,
+            'reference_id' => $referenceId,
+            'amount' => isset($data['amount']) ? (int) $data['amount'] : null,
+            'status' => $status,
+            'sender_bank' => isset($data['sender_bank']) ? (string) $data['sender_bank'] : null,
+            'created_at' => $data['created_at'] ?? null,
+            'received_at' => now()->toIso8601String(),
         ];
 
-        if ($internalStatus === 'settlement') {
-            $updateData['paid_at'] = now();
-        }
+        // Lock and re-check the row so concurrent callback retries cannot race
+        // or overwrite a terminal payment state.
+        return DB::transaction(function () use (
+            $pembayaran,
+            $internalStatus,
+            $gatewayResponse,
+            $status
+        ): bool {
+            $locked = Pembayaran::whereKey($pembayaran->id)->lockForUpdate()->first();
 
-        $pembayaran->update($updateData);
+            if (!$locked) {
+                return false;
+            }
 
-        Log::info('Flip webhook berhasil diproses', [
-            'bill_link_id' => $billLinkId,
-            'payment_id' => $paymentId,
-            'flip_status' => $status,
-            'internal_status' => $internalStatus,
-            'order_id' => $pembayaran->order_id,
-        ]);
+            if (in_array($locked->transaction_status, ['settlement', 'failed', 'expired', 'expire'], true)) {
+                return $locked->transaction_status === $internalStatus
+                    || ($locked->transaction_status === 'expire' && $internalStatus === 'expired');
+            }
 
-        return true;
+            $update = [
+                'transaction_status' => $internalStatus,
+                'gateway_response' => $gatewayResponse,
+            ];
+
+            if ($internalStatus === 'settlement') {
+                $update['paid_at'] = now();
+            }
+
+            $locked->update($update);
+
+            Log::info('Flip webhook processed successfully.', [
+                'order_id' => $locked->order_id,
+                'flip_status' => $status,
+                'internal_status' => $internalStatus,
+            ]);
+
+            return true;
+        });
     }
+}
 }
