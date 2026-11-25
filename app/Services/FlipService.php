@@ -152,12 +152,18 @@ class FlipService
         } else {
             $stagingBaseUrl = rtrim(trim((string) $gateway->getConfigValue('staging_base_url')), '/');
             $parts = parse_url($stagingBaseUrl);
+            $stagingHost = strtolower((string) ($parts['host'] ?? ''));
+            $isFlipHost = $stagingHost === 'flip.id'
+                || $stagingHost === 'bigflip.id'
+                || str_ends_with($stagingHost, '.flip.id')
+                || str_ends_with($stagingHost, '.bigflip.id');
 
             if (
                 blank($stagingBaseUrl) ||
                 !is_array($parts) ||
                 strtolower($parts['scheme'] ?? '') !== 'https' ||
-                blank($parts['host'] ?? null) ||
+                !$isFlipHost ||
+                isset($parts['port']) && (int) $parts['port'] !== 443 ||
                 isset($parts['user']) ||
                 isset($parts['pass']) ||
                 isset($parts['query']) ||
