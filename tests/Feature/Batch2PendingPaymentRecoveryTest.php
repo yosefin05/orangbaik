@@ -138,6 +138,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_donation_creation_generates_unique_payment_token()
     {
         $response = $this->postJson(route('donasi.store', $this->campaign->slug), [
@@ -160,6 +161,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_can_access_own_instruction_page_with_valid_token()
     {
         $donasi = Donasi::create([
@@ -191,6 +193,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_instruction_page_without_token()
     {
         $donasi = Donasi::create([
@@ -219,6 +222,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_instruction_page_with_invalid_or_other_token()
     {
         $donasi1 = Donasi::create([
@@ -250,6 +254,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_authenticated_user_payment_instruction()
     {
         $donasi = Donasi::create([
@@ -279,6 +284,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_upload_transfer_proof_requires_valid_token()
     {
         $donasi = Donasi::create([
@@ -325,6 +331,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_upload_transfer_proof_after_payment_is_terminal()
     {
         foreach (['settlement', 'failed', 'expired', 'expire'] as $status) {
@@ -368,6 +375,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function authenticated_donor_can_access_own_instruction_and_riwayat()
     {
         $donasi = Donasi::create([
@@ -404,6 +412,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function authenticated_user_cannot_access_or_resume_another_users_payment()
     {
         $donasiA = Donasi::create([
@@ -444,6 +453,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function resume_pending_payment_does_not_create_duplicate_donation_or_payment()
     {
         $donasi = Donasi::create([
@@ -487,6 +497,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function already_settled_payment_cannot_be_resumed()
     {
         $donasi = Donasi::create([
@@ -521,6 +532,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function midtrans_webhook_with_matching_amount_settles_and_updates_campaign_total()
     {
         $donasi = Donasi::create([
@@ -571,6 +583,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function midtrans_webhook_with_mismatched_amount_is_rejected_and_does_not_settle()
     {
         $donasi = Donasi::create([
@@ -620,6 +633,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function flip_webhook_with_matching_amount_settles_and_updates_campaign_total()
     {
         $donasi = Donasi::create([
@@ -664,6 +678,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function flip_webhook_with_mismatched_amount_is_rejected_and_does_not_settle()
     {
         $donasi = Donasi::create([
@@ -705,6 +720,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function duplicate_webhook_is_idempotent_and_does_not_duplicate_campaign_totals()
     {
         $donasi = Donasi::create([
@@ -757,6 +773,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function pending_and_expired_and_failed_statuses_do_not_contribute_to_campaign_total()
     {
         // 1. Pending donation
