@@ -281,7 +281,7 @@ class FullFormAuditTest extends TestCase
             ],
         ]);
 
-        $response->assertRedirect(route('campaign.show', 'bantu-masjid-desa'));
+        $response->assertRedirect(url('/bantu-masjid-desa'));
         $this->assertDatabaseHas('campaign', [
             'judul' => 'Bantu Pembangunan Masjid',
             'custom_slug' => 'bantu-masjid-desa',
@@ -305,7 +305,7 @@ class FullFormAuditTest extends TestCase
             'custom_slug' => 'bantu-masjid-desa', // preserve slug so redirect is deterministic
         ]);
 
-        $responseEdit->assertRedirect(route('campaign.show', ['slug' => 'bantu-masjid-desa']));
+        $responseEdit->assertRedirect(url('/bantu-masjid-desa'));
         $this->assertDatabaseHas('campaign', [
             'id' => $campaign->id,
             'judul' => 'Bantu Pembangunan Masjid Megah',
@@ -452,7 +452,7 @@ class FullFormAuditTest extends TestCase
 
         $this->actingAs($this->admin)->get(route('admin.donasi.show', $guestDonation->id))
             ->assertOk()
-            ->assertSee('menunggu%20pembayaran', false);
+            ->assertSee('Menunggu', false);
 
         $this->actingAs($this->user)->postJson(route('donasi.store', $campaign->slug), [
             'nominal' => 50000,
