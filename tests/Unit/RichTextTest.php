@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\\Unit;
+namespace Tests\Unit;
 
-use App\\Support\\RichText;
-use PHPUnit\\Framework\\TestCase;
+use App\Support\RichText;
+use PHPUnit\Framework\TestCase;
 
 class RichTextTest extends TestCase
 {
