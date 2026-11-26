@@ -163,7 +163,7 @@
                             // untuk produksi sebaiknya diganti aset resmi dari tiap penyedia.
                             $logoMap = [
                                 'gopay' => 'gopay',
-                                'ovo' => 'ovo-new',
+                                'ovo' => 'ovo',
                                 'dana' => 'dana',
                                 'shopeepay' => 'shopee-pay',
                                 'shopee pay' => 'shopee-pay',
