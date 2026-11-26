@@ -9,7 +9,7 @@ on:
       - '**'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   tests:
@@ -33,12 +33,6 @@ jobs:
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Apply safe dependency security updates on the audit branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/fix/final-prelaunch-hardening'
-        run: |
-          composer update --with-all-dependencies --prefer-dist --no-interaction
-          npm audit fix
 
       - name: Verify PSR-4 autoloading
         run: composer dump-autoload --optimize --strict-psr
@@ -69,15 +63,4 @@ jobs:
           QUEUE_CONNECTION: sync
           MAIL_MAILER: array
         run: php artisan test --display-warnings --fail-on-warning
-
-      - name: Commit verified dependency lockfile updates
-        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/fix/final-prelaunch-hardening'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add composer.lock package-lock.json
-          if ! git diff --cached --quiet; then
-            git commit -m "Security: update vulnerable dependency lockfiles"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-          fi
 
