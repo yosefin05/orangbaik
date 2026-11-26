@@ -50,13 +50,23 @@ jobs:
 
             command -v git
             command -v php
-            command -v composer
             command -v curl
 
             if ! git diff --quiet || ! git diff --cached --quiet; then
               echo "Refusing deployment: staging checkout contains uncommitted tracked changes."
               exit 1
             fi
+
+            COMPOSER_PHAR="/tmp/composer-2.11.3-${{ github.sha }}.phar"
+            curl --fail --silent --show-error https://getcomposer.org/download/2.11.3/composer.phar --output "$COMPOSER_PHAR"
+            EXPECTED_COMPOSER_SHA256="04f8b003da4e3a2459056591fbfebd02b4dc3e5adeb158616b90cf55a65113ec"
+            ACTUAL_COMPOSER_SHA256="$(php -r 'echo hash_file("sha256", $argv[1]);' "$COMPOSER_PHAR")"
+            if [ "$ACTUAL_COMPOSER_SHA256" != "$EXPECTED_COMPOSER_SHA256" ]; then
+              echo "Composer PHAR checksum verification failed; refusing deployment."
+              rm -f "$COMPOSER_PHAR"
+              exit 1
+            fi
+            php "$COMPOSER_PHAR" --version
 
             BUILD_STAGE="/tmp/orangbaik-build-${{ github.sha }}"
             PREVIOUS_BUILD="storage/app/deploy-build-previous-${{ github.sha }}"
@@ -73,7 +83,7 @@ jobs:
               if [ "$status" -ne 0 ]; then
                 echo "Deployment failed; restoring previous code, dependencies, and frontend assets."
                 git reset --hard "$PREVIOUS_COMMIT" || true
-                composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader || true
+                php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader || true
 
                 if [ "$BUILD_SWAPPED" -eq 1 ]; then
                   rm -rf public/build
@@ -85,6 +95,7 @@ jobs:
                 php artisan optimize:clear || true
               fi
               rm -rf "$BUILD_STAGE" || true
+              rm -f "$COMPOSER_PHAR" || true
               exit "$status"
             }
             trap rollback_on_failure EXIT
@@ -99,7 +110,7 @@ jobs:
               exit 1
             fi
 
-            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+            php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
             mkdir -p storage/app
             if [ -d public/build ]; then
@@ -117,4 +128,5 @@ jobs:
 
             trap - EXIT
             rm -rf "$BUILD_STAGE" "$PREVIOUS_BUILD" || true
+            rm -f "$COMPOSER_PHAR" || true
             echo "Staging deployed successfully at $DEPLOYED_COMMIT"
