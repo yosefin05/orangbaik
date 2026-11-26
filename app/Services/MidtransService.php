@@ -9,6 +9,7 @@ use App\Models\Pembayaran;
 use App\Models\PaymentChannel;
 use App\Models\PaymentGateway;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class MidtransService
 {
@@ -197,7 +198,7 @@ class MidtransService
 
         // Map status Midtrans ke 4 status internal: pending, settlement, failed, expired
         $internalStatus = match ($rawStatus) {
-            'capture' => ($fraudStatus === 'accept' ? 'settlement' : 'pending'),
+            'capture' => 'pending', // Settlement remains the only completed financial state.
             'settlement' => 'settlement',
             'pending'    => 'pending',
             'deny', 'cancel' => 'failed',
@@ -245,21 +246,47 @@ class MidtransService
             $updateData['paid_at'] = now();
         }
 
-        $pembayaran->update($updateData);
+        // Re-read under a row lock so concurrent/out-of-order callbacks cannot
+        // overwrite a terminal state (especially settlement) with stale data.
+        return DB::transaction(function () use (
+            $pembayaran,
+            $updateData,
+            $payload,
+            $orderId,
+            $rawStatus,
+            $paymentType,
+            $transactionId
+        ): bool {
+            $locked = Pembayaran::whereKey($pembayaran->id)->lockForUpdate()->first();
 
-        /*
-         * =====================================================
-         * 6. LOG
-         * =====================================================
-         */
-        Log::info('Midtrans webhook berhasil diproses', [
-            'order_id'           => $orderId,
-            'raw_status'         => $rawStatus,
-            'internal_status'    => $internalStatus,
-            'payment_type'       => $paymentType,
-            'transaction_id'     => $transactionId,
-        ]);
+            if (!$locked) {
+                return false;
+            }
 
-        return true;
+            if (in_array($locked->transaction_status, ['settlement', 'failed', 'expired', 'expire'], true)) {
+                Log::info('Midtrans webhook: concurrent callback ignored for terminal transaction', [
+                    'order_id' => $orderId,
+                    'current_status' => $locked->transaction_status,
+                    'incoming_status' => $rawStatus,
+                ]);
+
+                return true;
+            }
+
+            // Preserve the latest internal metadata (credential mode, audit fields)
+            // rather than overwriting it with a stale model snapshot.
+            $updateData['gateway_response'] = array_merge($locked->gateway_response ?? [], $payload);
+            $locked->update($updateData);
+
+            Log::info('Midtrans webhook berhasil diproses', [
+                'order_id'        => $orderId,
+                'raw_status'      => $rawStatus,
+                'internal_status' => $updateData['transaction_status'],
+                'payment_type'    => $paymentType,
+                'transaction_id'  => $transactionId,
+            ]);
+
+            return true;
+        });
     }
 }

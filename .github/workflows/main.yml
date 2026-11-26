@@ -18,8 +18,41 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            set -e
+            set -eu
             cd /www/wwwroot/staging.orangbaik.id/orangbaik
+
+            # Fail before changing the checkout if a required deploy tool is missing.
+            command -v git
+            command -v php
+            command -v composer
+            command -v node
+            command -v npm
+            command -v curl
+            node --version
+            npm --version
+            node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (!(major >= 24 || (major === 22 && minor >= 12))) { console.error("Node.js 22.12+ or 24+ is required to build Vite 7 assets."); process.exit(1); }'
+
+            if ! git diff --quiet || ! git diff --cached --quiet; then
+              echo "Refusing deployment: staging checkout contains uncommitted tracked changes."
+              exit 1
+            fi
+
+            PREVIOUS_COMMIT="$(git rev-parse HEAD)"
+
+            rollback_on_failure() {
+              status=$?
+              if [ "$status" -ne 0 ]; then
+                echo "Deployment failed; restoring previous code commit $PREVIOUS_COMMIT"
+                git reset --hard "$PREVIOUS_COMMIT" || true
+                composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader || true
+                npm ci --include=dev --no-audit --no-fund || true
+                npm run build || true
+                php artisan optimize:clear || true
+              fi
+              exit "$status"
+            }
+            trap rollback_on_failure EXIT
+
             git fetch origin main
             git pull --ff-only origin main
 
@@ -30,5 +63,17 @@ jobs:
               exit 1
             fi
 
+            # Install the exact locked PHP and frontend dependencies before cache rebuild.
+            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+            npm ci --include=dev --no-audit --no-fund
+            npm run build
+
             php artisan optimize:clear
+            php artisan config:cache
+            php artisan view:cache
+
+            # Smoke-check the public staging homepage before marking the deployment successful.
+            curl --fail --silent --show-error https://staging.orangbaik.id/ --output /dev/null
+
+            trap - EXIT
             echo "Staging deployed successfully at $DEPLOYED_COMMIT"
