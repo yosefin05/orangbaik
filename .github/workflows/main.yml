@@ -10,7 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to VPS
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js for frontend build
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Build frontend assets in GitHub Actions
+        run: |
+          npm ci --include=dev --no-audit --no-fund
+          npm run build
+          test -f public/build/manifest.json
+
+      - name: Upload compiled frontend assets to staging VPS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "public/build/**"
+          target: "/tmp/orangbaik-build-${{ github.sha }}"
+          strip_components: 2
+          overwrite: true
+
+      - name: Deploy application to staging
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -21,34 +48,43 @@ jobs:
             set -eu
             cd /www/wwwroot/staging.orangbaik.id/orangbaik
 
-            # Fail before changing the checkout if a required deploy tool is missing.
             command -v git
             command -v php
             command -v composer
-            command -v node
-            command -v npm
             command -v curl
-            node --version
-            npm --version
-            node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (!(major >= 24 || (major === 22 && minor >= 12))) { console.error("Node.js 22.12+ or 24+ is required to build Vite 7 assets."); process.exit(1); }'
 
             if ! git diff --quiet || ! git diff --cached --quiet; then
               echo "Refusing deployment: staging checkout contains uncommitted tracked changes."
               exit 1
             fi
 
+            BUILD_STAGE="/tmp/orangbaik-build-${{ github.sha }}"
+            PREVIOUS_BUILD="storage/app/deploy-build-previous-${{ github.sha }}"
             PREVIOUS_COMMIT="$(git rev-parse HEAD)"
+            BUILD_SWAPPED=0
+
+            if [ ! -f "$BUILD_STAGE/manifest.json" ]; then
+              echo "Frontend build artifact is missing; refusing deployment."
+              exit 1
+            fi
 
             rollback_on_failure() {
               status=$?
               if [ "$status" -ne 0 ]; then
-                echo "Deployment failed; restoring previous code commit $PREVIOUS_COMMIT"
+                echo "Deployment failed; restoring previous code, dependencies, and frontend assets."
                 git reset --hard "$PREVIOUS_COMMIT" || true
                 composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader || true
-                npm ci --include=dev --no-audit --no-fund || true
-                npm run build || true
+
+                if [ "$BUILD_SWAPPED" -eq 1 ]; then
+                  rm -rf public/build
+                  if [ -d "$PREVIOUS_BUILD" ]; then
+                    mv "$PREVIOUS_BUILD" public/build || true
+                  fi
+                fi
+
                 php artisan optimize:clear || true
               fi
+              rm -rf "$BUILD_STAGE" || true
               exit "$status"
             }
             trap rollback_on_failure EXIT
@@ -63,17 +99,22 @@ jobs:
               exit 1
             fi
 
-            # Install the exact locked PHP and frontend dependencies before cache rebuild.
             composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-            npm ci --include=dev --no-audit --no-fund
-            npm run build
+
+            mkdir -p storage/app
+            if [ -d public/build ]; then
+              mv public/build "$PREVIOUS_BUILD"
+            fi
+            BUILD_SWAPPED=1
+            mkdir -p public/build
+            cp -a "$BUILD_STAGE/." public/build/
 
             php artisan optimize:clear
             php artisan config:cache
             php artisan view:cache
 
-            # Smoke-check the public staging homepage before marking the deployment successful.
             curl --fail --silent --show-error https://staging.orangbaik.id/ --output /dev/null
 
             trap - EXIT
+            rm -rf "$BUILD_STAGE" "$PREVIOUS_BUILD" || true
             echo "Staging deployed successfully at $DEPLOYED_COMMIT"
