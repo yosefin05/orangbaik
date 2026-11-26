@@ -18,15 +18,21 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            set -Eeuo pipefail
+            set -eu
             cd /www/wwwroot/staging.orangbaik.id/orangbaik
 
             # Fail before changing the checkout if a required deploy tool is missing.
             command -v git
             command -v php
             command -v composer
+            command -v node
             command -v npm
             command -v curl
+
+            if ! git diff --quiet || ! git diff --cached --quiet; then
+              echo "Refusing deployment: staging checkout contains uncommitted tracked changes."
+              exit 1
+            fi
 
             PREVIOUS_COMMIT="$(git rev-parse HEAD)"
 
