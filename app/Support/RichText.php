@@ -1,6 +1,6 @@
 <?php
 
-namespace App\\Support;
+namespace App\Support;
 
 use DOMDocument;
 use DOMElement;
@@ -49,7 +49,7 @@ class RichText
             }
 
             return $result;
-        } catch (\\Throwable) {
+        } catch (\Throwable) {
             // Fail closed: malformed rich text must never be rendered as raw HTML.
             return e(strip_tags($html));
         } finally {
@@ -137,7 +137,7 @@ class RichText
 
     private static function isSafeLink(string $url): bool
     {
-        if ($url === '' || preg_match('/[\\x00-\\x20]/', $url)) {
+        if ($url === '' || preg_match('/[\x00-\x20]/', $url)) {
             return false;
         }
 
@@ -152,7 +152,7 @@ class RichText
 
     private static function isSafeImageSource(string $url): bool
     {
-        if ($url === '' || preg_match('/[\\x00-\\x20]/', $url)) {
+        if ($url === '' || preg_match('/[\x00-\x20]/', $url)) {
             return false;
         }
 
