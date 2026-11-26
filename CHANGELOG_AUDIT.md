@@ -203,3 +203,10 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Menambahkan regression tests untuk pembuatan OVO, QRIS, VA v3, kesiapan konfigurasi staging, dan callback v3.
 - Tidak ada migration, perubahan skema database, kredensial, callback WordPress, aktivasi channel, deployment, atau transaksi Live.
 - **Batas verifikasi**: test otomatis harus lulus terlebih dahulu; koneksi Flip staging dan callback settlement tetap harus diverifikasi dengan akun merchant resmi sebelum perubahan diaktifkan pada staging/production.
+
+
+### [2026-11-26] Flip Direct API v3 — diagnostik HTTP 422
+- Memperbaiki parser respons error Flip yang mengembalikan errors sebagai array objek; sebelumnya log hanya menampilkan indeks 0, bukan alasan validasi.
+- Log kini mencatat atribut, kode, dan pesan error yang diizinkan secara terstruktur, dengan pembatasan jumlah/panjang serta redaksi email dan nomor telepon.
+- Respons mentah Flip tetap tidak dicatat. Menambahkan regression test untuk format array dan memastikan data kontak dalam pesan error disamarkan.
+- Perubahan ini meningkatkan kemampuan diagnosis; tidak mengaktifkan metode merchant, mengubah kredensial/callback, atau menjamin metode yang belum diaktifkan Flip dapat digunakan.

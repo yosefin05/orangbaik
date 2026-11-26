@@ -229,33 +229,69 @@ class FlipService
             $providerMessage = null;
             $providerErrorCode = null;
             $providerErrorFields = [];
+            $providerErrors = [];
+
+            // Keep diagnostics useful without logging the raw response or donor data.
+            $sanitizeProviderText = static function ($value, int $limit = 300): ?string {
+                if (!is_string($value) && !is_numeric($value)) {
+                    return null;
+                }
+
+                $message = strip_tags((string) $value);
+                $message = preg_replace('/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i', '[redacted-email]', $message);
+                $message = preg_replace('/(?:\+?62|0)\d{8,13}/', '[redacted-phone]', $message);
+
+                return Str::limit(trim($message), $limit);
+            };
 
             if (is_array($providerError)) {
                 foreach (['code', 'error_code'] as $key) {
                     if (isset($providerError[$key]) && is_scalar($providerError[$key])) {
-                        $providerErrorCode = Str::limit((string) $providerError[$key], 100);
+                        $providerErrorCode = $sanitizeProviderText($providerError[$key], 100);
                         break;
                     }
                 }
 
                 foreach (['message', 'error_description'] as $key) {
                     if (isset($providerError[$key]) && is_string($providerError[$key])) {
-                        $message = strip_tags($providerError[$key]);
-                        $message = preg_replace('/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i', '[redacted-email]', $message);
-                        $message = preg_replace('/(?:\+?62|0)\d{8,13}/', '[redacted-phone]', $message);
-                        $providerMessage = Str::limit(trim($message), 300);
+                        $providerMessage = $sanitizeProviderText($providerError[$key]);
                         break;
                     }
                 }
 
                 if (isset($providerError['errors']) && is_array($providerError['errors'])) {
-                    $providerErrorFields = array_slice(array_map(
-                        static fn ($key) => Str::limit((string) $key, 80),
-                        array_keys($providerError['errors'])
-                    ), 0, 20);
+                    // Flip may return a list of {attribute, code, message} objects.
+                    if (array_is_list($providerError['errors'])) {
+                        foreach (array_slice($providerError['errors'], 0, 20) as $error) {
+                            if (!is_array($error)) {
+                                continue;
+                            }
+
+                            $attribute = $sanitizeProviderText($error['attribute'] ?? null, 80);
+                            $code = $sanitizeProviderText($error['code'] ?? null, 100);
+                            $message = $sanitizeProviderText($error['message'] ?? null, 300);
+
+                            if ($attribute !== null) {
+                                $providerErrorFields[] = $attribute;
+                            }
+
+                            if ($attribute !== null || $code !== null || $message !== null) {
+                                $providerErrors[] = array_filter([
+                                    'attribute' => $attribute,
+                                    'code' => $code,
+                                    'message' => $message,
+                                ], static fn ($value) => $value !== null);
+                            }
+                        }
+                    } else {
+                        // Preserve compatibility with older associative error maps.
+                        $providerErrorFields = array_slice(array_map(
+                            static fn ($key) => Str::limit((string) $key, 80),
+                            array_keys($providerError['errors'])
+                        ), 0, 20);
+                    }
                 }
             }
-
             Log::warning('Flip Direct API v3 rejected bill creation', [
                 'order_id' => $pembayaran->order_id,
                 'channel' => $bankCode,
@@ -263,7 +299,8 @@ class FlipService
                 'http_status' => $response->status(),
                 'provider_error_code' => $providerErrorCode,
                 'provider_message' => $providerMessage,
-                'provider_error_fields' => $providerErrorFields,
+                'provider_error_fields' => array_values(array_unique($providerErrorFields)),
+                'provider_errors' => $providerErrors,
                 'response_content_type' => Str::limit((string) $response->header('Content-Type'), 100),
             ]);
 
