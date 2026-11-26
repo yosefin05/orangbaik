@@ -60,6 +60,7 @@ class FinalPolishAndQaTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_login_with_remember_me_enabled()
     {
         $response = $this->post(route('login'), [
@@ -77,6 +78,7 @@ class FinalPolishAndQaTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_login_without_remember_me()
     {
         $response = $this->post(route('login'), [
@@ -89,6 +91,7 @@ class FinalPolishAndQaTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function login_fails_with_invalid_credentials_and_shows_error()
     {
         $response = $this->post(route('login'), [
@@ -107,6 +110,7 @@ class FinalPolishAndQaTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_submit_penggalang_dana_organisasi_with_files_and_documents()
     {
         $thumbnail = UploadedFile::fake()->image('banner_org.jpg', 800, 400);
@@ -149,6 +153,7 @@ class FinalPolishAndQaTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function penggalang_dana_organisasi_validates_required_fields()
     {
         $response = $this->actingAs($this->user)
@@ -169,6 +174,7 @@ class FinalPolishAndQaTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_submit_penggalang_dana_individu()
     {
         $fotoProfil = UploadedFile::fake()->image('foto_saya.jpg', 300, 300);
@@ -208,6 +214,7 @@ class FinalPolishAndQaTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function approved_penggalang_can_create_campaign_with_thumbnail_and_packages()
     {
         $penggalang = Penggalang_Dana::create([
@@ -276,6 +283,7 @@ class FinalPolishAndQaTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_create_update_toggle_and_delete_legalitas()
     {
         $file = UploadedFile::fake()->create('sk_kemenkumham.pdf', 500);
