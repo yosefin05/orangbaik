@@ -84,6 +84,7 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function custom_nominal_and_anonymous_donation_work_correctly()
     {
         $response = $this->postJson(route('donasi.store', $this->campaign->slug), [
@@ -109,6 +110,7 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function financial_statistics_only_count_settlement_status()
     {
         // Donasi 1: Settlement (50.000)
@@ -147,6 +149,7 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_cannot_edit_other_user_penggalang_dana()
     {
         $otherUser = User::factory()->create(['role' => 'user']);
@@ -158,6 +161,7 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function public_profile_penggalang_loads_by_id_param()
     {
         $response = $this->get(route('profil.penggalang', $this->penggalang->id));
@@ -167,6 +171,7 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_legalitas()
     {
         $response = $this->actingAs($this->admin)
@@ -186,6 +191,7 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_laporan_keuangan()
     {
         $response = $this->actingAs($this->admin)
@@ -206,6 +212,7 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function approved_penggalang_can_access_penggalang_dashboard()
     {
         $response = $this->actingAs($this->user)
