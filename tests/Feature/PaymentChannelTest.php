@@ -1033,4 +1033,76 @@ class PaymentChannelTest extends TestCase
     }
 
 
+
+    public function test_flip_422_error_list_is_logged_as_sanitized_structured_diagnostics(): void
+    {
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $flip->update([
+            'config' => PaymentGateway::secureConfigForStorage([
+                'credential_mode' => 'staging',
+                'staging_api_key' => 'test-staging-secret',
+                'staging_webhook_token' => 'test-staging-webhook',
+                'staging_base_url' => 'https://staging.flip.id',
+            ]),
+        ]);
+
+        $channel = PaymentChannel::create([
+            'payment_gateway_id' => $flip->id,
+            'name' => 'BCA Virtual Account',
+            'channel_code' => 'bca',
+            'payment_type' => 'va',
+            'sort_order' => 99,
+            'is_active' => false,
+        ]);
+        $channel->load('gateway');
+
+        $donasi = $this->createDonasi();
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'payment_gateway_id' => $flip->id,
+            'payment_token' => (string) \Illuminate\Support\Str::uuid(),
+            'order_id' => 'OB-FLIP-422-' . uniqid(),
+            'payment_type' => 'va',
+            'transaction_status' => 'pending',
+        ]);
+
+        \Illuminate\Support\Facades\Log::spy();
+
+        Http::fake([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => Http::response([
+                'code' => 'VALIDATION_ERROR',
+                'errors' => [
+                    [
+                        'attribute' => 'sender_bank',
+                        'code' => 'METHOD_NOT_ENABLED',
+                        'message' => 'Bank method unavailable for test@example.com, contact 08123456789.',
+                    ],
+                ],
+            ], 422),
+        ]);
+
+        try {
+            app(FlipService::class)->createVirtualAccount($donasi, $pembayaran, $channel);
+            $this->fail('Expected Flip HTTP 422 to throw a RuntimeException.');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('HTTP 422', $exception->getMessage());
+        }
+
+        \Illuminate\Support\Facades\Log::shouldHaveReceived('warning')
+            ->withArgs(function ($message, $context) {
+                $providerError = $context['provider_errors'][0] ?? [];
+                $providerMessage = $providerError['message'] ?? '';
+
+                return $message === 'Flip Direct API v3 rejected bill creation'
+                    && ($context['provider_error_code'] ?? null) === 'VALIDATION_ERROR'
+                    && ($context['provider_error_fields'] ?? []) === ['sender_bank']
+                    && ($providerError['attribute'] ?? null) === 'sender_bank'
+                    && ($providerError['code'] ?? null) === 'METHOD_NOT_ENABLED'
+                    && str_contains($providerMessage, '[redacted-email]')
+                    && str_contains($providerMessage, '[redacted-phone]')
+                    && !str_contains($providerMessage, 'test@example.com')
+                    && !str_contains($providerMessage, '08123456789');
+            });
+    }
 }
