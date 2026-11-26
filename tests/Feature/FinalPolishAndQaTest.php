@@ -59,7 +59,7 @@ class FinalPolishAndQaTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_login_with_remember_me_enabled()
     {
@@ -77,7 +77,7 @@ class FinalPolishAndQaTest extends TestCase
         $this->assertNotNull($this->user->remember_token);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_login_without_remember_me()
     {
@@ -90,7 +90,7 @@ class FinalPolishAndQaTest extends TestCase
         $this->assertAuthenticatedAs($this->user);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function login_fails_with_invalid_credentials_and_shows_error()
     {
@@ -109,7 +109,7 @@ class FinalPolishAndQaTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_submit_penggalang_dana_organisasi_with_files_and_documents()
     {
@@ -152,7 +152,7 @@ class FinalPolishAndQaTest extends TestCase
         Storage::disk('public')->assertExists($penggalang->foto_profil);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function penggalang_dana_organisasi_validates_required_fields()
     {
@@ -173,7 +173,7 @@ class FinalPolishAndQaTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_submit_penggalang_dana_individu()
     {
@@ -213,7 +213,7 @@ class FinalPolishAndQaTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function approved_penggalang_can_create_campaign_with_thumbnail_and_packages()
     {
@@ -282,7 +282,7 @@ class FinalPolishAndQaTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_create_update_toggle_and_delete_legalitas()
     {
