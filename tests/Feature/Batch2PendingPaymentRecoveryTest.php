@@ -137,7 +137,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function guest_donation_creation_generates_unique_payment_token()
     {
@@ -160,7 +160,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $this->assertStringContainsString('token=' . $pembayaran->payment_token, $response->json('redirect_url'));
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function guest_can_access_own_instruction_page_with_valid_token()
     {
@@ -192,7 +192,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $response->assertSee('OB-TEST-GUEST-1');
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_instruction_page_without_token()
     {
@@ -221,7 +221,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_instruction_page_with_invalid_or_other_token()
     {
@@ -253,7 +253,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_authenticated_user_payment_instruction()
     {
@@ -283,7 +283,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function guest_upload_transfer_proof_requires_valid_token()
     {
@@ -330,7 +330,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         Storage::disk('private')->assertExists($pembayaran->bukti_transfer);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_upload_transfer_proof_after_payment_is_terminal()
     {
@@ -374,7 +374,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function authenticated_donor_can_access_own_instruction_and_riwayat()
     {
@@ -411,7 +411,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $riwayatResponse->assertSee('OB-TEST-AUTH-OWN');
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function authenticated_user_cannot_access_or_resume_another_users_payment()
     {
@@ -452,7 +452,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $riwayatResponse->assertDontSee('OB-USER-A-ORDER');
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function resume_pending_payment_does_not_create_duplicate_donation_or_payment()
     {
@@ -496,7 +496,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $this->assertEquals($pembayaranCountBefore, Pembayaran::count());
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function already_settled_payment_cannot_be_resumed()
     {
@@ -531,7 +531,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function midtrans_webhook_with_matching_amount_settles_and_updates_campaign_total()
     {
@@ -582,7 +582,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $this->assertEquals(1, $this->campaign->getDonaturCount());
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function midtrans_webhook_with_mismatched_amount_is_rejected_and_does_not_settle()
     {
@@ -632,7 +632,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $this->assertEquals(0, $this->campaign->getTotalDonasiSuccess());
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function flip_webhook_with_matching_amount_settles_and_updates_campaign_total()
     {
@@ -677,7 +677,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $this->assertEquals(250000, $this->campaign->getTotalDonasiSuccess());
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function flip_webhook_with_mismatched_amount_is_rejected_and_does_not_settle()
     {
@@ -719,7 +719,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $this->assertEquals(0, $this->campaign->getTotalDonasiSuccess());
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function duplicate_webhook_is_idempotent_and_does_not_duplicate_campaign_totals()
     {
@@ -772,7 +772,7 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $this->assertEquals(1, $this->campaign->getDonaturCount());
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function pending_and_expired_and_failed_statuses_do_not_contribute_to_campaign_total()
     {
