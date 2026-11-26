@@ -761,8 +761,11 @@ class PaymentChannelTest extends TestCase
             ->get(route('admin.payment.gateway.show', $flip))
             ->assertOk()
             ->assertSee('Bank BCA')
-            ->assertSee('Virtual Account, OVO, DANA, dan QRIS melalui Direct API v3')
+            ->assertSee('Virtual Account, OVO, DANA, QRIS, ShopeePay, dan LinkAja melalui Direct API v3')
             ->assertSee('SeaBank Virtual Account')
+            ->assertSee('ShopeePay')
+            ->assertSee('LinkAja')
+            ->assertSee('BCA Virtual Account (Facilitator)')
             ->assertSee('OVO')
             ->assertSee('DANA')
             ->assertSee('QRIS');
@@ -786,7 +789,7 @@ class PaymentChannelTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
         $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
 
-        foreach (['ovo', 'dana', 'qris'] as $code) {
+        foreach (['ovo', 'dana', 'qris', 'shopeepay_app', 'linkaja'] as $code) {
             $this->actingAs($admin)
                 ->post(route('admin.payment.gateway.methods.store', $flip), [
                     'channel_code' => $code,
@@ -929,6 +932,141 @@ class PaymentChannelTest extends TestCase
             $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
             && $request['sender_bank'] === 'qris'
             && $request['sender_bank_type'] === 'wallet_account'
+            && $request['step'] === 'direct_api'
+        );
+    }
+
+
+    public function test_flip_direct_api_v3_creates_dana_shopeepay_and_linkaja_payments(): void
+    {
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $flip->update([
+            'config' => PaymentGateway::secureConfigForStorage([
+                'credential_mode' => 'staging',
+                'staging_api_key' => 'test-staging-secret',
+                'staging_webhook_token' => 'test-staging-webhook',
+                'staging_base_url' => 'https://staging.flip.id',
+            ]),
+        ]);
+
+        $sequence = Http::sequence();
+        foreach (['DANA', 'ShopeePay', 'LinkAja'] as $index => $label) {
+            $sequence->push([
+                'link_id' => (string) (2502091430251230100 + $index),
+                'payment_url' => 'https://checkout.flip.example.test/' . strtolower($label),
+                'bill_payment' => [
+                    'id' => 'PGPWF10117309708599318' . (600 + $index),
+                    'amount' => 50000,
+                    'unique_code' => 0,
+                    'receiver_bank_account' => [
+                        'account_number' => null,
+                        'account_holder' => 'Donatur Test',
+                    ],
+                ],
+            ], 200);
+        }
+        Http::fake([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => $sequence,
+        ]);
+
+        $expectedCodes = ['dana', 'shopeepay_app', 'linkaja'];
+        foreach ($expectedCodes as $index => $code) {
+            $channel = PaymentChannel::create([
+                'payment_gateway_id' => $flip->id,
+                'name' => match ($code) {
+                    'dana' => 'DANA',
+                    'shopeepay_app' => 'ShopeePay',
+                    default => 'LinkAja',
+                },
+                'channel_code' => $code,
+                'payment_type' => 'instant',
+                'sort_order' => 100 + $index,
+                'is_active' => false,
+            ]);
+            $channel->load('gateway');
+
+            $donasi = $this->createDonasi();
+            $pembayaran = Pembayaran::create([
+                'donasi_id' => $donasi->id,
+                'payment_channel_id' => $channel->id,
+                'payment_gateway_id' => $flip->id,
+                'payment_token' => (string) \Illuminate\Support\Str::uuid(),
+                'order_id' => 'OB-FLIP-' . strtoupper($code) . '-' . uniqid(),
+                'payment_type' => 'instant',
+                'transaction_status' => 'pending',
+            ]);
+
+            $result = app(FlipService::class)->createEwalletDirectApiV3($donasi, $pembayaran, $channel);
+            $this->assertSame('redirect', $result['type']);
+            $this->assertSame($code, data_get($pembayaran->fresh()->gateway_response, 'sender_bank'));
+            Http::assertSent(fn ($request) =>
+                $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
+                && $request['sender_bank'] === $code
+                && $request['sender_bank_type'] === 'wallet_account'
+                && $request['step'] === 'direct_api'
+            );
+        }
+
+        Http::assertSentCount(3);
+    }
+
+    public function test_flip_direct_api_v3_accepts_bca_direct_virtual_account_code(): void
+    {
+        $flip = PaymentGateway::where('code', 'flip')->firstOrFail();
+        $flip->update([
+            'config' => PaymentGateway::secureConfigForStorage([
+                'credential_mode' => 'staging',
+                'staging_api_key' => 'test-staging-secret',
+                'staging_webhook_token' => 'test-staging-webhook',
+                'staging_base_url' => 'https://staging.flip.id',
+            ]),
+        ]);
+
+        $channel = PaymentChannel::create([
+            'payment_gateway_id' => $flip->id,
+            'name' => 'BCA Virtual Account (Facilitator)',
+            'channel_code' => 'bca_direct',
+            'payment_type' => 'va',
+            'sort_order' => 101,
+            'is_active' => false,
+        ]);
+        $channel->load('gateway');
+
+        $donasi = $this->createDonasi();
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'payment_gateway_id' => $flip->id,
+            'payment_token' => (string) \Illuminate\Support\Str::uuid(),
+            'order_id' => 'OB-FLIP-BCA-DIRECT-' . uniqid(),
+            'payment_type' => 'va',
+            'transaction_status' => 'pending',
+        ]);
+
+        Http::fake([
+            'https://staging.flip.id/big_api/v3/pwf/bill' => Http::response([
+                'link_id' => '2502091430251230109',
+                'payment_url' => 'https://checkout.flip.example.test/bca-direct/123',
+                'expired_date' => '2026-11-27 20:00',
+                'bill_payment' => [
+                    'id' => 'PGPWF10117309708599318609',
+                    'amount' => 50000,
+                    'unique_code' => 0,
+                    'receiver_bank_account' => [
+                        'account_number' => '1900800000106690',
+                        'account_holder' => 'OrangBaik',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $result = app(FlipService::class)->createVirtualAccount($donasi, $pembayaran, $channel);
+
+        $this->assertSame('1900800000106690', $result['account_number']);
+        Http::assertSent(fn ($request) =>
+            $request->url() === 'https://staging.flip.id/big_api/v3/pwf/bill'
+            && $request['sender_bank'] === 'bca_direct'
+            && $request['sender_bank_type'] === 'virtual_account'
             && $request['step'] === 'direct_api'
         );
     }
