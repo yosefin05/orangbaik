@@ -1,11 +1,11 @@
 <?php
 
-namespace App\\Http\\Controllers\\User;
+namespace App\Http\Controllers\User;
 
-use App\\Http\\Controllers\\Controller;
-use App\\Models\\Donasi;
-use App\\Models\\PaymentGateway;
-use Illuminate\\Http\\Request;
+use App\Http\Controllers\Controller;
+use App\Models\Donasi;
+use App\Models\PaymentGateway;
+use Illuminate\Http\Request;
 
 class RiwayatDonasiController extends Controller
 {
