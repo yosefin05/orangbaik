@@ -83,7 +83,7 @@ class PreLaunchHardeningTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function custom_nominal_and_anonymous_donation_work_correctly()
     {
@@ -109,7 +109,7 @@ class PreLaunchHardeningTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function financial_statistics_only_count_settlement_status()
     {
@@ -148,7 +148,7 @@ class PreLaunchHardeningTest extends TestCase
         $this->assertEquals(1, $this->campaign->getDonaturCount());
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function user_cannot_edit_other_user_penggalang_dana()
     {
@@ -160,7 +160,7 @@ class PreLaunchHardeningTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function public_profile_penggalang_loads_by_id_param()
     {
@@ -170,7 +170,7 @@ class PreLaunchHardeningTest extends TestCase
         $response->assertSee('Yayasan Kita');
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_legalitas()
     {
@@ -190,7 +190,7 @@ class PreLaunchHardeningTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_laporan_keuangan()
     {
@@ -211,7 +211,7 @@ class PreLaunchHardeningTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function approved_penggalang_can_access_penggalang_dashboard()
     {
