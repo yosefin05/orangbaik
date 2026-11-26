@@ -36,7 +36,7 @@ class RichText
                 LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
             );
 
-            $root = $document->getElementById('rich-text-root');
+            $root = $document->getElementsByTagName('div')->item(0);
             if (!$root) {
                 return '';
             }
