@@ -89,6 +89,7 @@ class FullFormAuditTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function register_form_creates_new_user_and_redirects()
     {
         $response = $this->post(route('register'), [
@@ -107,6 +108,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function register_form_validates_duplicate_email_and_password_mismatch()
     {
         $response = $this->post(route('register'), [
@@ -120,6 +122,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function forgot_password_form_sends_reset_link()
     {
         $response = $this->post(route('password.email'), [
@@ -130,6 +133,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function reset_password_form_updates_user_password()
     {
         $token = Password::createToken($this->user);
@@ -153,6 +157,7 @@ class FullFormAuditTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function organisasi_form_submits_successfully_with_files_and_documents()
     {
         $thumbnail = UploadedFile::fake()->image('banner_org.jpg', 800, 400);
@@ -200,6 +205,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function penggalang_dana_update_form_saves_changes()
     {
         $penggalang = Penggalang_Dana::create([
@@ -242,6 +248,7 @@ class FullFormAuditTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function campaign_create_and_update_forms_work_properly()
     {
         $penggalang = Penggalang_Dana::create([
@@ -314,6 +321,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function campaign_update_kabar_terbaru_can_be_created_and_edited()
     {
         $penggalang = Penggalang_Dana::create([
@@ -383,6 +391,7 @@ class FullFormAuditTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function donation_form_creates_pending_donation_and_payment_records()
     {
         $penggalang = Penggalang_Dana::create([
@@ -490,6 +499,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function zakat_calculator_form_calculates_estimasi()
     {
         $response = $this->post(route('kalkulator.hitung'), [
@@ -503,6 +513,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function news_comment_form_creates_comment()
     {
         $berita = Berita::create([
@@ -533,6 +544,7 @@ class FullFormAuditTest extends TestCase
     */
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_berita()
     {
         $thumbnail = UploadedFile::fake()->image('berita.jpg', 600, 400);
@@ -574,6 +586,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_testimoni()
     {
         $foto = UploadedFile::fake()->image('tokoh.jpg', 200, 200);
@@ -613,6 +626,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_faq()
     {
         // CREATE
@@ -651,6 +665,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_syarat_ketentuan()
     {
         // CREATE
@@ -689,6 +704,7 @@ class FullFormAuditTest extends TestCase
     }
 
     /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_approve_and_reject_penggalang_dana()
     {
         $penggalang = Penggalang_Dana::create([
