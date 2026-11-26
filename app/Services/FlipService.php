@@ -47,7 +47,7 @@ class FlipService
 
 
     /**
-     * Create OVO, DANA, or QRIS payment through Flip Accept Payment Direct API v3.
+     * Create supported e-wallet and QRIS payments through Flip Accept Payment Direct API v3.
      * Staging and Production are supported; the legacy Sandbox endpoint is not.
      */
     public function createEwalletDirectApiV3(Donasi $donasi, Pembayaran $pembayaran, PaymentChannel $channel): array
@@ -55,8 +55,8 @@ class FlipService
         $gateway = $channel->gateway;
         $bankCode = strtolower(trim($channel->channel_code));
 
-        if (!$gateway || $gateway->code !== 'flip' || !in_array($bankCode, ['ovo', 'dana', 'qris'], true)) {
-            throw new \RuntimeException('Direct API v3 hanya mendukung OVO, DANA, dan QRIS melalui gateway Flip.');
+        if (!$gateway || $gateway->code !== 'flip' || !in_array($bankCode, ['ovo', 'dana', 'qris', 'shopeepay_app', 'linkaja'], true)) {
+            throw new \RuntimeException('Metode E-Wallet/QRIS ini tidak didukung oleh adapter Flip Direct API v3.');
         }
 
         return $this->createDirectApiV3Bill(
@@ -96,7 +96,7 @@ class FlipService
         $bankCode = self::normalizeBankCode($channel->channel_code);
         $supportedBanks = [
             'bca', 'bni', 'bri', 'bsm', 'mandiri',
-            'permata', 'cimb', 'danamon', 'seabank',
+            'permata', 'cimb', 'danamon', 'seabank', 'bca_direct',
         ];
 
         if (!in_array($bankCode, $supportedBanks, true)) {
