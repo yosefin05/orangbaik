@@ -28,6 +28,9 @@ jobs:
             command -v node
             command -v npm
             command -v curl
+            node --version
+            npm --version
+            node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (!(major >= 24 || (major === 22 && minor >= 12))) { console.error("Node.js 22.12+ or 24+ is required to build Vite 7 assets."); process.exit(1); }'
 
             if ! git diff --quiet || ! git diff --cached --quiet; then
               echo "Refusing deployment: staging checkout contains uncommitted tracked changes."
