@@ -222,3 +222,15 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - CI diperluas dari kelompok regression terpilih menjadi menjalankan seluruh Laravel test suite setelah build frontend.
 - **Status verifikasi**: perubahan berada pada branch review `fix/final-prelaunch-hardening`. Menunggu hasil CI lengkap. Belum di-merge ke `main`, belum dideploy ke staging, dan belum diverifikasi melalui browser nyata.
 - **Catatan batasan**: CI hijau tidak membuktikan seluruh alur role/UI, aksesibilitas, performa, atau callback transaksi live. Pemeriksaan browser staging dan pengujian merchant tetap wajib sebelum launch.
+
+### 26 November 2026 — Final pre-launch security remediation (continued)
+
+- Corrected controller namespace casing so Composer's strict PSR-4 autoload validation passes on Linux.
+- Prepared a real `.env` file in CI before running Laravel tests; the previous 155 warnings were caused by the missing test environment file, not suppressed.
+- Updated the locked PHP and JavaScript dependency trees using compatible, non-force updates. Composer and npm security audits now report zero known advisories.
+- Hardened Midtrans webhook updates with a database row lock and a terminal-state recheck to prevent concurrent or out-of-order callbacks from overwriting a completed transaction.
+- Kept `settlement` as the only completed financial state; a Midtrans `capture` callback remains pending until settlement is confirmed.
+- Updated the staging deploy workflow to install locked dependencies, build frontend assets, rebuild safe caches, smoke-check the public homepage, and attempt a code/dependency rollback if deployment fails.
+- Latest verified CI before this continued pass: 160 Laravel tests passed (710 assertions), strict PSR-4 validation passed, frontend build passed, npm audit reported zero vulnerabilities, and Composer audit reported no known security advisories.
+
+**Release boundary:** no database migration, live payment, production domain, gateway credential, or production deployment was performed. The updated staging deploy workflow still requires confirmation that the VPS has Composer, PHP, npm/Node.js, and curl available before the next main-branch deployment.
