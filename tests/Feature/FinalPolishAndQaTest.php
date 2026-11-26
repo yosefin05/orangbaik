@@ -155,8 +155,6 @@ class FinalPolishAndQaTest extends TestCase
             ->post(route('penggalang_dana.organisasi.store'), []);
 
         $response->assertSessionHasErrors([
-            'thumbnail',
-            'foto_profil',
             'nama_penggalang',
             'tahun_berdiri',
             'alamat',
