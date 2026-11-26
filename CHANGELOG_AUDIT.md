@@ -203,3 +203,14 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Menambahkan regression tests untuk pembuatan OVO, QRIS, VA v3, kesiapan konfigurasi staging, dan callback v3.
 - Tidak ada migration, perubahan skema database, kredensial, callback WordPress, aktivasi channel, deployment, atau transaksi Live.
 - **Batas verifikasi**: test otomatis harus lulus terlebih dahulu; koneksi Flip staging dan callback settlement tetap harus diverifikasi dengan akun merchant resmi sebelum perubahan diaktifkan pada staging/production.
+
+### [2026-11-26] Flip Payment Channel Coverage & Checkout Logos
+- **Status**: IMPLEMENTED ON REVIEW BRANCH; CI and merchant-side verification pending.
+- Menambahkan metode E-Wallet Direct API v3 yang tercantum pada katalog resmi Flip: ShopeePay (shopeepay_app) dan LinkAja (linkaja), dengan sender_bank_type=wallet_account.
+- Menambahkan BCA VA Facilitator (bca_direct) sebagai opsi Virtual Account terpisah dari BCA VA standar, sesuai katalog metode Flip.
+- Memperluas validasi allowlist adapter untuk metode tersebut; metode baru tetap terdaftar nonaktif dan tidak mengubah channel yang sudah aktif.
+- Memperbaiki pemetaan logo OVO yang sebelumnya menunjuk ovo-new.svg, padahal aset repository yang tersedia adalah ovo.svg. Aset logo lain yang telah ada dipakai melalui mapping nama channel yang sudah tersedia.
+- Menambahkan regression test untuk payload Direct API v3 DANA, ShopeePay, LinkAja, dan BCA VA Facilitator, serta memperbarui test katalog.
+- Tidak ada migration, perubahan credential, aktivasi channel, callback WordPress, deployment, atau transaksi sungguhan.
+- **Batas verifikasi**: automated tests dan CI harus lulus; setiap metode tetap memerlukan aktivasi pada dashboard merchant Flip dan konfirmasi API/callback sebelum ditampilkan kepada donatur.
+- GoPay tidak ditambahkan sebagai metode Flip tersendiri karena katalog Accept Payment Flip tidak mencantumkan GoPay; GoPay tetap mengikuti provider yang saat ini mendukungnya. QRIS dapat dipakai melalui aplikasi pembayaran yang mendukung QRIS.
