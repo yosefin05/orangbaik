@@ -223,11 +223,48 @@ class FlipService
         }
 
         if (!$response->successful()) {
+            // Record only a small allowlist of provider diagnostics. Never log the
+            // raw response body because it may contain personal or credential data.
+            $providerError = $response->json();
+            $providerMessage = null;
+            $providerErrorCode = null;
+            $providerErrorFields = [];
+
+            if (is_array($providerError)) {
+                foreach (['code', 'error_code'] as $key) {
+                    if (isset($providerError[$key]) && is_scalar($providerError[$key])) {
+                        $providerErrorCode = Str::limit((string) $providerError[$key], 100);
+                        break;
+                    }
+                }
+
+                foreach (['message', 'error_description'] as $key) {
+                    if (isset($providerError[$key]) && is_string($providerError[$key])) {
+                        $message = strip_tags($providerError[$key]);
+                        $message = preg_replace('/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i', '[redacted-email]', $message);
+                        $message = preg_replace('/(?:\+?62|0)\d{8,13}/', '[redacted-phone]', $message);
+                        $providerMessage = Str::limit(trim($message), 300);
+                        break;
+                    }
+                }
+
+                if (isset($providerError['errors']) && is_array($providerError['errors'])) {
+                    $providerErrorFields = array_slice(array_map(
+                        static fn ($key) => Str::limit((string) $key, 80),
+                        array_keys($providerError['errors'])
+                    ), 0, 20);
+                }
+            }
+
             Log::warning('Flip Direct API v3 rejected bill creation', [
                 'order_id' => $pembayaran->order_id,
                 'channel' => $bankCode,
                 'mode' => $mode,
                 'http_status' => $response->status(),
+                'provider_error_code' => $providerErrorCode,
+                'provider_message' => $providerMessage,
+                'provider_error_fields' => $providerErrorFields,
+                'response_content_type' => Str::limit((string) $response->header('Content-Type'), 100),
             ]);
 
             throw new \RuntimeException(
