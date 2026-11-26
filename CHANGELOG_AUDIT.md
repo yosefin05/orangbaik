@@ -210,3 +210,15 @@ Dokumen audit, perbaikan keamanan, hardening arsitektur, dan status testing untu
 - Log kini mencatat atribut, kode, dan pesan error yang diizinkan secara terstruktur, dengan pembatasan jumlah/panjang serta redaksi email dan nomor telepon.
 - Respons mentah Flip tetap tidak dicatat. Menambahkan regression test untuk format array dan memastikan data kontak dalam pesan error disamarkan.
 - Perubahan ini meningkatkan kemampuan diagnosis; tidak mengaktifkan metode merchant, mengubah kredensial/callback, atau menjamin metode yang belum diaktifkan Flip dapat digunakan.
+
+
+### [2026-11-26] Final Pre-Launch Hardening — Security, Donor Accounting & CI
+- Mengganti sanitasi rich text berbasis regex/strip_tags dengan parser DOM dan allowlist elemen/atribut; menghapus elemen aktif berbahaya, event handler, atribut style, URL javascript/data, serta membatasi sumber gambar.
+- Link eksternal dengan target tab baru diberi rel noopener noreferrer.
+- Riwayat donasi kini menganggap hanya status `settlement` sebagai pembayaran selesai; status `capture` tidak lagi diperlakukan sebagai bukti dana telah diselesaikan.
+- Total nominal pada ringkasan riwayat hanya menjumlahkan donasi settlement. Nama penggalang dana ditampilkan dari relasi campaign, bukan label generik.
+- E-Kwitansi reguler dan signed hanya dapat ditampilkan untuk status settlement.
+- Menambahkan unit tests untuk sanitasi HTML, event handler, script, URL berbahaya, gambar, dan link aman.
+- CI diperluas dari kelompok regression terpilih menjadi menjalankan seluruh Laravel test suite setelah build frontend.
+- **Status verifikasi**: perubahan berada pada branch review `fix/final-prelaunch-hardening`. Menunggu hasil CI lengkap. Belum di-merge ke `main`, belum dideploy ke staging, dan belum diverifikasi melalui browser nyata.
+- **Catatan batasan**: CI hijau tidak membuktikan seluruh alur role/UI, aksesibilitas, performa, atau callback transaksi live. Pemeriksaan browser staging dan pengujian merchant tetap wajib sebelum launch.
