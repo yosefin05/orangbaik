@@ -88,7 +88,7 @@ class FullFormAuditTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function register_form_creates_new_user_and_redirects()
     {
@@ -107,7 +107,7 @@ class FullFormAuditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function register_form_validates_duplicate_email_and_password_mismatch()
     {
@@ -121,7 +121,7 @@ class FullFormAuditTest extends TestCase
         $response->assertSessionHasErrors(['email', 'password']);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function forgot_password_form_sends_reset_link()
     {
@@ -132,7 +132,7 @@ class FullFormAuditTest extends TestCase
         $response->assertSessionHas('status');
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function reset_password_form_updates_user_password()
     {
@@ -156,7 +156,7 @@ class FullFormAuditTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function organisasi_form_submits_successfully_with_files_and_documents()
     {
@@ -204,7 +204,7 @@ class FullFormAuditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function penggalang_dana_update_form_saves_changes()
     {
@@ -247,7 +247,7 @@ class FullFormAuditTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function campaign_create_and_update_forms_work_properly()
     {
@@ -320,7 +320,7 @@ class FullFormAuditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function campaign_update_kabar_terbaru_can_be_created_and_edited()
     {
@@ -390,7 +390,7 @@ class FullFormAuditTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function donation_form_creates_pending_donation_and_payment_records()
     {
@@ -498,7 +498,7 @@ class FullFormAuditTest extends TestCase
         $this->get($receiptMatch[0] . '&signature=invalid')->assertForbidden();
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function zakat_calculator_form_calculates_estimasi()
     {
@@ -512,7 +512,7 @@ class FullFormAuditTest extends TestCase
         $response->assertSessionHas('hasil');
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function news_comment_form_creates_comment()
     {
@@ -543,7 +543,7 @@ class FullFormAuditTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_berita()
     {
@@ -585,7 +585,7 @@ class FullFormAuditTest extends TestCase
         $this->assertDatabaseMissing('berita', ['id' => $berita->id]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_testimoni()
     {
@@ -625,7 +625,7 @@ class FullFormAuditTest extends TestCase
         $this->assertDatabaseMissing('testimoni', ['id' => $testimoni->id]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_faq()
     {
@@ -664,7 +664,7 @@ class FullFormAuditTest extends TestCase
         $this->assertDatabaseMissing('faq', ['id' => $faq->id]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_syarat_ketentuan()
     {
@@ -703,7 +703,7 @@ class FullFormAuditTest extends TestCase
         $this->assertDatabaseMissing('syarat_ketentuan', ['id' => $sk->id]);
     }
 
-    /** @test */
+    /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_approve_and_reject_penggalang_dana()
     {
