@@ -267,6 +267,23 @@
                                         </span>
                                     @endif
 
+                                    @if(in_array($status, ['failed', 'expired', 'expire'], true))
+                                        <form action="{{ route('admin.donasi.destroy', $item->id) }}" method="POST"
+                                              onsubmit="return confirm('Hapus donasi gagal/kedaluwarsa ini secara permanen? Data pembayaran terkait juga akan dihapus. Tindakan ini tidak dapat dibatalkan.');"
+                                              style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="action-link" style="border:0;background:transparent;color:#dc3545;cursor:pointer;"
+                                                    title="Hapus donasi gagal/kedaluwarsa">
+                                                <i class="bi bi-trash"></i> Hapus
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="action-link text-muted" style="opacity:0.45; cursor:not-allowed;"
+                                              title="Donasi pending atau berhasil tidak dapat dihapus demi menjaga rekam jejak transaksi">
+                                            <i class="bi bi-lock"></i> Hapus
+                                        </span>
+                                    @endif
 
                                 </div>
                             </td>
