@@ -97,4 +97,49 @@ class FundraiserDocumentPrivacyTest extends TestCase
         $this->assertSame('private', $document->storage_disk);
         Storage::disk('private')->assertExists($document->file_dokumen);
     }
+    public function test_legacy_public_flag_never_grants_document_access_to_guest_owner_or_other_user(): void
+    {
+        Storage::fake('public');
+        Storage::fake('private');
+
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $fundraiser = Penggalang_Dana::create([
+            'user_id' => $owner->id,
+            'jenis_penggalang' => Penggalang_Dana::CATEGORY_INDIVIDU,
+            'foto_profil' => 'profile.jpg',
+            'nama_penggalang' => 'Legacy Public Flag Test',
+            'alamat' => 'Sidoarjo',
+            'deskripsi' => 'Legacy document authorization test.',
+            'email' => 'legacy-public-' . $owner->id . '@example.test',
+            'no_telepon' => '08123456789',
+            'status' => 'approved',
+        ]);
+
+        $legacyPath = 'dokumen_penggalang/' . $fundraiser->id . '/legacy-ktp.pdf';
+        Storage::disk('public')->put($legacyPath, 'legacy private document fixture');
+
+        $document = Penggalang_Dana_Dokumen::create([
+            'penggalang_dana_id' => $fundraiser->id,
+            'nama_dokumen' => 'Legacy KTP',
+            'file_dokumen' => $legacyPath,
+            'is_public' => true,
+            'storage_disk' => 'public',
+        ]);
+
+        $this->get(route('dokumen.show', $document->id))->assertForbidden();
+        $this->actingAs($owner)->get(route('dokumen.show', $document->id))->assertForbidden();
+        $this->actingAs($otherUser)->get(route('dokumen.show', $document->id))->assertForbidden();
+
+        $adminResponse = $this->actingAs($admin)->get(route('dokumen.show', $document->id));
+        $adminResponse->assertOk()
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+
+        $cacheControl = strtolower((string) $adminResponse->headers->get('Cache-Control'));
+        $this->assertStringContainsString('private', $cacheControl);
+        $this->assertStringContainsString('no-store', $cacheControl);
+    }
+
 }
