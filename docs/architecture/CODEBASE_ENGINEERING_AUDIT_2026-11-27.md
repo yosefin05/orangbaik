@@ -17,13 +17,13 @@ This document records findings supported by source inspection and the existing a
 
 ## Latest audit-branch verification (27 November 2026)
 
-- PR #23 head: `a5a42da4aeb19cfad002f32e93071acc18555cba`.
-- GitHub Actions run `46007456061` completed successfully against the PR merge ref.
-- Full Laravel suite: **179 tests passed, 795 assertions**.
+- PR #23 head at this verification: `5505082e6116763ef180e27dffe50f7986b0955d`.
+- GitHub Actions run `46008324335` completed successfully against the PR merge ref.
+- Full Laravel suite: **180 tests passed, 803 assertions**.
 - Repository-wide PHP syntax check passed for `app`, `routes`, `database`, and `tests`.
 - Laravel route listing, route-cache generation, and route-cache clearing all passed.
 - Composer dependency install, strict optimized PSR-4 check, Vite production build, Composer advisory audit, and npm advisory audit passed. npm audit reported **0 advisories**.
-- Regression coverage includes legacy public-flag verification documents (guest/owner/other-user denied; admin authorized with private/no-store response headers) and Flip callbacks with mismatched amount/provider payment ID (rejected without settling).
+- Regression coverage includes private/no-store headers on admin verification-document responses; guest, owner and other users are denied even when a legacy row has `is_public=true`; owner edit forms for both organization and individual fundraisers do not render stored document names or paths; Flip callbacks with mismatched amount/provider payment IDs are rejected without settlement.
 - CI uses PHP 8.3 and SQLite in-memory. It does not exercise the actual staging/production database engine or data, real merchant credentials, browser rendering, physical storage inventory, or server deployment.
 
 ## Confirmed CI evidence at baseline
@@ -66,7 +66,7 @@ The audit review records a legacy public-storage fallback in the donor payment-p
 
 The current `Penggalang_Dana_Dokumen::canBeAccessedBy()` permits administrators only. Owner-facing profile flows no longer load document records; the individual edit flow selects only the record identifiers needed for replacement uploads and renders a generic label, not the document name or path. This matches the requirement that identity/legal verification documents and their metadata are not exposed to users.
 
-**Status:** controller, owner-facing profile/edit rendering, and API/security documentation now consistently restrict document names, paths, and files to admin-only contexts. Owners see verification status only. The database `is_public` field remains for legacy compatibility; application authorization does not treat it as permission.
+**Status:** controller, owner-facing profile rendering, and both organization/individual edit forms now restrict stored document names, paths, and files to admin-only contexts. Edit forms receive only document IDs needed to associate replacement uploads; generic labels are shown to owners, and existing admin metadata is preserved when no replacement file is uploaded. A regression test covers both entity types. The document proxy also explicitly forces private/no-store headers after constructing the file response. The database `is_public` field remains for legacy compatibility; application authorization does not treat it as permission.
 
 
 ### P1 — Legacy public-disk verification documents require a separate storage inventory
@@ -188,10 +188,11 @@ The repository tree alone does not prove that every view is correctly classified
 - [ ] Private document and historical proof direct-URL denial tests.
 - [ ] Browser QA at desktop/mobile sizes for donation, payment instructions, receipt, profile, fundraiser dashboard, and admin workflows.
 - [ ] Staging backup/rollback rehearsal and smoke tests for homepage, `/up`, authentication, donation, admin, and document access.
+- [ ] Verify staging runtime environment has `APP_DEBUG=false`, the intended non-local `APP_ENV`, and HTTPS-only session cookies (`SESSION_SECURE_COOKIE=true` where TLS terminates directly at the app); confirm proxy/TLS detection before enabling the cookie flag.
 - [ ] Explicit production approval and separate production backup/change window. Production is not covered by staging CI.
 
 ## Current decision
 
-**Codebase cleanup: IN PROGRESS. Latest completed CI: PASSED on PR head `a5a42da` (run `46007456061`; 179 tests, 795 assertions). Release decision: NOT YET APPROVED.**
+**Codebase cleanup: IN PROGRESS. Latest completed CI: PASSED on PR head `5505082` (run `46008324335`; 180 tests, 803 assertions). Release decision: NOT YET APPROVED.**
 
 The baseline main test and staging deployment workflows succeeded. The current audit branch adds further regression coverage, but legacy public proof inventory/migration, phone normalization preflight, route/cache checks, browser QA, staging operational verification, and backup/rollback rehearsal remain open. This audit branch is a review boundary; merge only after each change is implemented, tested, and reviewed. No production change is authorized by this document.
