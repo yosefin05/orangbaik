@@ -305,7 +305,7 @@
                                             <div class="info-row legal-doc-row">
                                                 <strong class="info-label">{{ $dokumen->nama_dokumen }}</strong>
                                                 <p class="info-value">
-                                                    @if($dokumen->isPublicForVisitor() || $isOwner || $isAdmin)
+                                                    @if($isAdmin)
                                                         <a href="{{ $dokumen->secure_view_url }}" target="_blank"
                                                             rel="noopener noreferrer">
                                                             <i class="bi bi-file-earmark-text"></i> Lihat / Unduh Dokumen
@@ -321,7 +321,7 @@
                                     </div>
                                 @else
                                     <p class="info-empty">
-                                        {{ $isOwner || $isAdmin ? 'Belum ada dokumen legalitas.' : 'Dokumen legalitas belum dipublikasikan.' }}
+                                        {{ $isOwner || $isAdmin ? 'Belum ada dokumen legalitas.' : 'Dokumen legalitas bersifat privat.' }}
                                     </p>
                                 @endif
                             </details>
