@@ -97,6 +97,25 @@ jobs:
                 http_response_code(404);
                 exit;
             }
+            $action = (string) ($_POST['action'] ?? 'clear');
+            header('Content-Type: application/json');
+            if ($action === 'diagnose') {
+                $logPath = dirname(__DIR__) . '/storage/logs/laravel.log';
+                $summary = 'No readable Laravel log or no recent ERROR entry.';
+                if (is_readable($logPath)) {
+                    $lines = file($logPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                    foreach (array_reverse($lines ?: []) as $line) {
+                        if (preg_match('/\\.(?:ERROR|CRITICAL):\\s*([^\\r\\n]+)/', $line, $match)) {
+                            $summary = preg_replace('/\\s*\\{.*$/', '', $match[1]);
+                            $summary = preg_replace('/(?:password|token|secret|api[_-]?key)\\s*[:=]\\s*[^, ]+/i', '$1=[redacted]', $summary);
+                            $summary = substr($summary, 0, 240);
+                            break;
+                        }
+                    }
+                }
+                echo json_encode(['last_error_summary' => $summary], JSON_THROW_ON_ERROR);
+                exit;
+            }
             $cacheDir = dirname(__DIR__) . '/bootstrap/cache';
             $names = ['packages.php', 'services.php', 'config.php', 'routes-v7.php', 'events.php'];
             $cleared = [];
@@ -108,7 +127,6 @@ jobs:
                 }
             }
             if (function_exists('opcache_reset')) { @opcache_reset(); }
-            header('Content-Type: application/json');
             echo json_encode(['cleared' => $cleared, 'failed' => $failed], JSON_THROW_ON_ERROR);
             PHP
               sed -i "s/__REPAIR_TOKEN__/$REPAIR_TOKEN/" "$REPAIR_SCRIPT"
@@ -119,8 +137,6 @@ jobs:
                 *'"failed":[]'*) ;;
                 *) echo "Laravel cache repair did not clear all requested manifests."; return 1 ;;
               esac
-              rm -f "$REPAIR_SCRIPT"
-              REPAIR_CREATED=0
             }
 
             rollback_on_failure() {
@@ -171,8 +187,23 @@ jobs:
 
             # First request rebuilds Laravel package manifests as the web user;
             # verify both the framework health endpoint and the actual homepage.
-            curl --fail --silent --show-error --max-time 45 https://staging.orangbaik.id/up --output /dev/null
-            curl --fail --silent --show-error --max-time 45 https://staging.orangbaik.id/ --output /dev/null
+            UP_STATUS="$(curl --silent --show-error --max-time 45 -o /tmp/orangbaik-up-response -w '%{http_code}' https://staging.orangbaik.id/up || true)"
+            echo "Staging health endpoint HTTP status: $UP_STATUS"
+            if [ "$UP_STATUS" != "200" ]; then
+              DIAGNOSTIC="$(curl --fail --silent --show-error --max-time 30 -X POST --data-urlencode "token=$REPAIR_TOKEN" --data-urlencode "action=diagnose" "https://staging.orangbaik.id/$REPAIR_NAME" || true)"
+              echo "Laravel error summary: $DIAGNOSTIC"
+              echo "Health response preview: $(head -c 400 /tmp/orangbaik-up-response 2>/dev/null | tr '\\n' ' ' || true)"
+              exit 1
+            fi
+
+            HOME_STATUS="$(curl --silent --show-error --max-time 45 -o /tmp/orangbaik-home-response -w '%{http_code}' https://staging.orangbaik.id/ || true)"
+            echo "Staging homepage HTTP status: $HOME_STATUS"
+            if [ "$HOME_STATUS" != "200" ]; then
+              DIAGNOSTIC="$(curl --fail --silent --show-error --max-time 30 -X POST --data-urlencode "token=$REPAIR_TOKEN" --data-urlencode "action=diagnose" "https://staging.orangbaik.id/$REPAIR_NAME" || true)"
+              echo "Laravel error summary: $DIAGNOSTIC"
+              echo "Homepage response preview: $(head -c 400 /tmp/orangbaik-home-response 2>/dev/null | tr '\\n' ' ' || true)"
+              exit 1
+            fi
 
             trap - EXIT
             rm -rf "$BUILD_STAGE" "$PREVIOUS_BUILD" || true
