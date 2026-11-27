@@ -57,6 +57,22 @@ jobs:
               exit 1
             fi
 
+            # Run Laravel CLI as the web-server account when deploy-user permissions
+            # do not allow writes to Laravel's runtime/cache directories.
+            if [ -w bootstrap/cache ] && [ -w storage/framework ] && [ -w storage/logs ]; then
+              ARTISAN_MODE="deploy-user"
+              run_artisan() { LOG_CHANNEL=stderr php artisan "$@"; }
+            elif command -v sudo >/dev/null 2>&1 && sudo -n -u www test -w bootstrap/cache && sudo -n -u www test -w storage/framework && sudo -n -u www test -w storage/logs; then
+              ARTISAN_MODE="www"
+              run_artisan() { sudo -n -u www env LOG_CHANNEL=stderr php artisan "$@"; }
+            else
+              echo "No safe write access to Laravel runtime directories. Refusing to alter the active release."
+              id
+              stat -c '%U:%G %a %n' bootstrap/cache storage storage/framework storage/logs || true
+              exit 1
+            fi
+            echo "Laravel CLI execution account: $ARTISAN_MODE"
+
             COMPOSER_PHAR="/tmp/composer-2.11.3-${{ github.sha }}.phar"
             curl --fail --silent --show-error https://getcomposer.org/download/2.11.3/composer.phar --output "$COMPOSER_PHAR"
             EXPECTED_COMPOSER_SHA256="04f8b003da4e3a2459056591fbfebd02b4dc3e5adeb158616b90cf55a65113ec"
@@ -81,9 +97,11 @@ jobs:
             rollback_on_failure() {
               status=$?
               if [ "$status" -ne 0 ]; then
-                echo "Deployment failed; restoring previous code, dependencies, and frontend assets."
+                echo "Deployment failed; restoring previous code and frontend assets."
                 git reset --hard "$PREVIOUS_COMMIT" || true
-                php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader || true
+                php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts || true
+                rm -f bootstrap/cache/packages.php bootstrap/cache/services.php || true
+                run_artisan optimize:clear || true
 
                 if [ "$BUILD_SWAPPED" -eq 1 ]; then
                   rm -rf public/build
@@ -91,8 +109,6 @@ jobs:
                     mv "$PREVIOUS_BUILD" public/build || true
                   fi
                 fi
-
-                php artisan optimize:clear || true
               fi
               rm -rf "$BUILD_STAGE" || true
               rm -f "$COMPOSER_PHAR" || true
@@ -110,7 +126,12 @@ jobs:
               exit 1
             fi
 
-            php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+            # Production install must not run Laravel package discovery while
+            # stale manifests still reference dev-only providers such as Pail.
+            php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
+
+            rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
+            run_artisan package:discover --ansi
 
             mkdir -p storage/app
             if [ -d public/build ]; then
@@ -120,13 +141,14 @@ jobs:
             mkdir -p public/build
             cp -a "$BUILD_STAGE/." public/build/
 
-            php artisan optimize:clear
-            php artisan config:cache
-            php artisan view:cache
+            run_artisan optimize:clear
+            run_artisan config:cache
+            run_artisan view:cache
 
+            curl --fail --silent --show-error https://staging.orangbaik.id/up --output /dev/null
             curl --fail --silent --show-error https://staging.orangbaik.id/ --output /dev/null
 
             trap - EXIT
             rm -rf "$BUILD_STAGE" "$PREVIOUS_BUILD" || true
             rm -f "$COMPOSER_PHAR" || true
-            echo "Staging deployed successfully at $DEPLOYED_COMMIT"
+            echo "Staging deployed and Laravel health endpoint plus homepage returned HTTP success at $DEPLOYED_COMMIT"
