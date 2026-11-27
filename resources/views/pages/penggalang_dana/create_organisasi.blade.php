@@ -318,7 +318,7 @@
                                 @for($i = 1; $i <= 3; $i++)
 
                                     @if($i === 2)
-                                        <details class="reg-more" {{ (old('nama_dokumen.1') || old('file_dokumen.1') || old('nama_dokumen.2') || old('file_dokumen.2')) ? 'open' : '' }}>
+                                        <details class="reg-more" {{ (old('nama_dokumen.1') || old('nama_dokumen.2')) ? 'open' : '' }}>
                                             <summary>
                                                 Tambah dokumen lain (opsional)
                                                 <i class="bi bi-chevron-down"></i>
@@ -371,25 +371,8 @@
                                                     <p class="reg-hint">PDF, JPG, atau PNG. Maksimal 5 MB.</p>
                                                 </label>
 
-                                                <div class="reg-or">atau</div>
-
-                                                <label class="reg-field">
-                                                    <span class="reg-label">Tempel Tautan</span>
-
-                                                    <input
-                                                        type="url"
-                                                        name="file_dokumen[]"
-                                                        value="{{ old('file_dokumen.' . ($i - 1)) }}"
-                                                        placeholder="https://drive.google.com/..."
-                                                    >
-                                                    <p class="reg-hint">Boleh pakai tautan Google Drive atau penyimpanan online lain.</p>
-                                                </label>
-
-                                                @if($i === 1)
+                                                        @if($i === 1)
                                                     @error('dokumen_files.0')
-                                                        <small class="reg-error">{{ $message }}</small>
-                                                    @enderror
-                                                    @error('file_dokumen.0')
                                                         <small class="reg-error">{{ $message }}</small>
                                                     @enderror
                                                 @endif
