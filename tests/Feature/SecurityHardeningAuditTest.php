@@ -24,7 +24,7 @@ class SecurityHardeningAuditTest extends TestCase
 {
     use RefreshDatabase;
     /**
-     * Skenario 1: Dokumen individu tidak boleh berstatus publik untuk pengunjung (isPublicForVisitor)
+     * Skenario 1: Semua dokumen verifikasi tidak boleh berstatus publik
      */
     public function test_dokumen_individu_dilarang_publik(): void
     {
@@ -42,7 +42,21 @@ class SecurityHardeningAuditTest extends TestCase
         ]);
         $dokumenKtp->setRelation('penggalangDana', $penggalangIndividu);
 
-        $this->assertFalse($dokumenKtp->isPublicForVisitor(), 'KTP Individu dilarang berstatus publik untuk pengunjung');
+        $this->assertFalse($dokumenKtp->isPublicForVisitor(), 'Dokumen identitas individu harus selalu privat');
+
+        $organisasi = new Penggalang_Dana([
+            'id' => 11,
+            'user_id' => 101,
+            'jenis_penggalang' => 'organisasi',
+            'nama_penggalang' => 'Yayasan Test',
+        ]);
+        $dokumenLegalitas = new Penggalang_Dana_Dokumen([
+            'nama_dokumen' => 'SK Kemenkumham',
+            'file_dokumen' => 'sk.pdf',
+            'is_public' => true,
+        ]);
+        $dokumenLegalitas->setRelation('penggalangDana', $organisasi);
+        $this->assertFalse($dokumenLegalitas->isPublicForVisitor(), 'Dokumen legalitas organisasi juga tidak boleh publik');
     }
 
     /**
@@ -70,7 +84,7 @@ class SecurityHardeningAuditTest extends TestCase
         $dokumen->setRelation('penggalangDana', $penggalang);
 
         $this->assertFalse($dokumen->canBeAccessedBy($otherUser), 'Pengguna lain dilarang mengakses dokumen privat');
-        $this->assertTrue($dokumen->canBeAccessedBy($owner), 'Pemilik sah berhak mengakses dokumen miliknya');
+        $this->assertFalse($dokumen->canBeAccessedBy($owner), 'Pemilik hanya melihat metadata/status, bukan file dokumen verifikasi');
     }
 
     /**
