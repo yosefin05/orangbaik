@@ -14,10 +14,19 @@ class EmailVerificationNotificationController extends Controller
     public function store(Request $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('dashboard', absolute: false));
+            return redirect()->intended(route('home', absolute: false));
         }
 
-        $request->user()->sendEmailVerificationNotification();
+        try {
+            $request->user()->sendEmailVerificationNotification();
+        } catch (\\Throwable $e) {
+            Log::warning('Email verification resend failed.', [
+                'user_id' => $request->user()->getAuthIdentifier(),
+                'exception_class' => get_class($e),
+            ]);
+
+            return back()->with('error', 'Email verifikasi belum berhasil dikirim. Periksa alamat email dan coba lagi beberapa saat lagi.');
+        }
 
         return back()->with('status', 'verification-link-sent');
     }
