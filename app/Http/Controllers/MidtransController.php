@@ -42,7 +42,7 @@ class MidtransController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Midtrans webhook error', [
-                'message' => $e->getMessage(),
+                'exception_class' => get_class($e),
             ]);
 
             return response()->json([
