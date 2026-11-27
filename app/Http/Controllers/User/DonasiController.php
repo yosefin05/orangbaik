@@ -406,7 +406,10 @@ return response()->json(array_merge([
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="bukti-transfer-' . $pembayaran->order_id . '.' . pathinfo($fullPath, PATHINFO_EXTENSION) . '"',
             'X-Content-Type-Options' => 'nosniff',
-            'Cache-Control' => 'private, no-cache, must-revalidate',
+            'X-Frame-Options' => 'DENY',
+            'Referrer-Policy' => 'no-referrer',
+            'Cache-Control' => 'private, no-store, max-age=0, must-revalidate',
+            'Pragma' => 'no-cache',
         ]);
     }
 
