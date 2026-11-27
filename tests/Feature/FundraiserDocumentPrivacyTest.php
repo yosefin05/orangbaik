@@ -129,7 +129,7 @@ class FundraiserDocumentPrivacyTest extends TestCase
             'storage_disk' => 'public',
         ]);
 
-        $this->get(route('dokumen.show', $document->id))->assertForbidden();
+        $this->get(route('dokumen.show', $document->id))->assertRedirect(route('login'));
         $this->actingAs($owner)->get(route('dokumen.show', $document->id))->assertForbidden();
         $this->actingAs($otherUser)->get(route('dokumen.show', $document->id))->assertForbidden();
 
