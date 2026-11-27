@@ -27,11 +27,11 @@ A successful workflow is evidence for the checks actually executed by that workf
 
 ## Findings requiring remediation or explicit sign-off
 
-### P1 — Sensitive payment credentials are serialized into the admin page
+### P1 — Sensitive payment credential page exposure addressed in this audit branch
 
-`PaymentGatewayController::show()` currently retrieves decrypted credential values and passes both `credentialValues` and presence flags to the Blade view. The view renders the values in password inputs and toggles them client-side. A password input masks visual display but does not protect the value from page source, browser developer tools, extensions, or client-side scripts.
+The baseline `PaymentGatewayController::show()` passed decrypted credential values to the Blade view, where password inputs only masked the text visually. This audit branch now passes presence flags only. Saved credentials are requested through a separate admin-only POST endpoint protected by the existing `auth` + `admin` route group, CSRF, a six-requests-per-minute throttle, an explicit credential-key allowlist, no-store response headers, and an audit log entry that excludes the secret itself. The page's reveal control calls this endpoint only after an administrator explicitly requests the value.
 
-**Recommendation:** keep only presence flags in the initial page response. If credential reveal is required, use a dedicated authenticated POST action with authorization, CSRF protection, no-store response headers, rate limiting and audit logging; do not include plaintext secrets in the initial HTML. Keep secret replacement separate from reveal. Add tests that assert secrets are absent from initial HTML and only returned through the guarded reveal flow.
+**Verification status:** feature tests now assert that secrets are absent from initial HTML, successful explicit reveal returns no-store headers, unknown keys are rejected, and non-admin users are denied. The latest full CI run for the test changes is in progress; do not mark this finding closed until that run passes.
 
 ### P2 — Rich-text sanitizer needs focused regression coverage
 
