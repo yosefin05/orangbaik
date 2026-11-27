@@ -41,9 +41,9 @@ The current `App\\Support\\RichText` implementation uses `DOMDocument`, explicit
 
 ### P1 — Generic payment webhook must remain fail-closed
 
-The generic gateway driver was previously identified as accepting callback status data without a mandatory provider signature/token and amount integrity verification. The dynamic route now exists in `routes/web.php`, so the controller/driver contract and every provider's authentication/amount/status transition must be verified together.
+The current `routes/web.php` exposes `POST /payment/{gateway}/webhook` plus dedicated Midtrans and Flip callback endpoints. The generic controller resolves a gateway-specific driver and returns a failure for unknown or rejected callbacks. No universal `/payment/webhook` endpoint is present in the current route file.
 
-**Recommendation:** do not activate generic/custom gateways until provider-specific authentication, exact amount validation, idempotency, allowed state transitions, replay handling, and sanitized logging are covered by tests. Keep dedicated Midtrans/Flip callbacks canonical until then.
+**Recommendation:** do not activate generic/custom gateways until each provider-specific adapter has mandatory authentication, exact amount validation, idempotency, allowed state transitions, replay handling, and sanitized logging covered by tests. Keep dedicated Midtrans/Flip callbacks canonical until generic adapter support is independently proven.
 
 ### P1 — Legacy public-disk payment proofs need inventory before fallback removal
 
@@ -56,6 +56,13 @@ The audit review records a legacy public-storage fallback in the donor payment-p
 The current `Penggalang_Dana_Dokumen::canBeAccessedBy()` permits administrators only. Owners can see metadata/status but cannot fetch the file. This matches the latest product instruction that identity/legal verification files are private and not exposed to users, but conflicts with older comments and docs that claim owner access.
 
 **Recommendation:** update stale PHPDoc and `docs/api/README.md` / `docs/security/README.md` to state admin-only file access, user-visible metadata/status only, and no public visibility toggle. Keep the database `is_public` field only for legacy compatibility until a separately reviewed migration/data plan exists.
+
+
+### P1 — Midtrans callback persistence was hardened in this audit branch
+
+The baseline `MidtransService::handleWebhook()` merged the full provider callback payload into `pembayaran.gateway_response`, which could persist unnecessary donor/provider fields and the signature. This audit branch now stores a minimal `last_midtrans_callback` allowlist (status, fraud status, payment type, transaction ID, gross amount, receive time) and preserves existing internal gateway metadata. The feature test was extended to ensure arbitrary customer/card-token fields and the signature are not persisted.
+
+**Verification status:** change committed to the audit branch; the full Laravel workflow for the latest commit is running. Do not treat this finding as closed until that exact run passes.
 
 ### P2 — Webhook routes have legacy aliases and multiple orchestration paths
 
