@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 
 class PenggalangDanaController extends Controller
 {
@@ -154,12 +155,17 @@ class PenggalangDanaController extends Controller
                 ->route('profile.user')
                 ->with('success', 'Pengajuan penggalang dana berhasil dikirim. Tim admin akan memverifikasi dalam 1-3 hari kerja.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('Fundraiser organization submission failed.', [
+                'user_id' => $request->user()?->getAuthIdentifier(),
+                'exception_class' => get_class($e),
+            ]);
+
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat menyimpan pengajuan. Silakan coba lagi atau hubungi admin.');
         }
     }
 
