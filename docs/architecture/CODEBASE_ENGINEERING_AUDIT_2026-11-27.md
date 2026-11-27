@@ -67,6 +67,12 @@ The current `Penggalang_Dana_Dokumen::canBeAccessedBy()` permits administrators 
 **Status:** controller, owner-facing profile/edit rendering, and API/security documentation now consistently restrict document names, paths, and files to admin-only contexts. Owners see verification status only. The database `is_public` field remains for legacy compatibility; application authorization does not treat it as permission.
 
 
+### P1 — Legacy public-disk verification documents require a separate storage inventory
+
+New fundraiser verification uploads are stored on the private disk and the application proxy authorizes administrator access only. However, the document controller retains a compatibility fallback to the public disk for historical records. If a legacy verification file physically resides under the public web root or a public storage symlink, application-level authorization does not prevent a direct static-file URL from bypassing the controller.
+
+**Recommendation:** treat legacy public-disk verification documents as a separate P1 inventory alongside historical transfer proofs. Inventory DB rows, storage disk/path metadata, actual file locations, public symlink mappings, and checksums. Back up and migrate only after record-to-file reconciliation; update references transactionally; verify direct URL denial and admin-only proxy access; retain originals until the backup is independently verified. Do not bulk-delete or auto-move files based only on the database flag.
+
 ### P1 — Midtrans callback persistence was hardened in this audit branch
 
 The baseline `MidtransService::handleWebhook()` merged the full provider callback payload into `pembayaran.gateway_response`, which could persist unnecessary donor/provider fields and the signature. This audit branch now stores a minimal `last_midtrans_callback` allowlist (status, fraud status, payment type, transaction ID, gross amount, receive time) and preserves existing internal gateway metadata. The feature test was extended to ensure arbitrary customer/card-token fields and the signature are not persisted.
