@@ -94,7 +94,7 @@ New fundraiser submissions and replacements now require direct uploads to privat
 
 Campaign creation marks emergency and sustainable campaigns as pending while setting `is_active=true`. The public listing already filtered approval status, but the direct campaign detail query and fundraiser referral entry points did not consistently enforce that approval gate.
 
-**Status:** direct campaign detail and sidebar queries now apply the same approved/regular/legacy-null rule as public listings. Fundraiser enrollment and referral activation also require an active, approved campaign. Regression tests cover direct URL access and enrollment against a pending campaign.
+**Status:** direct campaign detail and sidebar queries now apply the same approved/regular/legacy-null rule as public listings. Fundraiser enrollment, canonical referral activation, and legacy `/ajak/{alias}` referral activation require an active, approved campaign. A follow-up audit found that the legacy alias path reached a shared activation helper that checked only active status; this branch now checks approval there as well. Regression tests cover direct URL access, enrollment, and legacy referral activation against a pending campaign.
 
 ### P2 — File replacement must not delete the prior proof before commit
 
