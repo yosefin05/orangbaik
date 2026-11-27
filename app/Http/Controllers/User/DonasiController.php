@@ -348,7 +348,7 @@ return response()->json(array_merge([
         } catch (\Exception $e) {
             Log::error('Upload bukti transfer gagal', [
                 'pembayaran_id' => $pembayaran->id,
-                'error'         => $e->getMessage(),
+                'exception_class' => get_class($e),
             ]);
 
             return back()->with('error', 'Gagal mengunggah bukti transfer. Silakan coba lagi.');
