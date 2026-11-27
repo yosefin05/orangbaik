@@ -17,13 +17,13 @@ This document records findings supported by source inspection and the existing a
 
 ## Latest audit-branch verification (27 November 2026)
 
-- PR #23 head at this verification: `d282eb82096b508dc2cf7988b9bd9f948c13cd94`.
-- GitHub Actions run `46008764843` completed successfully against the PR merge ref.
-- Full Laravel suite: **181 tests passed, 812 assertions**.
+- PR #23 head at this verification: `e2f14652d8f916c2891b0f364f1328109b05e852`.
+- GitHub Actions run `46009285579` completed successfully against the PR merge ref.
+- Full Laravel suite: **182 tests passed, 817 assertions**.
 - Repository-wide PHP syntax check passed for `app`, `routes`, `database`, and `tests`.
 - Laravel route listing, route-cache generation, and route-cache clearing all passed.
 - Composer dependency install, strict optimized PSR-4 check, Vite production build, Composer advisory audit, and npm advisory audit passed. npm audit reported **0 advisories**.
-- Regression coverage includes private/no-store headers on admin verification-document responses; guest, owner and other users are denied even when a legacy row has `is_public=true`; owner edit forms for both organization and individual fundraisers do not render stored document names or paths; Flip callbacks with mismatched amount/provider payment IDs are rejected without settlement; and fundraiser document uploads are capped at one file for individuals and three for organizations.
+- Regression coverage includes private/no-store headers on admin verification-document responses; guest, owner and other users are denied even when a legacy row has `is_public=true`; owner edit forms for both organization and individual fundraisers do not render stored document names or paths; Flip callbacks with mismatched amount/provider payment IDs are rejected without settlement; fundraiser document uploads are capped at one file for individuals and three for organizations; and admin CSV exports prefix untrusted spreadsheet-formula cells.
 - CI uses PHP 8.3 and SQLite in-memory. It does not exercise the actual staging/production database engine or data, real merchant credentials, browser rendering, physical storage inventory, or server deployment.
 
 ## Confirmed CI evidence at baseline
@@ -66,7 +66,7 @@ The audit review records a legacy public-storage fallback in the donor payment-p
 
 The current `Penggalang_Dana_Dokumen::canBeAccessedBy()` permits administrators only. Owner-facing profile flows no longer load document records; the individual edit flow selects only the record identifiers needed for replacement uploads and renders a generic label, not the document name or path. This matches the requirement that identity/legal verification documents and their metadata are not exposed to users.
 
-**Status:** controller, owner-facing profile rendering, and both organization/individual edit forms now restrict stored document names, paths, and files to admin-only contexts. Edit forms receive only document IDs needed to associate replacement uploads; generic labels are shown to owners, and existing admin metadata is preserved when no replacement file is uploaded. A regression test covers both entity types. New submission/edit validation also caps document counts (one for individuals, three for organizations) and document labels to 100 characters. The document proxy explicitly forces private/no-store headers after constructing the file response. The database `is_public` field remains for legacy compatibility; application authorization does not treat it as permission.
+**Status:** controller, owner-facing profile rendering, and both organization/individual edit forms now restrict stored document names, paths, and files to admin-only contexts. Edit forms receive only document IDs needed to associate replacement uploads; generic labels are shown to owners, and existing admin metadata is preserved when no replacement file is uploaded. A regression test covers both entity types. New submission/edit validation also caps document counts (one for individuals, three for organizations) and document labels to 100 characters. The document proxy explicitly forces private/no-store headers after constructing the file response. Admin donor CSV export also prefixes untrusted formula-leading cells to reduce spreadsheet formula-injection risk. The database `is_public` field remains for legacy compatibility; application authorization does not treat it as permission.
 
 
 ### P1 — Legacy public-disk verification documents require a separate storage inventory
@@ -193,6 +193,6 @@ The repository tree alone does not prove that every view is correctly classified
 
 ## Current decision
 
-**Codebase cleanup: IN PROGRESS. Latest completed CI: PASSED on PR head `d282eb8` (run `46008764843`; 181 tests, 812 assertions). Release decision: NOT YET APPROVED.**
+**Codebase cleanup: IN PROGRESS. Latest completed CI: PASSED on PR head `e2f1465` (run `46009285579`; 182 tests, 817 assertions). Release decision: NOT YET APPROVED.**
 
 The baseline main test and staging deployment workflows succeeded. The current audit branch adds further regression coverage, but legacy public proof inventory/migration, phone normalization preflight, route/cache checks, browser QA, staging operational verification, and backup/rollback rehearsal remain open. This audit branch is a review boundary; merge only after each change is implemented, tested, and reviewed. No production change is authorized by this document.
