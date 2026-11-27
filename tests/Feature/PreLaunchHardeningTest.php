@@ -252,7 +252,6 @@ class PreLaunchHardeningTest extends TestCase
 
     /**  */
     #[\PHPUnit\Framework\Attributes\Test]
-    #[\PHPUnit\Framework\Attributes\Test]
     public function referral_alias_cannot_activate_a_pending_campaign(): void
     {
         $pendingCampaign = $this->campaign->replicate();
@@ -277,6 +276,7 @@ class PreLaunchHardeningTest extends TestCase
         $this->assertFalse(session()->has('campaign_referral.' . $pendingCampaign->id));
     }
 
+    #[\PHPUnit\Framework\Attributes\Test]
     public function approved_penggalang_can_access_penggalang_dashboard()
     {
         $response = $this->actingAs($this->user)
