@@ -205,7 +205,7 @@
                                 <span>Nama Dokumen <b>*</b></span>
                                 <input type="hidden" name="dokumen_ids[]" value="{{ $dokumen?->id }}">
                             <input type="text" name="nama_dokumen[]"
-                                    value="{{ old('nama_dokumen.0', $dokumen->nama_dokumen ?? '') }}"
+                                    value="{{ old('nama_dokumen.0', $dokumen ? 'Dokumen Identitas' : '') }}"
                                     {{ $isPending ? 'disabled' : '' }}
                                     placeholder="Contoh: KTP, NPWP" required>
                             </label>
