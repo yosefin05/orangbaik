@@ -19,7 +19,7 @@ Kolom database legacy seperti `is_public` tidak boleh dianggap sebagai izin akse
 | Lihat campaign/berita yang dipublikasikan | ALLOW | ALLOW | ALLOW | ALLOW |
 | Donasi melalui alur yang tersedia | ALLOW sesuai token | ALLOW | ALLOW | ALLOW |
 | Lihat profil penggalang non-sensitif | ALLOW | ALLOW | ALLOW | ALLOW |
-| Lihat metadata/status verifikasi milik sendiri | DENY | DENY | ALLOW | ALLOW |
+| Lihat status verifikasi milik sendiri | DENY | DENY | ALLOW | ALLOW |
 | Buka/unduh file dokumen verifikasi | DENY (403) | DENY (403) | DENY (403) | ALLOW sesuai otorisasi |
 | Ubah visibilitas dokumen verifikasi | DENY | DENY | DENY | DENY |
 | Buat/edit campaign | DENY | Sesuai status verifikasi dan policy | Milik sendiri sesuai policy | ALLOW |
