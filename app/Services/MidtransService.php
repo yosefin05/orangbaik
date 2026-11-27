@@ -235,11 +235,25 @@ class MidtransService
          * 5. UPDATE PEMBAYARAN
          * =====================================================
          */
+        // Persist only the minimum callback fields needed for reconciliation.
+        // Never store the raw provider payload or its signature in gateway_response.
+        $callbackAudit = [
+            'status_code' => (string) $statusCode,
+            'transaction_status' => (string) $rawStatus,
+            'fraud_status' => $fraudStatus,
+            'payment_type' => $paymentType,
+            'transaction_id' => $transactionId,
+            'gross_amount' => (string) $grossAmount,
+            'received_at' => now()->toIso8601String(),
+        ];
+
         $updateData = [
             'payment_type'       => $paymentType,
             'transaction_id'     => $transactionId,
             'transaction_status' => $internalStatus,
-            'gateway_response'   => array_merge($pembayaran->gateway_response ?? [], $payload), // preserve credential mode and callback audit
+            'gateway_response'   => array_merge($pembayaran->gateway_response ?? [], [
+                'last_midtrans_callback' => $callbackAudit,
+            ]),
         ];
 
         if ($internalStatus === 'settlement') {
@@ -251,11 +265,11 @@ class MidtransService
         return DB::transaction(function () use (
             $pembayaran,
             $updateData,
-            $payload,
             $orderId,
             $rawStatus,
             $paymentType,
-            $transactionId
+            $transactionId,
+            $callbackAudit
         ): bool {
             $locked = Pembayaran::whereKey($pembayaran->id)->lockForUpdate()->first();
 
@@ -275,7 +289,10 @@ class MidtransService
 
             // Preserve the latest internal metadata (credential mode, audit fields)
             // rather than overwriting it with a stale model snapshot.
-            $updateData['gateway_response'] = array_merge($locked->gateway_response ?? [], $payload);
+            $updateData['gateway_response'] = array_merge(
+                $locked->gateway_response ?? [],
+                ['last_midtrans_callback' => $callbackAudit]
+            );
             $locked->update($updateData);
 
             Log::info('Midtrans webhook berhasil diproses', [
