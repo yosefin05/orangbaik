@@ -344,6 +344,22 @@ class DonasiController extends Controller
             ->with('success', 'Donasi gagal/kedaluwarsa berhasil dihapus.');
     }
 
+
+    /**
+     * Prevent spreadsheet formula execution when administrators open exported
+     * donor-controlled text in Excel or similar spreadsheet applications.
+     */
+    private static function csvSafeText($value): string
+    {
+        $text = $value === null ? '-' : (string) $value;
+
+        if ($text !== '' && preg_match('/^[\\x00-\\x20]*[=+\\-@]/u', $text)) {
+            return "'" . $text;
+        }
+
+        return $text;
+    }
+
     public function export(Request $request)
     {
         $query = Donasi::with(['campaign', 'user', 'pembayaran.paymentChannel.gateway']);
@@ -421,17 +437,17 @@ class DonasiController extends Controller
 
                 fputcsv($file, [
                     $d->id,
-                    $pembayaran?->order_id ?? '-',
-                    $d->campaign->judul ?? '-',
-                    $d->is_anonim ? 'Anonim' : ($d->nama_donatur ?: '-'),
-                    $d->email ?? '-',
-                    $d->no_hp ? "'" . $d->no_hp : '-',
+                    self::csvSafeText($pembayaran?->order_id),
+                    self::csvSafeText($d->campaign?->judul),
+                    $d->is_anonim ? 'Anonim' : self::csvSafeText($d->nama_donatur),
+                    self::csvSafeText($d->email),
+                    $d->no_hp ? "'" . self::csvSafeText($d->no_hp) : '-',
                     $d->nominal,
                     ucfirst($pembayaran?->transaction_status ?? 'pending'),
-                    $pembayaran?->payment_type ?? '-',
-                    $channel?->name ?? '-',
-                    $gateway?->name ?? '-',
-                    $d->pesan_doa ?? '-',
+                    self::csvSafeText($pembayaran?->payment_type),
+                    self::csvSafeText($channel?->name),
+                    self::csvSafeText($gateway?->name),
+                    self::csvSafeText($d->pesan_doa),
                     $d->is_anonim ? 'Ya' : 'Tidak',
                     $d->created_at ? $d->created_at->format('Y-m-d H:i:s') : '-',
                     $pembayaran?->paid_at ? \Carbon\Carbon::parse($pembayaran->paid_at)->format('Y-m-d H:i:s') : '-',
