@@ -240,6 +240,14 @@ class FlipService
                 $message = strip_tags((string) $value);
                 $message = preg_replace('/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i', '[redacted-email]', $message);
                 $message = preg_replace('/(?:\+?62|0)\d{8,13}/', '[redacted-phone]', $message);
+                // Also redact non-phone numeric identifiers such as bank
+                // account numbers and provider/customer reference numbers.
+                $message = preg_replace('/\b\d{8,}\b/', '[redacted-number]', $message);
+                $message = preg_replace(
+                    '/\b(password|token|secret|api[_-]?key|authorization)\s*[:=]\s*[^\s,;]+/i',
+                    '$1=[redacted]',
+                    $message
+                );
 
                 return Str::limit(trim($message), $limit);
             };
