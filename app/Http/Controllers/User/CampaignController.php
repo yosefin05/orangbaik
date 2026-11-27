@@ -28,7 +28,6 @@ class CampaignController extends Controller
         $now = Carbon::now();
         $filters = Filter::all();
         $kategori = Kategori::all();
-        $penggalangDana = Penggalang_Dana::where('status', 'verified')->get();
 
         // tampilkan campaign aktif
         $query = Campaign::with(['penggalangDana', 'donasi.pembayaran', 'kategori', 'filter'])
@@ -116,8 +115,7 @@ class CampaignController extends Controller
             'campaignTerbaru',
             'campaigns',
             'selectedJenis',
-            'selectedFilterIds',
-            'penggalangDana'
+            'selectedFilterIds'
         ));
     }
 
