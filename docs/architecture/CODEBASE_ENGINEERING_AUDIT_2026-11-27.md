@@ -15,6 +15,10 @@ This document records findings supported by source inspection and the existing a
 - `.github/workflows/tests.yml` runs on pull requests to `main` and pushes to branches. It checks strict optimized PSR-4 autoloading, builds frontend assets, audits npm/Composer dependencies, and runs the Laravel test suite with warnings treated as failures.
 - No production deployment workflow was identified in the inspected workflow files. Production remains out of scope for this audit.
 
+## Staging handoff
+
+- Added `docs/deployment/STAGING_SECURITY_AUDIT_RUNBOOK.md` with read-only database and filesystem inventories, proposed phone-normalization collision preflight, runtime checks, backup gates, and staging smoke tests. It deliberately contains no destructive migration command.
+
 ## Latest audit-branch verification (27 November 2026)
 
 - PR #23 head at this verification: `45f30d5b497a6c754ad91db34691a495224a1077`.
