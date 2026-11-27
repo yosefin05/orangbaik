@@ -156,7 +156,7 @@ class FundraiserDocumentPrivacyTest extends TestCase
                 'alamat' => 'Sidoarjo',
                 'deskripsi' => 'Profil pengujian privasi dokumen.',
                 'email' => 'edit-privacy-' . $owner->id . '@example.test',
-                'no_telepon' => '08123456789',
+                'no_telepon' => '0812345' . str_pad((string) $owner->id, 4, '0', STR_PAD_LEFT),
                 'status' => 'approved',
             ]);
 
