@@ -297,7 +297,7 @@
                                             <input
                                                 type="text"
                                                 name="nama_dokumen[]"
-                                                value="{{ old('nama_dokumen.' . $index, $dokumen->nama_dokumen ?? '') }}"
+                                                value="{{ old('nama_dokumen.' . $index, $dokumen ? 'Dokumen Legalitas ' . $i : '') }}"
                                                 placeholder="Contoh: SK Kemenkumham, Akta, Izin Operasional"
                                                 {{ $isPending ? 'disabled' : '' }}>
                                         </label>
