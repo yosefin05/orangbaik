@@ -27,54 +27,20 @@ class Penggalang_Dana_Dokumen extends Model
     }
 
     /**
-     * Scope untuk dokumen yang diizinkan diakses publik:
-     * - Hanya dokumen organisasi yang explicitly public
-     * - Dokumen identitas pribadi (KTP/NPWP/Individu) TIDAK BOLEH muncul di scope ini.
+     * Dokumen verifikasi tidak pernah ditampilkan kepada pengunjung umum.
+     * Dokumen hanya dapat diakses melalui endpoint terproteksi oleh pemilik
+     * dokumen dan admin yang berwenang.
      */
     public function scopePublicOnly(Builder $query): Builder
     {
-        return $query->whereHas('penggalangDana', function ($q) {
-            $q->whereIn('jenis_penggalang', ['organisasi', 'yayasan_lembaga', 'komunitas']);
-        })->where(function ($q) {
-            // Jika kolom is_public ada dan bernilai true
-            $q->where('is_public', true)
-              // Atau untuk backward-compatibility pada data organisasi non-identitas
-              ->orWhere(function ($sub) {
-                  $sub->whereNull('is_public')
-                      ->whereRaw("LOWER(nama_dokumen) NOT LIKE '%ktp%'")
-                      ->whereRaw("LOWER(nama_dokumen) NOT LIKE '%nik%'")
-                      ->whereRaw("LOWER(nama_dokumen) NOT LIKE '%identitas%'");
-              });
-        });
+        return $query->whereRaw('1 = 0');
     }
 
     /**
-     * Periksa apakah dokumen ini bersifat publik untuk pengunjung umum (Guest).
+     * Dokumen verifikasi selalu privat, termasuk dokumen legalitas organisasi.
      */
     public function isPublicForVisitor(): bool
     {
-        if (!$this->penggalangDana || !$this->penggalangDana->isEntity()) {
-            return false;
-        }
-
-        // Dokumen individu WAJIB 100% PRIVATE
-        if ($this->penggalangDana && ($this->penggalangDana->jenis_penggalang === 'individu' || (method_exists($this->penggalangDana, 'isIndividu') && $this->penggalangDana->isIndividu()))) {
-            return false;
-        }
-
-        // Cek nama dokumen terhadap data identitas sensitif
-        $namaLower = strtolower($this->nama_dokumen ?? '');
-        foreach (['ktp', 'nik', 'identitas', 'paspor', 'sim', 'kk'] as $sensitiveWord) {
-            if (str_contains($namaLower, $sensitiveWord)) {
-                return false;
-            }
-        }
-
-        // Jika eksplisit is_public = true dan organisasi
-        if ($this->is_public === true) {
-            return true;
-        }
-
         return false;
     }
 
