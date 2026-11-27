@@ -773,10 +773,7 @@ class CampaignController extends Controller
             \Log::error('Campaign update failed', [
                 'campaign_id' => $campaign->id,
                 'user_id' => auth()->id(),
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
+                'exception_class' => get_class($e),
             ]);
 
             return back()
