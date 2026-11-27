@@ -1134,6 +1134,31 @@ class PaymentChannelTest extends TestCase
 
 
 
+    public function test_replacing_a_private_transfer_proof_deletes_old_file_only_after_successful_replacement(): void
+    {
+        Storage::fake('private');
+
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+
+        $oldPath = 'bukti-transfer/previous-private-proof.jpg';
+        Storage::disk('private')->put($oldPath, 'previous-proof-content');
+
+        $payment = (new ManualTransferService())->createTransaction($this->createDonasi(), $manualChannel);
+        $payment->update(['bukti_transfer' => $oldPath]);
+
+        $newPath = (new ManualTransferService())->saveBuktiTransfer(
+            $payment,
+            UploadedFile::fake()->image('replacement-private-proof.jpg')
+        );
+
+        Storage::disk('private')->assertMissing($oldPath);
+        Storage::disk('private')->assertExists($newPath);
+        $this->assertSame($newPath, $payment->fresh()->bukti_transfer);
+    }
+
     public function test_private_transfer_proof_response_is_not_cacheable_and_has_security_headers(): void
     {
         Storage::fake('private');
