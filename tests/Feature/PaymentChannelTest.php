@@ -1148,14 +1148,19 @@ class PaymentChannelTest extends TestCase
         $payment = $service->createTransaction($donasi, $manualChannel);
         $service->saveBuktiTransfer($payment, UploadedFile::fake()->image('private-proof.jpg'));
 
-        $this->actingAs($donasi->user)
-            ->get(route('donasi.bayar.bukti_transfer', $payment->id))
-            ->assertOk()
-            ->assertHeader('Cache-Control')
+        $response = $this->actingAs($donasi->user)
+            ->get(route('donasi.bayar.bukti_transfer', $payment->id));
+
+        $response->assertOk()
             ->assertHeader('Pragma', 'no-cache')
             ->assertHeader('X-Content-Type-Options', 'nosniff')
             ->assertHeader('X-Frame-Options', 'DENY')
             ->assertHeader('Referrer-Policy', 'no-referrer');
+
+        $cacheControl = strtolower((string) $response->headers->get('Cache-Control'));
+        $this->assertStringContainsString('private', $cacheControl);
+        $this->assertStringContainsString('no-store', $cacheControl);
+        $this->assertStringNotContainsString('public', $cacheControl);
     }
 
 
