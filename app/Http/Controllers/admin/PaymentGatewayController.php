@@ -7,6 +7,7 @@ use App\Models\PaymentGateway;
 use App\Models\PaymentChannel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class PaymentGatewayController extends Controller
 {
@@ -44,15 +45,45 @@ class PaymentGatewayController extends Controller
             'staging_api_key', 'staging_webhook_token',
         ];
         $credentialFlags = [];
-        $credentialValues = [];
         foreach ($credentialKeys as $key) {
-            $credentialValues[$key] = $gateway->getConfigValue($key, '');
-            $credentialFlags[$key] = filled($credentialValues[$key]);
+            $credentialFlags[$key] = $gateway->hasConfigValue($key);
         }
 
-        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags', 'credentialValues', 'routingOptions', 'availableMethods'));
+        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags', 'routingOptions', 'availableMethods'));
     }
 
+
+
+    /**
+     * Reveal one stored credential only after an explicit, rate-limited admin POST.
+     */
+    public function revealCredential(Request $request, PaymentGateway $gateway)
+    {
+        abort_unless(in_array($gateway->code, ['midtrans', 'flip'], true), 404);
+
+        $validated = $request->validate([
+            'key' => ['required', 'string', 'in:sandbox_server_key,sandbox_client_key,sandbox_signature_secret_key,production_server_key,production_client_key,production_signature_secret_key,sandbox_api_key,production_api_key,sandbox_webhook_token,production_webhook_token,staging_api_key,staging_webhook_token'],
+        ]);
+
+        $key = $validated['key'];
+        $value = $gateway->getConfigValue($key);
+
+        if (!filled($value)) {
+            return response()->json(['message' => 'Kredensial tidak tersedia.'], 404)
+                ->header('Cache-Control', 'no-store, private, max-age=0');
+        }
+
+        Log::notice('Payment gateway credential revealed by administrator.', [
+            'admin_id' => $request->user()->getAuthIdentifier(),
+            'gateway_id' => $gateway->getKey(),
+            'credential_key' => $key,
+        ]);
+
+        return response()->json(['value' => $value])
+            ->header('Cache-Control', 'no-store, private, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('X-Content-Type-Options', 'nosniff');
+    }
 
     /**
      * Built-in methods supported by the current provider adapters.
