@@ -40,6 +40,17 @@
     </div>
 
     <div class="donasi-stat-card">
+        <div class="donasi-stat-icon icon-blue">
+            <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <div>
+            <p class="donasi-stat-label">Tingkat Keberhasilan</p>
+            <h3 class="donasi-stat-value text-blue">{{ number_format($paymentSuccessRate ?? 0, 1, ',', '.') }}%</h3>
+            <small class="text-muted">Dari {{ number_format($totalDonasiCount ?? 0, 0, ',', '.') }} total leads/donasi</small>
+        </div>
+    </div>
+
+    <div class="donasi-stat-card">
         <div class="donasi-stat-icon icon-orange">
             <i class="bi bi-hourglass-split"></i>
         </div>
