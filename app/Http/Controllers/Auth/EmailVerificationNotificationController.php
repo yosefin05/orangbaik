@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EmailVerificationNotificationController extends Controller
 {
@@ -19,7 +20,7 @@ class EmailVerificationNotificationController extends Controller
 
         try {
             $request->user()->sendEmailVerificationNotification();
-        } catch (\\Throwable $e) {
+        } catch (\Throwable $e) {
             Log::warning('Email verification resend failed.', [
                 'user_id' => $request->user()->getAuthIdentifier(),
                 'exception_class' => get_class($e),
