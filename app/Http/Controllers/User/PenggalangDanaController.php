@@ -265,10 +265,15 @@ class PenggalangDanaController extends Controller
                 ->route('profile.user')
                 ->with('success', 'Pengajuan berhasil dikirim. Tim admin akan memverifikasi dalam 1-3 hari kerja.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('Fundraiser individual submission failed.', [
+                'user_id' => $request->user()?->getAuthIdentifier(),
+                'exception_class' => get_class($e),
+            ]);
+
             return redirect()->back()->withInput()
-                ->with('error', 'Terjadi kesalahan: Gagal menyimpan data: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat menyimpan pengajuan. Silakan coba lagi atau hubungi admin.');
         }
     }
 
