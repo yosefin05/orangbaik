@@ -27,9 +27,9 @@ class Penggalang_Dana_Dokumen extends Model
     }
 
     /**
-     * Dokumen verifikasi tidak pernah ditampilkan kepada pengunjung umum.
-     * Dokumen hanya dapat diakses melalui endpoint terproteksi oleh pemilik
-     * dokumen dan admin yang berwenang.
+     * Dokumen verifikasi tidak pernah ditampilkan kepada publik.
+     * File hanya dapat diakses oleh admin berwenang; pemilik profil hanya
+     * dapat melihat metadata dan status verifikasi melalui dashboard.
      */
     public function scopePublicOnly(Builder $query): Builder
     {
@@ -45,10 +45,9 @@ class Penggalang_Dana_Dokumen extends Model
     }
 
     /**
-     * Cek otorisasi akses:
-     * - Admin: boleh akses semua
-     * - Pemilik: boleh akses dokumen miliknya sendiri
-     * - Pengunjung/Publik: hanya jika dokumen berstatus publik
+     * Hanya admin yang berwenang dapat membuka file dokumen verifikasi.
+     * Pemilik dan pengunjung tidak memperoleh akses file, apa pun nilai
+     * legacy pada kolom is_public.
      */
     public function canBeAccessedBy(?User $user): bool
     {
