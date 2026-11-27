@@ -254,8 +254,8 @@
                             <p class="reg-note">
                                 <i class="bi bi-shield-lock-fill"></i>
                                 <span>
-                                    Dokumen disimpan di penyimpanan privat yang aman dan
-                                    <strong>tidak akan pernah dipublikasikan</strong>.
+                                    Dokumen hanya diperiksa oleh admin OrangBaik untuk verifikasi identitas,
+                                    disimpan secara privat, dan <strong>tidak ditampilkan kepada donatur maupun publik</strong>.
                                 </span>
                             </p>
 

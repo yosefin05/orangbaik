@@ -65,7 +65,10 @@ class RegisteredUserController extends Controller
         try {
             event(new Registered($user));
         } catch (\Throwable $e) {
-            Log::warning('Email verification event skipped or failed: ' . $e->getMessage());
+            Log::warning('Email verification notification could not be dispatched during registration.', [
+                'user_id' => $user->getKey(),
+                'exception_class' => get_class($e),
+            ]);
         }
 
         // Langsung autentikasi pengguna

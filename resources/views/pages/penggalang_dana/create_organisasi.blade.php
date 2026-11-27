@@ -308,8 +308,9 @@
                             <div class="reg-card-head">
                                 <h2>Dokumen Legalitas</h2>
                                 <p>
-                                    Lampirkan minimal satu dokumen legalitas untuk meningkatkan
-                                    kepercayaan donatur.
+                                    Unggah minimal satu dokumen legalitas organisasi, seperti SK atau Akta.
+                                    Dokumen hanya diperiksa oleh admin OrangBaik untuk proses verifikasi,
+                                    dan tidak ditampilkan kepada donatur maupun publik.
                                 </p>
                             </div>
 

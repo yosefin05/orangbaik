@@ -110,7 +110,7 @@ Route::get('/pusat-bantuan', [PageController::class, 'pusatBantuan'])->name('pus
 
 // Penggalang Dana (Public)
 Route::get('/penggalang/{id}', [PenggalangDanaController::class, 'profile'])
-    ->where('id', '^(?!dashboard$)[A-Za-z0-9][A-Za-z0-9-]*$')
+    ->where('id', '^(?!dashboard$|rejected$)[A-Za-z0-9][A-Za-z0-9-]*$')
     ->name('profil.penggalang');
 Route::get('/profil-penggalang/{id}', function (string $id) {
     $penggalang = \App\Models\Penggalang_Dana::where('id', $id)->orWhere('slug', $id)->firstOrFail();
@@ -126,8 +126,8 @@ Route::get('/dokumen-penggalang/{id}', [DokumenPenggalangController::class, 'sho
 Route::middleware('auth')->group(function () {
 
     // Dashboard Penggalang Dana
-    Route::get('/penggalang/dashboard', [PenggalangDashboardController::class, 'index'])->name('penggalang.dashboard');
-    Route::get('/fundraiser/dashboard', [FundraiserDashboardController::class, 'index'])->name('fundraiser.dashboard');
+    Route::get('/penggalang/dashboard', [PenggalangDashboardController::class, 'index'])->middleware('verified')->name('penggalang.dashboard');
+    Route::get('/fundraiser/dashboard', [FundraiserDashboardController::class, 'index'])->middleware('verified')->name('fundraiser.dashboard');
 
     // Set intended URL
     Route::post('/set-intended-url', function (Request $request) {
@@ -137,25 +137,33 @@ Route::middleware('auth')->group(function () {
 
     // Penggalang Dana (CRUD)
     Route::get('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'createOrganisasi'])
+        ->middleware('verified')
         ->name('penggalang_dana.organisasi.create');
     Route::post('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'storeOrganisasi'])
+        ->middleware('verified')
         ->name('penggalang_dana.organisasi.store');
     Route::get('/verifikasi-penggalang', function () {
         return view('pages.penggalang_dana.create_individu');
-    })->name('verifikasi.penggalang');
+    })->middleware('verified')->name('verifikasi.penggalang');
     Route::post('/verifikasi-penggalang', [PenggalangDanaController::class, 'storeIndividu'])
+        ->middleware('verified')
         ->name('penggalang_dana.individu.store');
     Route::get('/penggalang/{id}/edit', [PenggalangDanaController::class, 'edit'])
+        ->middleware('verified')
         ->name('penggalang_dana.edit');
     Route::patch('/penggalang/{id}', [PenggalangDanaController::class, 'update'])
+        ->middleware('verified')
         ->name('penggalang_dana.update');
     Route::delete('/penggalang/{id}/dokumen', [PenggalangDanaController::class, 'destroyDocuments'])
+        ->middleware('verified')
         ->name('penggalang_dana.dokumen.destroy');
     Route::get('/penggalang-dana/{id}/edit', fn (string $id) => redirect()->route('penggalang_dana.edit', $id));
     Route::patch('/penggalang-dana/{id}', fn (Request $request, string $id) => redirect()->route('penggalang_dana.update', $id, 307));
     Route::get('/penggalang/rejected', [PenggalangDanaController::class, 'rejected'])
+        ->middleware('verified')
         ->name('penggalang_dana.rejected');
     Route::patch('/penggalang-dana/{id}/resubmit', [PenggalangDanaController::class, 'resubmit'])
+        ->middleware('verified')
         ->name('penggalang_dana.resubmit');
 
     // Profile User
