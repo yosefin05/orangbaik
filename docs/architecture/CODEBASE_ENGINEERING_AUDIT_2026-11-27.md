@@ -17,12 +17,14 @@ This document records findings supported by source inspection and the existing a
 
 ## Latest audit-branch verification (27 November 2026)
 
-- PR #23 head: `e20fee240b814cecc80ed643fd418efb22910348`.
-- GitHub Actions run `46006597126` completed successfully against the PR merge ref `d39fbac1ac8f23d188b82ce31949cf715a3ca5cd`.
-- Full Laravel suite: **176 tests passed, 781 assertions**.
-- Composer dependency install, strict optimized PSR-4 check, Vite production build, Composer/npm advisory audits, and isolated SQLite test setup all completed successfully.
-- This CI workflow did not yet include repository-wide PHP lint or route-cache registration checks at the time of run `46006597126`; those checks have now been added to `.github/workflows/tests.yml` and require a fresh run.
-- CI uses SQLite in-memory, not the staging/production database engine or data. It does not exercise real gateway credentials, browser rendering, actual storage files, or server deployment.
+- PR #23 head: `a5a42da4aeb19cfad002f32e93071acc18555cba`.
+- GitHub Actions run `46007456061` completed successfully against the PR merge ref.
+- Full Laravel suite: **179 tests passed, 795 assertions**.
+- Repository-wide PHP syntax check passed for `app`, `routes`, `database`, and `tests`.
+- Laravel route listing, route-cache generation, and route-cache clearing all passed.
+- Composer dependency install, strict optimized PSR-4 check, Vite production build, Composer advisory audit, and npm advisory audit passed. npm audit reported **0 advisories**.
+- Regression coverage includes legacy public-flag verification documents (guest/owner/other-user denied; admin authorized with private/no-store response headers) and Flip callbacks with mismatched amount/provider payment ID (rejected without settling).
+- CI uses PHP 8.3 and SQLite in-memory. It does not exercise the actual staging/production database engine or data, real merchant credentials, browser rendering, physical storage inventory, or server deployment.
 
 ## Confirmed CI evidence at baseline
 
@@ -179,10 +181,10 @@ The repository tree alone does not prove that every view is correctly classified
 - [x] Strict optimized Composer PSR-4 autoload check.
 - [x] Composer and npm dependency advisory audits completed by CI; review any new advisory before release.
 - [x] Frontend production build completed by CI.
-- [ ] PHP syntax check and route registration/cache check (added to CI after run `46006597126`; pending fresh run).
+- [x] Repository-wide PHP syntax check and Laravel route registration/cache check (run `46007456061`).
 - [ ] Database migration dry-run/rehearsal against a disposable DB matching target engine/version.
-- [ ] Authorization tests for guest, ordinary user, fundraiser, document owner, and admin.
-- [ ] Payment tests for exact amount, invalid/missing secret, replay, duplicate callback, terminal-state rollback, and idempotency.
+- [x] Feature/model authorization coverage for guest, ordinary user, document owner, and admin on verification-document access; full browser-role QA remains open.
+- [x] Automated payment tests cover exact amount rejection, invalid/missing secret, duplicate callback/idempotency, and terminal-state rollback for covered Midtrans/Flip paths; merchant sandbox/live integration remains open.
 - [ ] Private document and historical proof direct-URL denial tests.
 - [ ] Browser QA at desktop/mobile sizes for donation, payment instructions, receipt, profile, fundraiser dashboard, and admin workflows.
 - [ ] Staging backup/rollback rehearsal and smoke tests for homepage, `/up`, authentication, donation, admin, and document access.
@@ -190,6 +192,6 @@ The repository tree alone does not prove that every view is correctly classified
 
 ## Current decision
 
-**Codebase cleanup: IN PROGRESS. Latest completed CI: PASSED on PR head `e20fee2` (run `46006597126`; 176 tests, 781 assertions). Release decision: NOT YET APPROVED.**
+**Codebase cleanup: IN PROGRESS. Latest completed CI: PASSED on PR head `a5a42da` (run `46007456061`; 179 tests, 795 assertions). Release decision: NOT YET APPROVED.**
 
 The baseline main test and staging deployment workflows succeeded. The current audit branch adds further regression coverage, but legacy public proof inventory/migration, phone normalization preflight, route/cache checks, browser QA, staging operational verification, and backup/rollback rehearsal remain open. This audit branch is a review boundary; merge only after each change is implemented, tested, and reviewed. No production change is authorized by this document.
