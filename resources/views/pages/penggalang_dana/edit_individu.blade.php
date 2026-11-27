@@ -216,19 +216,9 @@
                                 <small class="field-help">PDF, JPG, atau PNG. Maksimal 5 MB.</small>
                             </label>
                         </div>
-                        <div class="verify-document-link-row">
-                            @if($dokumen)
-                                <span class="text-muted"><i class="bi bi-lock-fill"></i> Dokumen tersimpan (akses pemeriksaan admin)</span>
-                            @endif
-                            <label class="verify-field">
-                                <span>Atau Tautan Dokumen</span>
-                                <input type="url" name="file_dokumen[]"
-                                    value="{{ old('file_dokumen.0', filter_var($dokumen?->file_dokumen, FILTER_VALIDATE_URL) ? $dokumen->file_dokumen : '') }}"
-                                    {{ $isPending ? 'disabled' : '' }}
-                                    placeholder="https://drive.google.com/...">
-                                <small class="field-help">Gunakan tautan Google Drive atau penyimpanan online lain.</small>
-                            </label>
-                        </div>
+                        @if($dokumen)
+                            <p class="field-help"><i class="bi bi-lock-fill"></i> Dokumen tersimpan dan hanya dapat diperiksa admin. Untuk mengganti dokumen, unggah file baru secara langsung.</p>
+                        @endif
                         @if($dokumen && !$isPending && (int) auth()->id() === (int) $penggalang->user_id)
                             <div class="verify-actions" style="justify-content:flex-end;">
                                 <button type="submit" form="deleteDocumentsForm" class="verify-cancel-button"
