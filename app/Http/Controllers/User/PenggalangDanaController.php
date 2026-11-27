@@ -289,23 +289,23 @@ class PenggalangDanaController extends Controller
             abort(404, 'Profil penggalang dana tidak ditemukan atau belum disetujui.');
         }
 
-        // Dokumen handling:
-        // - Owner atau Admin: dapat melihat seluruh dokumen
-        // - Publik: jika organisasi/yayasan/komunitas, hanya dokumen publik. Jika individu, KOSONG (0 dokumen di-load).
-        if ($isOwner || $isAdmin) {
+        // Dokumen verifikasi (termasuk KTP dan legalitas organisasi) hanya
+        // dimuat untuk admin. Owner cukup melihat status verifikasi, bukan nama,
+        // metadata, atau file dokumen yang diunggah.
+        if ($isAdmin) {
             $penggalang->load('penggalangDanaDokumen');
-            // Pemilik/admin perlu melihat campaign pending/rejected untuk memantau workflow.
+        } else {
+            $penggalang->setRelation('penggalangDanaDokumen', collect([]));
+        }
+
+        // Pemilik/admin dapat memantau campaign pending/rejected; publik hanya
+        // melihat campaign yang aktif dan telah disetujui.
+        if ($isOwner || $isAdmin) {
             $penggalang->load('campaign');
-        } elseif ($penggalang->isEntity()) {
+        } else {
             $penggalang->setRelation('campaign', $penggalang->campaign
                 ->filter(fn ($campaign) => $campaign->is_active && $campaign->isApproved())
                 ->values());
-            $penggalang->load(['penggalangDanaDokumen' => function ($q) {
-                $q->publicOnly();
-            }]);
-        } else {
-            // Penggalang individu: dokumen identitas (KTP dsb) 100% PRIVATE, jangan pernah di-load untuk publik
-            $penggalang->setRelation('penggalangDanaDokumen', collect([]));
         }
 
         // Jika owner, tandai notifikasi sudah dibaca
