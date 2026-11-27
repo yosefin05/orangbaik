@@ -198,7 +198,10 @@ class FundraiserController extends Controller
 
             $fundraiser->update(['qr_path' => $fileName]);
         } catch (\Exception $e) {
-            Log::error('QR Generation failed: ' . $e->getMessage());
+            Log::error('QR generation failed.', [
+                'fundraiser_id' => $fundraiser->id,
+                'exception_class' => get_class($e),
+            ]);
         }
     }
 }
