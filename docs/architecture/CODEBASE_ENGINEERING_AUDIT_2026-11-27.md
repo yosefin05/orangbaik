@@ -78,6 +78,18 @@ This audit branch changes the placeholder to fail closed: `isConfigured()` retur
 
 **Recommendation:** map each endpoint to its middleware, controller, driver, signature/token check, response contract, and provider dashboard configuration. Select one canonical endpoint per provider; retain aliases only when needed for backward compatibility and test each alias explicitly.
 
+### P1 — External document URLs cannot guarantee private verification storage
+
+New fundraiser submission and edit flows currently accept `file_dokumen[]` URLs. `DokumenPenggalangController` redirects an authorized admin to the external URL, but OrangBaik cannot enforce that the external host keeps the file private or prevent direct access to a publicly shared link.
+
+**Recommendation:** decide and document whether external links are an accepted verification channel. If strict privacy is required, make new submissions upload-only to private storage, and treat existing URL-backed records as a separate migration/review queue. Do not auto-fetch arbitrary URLs from the server because that introduces SSRF risk. Preserve existing records until their source and replacement file have been verified.
+
+### P2 — Indonesian phone storage format is inconsistent with the requested local format
+
+`Penggalang_Dana::setNoTeleponAttribute()` and `PenggalangDanaController::normalizedContactInput()` currently canonicalize numbers to international digits beginning with `62`, while the agreed storage convention is local digits beginning with `08`. Validation rules also expect `62` format. A direct setter change is unsafe while existing records and the unique index may contain both equivalent `08...` and `62...` values.
+
+**Recommendation:** inventory current values and unique-index behavior first; design an additive normalization migration that detects collisions before writing, then update create/update validation and tests together. Keep display formatting separate from storage normalization.
+
 ### P2 — Naming conventions are mixed in legacy domain types and routes
 
 Examples include `Penggalang_Dana_Dokumen`, underscore-separated route names, kebab-case URLs, inconsistent route parameter names, and legacy model names. Some are public contracts or Eloquent table mappings.
