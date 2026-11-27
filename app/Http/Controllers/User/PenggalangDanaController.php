@@ -63,19 +63,18 @@ class PenggalangDanaController extends Controller
             'nama_dokumen'     => 'required|array|min:1',
             'nama_dokumen.0'   => 'required|string',
             'dokumen_files.*'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'file_dokumen.*'   => 'nullable|url|max:2048',
-            'file_dokumen.0'   => 'required_without:dokumen_files.0|nullable|url|max:2048',
             'instagram'        => 'nullable|string|max:255',
             'facebook'         => 'nullable|string|max:255',
             'youtube'          => 'nullable|string|max:255',
             'tiktok'           => 'nullable|string|max:255',
         ]);
 
-        // Cek setidaknya ada 1 file atau URL dokumen
-        $hasDoc0 = $request->hasFile('dokumen_files.0') || !empty($request->input('file_dokumen.0'));
+        // Verification documents must be uploaded directly to private storage.
+        // External URLs cannot be controlled for confidentiality or availability.
+        $hasDoc0 = $request->hasFile('dokumen_files.0');
         if (!$hasDoc0) {
             return redirect()->back()->withInput()->withErrors([
-                'file_dokumen.0' => 'Dokumen persyaratan pertama wajib diunggah (PDF, JPG, PNG maks 5MB) atau sertakan link.',
+                'dokumen_files.0' => 'Dokumen persyaratan pertama wajib diunggah (PDF, JPG, PNG maks 5MB). Link eksternal tidak diterima.',
             ]);
         }
 
@@ -133,9 +132,6 @@ class PenggalangDanaController extends Controller
                     $uploadedFile = $request->file("dokumen_files.{$index}");
                     $filePath = $uploadedFile->store("dokumen_penggalang/{$penggalangDana->id}", 'private');
                     $disk = 'private';
-                } elseif (!empty($request->file_dokumen[$index])) {
-                    $filePath = trim($request->file_dokumen[$index]);
-                    $disk = 'private';
                 }
 
                 if ($filePath) {
@@ -186,7 +182,6 @@ class PenggalangDanaController extends Controller
             'nama_dokumen'    => 'required|array|min:1',
             'nama_dokumen.0'  => 'required|string',
             'dokumen_files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'file_dokumen.*'  => 'nullable|url|max:2048',
             'visi'            => 'nullable|string|max:5000',
             'misi'            => 'nullable|string|max:10000',
             'instagram'       => 'nullable',
@@ -195,10 +190,10 @@ class PenggalangDanaController extends Controller
             'tiktok'          => 'nullable',
         ]);
 
-        $hasDoc0 = $request->hasFile('dokumen_files.0') || !empty($request->input('file_dokumen.0'));
+        $hasDoc0 = $request->hasFile('dokumen_files.0');
         if (!$hasDoc0) {
             return redirect()->back()->withInput()->withErrors([
-                'dokumen_files.0' => 'Dokumen identitas KTP wajib diunggah (PDF, JPG, PNG maks 5MB) atau sertakan link.',
+                'dokumen_files.0' => 'Dokumen identitas KTP wajib diunggah (PDF, JPG, PNG maks 5MB). Link eksternal tidak diterima.',
             ]);
         }
 
@@ -242,9 +237,6 @@ class PenggalangDanaController extends Controller
                 if ($request->hasFile("dokumen_files.{$i}")) {
                     $uploadedFile = $request->file("dokumen_files.{$i}");
                     $filePath = $uploadedFile->store("dokumen_penggalang/{$penggalangDana->id}", 'private');
-                    $disk = 'private';
-                } elseif (!empty($request->file_dokumen[$i])) {
-                    $filePath = trim($request->file_dokumen[$i]);
                     $disk = 'private';
                 }
 
