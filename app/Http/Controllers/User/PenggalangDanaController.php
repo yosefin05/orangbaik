@@ -322,7 +322,6 @@ class PenggalangDanaController extends Controller
     {
         $penggalang = auth()->user()
             ->penggalangDana()
-            ->with('penggalangDanaDokumen')
             ->firstOrFail();
 
         if (!$penggalang->status_read) {
@@ -337,12 +336,23 @@ class PenggalangDanaController extends Controller
      */
     public function edit($id)
     {
-        $penggalang = Penggalang_Dana::with('penggalangDanaDokumen')
+        $penggalang = Penggalang_Dana::query()
             ->where('id', $id)
             ->orWhere('slug', $id)
             ->firstOrFail();
 
         Gate::authorize('update', $penggalang);
+
+        // Individual verification files and paths are not passed to the
+        // owner-facing edit view. Only the record identifiers needed to
+        // associate a replacement upload are selected.
+        if ($penggalang->isEntity()) {
+            $penggalang->load('penggalangDanaDokumen');
+        } else {
+            $penggalang->load(['penggalangDanaDokumen' => function ($query) {
+                $query->select(['id', 'penggalang_dana_id']);
+            }]);
+        }
 
         $categories = Penggalang_Dana::getCategoryLabels();
 
@@ -504,7 +514,9 @@ class PenggalangDanaController extends Controller
                 $data = [
                     'nama_dokumen' => $nama,
                     'file_dokumen' => $newPath,
-                    'is_public' => $document?->is_public ?? false,
+                    // Verification documents are always private, even
+                    // when replacing a legacy row previously marked public.
+                    'is_public' => false,
                     'storage_disk' => $newDisk,
                 ];
 
