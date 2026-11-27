@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class CampaignController extends Controller
@@ -261,11 +262,16 @@ class CampaignController extends Controller
             return redirect($campaign->public_url)
                 ->with('success', $message);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('Campaign creation failed.', [
+                'user_id' => auth()->id(),
+                'exception_class' => get_class($e),
+            ]);
+
             return back()
                 ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat membuat campaign. Silakan coba lagi atau hubungi admin.');
         }
     }
 
