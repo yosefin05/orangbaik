@@ -286,19 +286,7 @@
                                         <p class="reg-hint">PDF, JPG, atau PNG. Maksimal 5 MB.</p>
                                     </label>
 
-                                    <div class="reg-or">atau</div>
-
-                                    <label class="reg-field">
-                                        <span class="reg-label">Tempel Tautan</span>
-
-                                        <input type="url" name="file_dokumen[]" placeholder="https://drive.google.com/...">
-                                        <p class="reg-hint">Boleh pakai tautan Google Drive atau penyimpanan online lain.</p>
-                                    </label>
-
                                     @error('dokumen_files.0')
-                                        <small class="reg-error">{{ $message }}</small>
-                                    @enderror
-                                    @error('file_dokumen.0')
                                         <small class="reg-error">{{ $message }}</small>
                                     @enderror
                                 </div>
