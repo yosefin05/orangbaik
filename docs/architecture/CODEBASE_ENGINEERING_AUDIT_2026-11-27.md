@@ -33,11 +33,11 @@ A successful workflow is evidence for the checks actually executed by that workf
 
 **Recommendation:** keep only presence flags in the initial page response. If credential reveal is required, use a dedicated authenticated POST action with authorization, CSRF protection, no-store response headers, rate limiting and audit logging; do not include plaintext secrets in the initial HTML. Keep secret replacement separate from reveal. Add tests that assert secrets are absent from initial HTML and only returned through the guarded reveal flow.
 
-### P1 — Rich-text sanitization needs a vetted allowlist
+### P2 — Rich-text sanitizer needs focused regression coverage
 
-The audit review dated 23 November records that `App\\Support\\RichText::clean` relies on `strip_tags` and custom regular expressions while some content is rendered using raw Blade output. This is not a robust HTML sanitizer boundary.
+The current `App\\Support\\RichText` implementation uses `DOMDocument`, explicit allowed-tag and allowed-attribute lists, drops active-content elements, and restricts link/image URL schemes. This is materially stronger than the older 23 November audit description, which is now stale.
 
-**Recommendation:** adopt a maintained HTML sanitizer with explicit tag, attribute, and URL-scheme allowlists. Add regression tests for encoded and malformed URL schemes, event-handler attributes, SVG/MathML payloads, and nested markup before changing rendering behavior.
+**Recommendation:** retain the current allowlist boundary while adding/confirming regression tests for entity-encoded and malformed schemes, protocol-relative URLs, event-handler attributes, SVG/MathML payloads, nested malformed markup, and image source handling. Consider a maintained sanitizer package only after compatibility and behavior are compared; do not replace working sanitization blindly.
 
 ### P1 — Generic payment webhook must remain fail-closed
 
