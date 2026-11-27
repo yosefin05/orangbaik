@@ -12,30 +12,30 @@ users (1) ─────────── (0..1) penggalang_dana (1) ───
                                                              pembayaran (1)
 ```
 
----
-
 ## 2. Definisi Entitas & Aturan Bisnis
 
 ### A. Tabel `pembayaran`
-- **`transaction_status`**: Sumber kebenaran status pembayaran (`pending`, `settlement`, `failed`, `expired`).
-- **`payment_token`**: UUID acak untuk otorisasi guest donor tanpa mengekspos ID berurutan (mencegah IDOR).
-- **`bukti_transfer`**: Path file bukti transfer fisik (tersimpan di `storage/app/private/bukti-transfer/`).
-- **`paid_at`**: Timestamp resmi ketika status berubah menjadi `settlement`.
+- **`transaction_status`**: sumber status transaksi; status terminal dan aturan transisi harus mengikuti service pembayaran.
+- **`payment_token`**: UUID acak untuk otorisasi guest donor tanpa mengekspos ID berurutan.
+- **`bukti_transfer`**: path bukti transfer; file baru disimpan pada private storage.
+- **`paid_at`**: timestamp ketika pembayaran dikonfirmasi settlement.
 
 ### B. Tabel `donasi`
-- **`nominal`**: Nilai donasi yang disetorkan.
-- **`is_anonim`**: Boolean anonimitas donatur (nama ditampilkan sebagai "Hamba Allah" jika bernilai `true`).
-- **`fundraiser_id`**: Foreign key ke `campaign_fundraiser` jika donasi berasal dari referral relawan.
+- **`nominal`**: nilai donasi.
+- **`is_anonim`**: boolean anonimitas donatur.
+- **`fundraiser_id`**: foreign key ke fundraiser jika donasi berasal dari referral relawan.
 
 ### C. Tabel `campaign`
-- **`penggalang_dana_id`**: Relasi ke profil penggalang pemilik campaign.
-- **`target_donasi` & `minimal_donasi`**: Batasan nominal.
-- **`approval_status`**: Status persetujuan oleh admin (`pending`, `approved`, `rejected`) untuk tipe campaign `emergency` & `sustainable`.
-- **`is_active`**: Boolean visibilitas campaign.
+- **`penggalang_dana_id`**: FK ke profil penggalang pemilik campaign.
+- **`target_donasi` & `minimal_donasi`**: batas nominal campaign.
+- **`approval_status`**: status persetujuan sesuai jenis campaign dan policy.
+- **`is_active`**: status campaign aktif.
 
 ### D. Tabel `penggalang_dana_dokumen`
-- **`penggalang_dana_id`**: FK ke `penggalang_dana`.
-- **`nama_dokumen`**: Keterangan dokumen (e.g. "KTP", "Akta Pendirian").
-- **`file_dokumen`**: Path storage atau URL dokumen.
-- **`is_public`**: Boolean (default `false`). Dokumen individu selalu `false` (privat).
-- **`storage_disk`**: Disk penyimpanan dokumen (`private` vs `public`).
+- **`penggalang_dana_id`**: FK ke penggalang dana.
+- **`nama_dokumen`**: metadata jenis dokumen (misalnya KTP, akta, atau SK).
+- **`file_dokumen`**: path file atau referensi legacy; bukan URL publik yang boleh ditampilkan.
+- **`is_public`**: kolom legacy/kompatibilitas. Nilainya tidak memberikan hak akses publik dan tidak boleh dipakai untuk menampilkan file.
+- **`storage_disk`**: disk penyimpanan. Semua file verifikasi baru wajib menggunakan disk `private`.
+
+**Invariant privasi:** semua dokumen verifikasi, baik individu maupun organisasi, hanya dapat dibuka/diunduh oleh admin yang berwenang. Pemilik hanya melihat metadata/status verifikasi. Guest dan pengguna biasa tidak boleh mengakses file. Jangan menghapus kolom atau mengubah data legacy sebelum seluruh pemakaian, migrasi, dan foreign-key dependency diaudit.
