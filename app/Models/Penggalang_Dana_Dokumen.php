@@ -56,11 +56,9 @@ class Penggalang_Dana_Dokumen extends Model
             return true;
         }
 
-        if ($user && $this->penggalangDana && (int) $this->penggalangDana->user_id === (int) $user->id) {
-            return true;
-        }
-
-        return $this->isPublicForVisitor();
+        // Dokumen verifikasi hanya boleh dibuka admin. Pemilik tetap dapat
+        // melihat metadata/status melalui dashboard, bukan file identitas/legalitas.
+        return false;
     }
 
     /**
