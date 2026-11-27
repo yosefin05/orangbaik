@@ -57,7 +57,7 @@ class EmailVerificationTest extends TestCase
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
     }
-    public function test_registration_sends_verification_and_redirects_to_verification_screen(): void
+    public function test_registration_sends_verification_and_redirects_to_home(): void
     {
         Notification::fake();
 
@@ -71,7 +71,7 @@ class EmailVerificationTest extends TestCase
         $user = User::where('email', 'penggalang@example.test')->firstOrFail();
 
         $this->assertFalse($user->hasVerifiedEmail());
-        $response->assertRedirect(route('verification.notice'));
+        $response->assertRedirect(route('home'));
         Notification::assertSentTo(
             $user,
             VerifyEmail::class
