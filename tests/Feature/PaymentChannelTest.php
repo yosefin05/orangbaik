@@ -1156,7 +1156,7 @@ class PaymentChannelTest extends TestCase
                     [
                         'attribute' => 'sender_bank',
                         'code' => 'METHOD_NOT_ENABLED',
-                        'message' => 'Bank method unavailable for test@example.com, contact 08123456789.',
+                        'message' => 'Bank method unavailable for test@example.com, contact 08123456789, account 1234567890123456, token=FLIPSECRET123.',
                     ],
                 ],
             ], 422),
@@ -1182,7 +1182,11 @@ class PaymentChannelTest extends TestCase
                     && str_contains($providerMessage, '[redacted-email]')
                     && str_contains($providerMessage, '[redacted-phone]')
                     && !str_contains($providerMessage, 'test@example.com')
-                    && !str_contains($providerMessage, '08123456789');
+                    && !str_contains($providerMessage, '08123456789')
+                    && str_contains($providerMessage, '[redacted-number]')
+                    && str_contains($providerMessage, 'token=[redacted]')
+                    && !str_contains($providerMessage, '1234567890123456')
+                    && !str_contains($providerMessage, 'FLIPSECRET123');
             });
     }
 
