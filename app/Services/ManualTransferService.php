@@ -56,13 +56,14 @@ class ManualTransferService
         return DB::transaction(function () use ($pembayaran, $file): string {
             $lockedPayment = $this->lockPendingManualPayment($pembayaran);
 
-            // Hapus file lama jika ada (cek disk private dan public untuk data migrasi)
-            if ($lockedPayment->bukti_transfer) {
-                if (Storage::disk('private')->exists($lockedPayment->bukti_transfer)) {
-                    Storage::disk('private')->delete($lockedPayment->bukti_transfer);
-                } elseif (Storage::disk('public')->exists($lockedPayment->bukti_transfer)) {
-                    Storage::disk('public')->delete($lockedPayment->bukti_transfer);
-                }
+            // Only replace a prior private proof. Legacy public-disk proofs are
+            // retained until a separately backed-up and verified migration; never
+            // delete historical evidence as a side effect of a new upload.
+            if (
+                $lockedPayment->bukti_transfer &&
+                Storage::disk('private')->exists($lockedPayment->bukti_transfer)
+            ) {
+                Storage::disk('private')->delete($lockedPayment->bukti_transfer);
             }
 
             // Simpan file baru di private storage (tidak dapat diakses publik langsung)
