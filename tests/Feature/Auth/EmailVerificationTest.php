@@ -78,6 +78,16 @@ class EmailVerificationTest extends TestCase
         );
     }
 
+
+    public function test_unverified_regular_user_can_still_visit_home_and_donation_page(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)->get(route('home'))->assertOk();
+        $this->actingAs($user)->get(route('donasi'))->assertOk();
+    }
+
+
     public function test_unverified_user_can_request_a_new_verification_email(): void
     {
         Notification::fake();
