@@ -591,7 +591,6 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
 
     /**  */
     #[\PHPUnit\Framework\Attributes\Test]
-    #[\\PHPUnit\\Framework\\Attributes\\Test]
     public function midtrans_webhook_rejects_fractional_rupiah_amount_without_rounding()
     {
         $donasi = Donasi::create([
