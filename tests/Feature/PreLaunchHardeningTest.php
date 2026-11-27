@@ -252,6 +252,31 @@ class PreLaunchHardeningTest extends TestCase
 
     /**  */
     #[\PHPUnit\Framework\Attributes\Test]
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function referral_alias_cannot_activate_a_pending_campaign(): void
+    {
+        $pendingCampaign = $this->campaign->replicate();
+        $pendingCampaign->slug = 'pending-referral-' . uniqid();
+        $pendingCampaign->judul = 'Campaign Referral Menunggu Persetujuan';
+        $pendingCampaign->campaign_type = 'emergency';
+        $pendingCampaign->approval_status = 'pending';
+        $pendingCampaign->is_active = true;
+        $pendingCampaign->save();
+
+        \App\Models\Campaign_Fundraiser::create([
+            'campaign_id' => $pendingCampaign->id,
+            'user_id' => $this->user->id,
+            'referral_code' => 'REF-PENDING-TEST',
+            'alias' => 'relawan-pending-test',
+            'status' => 'active',
+        ]);
+
+        $response = $this->get(route('referral.track', 'relawan-pending-test'));
+
+        $response->assertNotFound();
+        $this->assertFalse(session()->has('campaign_referral.' . $pendingCampaign->id));
+    }
+
     public function approved_penggalang_can_access_penggalang_dashboard()
     {
         $response = $this->actingAs($this->user)
