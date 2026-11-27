@@ -31,7 +31,7 @@ A successful workflow is evidence for the checks actually executed by that workf
 
 The baseline `PaymentGatewayController::show()` passed decrypted credential values to the Blade view, where password inputs only masked the text visually. This audit branch now passes presence flags only. Saved credentials are requested through a separate admin-only POST endpoint protected by the existing `auth` + `admin` route group, CSRF, a six-requests-per-minute throttle, an explicit credential-key allowlist, no-store response headers, and an audit log entry that excludes the secret itself. The page's reveal control calls this endpoint only after an administrator explicitly requests the value.
 
-**Verification status:** feature tests now assert that secrets are absent from initial HTML, successful explicit reveal returns no-store headers, unknown keys are rejected, and non-admin users are denied. The latest full CI run for the test changes is in progress; do not mark this finding closed until that run passes.
+**Verification status:** feature tests assert that secrets are absent from initial HTML, successful explicit reveal returns no-store headers, unknown keys are rejected, and non-admin users are denied. CI run `46004895058` passed on code commit `0aea0c2`: 175 tests, 779 assertions; Composer install, strict PSR-4, Vite build, and dependency advisory audit also passed.
 
 ### P2 — Rich-text sanitizer needs focused regression coverage
 
@@ -62,7 +62,7 @@ The current `Penggalang_Dana_Dokumen::canBeAccessedBy()` permits administrators 
 
 The baseline `MidtransService::handleWebhook()` merged the full provider callback payload into `pembayaran.gateway_response`, which could persist unnecessary donor/provider fields and the signature. This audit branch now stores a minimal `last_midtrans_callback` allowlist (status, fraud status, payment type, transaction ID, gross amount, receive time) and preserves existing internal gateway metadata. The feature test was extended to ensure arbitrary customer/card-token fields and the signature are not persisted.
 
-**Verification status:** change committed to the audit branch; the full Laravel workflow for the latest commit is running. Do not treat this finding as closed until that exact run passes.
+**Verification status:** change committed to the audit branch; CI run `46004895058` passed on code commit `0aea0c2` with 175 tests and 779 assertions, including the callback persistence regression.
 
 ### P1 — Generic API driver disabled until provider security contract exists
 
@@ -70,7 +70,7 @@ The previous `GenericApiDriver` accepted arbitrary callback status values and co
 
 This audit branch changes the placeholder to fail closed: `isConfigured()` returns false, transaction creation throws a clear `LogicException`, and webhook handling always rejects. A feature test covers the disabled state and forged settlement callback.
 
-**Verification status:** change committed to the audit branch; exact latest-commit CI must pass before merge. Re-enable only by implementing a concrete provider adapter with signature/token verification, amount integrity, idempotency, and status-transition tests.
+**Verification status:** change committed to the audit branch; CI run `46004895058` passed on code commit `0aea0c2` with 175 tests and 779 assertions. Re-enable only by implementing a concrete provider adapter with signature/token verification, amount integrity, idempotency, and status-transition tests.
 
 ### P2 — Webhook routes have legacy aliases and multiple orchestration paths
 
@@ -160,10 +160,10 @@ The repository tree alone does not prove that every view is correctly classified
 
 ## Required verification gates before release
 
-- [x] Full Laravel test suite on audit branch commit `15943e8` (run 45998143618): success, including strict PSR-4, frontend build, dependency advisory audit, and complete Laravel suite. Re-run after any further code changes.
-- [ ] Strict optimized Composer PSR-4 autoload check.
-- [ ] Composer and npm dependency audits reviewed; no untriaged high/critical advisories.
-- [ ] Frontend production build and manifest verification.
+- [x] Full Laravel test suite on audit branch code commit `0aea0c2` (run `46004895058`): **175 passed, 779 assertions**.
+- [x] Strict optimized Composer PSR-4 autoload check.
+- [x] Composer and npm dependency advisory audits completed by CI; review any new advisory before release.
+- [x] Frontend production build completed by CI.
 - [ ] PHP syntax check and route registration/cache check.
 - [ ] Database migration dry-run/rehearsal against a disposable DB matching target engine/version.
 - [ ] Authorization tests for guest, ordinary user, fundraiser, document owner, and admin.
@@ -175,6 +175,6 @@ The repository tree alone does not prove that every view is correctly classified
 
 ## Current decision
 
-**Codebase cleanup: IN PROGRESS. Latest audit branch CI: PASSED on `15943e8`. Release decision: NOT YET APPROVED.**
+**Codebase cleanup: IN PROGRESS. Latest code CI: PASSED on `0aea0c2` (175 tests, 779 assertions). Release decision: NOT YET APPROVED.**
 
-The baseline main test and staging deployment workflows succeeded, but the P1 findings and unverified operational gates above remain. This audit branch is a review boundary; merge only after each change is implemented, tested, and reviewed. No production change is authorized by this document.
+The baseline main test and staging deployment workflows succeeded. The current audit branch adds further regression coverage, but legacy public proof inventory/migration, phone normalization preflight, route/cache checks, browser QA, staging operational verification, and backup/rollback rehearsal remain open. This audit branch is a review boundary; merge only after each change is implemented, tested, and reviewed. No production change is authorized by this document.
