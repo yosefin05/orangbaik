@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\ManualTransferService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class DonasiController extends Controller
@@ -149,7 +150,12 @@ class DonasiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menambahkan donasi: ' . $e->getMessage());
+            Log::error('Admin donation creation failed.', [
+                'exception_class' => get_class($e),
+                'admin_id' => auth()->id(),
+            ]);
+
+            return back()->with('error', 'Gagal menambahkan donasi. Silakan coba lagi.');
         }
     }
 
@@ -289,7 +295,13 @@ class DonasiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal mengupdate donasi: ' . $e->getMessage());
+            Log::error('Admin donation update failed.', [
+                'exception_class' => get_class($e),
+                'admin_id' => auth()->id(),
+                'donasi_id' => $donasi->id,
+            ]);
+
+            return back()->with('error', 'Gagal memperbarui donasi. Silakan coba lagi.');
         }
     }
 
