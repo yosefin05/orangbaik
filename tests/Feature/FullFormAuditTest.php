@@ -39,6 +39,7 @@ class FullFormAuditTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public');
+        Storage::fake('private');
 
         $this->user = User::factory()->create([
             'role' => 'user',
