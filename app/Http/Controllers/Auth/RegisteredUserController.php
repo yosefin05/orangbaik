@@ -65,7 +65,10 @@ class RegisteredUserController extends Controller
         try {
             event(new Registered($user));
         } catch (\Throwable $e) {
-            Log::warning('Email verification event skipped or failed: ' . $e->getMessage());
+            Log::warning('Email verification notification could not be dispatched during registration.', [
+                'user_id' => $user->getKey(),
+                'exception_class' => get_class($e),
+            ]);
         }
 
         // Langsung autentikasi pengguna
@@ -75,6 +78,6 @@ class RegisteredUserController extends Controller
         $request->session()->regenerate();
 
         // Redirect langsung ke beranda tanpa harus login ulang
-        return redirect()->route('home')->with('success', 'Registrasi berhasil! Selamat datang di OrangBaik.id.');
+        return redirect()->route('verification.notice')->with('success', 'Registrasi berhasil. Silakan verifikasi email untuk mengaktifkan fitur penggalangan dana. Jika email belum masuk, gunakan tombol kirim ulang.');
     }
 }
