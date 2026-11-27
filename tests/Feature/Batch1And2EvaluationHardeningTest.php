@@ -55,7 +55,7 @@ class Batch1And2EvaluationHardeningTest extends TestCase
     }
 
     /**
-     * 1. Test Registrasi Auto-Login dan Redirect Verifikasi Email
+     * 1. Test Registrasi Auto-Login dan Redirect Beranda
      */
     public function test_user_registration_auto_logins_and_redirects_to_home(): void
     {
@@ -67,7 +67,7 @@ class Batch1And2EvaluationHardeningTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('verification.notice'));
+        $response->assertRedirect(route('home'));
         $this->assertDatabaseHas('users', [
             'email' => 'teladan@example.com',
             'name'  => 'Donatur Teladan',
