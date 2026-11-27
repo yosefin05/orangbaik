@@ -142,4 +142,43 @@ class FundraiserDocumentPrivacyTest extends TestCase
         $this->assertStringContainsString('no-store', $cacheControl);
     }
 
+    public function test_owner_edit_forms_never_render_verification_document_names_or_paths(): void
+    {
+        Storage::fake('private');
+
+        foreach (['organisasi', 'individu'] as $category) {
+            $owner = User::factory()->create();
+            $fundraiser = Penggalang_Dana::create([
+                'user_id' => $owner->id,
+                'jenis_penggalang' => $category,
+                'foto_profil' => 'profile.jpg',
+                'nama_penggalang' => 'Profil ' . ucfirst($category),
+                'alamat' => 'Sidoarjo',
+                'deskripsi' => 'Profil pengujian privasi dokumen.',
+                'email' => 'edit-privacy-' . $owner->id . '@example.test',
+                'no_telepon' => '08123456789',
+                'status' => 'approved',
+            ]);
+
+            $secretName = 'NAMA DOKUMEN RAHASIA ' . strtoupper($category);
+            $secretPath = 'dokumen_penggalang/' . $fundraiser->id . '/private-' . $category . '-path.pdf';
+            Storage::disk('private')->put($secretPath, 'private document fixture');
+
+            Penggalang_Dana_Dokumen::create([
+                'penggalang_dana_id' => $fundraiser->id,
+                'nama_dokumen' => $secretName,
+                'file_dokumen' => $secretPath,
+                'is_public' => false,
+                'storage_disk' => 'private',
+            ]);
+
+            $response = $this->actingAs($owner)->get(route('penggalang_dana.edit', $fundraiser->id));
+
+            $response->assertOk()
+                ->assertDontSee($secretName)
+                ->assertDontSee($secretPath)
+                ->assertSee($category === 'organisasi' ? 'Dokumen Legalitas 1' : 'Dokumen Identitas');
+        }
+    }
+
 }
