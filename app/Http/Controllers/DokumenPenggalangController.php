@@ -14,8 +14,8 @@ class DokumenPenggalangController extends Controller
      * Endpoint terproteksi untuk melihat/mengunduh dokumen penggalang dana.
      * Otorisasi ketat:
      * - Admin: Boleh akses semua dokumen.
-     * - Pemilik Penggalang Dana: Hanya boleh akses dokumen miliknya.
-     * - Publik/Guest: HANYA dokumen organisasi yang explicitly publik. KTP/Individu DITOLAK (403).
+     * - Admin: Boleh akses semua dokumen verifikasi.
+     * - Pemilik, pengguna lain, dan publik/guest: Tidak boleh mengakses file dokumen.
      */
     public function show(Request $request, $id)
     {
@@ -24,7 +24,7 @@ class DokumenPenggalangController extends Controller
 
         // Verifikasi hak akses
         if (!$dokumen->canBeAccessedBy($user)) {
-            abort(Response::HTTP_FORBIDDEN, 'Akses ditolak: Dokumen ini bersifat privat dan hanya dapat diakses oleh pemilik atau administrator.');
+            abort(Response::HTTP_FORBIDDEN, 'Akses ditolak: Dokumen verifikasi hanya dapat diakses administrator.');
         }
 
         $filePath = $dokumen->file_dokumen;
