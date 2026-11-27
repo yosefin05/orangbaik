@@ -57,22 +57,6 @@ jobs:
               exit 1
             fi
 
-            # Run Laravel CLI as the web-server account when deploy-user permissions
-            # do not allow writes to Laravel's runtime/cache directories.
-            if [ -w bootstrap/cache ] && [ -w storage/framework ] && [ -w storage/logs ]; then
-              ARTISAN_MODE="deploy-user"
-              run_artisan() { LOG_CHANNEL=stderr php artisan "$@"; }
-            elif command -v sudo >/dev/null 2>&1 && sudo -n -u www test -w bootstrap/cache && sudo -n -u www test -w storage/framework && sudo -n -u www test -w storage/logs; then
-              ARTISAN_MODE="www"
-              run_artisan() { sudo -n -u www env LOG_CHANNEL=stderr php artisan "$@"; }
-            else
-              echo "No safe write access to Laravel runtime directories. Refusing to alter the active release."
-              id
-              stat -c '%U:%G %a %n' bootstrap/cache storage storage/framework storage/logs || true
-              exit 1
-            fi
-            echo "Laravel CLI execution account: $ARTISAN_MODE"
-
             COMPOSER_PHAR="/tmp/composer-2.11.3-${{ github.sha }}.phar"
             curl --fail --silent --show-error https://getcomposer.org/download/2.11.3/composer.phar --output "$COMPOSER_PHAR"
             EXPECTED_COMPOSER_SHA256="04f8b003da4e3a2459056591fbfebd02b4dc3e5adeb158616b90cf55a65113ec"
@@ -86,22 +70,61 @@ jobs:
 
             BUILD_STAGE="/tmp/orangbaik-build-${{ github.sha }}"
             PREVIOUS_BUILD="storage/app/deploy-build-previous-${{ github.sha }}"
+            REPAIR_NAME="__orangbaik_repair_${{ github.sha }}.php"
+            REPAIR_SCRIPT="public/$REPAIR_NAME"
+            REPAIR_TOKEN="$(php -r 'echo bin2hex(random_bytes(32));')"
             PREVIOUS_COMMIT="$(git rev-parse HEAD)"
             BUILD_SWAPPED=0
+            REPAIR_CREATED=0
 
             if [ ! -f "$BUILD_STAGE/manifest.json" ]; then
               echo "Frontend build artifact is missing; refusing deployment."
               exit 1
             fi
 
+            clear_laravel_runtime_cache() {
+              # Temporary token-protected PHP endpoint runs as PHP-FPM's own
+              # www account, which owns bootstrap/cache and storage directories.
+              cat > "$REPAIR_SCRIPT" <<PHP
+            <?php
+            declare(strict_types=1);
+            if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || !hash_equals('$REPAIR_TOKEN', (string) ($_POST['token'] ?? ''))) {
+                http_response_code(404);
+                exit;
+            }
+            $cacheDir = dirname(__DIR__) . '/bootstrap/cache';
+            $names = ['packages.php', 'services.php', 'config.php', 'routes-v7.php', 'events.php'];
+            $cleared = [];
+            $failed = [];
+            foreach ($names as $name) {
+                $path = $cacheDir . '/' . $name;
+                if (is_file($path)) {
+                    if (@unlink($path)) { $cleared[] = $name; } else { $failed[] = $name; }
+                }
+            }
+            if (function_exists('opcache_reset')) { @opcache_reset(); }
+            header('Content-Type: application/json');
+            echo json_encode(['cleared' => $cleared, 'failed' => $failed], JSON_THROW_ON_ERROR);
+            PHP
+              chmod 0644 "$REPAIR_SCRIPT"
+              REPAIR_CREATED=1
+              RESPONSE="$(curl --fail --silent --show-error --max-time 30 -X POST --data-urlencode "token=$REPAIR_TOKEN" "https://staging.orangbaik.id/$REPAIR_NAME")"
+              echo "Laravel cache repair response: $RESPONSE"
+              case "$RESPONSE" in
+                *'"failed":[]'*) ;;
+                *) echo "Laravel cache repair did not clear all requested manifests."; return 1 ;;
+              esac
+              rm -f "$REPAIR_SCRIPT"
+              REPAIR_CREATED=0
+            }
+
             rollback_on_failure() {
               status=$?
               if [ "$status" -ne 0 ]; then
-                echo "Deployment failed; restoring previous code and frontend assets."
+                echo "Deployment failed; restoring previous code, dependencies, and frontend assets."
                 git reset --hard "$PREVIOUS_COMMIT" || true
                 php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts || true
-                rm -f bootstrap/cache/packages.php bootstrap/cache/services.php || true
-                run_artisan optimize:clear || true
+                clear_laravel_runtime_cache || true
 
                 if [ "$BUILD_SWAPPED" -eq 1 ]; then
                   rm -rf public/build
@@ -110,6 +133,7 @@ jobs:
                   fi
                 fi
               fi
+              if [ "$REPAIR_CREATED" -eq 1 ]; then rm -f "$REPAIR_SCRIPT" || true; fi
               rm -rf "$BUILD_STAGE" || true
               rm -f "$COMPOSER_PHAR" || true
               exit "$status"
@@ -126,12 +150,9 @@ jobs:
               exit 1
             fi
 
-            # Production install must not run Laravel package discovery while
-            # stale manifests still reference dev-only providers such as Pail.
+            # Do not run Composer's Laravel scripts here: production excludes
+            # dev-only Pail, and old package manifests may still reference it.
             php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
-
-            rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
-            run_artisan package:discover --ansi
 
             mkdir -p storage/app
             if [ -d public/build ]; then
@@ -141,14 +162,14 @@ jobs:
             mkdir -p public/build
             cp -a "$BUILD_STAGE/." public/build/
 
-            run_artisan optimize:clear
-            run_artisan config:cache
-            run_artisan view:cache
+            clear_laravel_runtime_cache
 
-            curl --fail --silent --show-error https://staging.orangbaik.id/up --output /dev/null
-            curl --fail --silent --show-error https://staging.orangbaik.id/ --output /dev/null
+            # First request rebuilds Laravel package manifests as the web user;
+            # verify both the framework health endpoint and the actual homepage.
+            curl --fail --silent --show-error --max-time 45 https://staging.orangbaik.id/up --output /dev/null
+            curl --fail --silent --show-error --max-time 45 https://staging.orangbaik.id/ --output /dev/null
 
             trap - EXIT
             rm -rf "$BUILD_STAGE" "$PREVIOUS_BUILD" || true
-            rm -f "$COMPOSER_PHAR" || true
-            echo "Staging deployed and Laravel health endpoint plus homepage returned HTTP success at $DEPLOYED_COMMIT"
+            rm -f "$COMPOSER_PHAR" "$REPAIR_SCRIPT" || true
+            echo "Staging deployed and health endpoint plus homepage returned HTTP success at $DEPLOYED_COMMIT"
