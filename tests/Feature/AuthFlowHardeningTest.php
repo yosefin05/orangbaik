@@ -11,7 +11,7 @@ class AuthFlowHardeningTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_can_register_and_is_redirected_to_email_verification(): void
+    public function test_user_can_register_and_is_redirected_to_home(): void
     {
         $email = 'donatur_baru_' . uniqid() . '@example.com';
 
@@ -22,7 +22,7 @@ class AuthFlowHardeningTest extends TestCase
             'password_confirmation' => 'Password123!',
         ]);
 
-        $response->assertRedirect(route('verification.notice'));
+        $response->assertRedirect(route('home'));
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => $email,
