@@ -259,8 +259,11 @@
                             ] as $key => $labelText)
                                 <div class="payment-field">
                                     <label for="{{ $key }}">{{ $labelText }}</label>
-                                    <input id="{{ $key }}" name="{{ $key }}" type="password" class="form-control" autocomplete="new-password" placeholder="{{ $credentialFlags[$key] ? 'Tersimpan aman — isi hanya untuk mengganti' : 'Masukkan ' . $labelText }}" value="">
-                                    <small>{{ $credentialFlags[$key] ? 'Kredensial sudah tersimpan dan tidak ditampilkan kembali.' : 'Belum ada kredensial tersimpan.' }}</small>
+                                    <div class="payment-secret-control">
+                                        <input id="{{ $key }}" name="{{ $key }}" type="password" class="form-control" autocomplete="off" value="{{ $credentialValues[$key] ?? '' }}" placeholder="Masukkan {{ $labelText }}">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle-secret="{{ $key }}" aria-label="Tampilkan {{ $labelText }}"><i class="bi bi-eye"></i></button>
+                                    </div>
+                                    <small>{{ $credentialFlags[$key] ? 'Nilai tersimpan. Gunakan tombol mata untuk melihat atau menyembunyikannya.' : 'Belum ada kredensial tersimpan.' }}</small>
                                 </div>
                             @endforeach
                         </div>
@@ -284,8 +287,11 @@
                             ] as $key => $labelText)
                                 <div class="payment-field">
                                     <label for="{{ $key }}">{{ $labelText }}</label>
-                                    <input id="{{ $key }}" name="{{ $key }}" type="password" class="form-control" autocomplete="new-password" placeholder="{{ $credentialFlags[$key] ? 'Tersimpan aman — isi hanya untuk mengganti' : 'Masukkan ' . $labelText }}" value="">
-                                    <small>{{ $credentialFlags[$key] ? 'Kredensial sudah tersimpan dan tidak ditampilkan kembali.' : 'Belum ada kredensial tersimpan.' }}</small>
+                                    <div class="payment-secret-control">
+                                        <input id="{{ $key }}" name="{{ $key }}" type="password" class="form-control" autocomplete="off" value="{{ $credentialValues[$key] ?? '' }}" placeholder="Masukkan {{ $labelText }}">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle-secret="{{ $key }}" aria-label="Tampilkan {{ $labelText }}"><i class="bi bi-eye"></i></button>
+                                    </div>
+                                    <small>{{ $credentialFlags[$key] ? 'Nilai tersimpan. Gunakan tombol mata untuk melihat atau menyembunyikannya.' : 'Belum ada kredensial tersimpan.' }}</small>
                                 </div>
                             @endforeach
                         </div>
@@ -312,6 +318,21 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('click', function (event) {
+    const button = event.target.closest('[data-toggle-secret]');
+    if (!button) return;
+    const input = document.getElementById(button.dataset.toggleSecret);
+    if (!input) return;
+    const reveal = input.type === 'password';
+    input.type = reveal ? 'text' : 'password';
+    button.innerHTML = reveal ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+    button.setAttribute('aria-label', (reveal ? 'Sembunyikan ' : 'Tampilkan ') + button.dataset.toggleSecret);
+});
+</script>
+@endpush
 
 @push('styles')
 <style>
@@ -341,6 +362,9 @@
 .payment-panel__heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
 .payment-panel__heading h2{font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0;color:var(--pd-ink)}
 .payment-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}
+.payment-secret-control{display:flex;align-items:stretch;gap:7px}
+.payment-secret-control .form-control{min-width:0;flex:1}
+.payment-secret-control .btn{flex:none;min-width:42px}
 .payment-field{min-width:0}
 .payment-field--full{grid-column:1/-1}
 .payment-field>label{display:block;font-size:12px;font-weight:650;color:#344054;margin-bottom:7px}

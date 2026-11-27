@@ -316,9 +316,7 @@
                                                 {{ $isPending ? 'disabled' : '' }}>
                                             <small class="field-help">Gunakan tautan Google Drive atau penyimpanan online lain.</small>
                                             @if($dokumen)
-                                                <a class="verify-document-link" href="{{ $dokumen->secure_view_url }}" target="_blank" rel="noopener noreferrer">
-                                                    <i class="bi bi-file-earmark-text"></i> Lihat dokumen tersimpan
-                                                </a>
+                                                <small class="field-help"><i class="bi bi-lock-fill"></i> Dokumen tersimpan; file hanya dapat diperiksa admin.</small>
                                             @endif
                                         </label>
 

@@ -62,8 +62,6 @@ Route::middleware(['auth', 'admin'])
             ->name('penggalang_dana.verify');
         Route::patch('/penggalang_dana/{penggalangDana}/unverify', [PenggalangDanaController::class, 'unverify'])
             ->name('penggalang_dana.unverify');
-        Route::patch('/penggalang_dana/dokumen/{dokumen}/toggle-public', [PenggalangDanaController::class, 'toggleDokumenPublic'])
-            ->name('penggalang_dana.dokumen.toggle_public');
 
         // ==================== CAMPAIGN ROUTES ===================
         Route::prefix('campaign')->name('campaign.')->group(function () {
@@ -106,7 +104,7 @@ Route::middleware(['auth', 'admin'])
         Route::patch('donasi/{donasi}/approve-manual', [DonasiController::class, 'approveManual'])->name('donasi.approve-manual');
         Route::patch('donasi/{donasi}/reject-manual', [DonasiController::class, 'rejectManual'])->name('donasi.reject-manual');
         Route::patch('donasi/{donasi}/expire-manual', [DonasiController::class, 'expireManual'])->name('donasi.expire-manual');
-        Route::resource('donasi', DonasiController::class)->only(['index', 'show']);
+        Route::resource('donasi', DonasiController::class)->only(['index', 'show', 'destroy']);
 
         // ==================== PAYMENT MANAGEMENT ====================
         Route::prefix('payment')->name('payment.')->group(function () {
