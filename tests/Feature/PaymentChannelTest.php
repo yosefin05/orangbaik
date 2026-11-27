@@ -328,6 +328,46 @@ class PaymentChannelTest extends TestCase
         $this->assertEquals('pending', $pembayaran->fresh()->transaction_status);
     }
 
+    public function test_flip_webhook_rejects_fractional_rupiah_amount_without_truncating(): void
+    {
+        Config::set('payment.flip.webhook_token', 'test-flip-token');
+
+        $donasi = $this->createDonasi();
+        $channel = PaymentChannel::where('payment_gateway_id', PaymentGateway::where('code', 'flip')->first()->id)->firstOrFail();
+        $flipId = '2502091430251230010';
+        $paymentId = 'PGPWF10117309708599318554';
+        $orderId = 'OB-FLIP-FRACTION-' . uniqid();
+
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'order_id' => $orderId,
+            'transaction_id' => $flipId,
+            'payment_type' => 'va',
+            'transaction_status' => 'pending',
+            'gateway_response' => [
+                'credential_mode' => 'sandbox',
+                'link_id' => $flipId,
+                'flip_payment_id' => $paymentId,
+                'unique_code' => 0,
+            ],
+        ]);
+
+        $result = (new FlipService())->handleWebhook('test-flip-token', [
+            'data' => json_encode([
+                'id' => $paymentId,
+                'bill_link_id' => $flipId,
+                'reference_id' => $orderId,
+                'amount' => '50000.99',
+                'status' => 'SUCCESSFUL',
+            ]),
+        ]);
+
+        $this->assertFalse($result);
+        $this->assertSame('pending', $pembayaran->fresh()->transaction_status);
+        $this->assertNull($pembayaran->fresh()->paid_at);
+    }
+
     public function test_flip_webhook_rejects_settlement_amount_mismatch(): void
     {
         Config::set('payment.flip.webhook_token', 'test-flip-token');
