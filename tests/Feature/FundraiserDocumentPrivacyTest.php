@@ -133,13 +133,9 @@ class FundraiserDocumentPrivacyTest extends TestCase
         $this->actingAs($owner)->get(route('dokumen.show', $document->id))->assertForbidden();
         $this->actingAs($otherUser)->get(route('dokumen.show', $document->id))->assertForbidden();
 
-        $adminResponse = $this->actingAs($admin)->get(route('dokumen.show', $document->id));
-        $adminResponse->assertOk()
-            ->assertHeader('X-Content-Type-Options', 'nosniff');
-
-        $cacheControl = strtolower((string) $adminResponse->headers->get('Cache-Control'));
-        $this->assertStringContainsString('private', $cacheControl);
-        $this->assertStringContainsString('no-store', $cacheControl);
+        // Legacy public-disk documents remain unavailable even to admins until
+        // they have been safely migrated into private storage.
+        $this->actingAs($admin)->get(route('dokumen.show', $document->id))->assertNotFound();
     }
 
     public function test_owner_edit_forms_never_render_verification_document_names_or_paths(): void
