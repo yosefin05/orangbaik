@@ -130,7 +130,7 @@ The repository tree alone does not prove that every view is correctly classified
 
 ## Required verification gates before release
 
-- [ ] Full Laravel test suite on the exact candidate commit, with warnings treated as failures.
+- [x] Full Laravel test suite on audit branch commit `15943e8` (run 45998143618): success, including strict PSR-4, frontend build, dependency advisory audit, and complete Laravel suite. Re-run after any further code changes.
 - [ ] Strict optimized Composer PSR-4 autoload check.
 - [ ] Composer and npm dependency audits reviewed; no untriaged high/critical advisories.
 - [ ] Frontend production build and manifest verification.
@@ -145,6 +145,6 @@ The repository tree alone does not prove that every view is correctly classified
 
 ## Current decision
 
-**Codebase cleanup: IN PROGRESS. Release decision: NOT YET APPROVED.**
+**Codebase cleanup: IN PROGRESS. Latest audit branch CI: PASSED on `15943e8`. Release decision: NOT YET APPROVED.**
 
 The baseline main test and staging deployment workflows succeeded, but the P1 findings and unverified operational gates above remain. This audit branch is a review boundary; merge only after each change is implemented, tested, and reviewed. No production change is authorized by this document.
