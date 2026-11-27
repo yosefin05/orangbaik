@@ -566,6 +566,8 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
             'transaction_status' => 'settlement',
             'payment_type'       => 'gopay',
             'transaction_id'     => 'TRX-MID-001',
+            'customer_email'     => 'private-donor@example.test',
+            'card_token'         => 'SENSITIVE-CARD-TOKEN-SHOULD-NOT-PERSIST',
         ];
 
         $response = $this->postJson(route('payment.midtrans.webhook'), $payload);
@@ -576,6 +578,11 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
         $pembayaran->refresh();
         $this->assertEquals('settlement', $pembayaran->transaction_status);
         $this->assertNotNull($pembayaran->paid_at);
+        $storedCallback = data_get($pembayaran->gateway_response, 'last_midtrans_callback', []);
+        $this->assertSame('settlement', $storedCallback['transaction_status'] ?? null);
+        $this->assertArrayNotHasKey('signature_key', $storedCallback);
+        $this->assertArrayNotHasKey('customer_email', $pembayaran->gateway_response ?? []);
+        $this->assertArrayNotHasKey('card_token', $pembayaran->gateway_response ?? []);
 
         // Campaign totals must increase by exactly 150.000
         $this->assertEquals(150000, $this->campaign->getTotalDonasiSuccess());
