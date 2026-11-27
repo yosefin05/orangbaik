@@ -128,4 +128,30 @@ class EmailVerificationTest extends TestCase
             ->assertOk();
     }
 
+
+    public function test_unverified_user_cannot_manage_fundraiser_profile(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)
+            ->get('/penggalang/123/edit')
+            ->assertRedirect(route('verification.notice'));
+
+        $this->actingAs($user)
+            ->patch('/penggalang/123', [])
+            ->assertRedirect(route('verification.notice'));
+
+        $this->actingAs($user)
+            ->delete('/penggalang/123/dokumen', [])
+            ->assertRedirect(route('verification.notice'));
+
+        $this->actingAs($user)
+            ->get(route('penggalang_dana.rejected'))
+            ->assertRedirect(route('verification.notice'));
+
+        $this->actingAs($user)
+            ->patch('/penggalang-dana/123/resubmit', [])
+            ->assertRedirect(route('verification.notice'));
+    }
+
 }
