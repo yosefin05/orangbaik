@@ -126,8 +126,8 @@ Route::get('/dokumen-penggalang/{id}', [DokumenPenggalangController::class, 'sho
 Route::middleware('auth')->group(function () {
 
     // Dashboard Penggalang Dana
-    Route::get('/penggalang/dashboard', [PenggalangDashboardController::class, 'index'])->name('penggalang.dashboard');
-    Route::get('/fundraiser/dashboard', [FundraiserDashboardController::class, 'index'])->name('fundraiser.dashboard');
+    Route::get('/penggalang/dashboard', [PenggalangDashboardController::class, 'index'])->middleware('verified')->name('penggalang.dashboard');
+    Route::get('/fundraiser/dashboard', [FundraiserDashboardController::class, 'index'])->middleware('verified')->name('fundraiser.dashboard');
 
     // Set intended URL
     Route::post('/set-intended-url', function (Request $request) {
@@ -137,13 +137,16 @@ Route::middleware('auth')->group(function () {
 
     // Penggalang Dana (CRUD)
     Route::get('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'createOrganisasi'])
+        ->middleware('verified')
         ->name('penggalang_dana.organisasi.create');
     Route::post('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'storeOrganisasi'])
+        ->middleware('verified')
         ->name('penggalang_dana.organisasi.store');
     Route::get('/verifikasi-penggalang', function () {
         return view('pages.penggalang_dana.create_individu');
-    })->name('verifikasi.penggalang');
+    })->middleware('verified')->name('verifikasi.penggalang');
     Route::post('/verifikasi-penggalang', [PenggalangDanaController::class, 'storeIndividu'])
+        ->middleware('verified')
         ->name('penggalang_dana.individu.store');
     Route::get('/penggalang/{id}/edit', [PenggalangDanaController::class, 'edit'])
         ->name('penggalang_dana.edit');
