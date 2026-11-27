@@ -171,6 +171,29 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
+    public function fundraiser_cannot_join_a_campaign_pending_admin_approval(): void
+    {
+        $pendingCampaign = $this->campaign->replicate();
+        $pendingCampaign->slug = 'pending-fundraiser-' . uniqid();
+        $pendingCampaign->judul = 'Campaign Menunggu Persetujuan';
+        $pendingCampaign->campaign_type = 'emergency';
+        $pendingCampaign->approval_status = 'pending';
+        $pendingCampaign->is_active = true;
+        $pendingCampaign->save();
+
+        $response = $this->actingAs($this->user)
+            ->post(route('fundraiser.store', $pendingCampaign->slug), [
+                'alias' => 'relawan-uji',
+            ]);
+
+        $response->assertNotFound();
+        $this->assertDatabaseMissing('campaign_fundraiser', [
+            'campaign_id' => $pendingCampaign->id,
+            'user_id' => $this->user->id,
+        ]);
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
     public function pending_emergency_campaign_cannot_be_opened_by_direct_public_url(): void
     {
         $pendingCampaign = $this->campaign->replicate();
