@@ -145,4 +145,63 @@ class ManualTransferExpirationTest extends TestCase
             ->patch(route('admin.donasi.expire-manual', $donasi->id))
             ->assertForbidden();
     }
+
+    public function test_admin_can_delete_failed_or_expired_donation_and_related_payment(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $donasi = $this->createDonation();
+        $payment = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'order_id' => 'OB-DELETE-FAILED-' . $donasi->id,
+            'transaction_status' => 'failed',
+        ]);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.donasi.destroy', $donasi->id))
+            ->assertRedirect(route('admin.donasi.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('donasi', ['id' => $donasi->id]);
+        $this->assertDatabaseMissing('pembayaran', ['id' => $payment->id]);
+    }
+
+    public function test_admin_cannot_delete_pending_or_settled_donation(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        foreach (['pending', 'settlement'] as $status) {
+            $donasi = $this->createDonation();
+            Pembayaran::create([
+                'donasi_id' => $donasi->id,
+                'order_id' => 'OB-DELETE-' . strtoupper($status) . '-' . $donasi->id,
+                'transaction_status' => $status,
+                'paid_at' => $status === 'settlement' ? now() : null,
+            ]);
+
+            $this->actingAs($admin)
+                ->delete(route('admin.donasi.destroy', $donasi->id))
+                ->assertRedirect(route('admin.donasi.index'))
+                ->assertSessionHas('error');
+
+            $this->assertDatabaseHas('donasi', ['id' => $donasi->id]);
+        }
+    }
+
+    public function test_non_admin_cannot_delete_donation(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $donasi = $this->createDonation();
+        Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'order_id' => 'OB-DELETE-AUTH-' . $donasi->id,
+            'transaction_status' => 'failed',
+        ]);
+
+        $this->actingAs($user)
+            ->delete(route('admin.donasi.destroy', $donasi->id))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('donasi', ['id' => $donasi->id]);
+    }
+
 }
