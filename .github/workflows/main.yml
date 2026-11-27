@@ -107,7 +107,7 @@ jobs:
                     foreach (array_reverse($lines ?: []) as $line) {
                         if (preg_match('/\\.(?:ERROR|CRITICAL):\\s*([^\\r\\n]+)/', $line, $match)) {
                             $summary = preg_replace('/\\s*\\{.*$/', '', $match[1]);
-                            $summary = preg_replace('/(?:password|token|secret|api[_-]?key)\\s*[:=]\\s*[^, ]+/i', '$1=[redacted]', $summary);
+                            $summary = preg_replace('/(password|token|secret|api[_-]?key)\\s*[:=]\\s*[^, ]+/i', '$1=[redacted]', $summary);
                             $summary = substr($summary, 0, 240);
                             break;
                         }
