@@ -1133,4 +1133,30 @@ class PaymentChannelTest extends TestCase
     }
 
 
+
+    public function test_private_transfer_proof_response_is_not_cacheable_and_has_security_headers(): void
+    {
+        Storage::fake('private');
+
+        $donasi = $this->createDonasi();
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+
+        $service = new ManualTransferService();
+        $payment = $service->createTransaction($donasi, $manualChannel);
+        $service->saveBuktiTransfer($payment, UploadedFile::fake()->image('private-proof.jpg'));
+
+        $this->actingAs($donasi->user)
+            ->get(route('donasi.bayar.bukti_transfer', $payment->id))
+            ->assertOk()
+            ->assertHeader('Cache-Control', 'private, no-store, max-age=0, must-revalidate')
+            ->assertHeader('Pragma', 'no-cache')
+            ->assertHeader('X-Content-Type-Options', 'nosniff')
+            ->assertHeader('X-Frame-Options', 'DENY')
+            ->assertHeader('Referrer-Policy', 'no-referrer');
+    }
+
+
 }
