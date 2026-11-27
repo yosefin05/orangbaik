@@ -8,7 +8,7 @@
 | **P1: INTERNAL / RESTRICTED** | Catatan verifikasi, data transaksi belum lunas, audit logs | Database & log yang dikontrol aksesnya | **DENY** | Admin & system internal sesuai least privilege |
 | **P2: PUBLIC / APPROVED CONTENT** | Campaign yang disetujui/aktif, berita dan konten yang memang ditetapkan publik | Database / public assets | Diizinkan sesuai status dan policy konten | Publik, donatur, pengguna |
 
-**Semua file dokumen verifikasi penggalang dana bersifat privat**, termasuk KTP individu, akta, SK, dan dokumen organisasi. Dokumen tidak boleh ditampilkan atau diunduh oleh pengunjung, donatur, maupun pemilik akun. Pemilik dapat melihat metadata/status verifikasi melalui dashboard; akses file hanya untuk admin yang berwenang. Tidak ada fitur untuk mengubah dokumen verifikasi menjadi publik.
+**Semua file dokumen verifikasi penggalang dana bersifat privat**, termasuk KTP individu, akta, SK, dan dokumen organisasi. Dokumen tidak boleh ditampilkan atau diunduh oleh pengunjung, donatur, maupun pemilik akun. Pemilik hanya dapat melihat status verifikasi. Nama dokumen, metadata penyimpanan, dan file identitas/legalitas tidak ditampilkan pada halaman pengguna; akses file hanya untuk admin yang berwenang. Tidak ada fitur untuk mengubah dokumen verifikasi menjadi publik.
 
 Kolom database legacy seperti `is_public` tidak boleh dianggap sebagai izin akses. Pertahankan kompatibilitas skema sampai migrasi data dan dampak kode lama diaudit secara terpisah.
 
