@@ -341,16 +341,12 @@ class PenggalangDanaController extends Controller
 
         Gate::authorize('update', $penggalang);
 
-        // Individual verification files and paths are not passed to the
-        // owner-facing edit view. Only the record identifiers needed to
-        // associate a replacement upload are selected.
-        if ($penggalang->isEntity()) {
-            $penggalang->load('penggalangDanaDokumen');
-        } else {
-            $penggalang->load(['penggalangDanaDokumen' => function ($query) {
-                $query->select(['id', 'penggalang_dana_id']);
-            }]);
-        }
+        // Verification metadata and file paths are admin-only for both
+        // individuals and organizations. The owner form receives only IDs
+        // needed to associate a replacement upload or deletion request.
+        $penggalang->load(['penggalangDanaDokumen' => function ($query) {
+            $query->select(['id', 'penggalang_dana_id']);
+        }]);
 
         $categories = Penggalang_Dana::getCategoryLabels();
 
@@ -502,15 +498,15 @@ class PenggalangDanaController extends Controller
                 }
 
                 if (!$newPath) {
-                    if ($document && $document->nama_dokumen !== $nama) {
-                        $document->update(['nama_dokumen' => $nama]);
-                    }
+                    // Existing verification names and paths are admin-only
+                    // metadata. An owner edit without a replacement file
+                    // must never rewrite the stored document metadata.
                     continue;
                 }
 
                 $pathChanged = !$document || $oldPath !== $newPath || $oldDisk !== $newDisk;
                 $data = [
-                    'nama_dokumen' => $nama,
+                    'nama_dokumen' => $document?->nama_dokumen ?? $nama,
                     'file_dokumen' => $newPath,
                     // Verification documents are always private, even
                     // when replacing a legacy row previously marked public.
