@@ -127,7 +127,12 @@ class FundraiserController extends Controller
 
     private function activateReferral(?Campaign_Fundraiser $fundraiser)
     {
-        abort_unless($fundraiser?->status === 'active' && $fundraiser->campaign?->is_active, 404);
+        abort_unless(
+            $fundraiser?->status === 'active'
+                && $fundraiser->campaign?->is_active
+                && $fundraiser->campaign?->isApproved(),
+            404
+        );
         session()->put('campaign_referral.' . $fundraiser->campaign_id, $fundraiser->referral_code);
 
         return redirect($fundraiser->campaign->public_url);
