@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\ManualTransferService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DonasiController extends Controller
 {
@@ -285,13 +286,43 @@ class DonasiController extends Controller
         }
     }
 
+    /**
+     * Hapus hanya catatan donasi gagal/kedaluwarsa.
+     * Transaksi pending dan berhasil dipertahankan agar webhook, bukti,
+     * kuitansi, dan rekam jejak keuangan tidak terputus.
+     */
     public function destroy($id)
     {
-        $donasi = Donasi::findOrFail($id);
-        $donasi->delete();
+        $donasi = Donasi::with('pembayaran')->findOrFail($id);
+        $pembayaran = $donasi->pembayaran;
+        $status = strtolower((string) ($pembayaran?->transaction_status ?? ''));
+
+        if (!in_array($status, ['failed', 'expired', 'expire'], true)) {
+            return redirect()->route('admin.donasi.index')
+                ->with('error', 'Donasi hanya dapat dihapus jika statusnya Gagal atau Kedaluwarsa. Donasi pending dan berhasil harus tetap tersimpan.');
+        }
+
+        $proofPath = $pembayaran?->bukti_transfer;
+
+        DB::transaction(function () use ($donasi): void {
+            // FK pembayaran menggunakan cascadeOnDelete; data terkait dihapus
+            // dalam transaksi yang sama agar tidak meninggalkan relasi yatim.
+            $donasi->delete();
+        });
+
+        if ($proofPath) {
+            $stillReferenced = \App\Models\Pembayaran::where('bukti_transfer', $proofPath)->exists();
+            if (!$stillReferenced) {
+                foreach (['private', 'public'] as $disk) {
+                    if (Storage::disk($disk)->exists($proofPath)) {
+                        Storage::disk($disk)->delete($proofPath);
+                    }
+                }
+            }
+        }
 
         return redirect()->route('admin.donasi.index')
-            ->with('success', 'Donasi berhasil dihapus!');
+            ->with('success', 'Donasi gagal/kedaluwarsa berhasil dihapus.');
     }
 
     public function export(Request $request)
