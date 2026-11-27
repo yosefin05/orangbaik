@@ -33,6 +33,41 @@ class FundraiserDocumentPrivacyTest extends TestCase
         $this->assertDatabaseCount('penggalang_dana_dokumen', 0);
     }
 
+    public function test_fundraiser_owner_profile_does_not_render_verification_document_metadata(): void
+    {
+        Storage::fake('private');
+        $user = User::factory()->create();
+
+        $fundraiser = Penggalang_Dana::create([
+            'user_id' => $user->id,
+            'jenis_penggalang' => Penggalang_Dana::CATEGORY_INDIVIDU,
+            'foto_profil' => 'profile.jpg',
+            'nama_penggalang' => 'Profil Privat Uji',
+            'alamat' => 'Sidoarjo',
+            'deskripsi' => 'Profil untuk pengujian privasi.',
+            'email' => 'profil-privat-' . $user->id . '@example.test',
+            'no_telepon' => '08123456789',
+            'status' => 'approved',
+        ]);
+
+        $documentPath = 'dokumen_penggalang/' . $fundraiser->id . '/ktp-rahasia.pdf';
+        Storage::disk('private')->put($documentPath, 'private test content');
+
+        Penggalang_Dana_Dokumen::create([
+            'penggalang_dana_id' => $fundraiser->id,
+            'nama_dokumen' => 'KTP RAHASIA JANGAN TAMPIL',
+            'file_dokumen' => $documentPath,
+            'is_public' => false,
+            'storage_disk' => 'private',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('profil.penggalang', $fundraiser->slug));
+
+        $response->assertOk();
+        $response->assertDontSee('KTP RAHASIA JANGAN TAMPIL');
+        $response->assertDontSee(route('dokumen.show', 1));
+    }
+
     public function test_individual_verification_document_is_stored_privately(): void
     {
         Storage::fake('private');
