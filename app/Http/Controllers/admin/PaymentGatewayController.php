@@ -36,18 +36,21 @@ class PaymentGatewayController extends Controller
             ->reject(fn ($method) => in_array($method['channel_code'], $registeredCodes, true))
             ->values();
 
-        $credentialFlags = [];
-        foreach ([
+        $credentialKeys = [
             'sandbox_server_key', 'sandbox_client_key', 'sandbox_signature_secret_key',
             'production_server_key', 'production_client_key', 'production_signature_secret_key',
             'sandbox_api_key', 'production_api_key',
             'sandbox_webhook_token', 'production_webhook_token',
             'staging_api_key', 'staging_webhook_token',
-        ] as $key) {
-            $credentialFlags[$key] = $gateway->hasConfigValue($key);
+        ];
+        $credentialFlags = [];
+        $credentialValues = [];
+        foreach ($credentialKeys as $key) {
+            $credentialValues[$key] = $gateway->getConfigValue($key, '');
+            $credentialFlags[$key] = filled($credentialValues[$key]);
         }
 
-        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags', 'routingOptions', 'availableMethods'));
+        return view('admin.payment.gateway.show', compact('gateway', 'channels', 'credentialFlags', 'credentialValues', 'routingOptions', 'availableMethods'));
     }
 
 
