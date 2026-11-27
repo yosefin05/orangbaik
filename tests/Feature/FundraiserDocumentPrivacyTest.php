@@ -181,4 +181,51 @@ class FundraiserDocumentPrivacyTest extends TestCase
         }
     }
 
+    public function test_verification_upload_count_is_bounded_for_individual_and_organization_submissions(): void
+    {
+        Storage::fake('private');
+
+        $individual = User::factory()->create();
+        $individualResponse = $this->actingAs($individual)->post(route('penggalang_dana.individu.store'), [
+            'nama_penggalang' => 'Penggalang Individu Batas',
+            'alamat' => 'Sidoarjo',
+            'deskripsi' => 'Pengujian batas dokumen.',
+            'email' => 'individual-limit-' . $individual->id . '@example.test',
+            'no_telepon' => '0812345' . str_pad((string) $individual->id, 4, '0', STR_PAD_LEFT),
+            'nama_dokumen' => ['Dokumen Identitas', 'Dokumen Tambahan'],
+            'dokumen_files' => [
+                UploadedFile::fake()->create('identity.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('extra.pdf', 100, 'application/pdf'),
+            ],
+        ]);
+
+        $individualResponse->assertSessionHasErrors('nama_dokumen');
+        $this->assertDatabaseMissing('penggalang_dana', ['user_id' => $individual->id]);
+
+        $organization = User::factory()->create();
+        $organizationResponse = $this->actingAs($organization)->post(route('penggalang_dana.organisasi.store'), [
+            'jenis_penggalang' => 'organisasi',
+            'nama_penggalang' => 'Organisasi Batas Dokumen',
+            'tahun_berdiri' => '2020',
+            'alamat' => 'Sidoarjo',
+            'deskripsi' => 'Pengujian batas dokumen organisasi.',
+            'visi' => 'Visi uji.',
+            'misi' => 'Misi uji.',
+            'email' => 'organization-limit-' . $organization->id . '@example.test',
+            'no_telepon' => '0812345' . str_pad((string) $organization->id, 4, '0', STR_PAD_LEFT),
+            'nama_dokumen' => ['Dokumen 1', 'Dokumen 2', 'Dokumen 3', 'Dokumen 4'],
+            'dokumen_files' => [
+                UploadedFile::fake()->create('doc-1.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('doc-2.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('doc-3.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('doc-4.pdf', 100, 'application/pdf'),
+            ],
+        ]);
+
+        $organizationResponse->assertSessionHasErrors(['nama_dokumen', 'dokumen_files']);
+        $this->assertDatabaseMissing('penggalang_dana', ['user_id' => $organization->id]);
+        $this->assertDatabaseCount('penggalang_dana_dokumen', 0);
+        $this->assertEmpty(Storage::disk('private')->allFiles());
+    }
+
 }
