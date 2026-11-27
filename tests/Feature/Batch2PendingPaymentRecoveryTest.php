@@ -591,6 +591,51 @@ class Batch2PendingPaymentRecoveryTest extends TestCase
 
     /**  */
     #[\PHPUnit\Framework\Attributes\Test]
+    #[\\PHPUnit\\Framework\\Attributes\\Test]
+    public function midtrans_webhook_rejects_fractional_rupiah_amount_without_rounding()
+    {
+        $donasi = Donasi::create([
+            'campaign_id'  => $this->campaign->id,
+            'user_id'      => $this->userA->id,
+            'nama_donatur' => $this->userA->name,
+            'no_hp'        => '081211116667',
+            'nominal'      => 500000,
+        ]);
+
+        $orderId = 'OB-MIDTRANS-FRACTIONAL-' . uniqid();
+        $pembayaran = Pembayaran::create([
+            'donasi_id'          => $donasi->id,
+            'payment_channel_id' => $this->channelMidtrans->id,
+            'payment_token'      => (string) Str::uuid(),
+            'order_id'           => $orderId,
+            'transaction_status' => 'pending',
+            'payment_type'       => 'gopay',
+        ]);
+
+        $gateway = $this->channelMidtrans->gateway;
+        $credentialMode = $gateway->activeCredentialMode();
+        $secret = $gateway->getCredentialForMode('signature_secret_key', $credentialMode);
+        $statusCode = '200';
+        $fractionalGrossAmount = '500000.50';
+        $signature = hash('sha512', $orderId . $statusCode . $fractionalGrossAmount . $secret);
+
+        $response = $this->postJson(route('payment.midtrans.webhook'), [
+            'order_id'           => $orderId,
+            'status_code'        => $statusCode,
+            'gross_amount'       => $fractionalGrossAmount,
+            'signature_key'      => $signature,
+            'transaction_status' => 'settlement',
+            'payment_type'       => 'gopay',
+            'transaction_id'     => 'TRX-MID-FRACTIONAL',
+        ]);
+
+        $response->assertStatus(400);
+        $pembayaran->refresh();
+        $this->assertSame('pending', $pembayaran->transaction_status);
+        $this->assertNull($pembayaran->paid_at);
+        $this->assertSame(0, $this->campaign->getTotalDonasiSuccess());
+    }
+
     public function midtrans_webhook_with_mismatched_amount_is_rejected_and_does_not_settle()
     {
         $donasi = Donasi::create([
