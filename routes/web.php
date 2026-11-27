@@ -110,7 +110,156 @@ Route::get('/pusat-bantuan', [PageController::class, 'pusatBantuan'])->name('pus
 
 // Penggalang Dana (Public)
 Route::get('/penggalang/{id}', [PenggalangDanaController::class, 'profile'])
-    ->where('id', '^(?!dashboard$)[A-Za-z0-9][A-Za-z0-9-]*$')
+    ->where('id', '^(?!dashboard$|rejected$)[A-Za-z0-9][A-Za-z0-9-]*
+    ->name('profil.penggalang');
+Route::get('/profil-penggalang/{id}', function (string $id) {
+    $penggalang = \App\Models\Penggalang_Dana::where('id', $id)->orWhere('slug', $id)->firstOrFail();
+    return redirect()->route('profil.penggalang', $penggalang);
+});
+Route::get('/dokumen-penggalang/{id}', [DokumenPenggalangController::class, 'show'])
+    ->middleware(['auth', 'admin'])
+    ->name('dokumen.show');
+
+// ============================================================
+// AUTHENTICATED ROUTES (BUTUH LOGIN, TAPI BELUM TENTU VERIFIED)
+// ============================================================
+Route::middleware('auth')->group(function () {
+
+    // Dashboard Penggalang Dana
+    Route::get('/penggalang/dashboard', [PenggalangDashboardController::class, 'index'])->middleware('verified')->name('penggalang.dashboard');
+    Route::get('/fundraiser/dashboard', [FundraiserDashboardController::class, 'index'])->middleware('verified')->name('fundraiser.dashboard');
+
+    // Set intended URL
+    Route::post('/set-intended-url', function (Request $request) {
+        session(['url.intended' => $request->url]);
+        return response()->json(['success' => true]);
+    })->name('set.intended.url');
+
+    // Penggalang Dana (CRUD)
+    Route::get('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'createOrganisasi'])
+        ->middleware('verified')
+        ->name('penggalang_dana.organisasi.create');
+    Route::post('/penggalang_dana_organisasi', [PenggalangDanaController::class, 'storeOrganisasi'])
+        ->middleware('verified')
+        ->name('penggalang_dana.organisasi.store');
+    Route::get('/verifikasi-penggalang', function () {
+        return view('pages.penggalang_dana.create_individu');
+    })->middleware('verified')->name('verifikasi.penggalang');
+    Route::post('/verifikasi-penggalang', [PenggalangDanaController::class, 'storeIndividu'])
+        ->middleware('verified')
+        ->name('penggalang_dana.individu.store');
+    Route::get('/penggalang/{id}/edit', [PenggalangDanaController::class, 'edit'])
+        ->middleware('verified')
+        ->name('penggalang_dana.edit');
+    Route::patch('/penggalang/{id}', [PenggalangDanaController::class, 'update'])
+        ->middleware('verified')
+        ->name('penggalang_dana.update');
+    Route::delete('/penggalang/{id}/dokumen', [PenggalangDanaController::class, 'destroyDocuments'])
+        ->middleware('verified')
+        ->name('penggalang_dana.dokumen.destroy');
+    Route::get('/penggalang-dana/{id}/edit', fn (string $id) => redirect()->route('penggalang_dana.edit', $id));
+    Route::patch('/penggalang-dana/{id}', fn (Request $request, string $id) => redirect()->route('penggalang_dana.update', $id, 307));
+    Route::get('/penggalang/rejected', [PenggalangDanaController::class, 'rejected'])
+        ->middleware('verified')
+        ->name('penggalang_dana.rejected');
+    Route::patch('/penggalang-dana/{id}/resubmit', [PenggalangDanaController::class, 'resubmit'])
+        ->middleware('verified')
+        ->name('penggalang_dana.resubmit');
+
+    // Profile User
+    Route::get('/profil', function () {
+        $penggalang = auth()->user()->penggalangDana()->first();
+        return view('pages.profile-user', compact('penggalang'));
+    })->name('profile.user');
+    Route::get('/profile-user', fn () => redirect()->route('profile.user'));
+
+    // Riwayat Donasi & Resume Pembayaran
+    Route::get('/riwayat-donasi', [RiwayatDonasiController::class, 'index'])->name('riwayat.donasi');
+    Route::get('/riwayat-donasi/{donasi}/kwitansi', [RiwayatDonasiController::class, 'kwitansi'])
+        ->name('riwayat-donasi.kwitansi');
+    Route::get('/donasi/pembayaran/{pembayaran}/resume', [DonasiController::class, 'resume'])
+        ->name('donasi.resume');
+
+    // Profile (Breeze)
+    Route::get('/profil/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profil', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Legacy Breeze URLs tetap aktif agar form/bookmark lama tidak rusak.
+    Route::get('/profile', [ProfileController::class, 'edit']);
+    Route::patch('/profile', [ProfileController::class, 'update']);
+    Route::delete('/profile', [ProfileController::class, 'destroy']);
+});
+
+// ============================================================
+// AUTHENTICATED + VERIFIED EMAIL ROUTES (WAJIB VERIFIKASI)
+// ============================================================
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Campaign Management
+    Route::get('/campaign/create', [CampaignController::class, 'create'])->name('campaign.create');
+    Route::post('/campaign', [CampaignController::class, 'store'])->name('campaign.store');
+    Route::get('/campaign/{campaign}/edit', [CampaignController::class, 'edit'])->name('campaign.edit');
+    Route::put('/campaign/{campaign}', [CampaignController::class, 'update'])->name('campaign.update');
+    Route::delete('/campaign/{campaign}', [CampaignController::class, 'destroy'])->name('campaign.destroy');
+
+    // Campaign Updates (Kabar Terbaru)
+    Route::prefix('campaign/{slug}/update')->group(function () {
+        Route::get('/create', [CampaignUpdateController::class, 'create'])->name('campaign.update.create');
+        Route::post('/', [CampaignUpdateController::class, 'store'])->name('campaign.update.store');
+        Route::get('/{update}/edit', [CampaignUpdateController::class, 'edit'])->name('campaign.update.edit');
+        Route::put('/{update}', [CampaignUpdateController::class, 'update'])->name('campaign.update.update');
+        Route::delete('/{update}', [CampaignUpdateController::class, 'destroy'])->name('campaign.update.destroy');
+    });
+
+    // Fundraiser
+    Route::post('/campaign/{slug}/fundraiser', [FundraiserController::class, 'store'])
+        ->name('fundraiser.store')
+        ->where('slug', '.*');
+    Route::delete('/campaign/{slug}/fundraiser', [FundraiserController::class, 'destroy'])
+        ->name('fundraiser.destroy')
+        ->where('slug', '.*');
+    Route::patch('/fundraiser/{fundraiser}/alias', [FundraiserController::class, 'updateShortAlias'])->name('fundraiser.alias.update');
+
+});
+
+// ============================================================
+// ADMIN ROUTES
+// ============================================================
+require __DIR__ . '/admin.php';
+
+// ============================================================
+// URL campaign canonical: slug otomatis berada di /campaign, custom URL di root.
+Route::get('/campaign/{slug}', [CampaignController::class, 'show'])->name('campaign.show');
+Route::get('/donasi/{slug}', function (string $slug) {
+    $campaign = \App\Models\Campaign::where('slug', $slug)->orWhere('custom_slug', $slug)->firstOrFail();
+    return redirect($campaign->public_url, 301);
+})->name('campaign.legacy.show');
+Route::get('/ajak/{alias}', [FundraiserController::class, 'track'])->name('referral.track');
+Route::get('/campaign/{campaignSlug}/{fundraiserAlias}', [FundraiserController::class, 'showReferral'])
+    ->name('fundraiser.referral.canonical')
+    ->where(['campaignSlug' => '[A-Za-z0-9][A-Za-z0-9-]*', 'fundraiserAlias' => '[A-Za-z0-9][A-Za-z0-9_-]*']);
+Route::get('/{campaignSlug}/{fundraiserAlias}', [FundraiserController::class, 'showReferral'])
+    ->name('fundraiser.referral')
+    ->where(['campaignSlug' => '[A-Za-z0-9][A-Za-z0-9-]*', 'fundraiserAlias' => '[A-Za-z0-9][A-Za-z0-9_-]*']);
+Route::get('/{slug}', function (string $slug) {
+    $campaign = \App\Models\Campaign::where('custom_slug', $slug)->first();
+    if ($campaign) {
+        return app(CampaignController::class)->show($slug);
+    }
+
+    $oldUrl = \App\Models\Campaign_Url_Alias::with('campaign')->where('custom_slug', $slug)->first();
+    if ($oldUrl?->campaign) {
+        return redirect($oldUrl->campaign->public_url, 301);
+    }
+
+    $campaign = \App\Models\Campaign::where('slug', $slug)->first();
+    if ($campaign) {
+        return redirect()->route('campaign.show', $campaign->slug, 301);
+    }
+
+    return app(FundraiserController::class)->trackShort($slug);
+})->where('slug', '[A-Za-z0-9][A-Za-z0-9_-]*')->name('campaign.legacy');
+)
     ->name('profil.penggalang');
 Route::get('/profil-penggalang/{id}', function (string $id) {
     $penggalang = \App\Models\Penggalang_Dana::where('id', $id)->orWhere('slug', $id)->firstOrFail();
