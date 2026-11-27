@@ -55,4 +55,55 @@ class EmailVerificationTest extends TestCase
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
     }
+    public function test_registration_sends_verification_and_redirects_to_verification_screen(): void
+    {
+        \\Illuminate\\Support\\Facades\\Notification::fake();
+
+        $response = $this->post('/register', [
+            'name' => 'Penggalang Baru',
+            'email' => 'penggalang@example.test',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+        ]);
+
+        $user = User::where('email', 'penggalang@example.test')->firstOrFail();
+
+        $this->assertFalse($user->hasVerifiedEmail());
+        $response->assertRedirect(route('verification.notice'));
+        \\Illuminate\\Support\\Facades\\Notification::assertSentTo(
+            $user,
+            \\Illuminate\\Auth\\Notifications\\VerifyEmail::class
+        );
+    }
+
+    public function test_unverified_user_cannot_submit_fundraiser_profile(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)
+            ->get(route('penggalang_dana.organisasi.create'))
+            ->assertRedirect(route('verification.notice'));
+
+        $this->actingAs($user)
+            ->post(route('penggalang_dana.organisasi.store'), [])
+            ->assertRedirect(route('verification.notice'));
+
+        $this->actingAs($user)
+            ->get(route('penggalang.dashboard'))
+            ->assertRedirect(route('verification.notice'));
+
+        $this->actingAs($user)
+            ->post(route('fundraiser.store', ['slug' => 'campaign-uji']), [])
+            ->assertRedirect(route('verification.notice'));
+    }
+
+    public function test_verified_user_can_access_fundraiser_application_screen(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => now()]);
+
+        $this->actingAs($user)
+            ->get(route('penggalang_dana.organisasi.create'))
+            ->assertOk();
+    }
+
 }
