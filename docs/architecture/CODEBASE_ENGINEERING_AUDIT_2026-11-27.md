@@ -53,9 +53,9 @@ The audit review records a legacy public-storage fallback in the donor payment-p
 
 ### P1 — Document access policy and implementation documentation disagree
 
-The current `Penggalang_Dana_Dokumen::canBeAccessedBy()` permits administrators only. Owners can see metadata/status but cannot fetch the file. This matches the latest product instruction that identity/legal verification files are private and not exposed to users, but conflicts with older comments and docs that claim owner access.
+The current `Penggalang_Dana_Dokumen::canBeAccessedBy()` permits administrators only. Owner-facing profile flows no longer load document records; the individual edit flow selects only the record identifiers needed for replacement uploads and renders a generic label, not the document name or path. This matches the requirement that identity/legal verification documents and their metadata are not exposed to users.
 
-**Recommendation:** update stale PHPDoc and `docs/api/README.md` / `docs/security/README.md` to state admin-only file access, user-visible metadata/status only, and no public visibility toggle. Keep the database `is_public` field only for legacy compatibility until a separately reviewed migration/data plan exists.
+**Status:** controller, owner-facing profile/edit rendering, and API/security documentation now consistently restrict document names, paths, and files to admin-only contexts. Owners see verification status only. The database `is_public` field remains for legacy compatibility; application authorization does not treat it as permission.
 
 
 ### P1 — Midtrans callback persistence was hardened in this audit branch
@@ -80,15 +80,33 @@ This audit branch changes the placeholder to fail closed: `isConfigured()` retur
 
 ### P1 — External document URLs cannot guarantee private verification storage
 
-New fundraiser submission and edit flows currently accept `file_dokumen[]` URLs. `DokumenPenggalangController` redirects an authorized admin to the external URL, but OrangBaik cannot enforce that the external host keeps the file private or prevent direct access to a publicly shared link.
+New fundraiser submissions and replacements now require direct uploads to private storage; new external document URLs are rejected. Unchanged URL-backed legacy records are preserved for compatibility and remain admin-only at the application endpoint, but OrangBaik cannot control the external host's direct-access policy.
 
-**Recommendation:** decide and document whether external links are an accepted verification channel. If strict privacy is required, make new submissions upload-only to private storage, and treat existing URL-backed records as a separate migration/review queue. Do not auto-fetch arbitrary URLs from the server because that introduces SSRF risk. Preserve existing records until their source and replacement file have been verified.
+**Status:** upload-only is implemented for new submissions and replacements. Keep existing URL-backed records in a separate migration/review queue; do not auto-fetch arbitrary URLs because that introduces SSRF risk. Preserve existing records until their source and replacement file have been verified.
 
 ### P2 — Indonesian phone storage format is inconsistent with the requested local format
 
 `Penggalang_Dana::setNoTeleponAttribute()` and `PenggalangDanaController::normalizedContactInput()` currently canonicalize numbers to international digits beginning with `62`, while the agreed storage convention is local digits beginning with `08`. Validation rules also expect `62` format. A direct setter change is unsafe while existing records and the unique index may contain both equivalent `08...` and `62...` values.
 
 **Recommendation:** inventory current values and unique-index behavior first; design an additive normalization migration that detects collisions before writing, then update create/update validation and tests together. Keep display formatting separate from storage normalization.
+
+### P1 — Pending campaigns were reachable through direct URLs
+
+Campaign creation marks emergency and sustainable campaigns as pending while setting `is_active=true`. The public listing already filtered approval status, but the direct campaign detail query and fundraiser referral entry points did not consistently enforce that approval gate.
+
+**Status:** direct campaign detail and sidebar queries now apply the same approved/regular/legacy-null rule as public listings. Fundraiser enrollment and referral activation also require an active, approved campaign. Regression tests cover direct URL access and enrollment against a pending campaign.
+
+### P2 — File replacement must not delete the prior proof before commit
+
+A private transfer-proof replacement previously deleted the old private file before storing the new file and updating the database pointer. Filesystem operations do not roll back with the SQL transaction.
+
+**Status:** the old private proof is now deleted only after the replacement file and database pointer have committed. Legacy public-disk proofs remain preserved. Regression coverage verifies successful private replacement and legacy public-file preservation.
+
+### P2 — Raw webhook and exception details in logs
+
+Webhook controllers and several application error paths previously logged raw exception messages or stack traces.
+
+**Status:** webhook controller logs and the audited donation/campaign/QR paths now record exception classes and minimal identifiers rather than raw exception messages or stack traces. Domain validation errors remain user-facing only where they are fixed, controlled messages.
 
 ### P2 — Naming conventions are mixed in legacy domain types and routes
 
@@ -117,9 +135,9 @@ Before moving a Blade file, search all `view()`, `@include`, `<x-...>`, componen
 
 ### P2 — Historical docs contain conflicting or stale claims
 
-The security/API docs still describe owner access and organization documents that may be public, while the current implementation denies non-admin file access and the latest requirement removes public exposure. The deployment guide describes production steps, but the inspected automated deployment workflow targets staging only. The release verification dated 9 November records blockers that must be rechecked against current code and current CI rather than copied as present-day facts.
+The security/API docs have been aligned with admin-only document names, metadata, and file access. Older historical audit records may still describe owner access or public organization documents and must be treated as superseded evidence. The deployment guide describes production steps, but the inspected automated deployment workflow targets staging only. The release verification dated 9 November records blockers that must be rechecked against current code and current CI rather than copied as present-day facts.
 
-**Recommendation:** date and label historical evidence, distinguish implemented behavior from intended behavior, and link every release claim to a current test, workflow, or operational check.
+**Recommendation:** date and label historical evidence, distinguish implemented behavior from intended behavior, and link every release claim to a current test, workflow, or operational check. Do not copy old `VERIFIED` labels into a current release decision without rerunning the corresponding check.
 
 ## Blade and frontend inventory policy
 
