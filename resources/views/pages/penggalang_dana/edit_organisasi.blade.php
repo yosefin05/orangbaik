@@ -307,16 +307,8 @@
                                             <input type="file" name="dokumen_files[]" accept=".pdf,.jpg,.jpeg,.png"
                                                 {{ $isPending ? 'disabled' : '' }}>
                                             <small class="field-help">PDF, JPG, atau PNG. Maksimal 5 MB.</small>
-                                            <span>Atau Tautan Dokumen</span>
-                                            <input
-                                                type="url"
-                                                name="file_dokumen[]"
-                                                value="{{ old('file_dokumen.' . $index, filter_var($dokumen?->file_dokumen, FILTER_VALIDATE_URL) ? $dokumen->file_dokumen : '') }}"
-                                                placeholder="https://drive.google.com/..."
-                                                {{ $isPending ? 'disabled' : '' }}>
-                                            <small class="field-help">Gunakan tautan Google Drive atau penyimpanan online lain.</small>
                                             @if($dokumen)
-                                                <small class="field-help"><i class="bi bi-lock-fill"></i> Dokumen tersimpan; file hanya dapat diperiksa admin.</small>
+                                                <small class="field-help"><i class="bi bi-lock-fill"></i> Dokumen tersimpan; file hanya dapat diperiksa admin. Unggah file baru secara langsung untuk menggantinya.</small>
                                             @endif
                                         </label>
 
