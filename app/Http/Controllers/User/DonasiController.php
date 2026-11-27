@@ -233,7 +233,7 @@ return response()->json(array_merge([
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Donasi store error', [
-                'message'    => $e->getMessage(),
+                'exception_class' => get_class($e),
                 'channel_id' => $channelId,
                 'campaign'   => $campaign->id,
             ]);
