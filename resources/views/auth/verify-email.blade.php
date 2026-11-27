@@ -23,6 +23,18 @@
                 <h1>Verifikasi Email Kamu</h1>
                 <p class="subtitle">Satu langkah lagi untuk mengaktifkan akun OrangBaik.id kamu.</p>
 
+                @if (session('success'))
+                    <div class="alert-success">{{ session('success') }}</div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert-danger" role="alert">{{ session('error') }}</div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert-danger" role="alert">{{ $errors->first() }}</div>
+                @endif
+
                 @if (session('status') == 'verification-link-sent')
                     <div class="alert-success">
                         {{ __('A new verification link has been sent to the email address you provided during registration.') }}
