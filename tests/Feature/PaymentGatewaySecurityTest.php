@@ -111,6 +111,31 @@ class PaymentGatewaySecurityTest extends TestCase
         $this->assertSame('LEGACY-LIVE-server-key', $gateway->getCredentialForMode('signature_secret_key', 'production'));
     }
 
+    public function test_generic_api_driver_is_disabled_and_rejects_all_webhooks(): void
+    {
+        $gateway = PaymentGateway::create([
+            'name' => 'Unverified provider',
+            'code' => 'unverified',
+            'driver' => 'unverified',
+            'is_active' => false,
+            'config' => PaymentGateway::secureConfigForStorage([
+                'api_key' => 'some-key',
+                'endpoint_url' => 'https://provider.example.test/pay',
+            ]),
+        ]);
+
+        $driver = (new \App\Services\PaymentGateways\GenericApiDriver())->setGateway($gateway);
+
+        $this->assertFalse($driver->isConfigured());
+        $this->assertFalse($driver->handleWebhook(
+            \Illuminate\Http\Request::create('/payment/unverified/webhook', 'POST', [
+                'order_id' => 'OB-FAKE-ORDER',
+                'status' => 'settlement',
+                'amount' => 100000,
+            ])
+        ));
+    }
+
     public function test_manager_rejects_provider_without_a_dedicated_adapter(): void
     {
         $this->expectException(InvalidArgumentException::class);
