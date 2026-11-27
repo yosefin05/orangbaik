@@ -7,6 +7,8 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Tests\TestCase;
 
 class EmailVerificationTest extends TestCase
@@ -74,6 +76,18 @@ class EmailVerificationTest extends TestCase
             $user,
             VerifyEmail::class
         );
+    }
+
+    public function test_unverified_user_can_request_a_new_verification_email(): void
+    {
+        Notification::fake();
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)
+            ->post(route('verification.send'))
+            ->assertRedirect();
+
+        Notification::assertSentTo($user, VerifyEmail::class);
     }
 
     public function test_unverified_user_cannot_submit_fundraiser_profile(): void
