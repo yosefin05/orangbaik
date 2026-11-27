@@ -218,9 +218,7 @@
                         </div>
                         <div class="verify-document-link-row">
                             @if($dokumen)
-                                <a href="{{ $dokumen->secure_view_url }}" target="_blank" rel="noopener noreferrer">
-                                    <i class="bi bi-file-earmark-text"></i> Lihat dokumen tersimpan
-                                </a>
+                                <span class="text-muted"><i class="bi bi-lock-fill"></i> Dokumen tersimpan (akses pemeriksaan admin)</span>
                             @endif
                             <label class="verify-field">
                                 <span>Atau Tautan Dokumen</span>
