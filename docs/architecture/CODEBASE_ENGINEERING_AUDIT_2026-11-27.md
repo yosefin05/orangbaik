@@ -64,6 +64,14 @@ The baseline `MidtransService::handleWebhook()` merged the full provider callbac
 
 **Verification status:** change committed to the audit branch; the full Laravel workflow for the latest commit is running. Do not treat this finding as closed until that exact run passes.
 
+### P1 — Generic API driver disabled until provider security contract exists
+
+The previous `GenericApiDriver` accepted arbitrary callback status values and could mark a transaction settled without provider authentication or amount verification. It was not registered as a supported built-in provider, but the class itself remained unsafe if reused.
+
+This audit branch changes the placeholder to fail closed: `isConfigured()` returns false, transaction creation throws a clear `LogicException`, and webhook handling always rejects. A feature test covers the disabled state and forged settlement callback.
+
+**Verification status:** change committed to the audit branch; exact latest-commit CI must pass before merge. Re-enable only by implementing a concrete provider adapter with signature/token verification, amount integrity, idempotency, and status-transition tests.
+
 ### P2 — Webhook routes have legacy aliases and multiple orchestration paths
 
 `routes/web.php` exposes dedicated Midtrans/Flip endpoints, a dynamic provider endpoint, and a legacy Midtrans alias. `routes/api.php` also exposes a Midtrans notification endpoint. Historical audit records identify multiple controllers/orchestration paths.
