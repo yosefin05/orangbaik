@@ -99,6 +99,10 @@ class EmailVerificationTest extends TestCase
             ->assertRedirect(route('verification.notice'));
 
         $this->actingAs($user)
+            ->get(route('verifikasi.penggalang'))
+            ->assertRedirect(route('verification.notice'));
+
+        $this->actingAs($user)
             ->post(route('penggalang_dana.organisasi.store'), [])
             ->assertRedirect(route('verification.notice'));
 
@@ -117,6 +121,10 @@ class EmailVerificationTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('penggalang_dana.organisasi.create'))
+            ->assertOk();
+
+        $this->actingAs($user)
+            ->get(route('verifikasi.penggalang'))
             ->assertOk();
     }
 
