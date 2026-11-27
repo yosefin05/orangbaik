@@ -116,7 +116,9 @@ Route::get('/profil-penggalang/{id}', function (string $id) {
     $penggalang = \App\Models\Penggalang_Dana::where('id', $id)->orWhere('slug', $id)->firstOrFail();
     return redirect()->route('profil.penggalang', $penggalang);
 });
-Route::get('/dokumen-penggalang/{id}', [DokumenPenggalangController::class, 'show'])->name('dokumen.show');
+Route::get('/dokumen-penggalang/{id}', [DokumenPenggalangController::class, 'show'])
+    ->middleware(['auth', 'admin'])
+    ->name('dokumen.show');
 
 // ============================================================
 // AUTHENTICATED ROUTES (BUTUH LOGIN, TAPI BELUM TENTU VERIFIED)
