@@ -15,6 +15,15 @@ This document records findings supported by source inspection and the existing a
 - `.github/workflows/tests.yml` runs on pull requests to `main` and pushes to branches. It checks strict optimized PSR-4 autoloading, builds frontend assets, audits npm/Composer dependencies, and runs the Laravel test suite with warnings treated as failures.
 - No production deployment workflow was identified in the inspected workflow files. Production remains out of scope for this audit.
 
+## Latest audit-branch verification (27 November 2026)
+
+- PR #23 head: `e20fee240b814cecc80ed643fd418efb22910348`.
+- GitHub Actions run `46006597126` completed successfully against the PR merge ref `d39fbac1ac8f23d188b82ce31949cf715a3ca5cd`.
+- Full Laravel suite: **176 tests passed, 781 assertions**.
+- Composer dependency install, strict optimized PSR-4 check, Vite production build, Composer/npm advisory audits, and isolated SQLite test setup all completed successfully.
+- This CI workflow did not yet include repository-wide PHP lint or route-cache registration checks at the time of run `46006597126`; those checks have now been added to `.github/workflows/tests.yml` and require a fresh run.
+- CI uses SQLite in-memory, not the staging/production database engine or data. It does not exercise real gateway credentials, browser rendering, actual storage files, or server deployment.
+
 ## Confirmed CI evidence at baseline
 
 | Workflow | Run | Result |
@@ -164,7 +173,7 @@ The repository tree alone does not prove that every view is correctly classified
 - [x] Strict optimized Composer PSR-4 autoload check.
 - [x] Composer and npm dependency advisory audits completed by CI; review any new advisory before release.
 - [x] Frontend production build completed by CI.
-- [ ] PHP syntax check and route registration/cache check.
+- [ ] PHP syntax check and route registration/cache check (added to CI after run `46006597126`; pending fresh run).
 - [ ] Database migration dry-run/rehearsal against a disposable DB matching target engine/version.
 - [ ] Authorization tests for guest, ordinary user, fundraiser, document owner, and admin.
 - [ ] Payment tests for exact amount, invalid/missing secret, replay, duplicate callback, terminal-state rollback, and idempotency.
@@ -175,6 +184,6 @@ The repository tree alone does not prove that every view is correctly classified
 
 ## Current decision
 
-**Codebase cleanup: IN PROGRESS. Latest code CI: PASSED on `0aea0c2` (175 tests, 779 assertions). Release decision: NOT YET APPROVED.**
+**Codebase cleanup: IN PROGRESS. Latest completed CI: PASSED on PR head `e20fee2` (run `46006597126`; 176 tests, 781 assertions). Release decision: NOT YET APPROVED.**
 
 The baseline main test and staging deployment workflows succeeded. The current audit branch adds further regression coverage, but legacy public proof inventory/migration, phone normalization preflight, route/cache checks, browser QA, staging operational verification, and backup/rollback rehearsal remain open. This audit branch is a review boundary; merge only after each change is implemented, tested, and reviewed. No production change is authorized by this document.
