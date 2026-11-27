@@ -25,7 +25,7 @@
 ### B. Dokumen Penggalang (STRICTLY PRIVATE)
 - `GET /dokumen-penggalang/{id}`
 - **Admin only**: only an authorized administrator may stream a verification document.
-- **Guest, ordinary user, and fundraiser/owner**: denied (403). The owner may see verification metadata/status in the application, but cannot open or download the underlying KTP or legal/verification file.
+- **Guest, ordinary user, and fundraiser/owner**: denied (403). The owner can see the verification status only. Document names, storage metadata, and the underlying KTP or legal/verification file are not rendered in owner-facing profile flows.
 - **Public access**: never allowed. Organization documents are also private; there is no public visibility toggle.
 - Files must be stored and streamed from private storage. Legacy public-disk records require a controlled inventory and migration before removing any compatibility fallback.
 
