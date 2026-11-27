@@ -1105,4 +1105,32 @@ class PaymentChannelTest extends TestCase
                     && !str_contains($providerMessage, '08123456789');
             });
     }
+
+    public function test_replacing_a_legacy_public_transfer_proof_does_not_delete_historical_file(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+
+        $legacyPath = 'bukti-transfer/legacy-proof.jpg';
+        Storage::disk('public')->put($legacyPath, 'historical-proof-content');
+
+        $payment = (new ManualTransferService())->createTransaction($this->createDonasi(), $manualChannel);
+        $payment->update(['bukti_transfer' => $legacyPath]);
+
+        $newPath = (new ManualTransferService())->saveBuktiTransfer(
+            $payment,
+            UploadedFile::fake()->image('replacement-proof.jpg')
+        );
+
+        Storage::disk('public')->assertExists($legacyPath);
+        Storage::disk('private')->assertExists($newPath);
+        $this->assertSame($newPath, $payment->fresh()->bukti_transfer);
+    }
+
+
 }
