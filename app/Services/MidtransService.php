@@ -13,6 +13,27 @@ use Illuminate\Support\Facades\DB;
 
 class MidtransService
 {
+    /**
+     * Parse an IDR amount without rounding fractional values. Midtrans may
+     * encode whole rupiah as an integer or a decimal string ending in .00.
+     */
+    private function parseWholeRupiahAmount(mixed $value): ?int
+    {
+        if (!is_scalar($value)) {
+            return null;
+        }
+
+        $amount = trim((string) $value);
+        if (!preg_match('/^\\d+(?:\\.0+)?$/D', $amount)) {
+            return null;
+        }
+
+        $whole = explode('.', $amount, 2)[0];
+        $parsed = filter_var($whole, FILTER_VALIDATE_INT);
+
+        return $parsed === false ? null : $parsed;
+    }
+
     public function __construct()
     {
         Config::$isSanitized = true;
@@ -218,9 +239,9 @@ class MidtransService
          */
         if ($internalStatus === 'settlement') {
             $expectedNominal = (int) ($pembayaran->donasi?->nominal ?? 0);
-            $actualGrossAmount = (int) round((float) $grossAmount);
+            $actualGrossAmount = $this->parseWholeRupiahAmount($grossAmount);
 
-            if ($expectedNominal <= 0 || $actualGrossAmount !== $expectedNominal) {
+            if ($expectedNominal <= 0 || $actualGrossAmount === null || $actualGrossAmount !== $expectedNominal) {
                 Log::error('Midtrans webhook: nominal tidak sesuai (Amount Integrity Mismatch)', [
                     'order_id'        => $orderId,
                     'expected_amount' => $expectedNominal,
