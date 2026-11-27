@@ -85,10 +85,11 @@ jobs:
             clear_laravel_runtime_cache() {
               # Temporary token-protected PHP endpoint runs as PHP-FPM's own
               # www account, which owns bootstrap/cache and storage directories.
-              cat > "$REPAIR_SCRIPT" <<PHP
+              REPAIR_CREATED=1
+              cat > "$REPAIR_SCRIPT" <<'PHP'
             <?php
             declare(strict_types=1);
-            if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || !hash_equals('$REPAIR_TOKEN', (string) ($_POST['token'] ?? ''))) {
+            if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || !hash_equals('__REPAIR_TOKEN__', (string) ($_POST['token'] ?? ''))) {
                 http_response_code(404);
                 exit;
             }
@@ -106,8 +107,8 @@ jobs:
             header('Content-Type: application/json');
             echo json_encode(['cleared' => $cleared, 'failed' => $failed], JSON_THROW_ON_ERROR);
             PHP
+              sed -i "s/__REPAIR_TOKEN__/$REPAIR_TOKEN/" "$REPAIR_SCRIPT"
               chmod 0644 "$REPAIR_SCRIPT"
-              REPAIR_CREATED=1
               RESPONSE="$(curl --fail --silent --show-error --max-time 30 -X POST --data-urlencode "token=$REPAIR_TOKEN" "https://staging.orangbaik.id/$REPAIR_NAME")"
               echo "Laravel cache repair response: $RESPONSE"
               case "$RESPONSE" in
