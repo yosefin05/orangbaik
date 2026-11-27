@@ -169,10 +169,12 @@ class PaymentGatewaySecurityTest extends TestCase
         $this->assertSame('old-server-key', $gateway->fresh()->getCredentialForMode('server_key', 'sandbox'));
     }
 
-    public function test_provider_detail_page_is_admin_only_and_renders_without_exposing_secrets(): void
+    public function test_admin_can_reveal_saved_gateway_credentials_on_provider_detail_page(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
-        $secret = 'DETAIL-PAGE-SECRET-MUST-STAY-HIDDEN';
+        $secret = 'DETAIL-PAGE-SECRET-REVEAL-TEST';
+        $clientKey = 'PUBLIC-CLIENT-KEY-REVEAL-TEST';
+        $signature = 'SIGNATURE-SECRET-REVEAL-TEST';
         $gateway = PaymentGateway::create([
             'name' => 'Midtrans',
             'code' => 'midtrans',
@@ -180,8 +182,8 @@ class PaymentGatewaySecurityTest extends TestCase
             'is_active' => true,
             'config' => PaymentGateway::secureConfigForStorage([
                 'sandbox_server_key' => $secret,
-                'sandbox_client_key' => 'PUBLIC-KEY-NOT-RENDERED',
-                'sandbox_signature_secret_key' => 'SIGNATURE-NOT-RENDERED',
+                'sandbox_client_key' => $clientKey,
+                'sandbox_signature_secret_key' => $signature,
             ]),
         ]);
 
@@ -189,9 +191,10 @@ class PaymentGatewaySecurityTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Konfigurasi Midtrans');
-        $response->assertDontSee($secret);
-        $response->assertDontSee('PUBLIC-KEY-NOT-RENDERED');
-        $response->assertDontSee('SIGNATURE-NOT-RENDERED');
+        $response->assertSee('value="' . $secret . '"', false);
+        $response->assertSee('value="' . $clientKey . '"', false);
+        $response->assertSee('value="' . $signature . '"', false);
+        $response->assertSee('data-toggle-secret="sandbox_server_key"', false);
     }
 
 }
