@@ -176,9 +176,9 @@ class FullFormAuditTest extends TestCase
             'email' => 'yayasan@orangbaik.id',
             'no_telepon' => '081234567890',
             'nama_dokumen' => ['Akta Notaris Kemenkumham', 'SK Domisili'],
-            'file_dokumen' => [
-                'https://drive.google.com/file/d/12345/view',
-                'https://drive.google.com/file/d/67890/view',
+            'dokumen_files' => [
+                UploadedFile::fake()->create('akta.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('sk.pdf', 100, 'application/pdf'),
             ],
         ]);
 
