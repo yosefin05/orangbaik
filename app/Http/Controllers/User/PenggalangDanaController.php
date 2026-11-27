@@ -452,8 +452,19 @@ class PenggalangDanaController extends Controller
                         ->store("dokumen_penggalang/{$penggalang->id}", 'private');
                 } else {
                     $candidateUrl = trim((string) $request->input("file_dokumen.{$i}"));
+
+                    // Existing URL-backed legacy records may remain untouched for compatibility,
+                    // but users cannot add or replace verification documents with external URLs.
                     if ($candidateUrl !== '') {
-                        $newPath = $candidateUrl;
+                        $isUnchangedLegacyUrl = $document
+                            && filter_var($oldPath, FILTER_VALIDATE_URL)
+                            && hash_equals((string) $oldPath, $candidateUrl);
+
+                        if (!$isUnchangedLegacyUrl) {
+                            return back()->withInput()->withErrors([
+                                "dokumen_files.{$i}" => 'Dokumen baru wajib diunggah langsung. Link eksternal tidak diterima.',
+                            ]);
+                        }
                     }
                 }
 
