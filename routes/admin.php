@@ -114,6 +114,9 @@ Route::middleware(['auth', 'admin'])
                 ->name('gateway.index');
             Route::get('/gateway/{gateway}', [PaymentGatewayController::class, 'show'])
                 ->name('gateway.show');
+            Route::post('/gateway/{gateway}/credentials/reveal', [PaymentGatewayController::class, 'revealCredential'])
+                ->middleware('throttle:6,1')
+                ->name('gateway.credentials.reveal');
             Route::post('/gateway', [PaymentGatewayController::class, 'store'])
                 ->name('gateway.store');
             Route::put('/gateway/{gateway}', [PaymentGatewayController::class, 'update'])

@@ -289,14 +289,14 @@
                             </div>
                         </details>
 
-                        @php
-                            $docsToShow = $legalitasDokumen ?? $penggalang->penggalangDanaDokumen;
-                        @endphp
-                        @if($penggalang->isEntity() || $isOwner || $isAdmin)
+                        {{-- Metadata dan file dokumen verifikasi hanya tampil pada sesi admin. --}}
+                        @if($isAdmin)
+                            @php
+                                $docsToShow = $legalitasDokumen ?? $penggalang->penggalangDanaDokumen;
+                            @endphp
                             <details class="info-card" open>
                                 <summary>
-                                    <span>Informasi Legalitas
-                                        {{ $penggalang->isEntity() ? $penggalang->jenis_penggalang_label : '(Privat Pemilik)' }}</span>
+                                    <span>Dokumen Verifikasi (Privat Admin)</span>
                                     <b><i class="bi bi-chevron-down"></i></b>
                                 </summary>
                                 @if($docsToShow->isNotEmpty())
@@ -305,24 +305,16 @@
                                             <div class="info-row legal-doc-row">
                                                 <strong class="info-label">{{ $dokumen->nama_dokumen }}</strong>
                                                 <p class="info-value">
-                                                    @if($isAdmin)
-                                                        <a href="{{ $dokumen->secure_view_url }}" target="_blank"
-                                                            rel="noopener noreferrer">
-                                                            <i class="bi bi-file-earmark-text"></i> Lihat / Unduh Dokumen
-                                                        </a>
-                                                    @else
-                                                        <span class="legal-doc-private">
-                                                            <i class="bi bi-lock-fill"></i> Dokumen privat
-                                                        </span>
-                                                    @endif
+                                                    <a href="{{ $dokumen->secure_view_url }}" target="_blank"
+                                                        rel="noopener noreferrer">
+                                                        <i class="bi bi-file-earmark-text"></i> Lihat / Unduh Dokumen
+                                                    </a>
                                                 </p>
                                             </div>
                                         @endforeach
                                     </div>
                                 @else
-                                    <p class="info-empty">
-                                        {{ $isOwner || $isAdmin ? 'Belum ada dokumen legalitas.' : 'Dokumen legalitas bersifat privat.' }}
-                                    </p>
+                                    <p class="info-empty">Belum ada dokumen verifikasi.</p>
                                 @endif
                             </details>
                         @endif

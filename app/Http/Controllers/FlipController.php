@@ -52,7 +52,7 @@ class FlipController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Flip webhook error', [
-                'message' => $e->getMessage(),
+                'exception_class' => get_class($e),
             ]);
 
             return response()->json([

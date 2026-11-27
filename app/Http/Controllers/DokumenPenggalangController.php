@@ -14,8 +14,8 @@ class DokumenPenggalangController extends Controller
      * Endpoint terproteksi untuk melihat/mengunduh dokumen penggalang dana.
      * Otorisasi ketat:
      * - Admin: Boleh akses semua dokumen.
-     * - Pemilik Penggalang Dana: Hanya boleh akses dokumen miliknya.
-     * - Publik/Guest: HANYA dokumen organisasi yang explicitly publik. KTP/Individu DITOLAK (403).
+     * - Admin: Boleh akses semua dokumen verifikasi.
+     * - Pemilik, pengguna lain, dan publik/guest: Tidak boleh mengakses file dokumen.
      */
     public function show(Request $request, $id)
     {
@@ -24,7 +24,7 @@ class DokumenPenggalangController extends Controller
 
         // Verifikasi hak akses
         if (!$dokumen->canBeAccessedBy($user)) {
-            abort(Response::HTTP_FORBIDDEN, 'Akses ditolak: Dokumen ini bersifat privat dan hanya dapat diakses oleh pemilik atau administrator.');
+            abort(Response::HTTP_FORBIDDEN, 'Akses ditolak: Dokumen verifikasi hanya dapat diakses administrator.');
         }
 
         $filePath = $dokumen->file_dokumen;
@@ -66,12 +66,20 @@ class DokumenPenggalangController extends Controller
 
         $mimeType = Storage::disk($disk)->mimeType($filePath) ?: 'application/octet-stream';
 
-        return response()->file($fullPath, [
+        $response = response()->file($fullPath, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
             'X-Content-Type-Options' => 'nosniff',
-            'X-Frame-Options' => 'SAMEORIGIN',
-            'Cache-Control' => 'private, no-cache, no-store, must-revalidate',
+            'X-Frame-Options' => 'DENY',
+            'Referrer-Policy' => 'no-referrer',
+            'Pragma' => 'no-cache',
         ]);
+
+        // BinaryFileResponse may append a public cache directive. Force
+        // private, non-storable semantics after the file response is created.
+        $response->setPrivate();
+        $response->headers->set('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
+
+        return $response;
     }
 }

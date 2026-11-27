@@ -260,10 +260,10 @@
                                 <div class="payment-field">
                                     <label for="{{ $key }}">{{ $labelText }}</label>
                                     <div class="payment-secret-control">
-                                        <input id="{{ $key }}" name="{{ $key }}" type="password" class="form-control" autocomplete="off" value="{{ $credentialValues[$key] ?? '' }}" placeholder="Masukkan {{ $labelText }}">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle-secret="{{ $key }}" aria-label="Tampilkan {{ $labelText }}"><i class="bi bi-eye"></i></button>
+                                        <input id="{{ $key }}" name="{{ $key }}" type="password" class="form-control" autocomplete="off" value="" placeholder="{{ $credentialFlags[$key] ? 'Tersimpan — klik mata untuk melihat' : 'Masukkan ' . $labelText }}">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-reveal-secret="{{ $key }}" data-reveal-url="{{ route('admin.payment.gateway.credentials.reveal', $gateway) }}" aria-label="Tampilkan {{ $labelText }}"><i class="bi bi-eye"></i></button>
                                     </div>
-                                    <small>{{ $credentialFlags[$key] ? 'Nilai tersimpan. Gunakan tombol mata untuk melihat atau menyembunyikannya.' : 'Belum ada kredensial tersimpan.' }}</small>
+                                    <small>{{ $credentialFlags[$key] ? 'Kredensial tersimpan dan tidak dikirim ke halaman ini. Klik mata untuk meminta tampilan sementara.' : 'Belum ada kredensial tersimpan.' }}</small>
                                 </div>
                             @endforeach
                         </div>
@@ -288,10 +288,10 @@
                                 <div class="payment-field">
                                     <label for="{{ $key }}">{{ $labelText }}</label>
                                     <div class="payment-secret-control">
-                                        <input id="{{ $key }}" name="{{ $key }}" type="password" class="form-control" autocomplete="off" value="{{ $credentialValues[$key] ?? '' }}" placeholder="Masukkan {{ $labelText }}">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle-secret="{{ $key }}" aria-label="Tampilkan {{ $labelText }}"><i class="bi bi-eye"></i></button>
+                                        <input id="{{ $key }}" name="{{ $key }}" type="password" class="form-control" autocomplete="off" value="" placeholder="{{ $credentialFlags[$key] ? 'Tersimpan — klik mata untuk melihat' : 'Masukkan ' . $labelText }}">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-reveal-secret="{{ $key }}" data-reveal-url="{{ route('admin.payment.gateway.credentials.reveal', $gateway) }}" aria-label="Tampilkan {{ $labelText }}"><i class="bi bi-eye"></i></button>
                                     </div>
-                                    <small>{{ $credentialFlags[$key] ? 'Nilai tersimpan. Gunakan tombol mata untuk melihat atau menyembunyikannya.' : 'Belum ada kredensial tersimpan.' }}</small>
+                                    <small>{{ $credentialFlags[$key] ? 'Kredensial tersimpan dan tidak dikirim ke halaman ini. Klik mata untuk meminta tampilan sementara.' : 'Belum ada kredensial tersimpan.' }}</small>
                                 </div>
                             @endforeach
                         </div>
@@ -321,15 +321,42 @@
 
 @push('scripts')
 <script>
-document.addEventListener('click', function (event) {
-    const button = event.target.closest('[data-toggle-secret]');
+document.addEventListener('click', async function (event) {
+    const button = event.target.closest('[data-reveal-secret]');
     if (!button) return;
-    const input = document.getElementById(button.dataset.toggleSecret);
+    const input = document.getElementById(button.dataset.revealSecret);
     if (!input) return;
-    const reveal = input.type === 'password';
-    input.type = reveal ? 'text' : 'password';
-    button.innerHTML = reveal ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
-    button.setAttribute('aria-label', (reveal ? 'Sembunyikan ' : 'Tampilkan ') + button.dataset.toggleSecret);
+
+    if (input.type === 'text' && input.value !== '') {
+        input.type = 'password';
+        button.innerHTML = '<i class="bi bi-eye"></i>';
+        return;
+    }
+
+    button.disabled = true;
+    try {
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content
+            || document.querySelector('input[name="_token"]')?.value;
+        const response = await fetch(button.dataset.revealUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrf || ''
+            },
+            body: JSON.stringify({ key: button.dataset.revealSecret })
+        });
+        if (!response.ok) throw new Error('Credential reveal rejected');
+        const payload = await response.json();
+        input.value = payload.value || '';
+        input.type = 'text';
+        button.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } catch (error) {
+        window.alert('Kredensial gagal ditampilkan. Muat ulang halaman dan coba lagi.');
+    } finally {
+        button.disabled = false;
+    }
 });
 </script>
 @endpush

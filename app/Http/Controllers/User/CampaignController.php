@@ -10,13 +10,13 @@ use App\Models\Campaign_Package;
 use App\Models\Filter;
 use App\Models\Kategori;
 use App\Models\Donasi;
-use App\Models\Penggalang_Dana;
 use App\Support\RichText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class CampaignController extends Controller
@@ -27,7 +27,6 @@ class CampaignController extends Controller
         $now = Carbon::now();
         $filters = Filter::all();
         $kategori = Kategori::all();
-        $penggalangDana = Penggalang_Dana::where('status', 'verified')->get();
 
         // tampilkan campaign aktif
         $query = Campaign::with(['penggalangDana', 'donasi.pembayaran', 'kategori', 'filter'])
@@ -115,8 +114,7 @@ class CampaignController extends Controller
             'campaignTerbaru',
             'campaigns',
             'selectedJenis',
-            'selectedFilterIds',
-            'penggalangDana'
+            'selectedFilterIds'
         ));
     }
 
@@ -261,11 +259,16 @@ class CampaignController extends Controller
             return redirect($campaign->public_url)
                 ->with('success', $message);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('Campaign creation failed.', [
+                'user_id' => auth()->id(),
+                'exception_class' => get_class($e),
+            ]);
+
             return back()
                 ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat membuat campaign. Silakan coba lagi atau hubungi admin.');
         }
     }
 
@@ -306,6 +309,12 @@ class CampaignController extends Controller
             'filter'
         ])
             ->where('is_active', true)
+            // Direct URLs must enforce the same approval gate as public listings.
+            ->where(function ($query) {
+                $query->where('campaign_type', 'regular')
+                    ->orWhere('approval_status', 'approved')
+                    ->orWhereNull('approval_status');
+            })
             ->where(function ($query) use ($slug) {
                 $query->where('slug', $slug)
                     ->orWhere('custom_slug', $slug);
@@ -350,6 +359,11 @@ class CampaignController extends Controller
             ->where(function ($query) {
                 $query->whereNull('tanggal_berakhir')
                     ->orWhere('tanggal_berakhir', '>=', now());
+            })
+            ->where(function ($query) {
+                $query->where('campaign_type', 'regular')
+                    ->orWhere('approval_status', 'approved')
+                    ->orWhereNull('approval_status');
             })
             ->latest()
             ->take(5)
@@ -759,10 +773,7 @@ class CampaignController extends Controller
             \Log::error('Campaign update failed', [
                 'campaign_id' => $campaign->id,
                 'user_id' => auth()->id(),
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
+                'exception_class' => get_class($e),
             ]);
 
             return back()

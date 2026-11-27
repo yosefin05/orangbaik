@@ -233,7 +233,7 @@ return response()->json(array_merge([
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Donasi store error', [
-                'message'    => $e->getMessage(),
+                'exception_class' => get_class($e),
                 'channel_id' => $channelId,
                 'campaign'   => $campaign->id,
             ]);
@@ -348,7 +348,7 @@ return response()->json(array_merge([
         } catch (\Exception $e) {
             Log::error('Upload bukti transfer gagal', [
                 'pembayaran_id' => $pembayaran->id,
-                'error'         => $e->getMessage(),
+                'exception_class' => get_class($e),
             ]);
 
             return back()->with('error', 'Gagal mengunggah bukti transfer. Silakan coba lagi.');
@@ -402,12 +402,21 @@ return response()->json(array_merge([
         $fullPath = \Illuminate\Support\Facades\Storage::disk($disk)->path($filePath);
         $mimeType = \Illuminate\Support\Facades\Storage::disk($disk)->mimeType($filePath) ?: 'image/jpeg';
 
-        return response()->file($fullPath, [
+        $response = response()->file($fullPath, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="bukti-transfer-' . $pembayaran->order_id . '.' . pathinfo($fullPath, PATHINFO_EXTENSION) . '"',
             'X-Content-Type-Options' => 'nosniff',
-            'Cache-Control' => 'private, no-cache, must-revalidate',
+            'X-Frame-Options' => 'DENY',
+            'Referrer-Policy' => 'no-referrer',
+            'Pragma' => 'no-cache',
         ]);
+
+        // BinaryFileResponse may default to public caching; explicitly force
+        // private cache semantics for financial evidence.
+        $response->setPrivate();
+        $response->headers->set('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
+
+        return $response;
     }
 
     /**

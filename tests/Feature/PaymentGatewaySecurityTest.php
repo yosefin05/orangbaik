@@ -111,6 +111,31 @@ class PaymentGatewaySecurityTest extends TestCase
         $this->assertSame('LEGACY-LIVE-server-key', $gateway->getCredentialForMode('signature_secret_key', 'production'));
     }
 
+    public function test_generic_api_driver_is_disabled_and_rejects_all_webhooks(): void
+    {
+        $gateway = PaymentGateway::create([
+            'name' => 'Unverified provider',
+            'code' => 'unverified',
+            'driver' => 'unverified',
+            'is_active' => false,
+            'config' => PaymentGateway::secureConfigForStorage([
+                'api_key' => 'some-key',
+                'endpoint_url' => 'https://provider.example.test/pay',
+            ]),
+        ]);
+
+        $driver = (new \App\Services\PaymentGateways\GenericApiDriver())->setGateway($gateway);
+
+        $this->assertFalse($driver->isConfigured());
+        $this->assertFalse($driver->handleWebhook(
+            \Illuminate\Http\Request::create('/payment/unverified/webhook', 'POST', [
+                'order_id' => 'OB-FAKE-ORDER',
+                'status' => 'settlement',
+                'amount' => 100000,
+            ])
+        ));
+    }
+
     public function test_manager_rejects_provider_without_a_dedicated_adapter(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -169,7 +194,7 @@ class PaymentGatewaySecurityTest extends TestCase
         $this->assertSame('old-server-key', $gateway->fresh()->getCredentialForMode('server_key', 'sandbox'));
     }
 
-    public function test_admin_can_reveal_saved_gateway_credentials_on_provider_detail_page(): void
+    public function test_gateway_detail_page_never_embeds_saved_credentials_in_initial_html(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $secret = 'DETAIL-PAGE-SECRET-REVEAL-TEST';
@@ -191,10 +216,60 @@ class PaymentGatewaySecurityTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Konfigurasi Midtrans');
-        $response->assertSee('value="' . $secret . '"', false);
-        $response->assertSee('value="' . $clientKey . '"', false);
-        $response->assertSee('value="' . $signature . '"', false);
-        $response->assertSee('data-toggle-secret="sandbox_server_key"', false);
+        $response->assertDontSee($secret);
+        $response->assertDontSee($clientKey);
+        $response->assertDontSee($signature);
+        $response->assertSee('data-reveal-secret="sandbox_server_key"', false);
+    }
+
+    public function test_admin_can_reveal_saved_credential_only_through_explicit_no_store_post(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $secret = 'POST-ONLY-SECRET-REVEAL-TEST';
+        $gateway = PaymentGateway::create([
+            'name' => 'Midtrans',
+            'code' => 'midtrans',
+            'driver' => 'midtrans',
+            'is_active' => true,
+            'config' => PaymentGateway::secureConfigForStorage([
+                'sandbox_server_key' => $secret,
+            ]),
+        ]);
+
+        $response = $this->actingAs($admin)->postJson(
+            route('admin.payment.gateway.credentials.reveal', $gateway),
+            ['key' => 'sandbox_server_key']
+        );
+
+        $response->assertOk()->assertJson(['value' => $secret]);
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control', ''));
+        $this->assertStringContainsString('private', $response->headers->get('Cache-Control', ''));
+        $response->assertHeader('Pragma', 'no-cache');
+    }
+
+    public function test_credential_reveal_rejects_unknown_keys_and_non_admin_users(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['role' => 'user']);
+        $gateway = PaymentGateway::create([
+            'name' => 'Midtrans',
+            'code' => 'midtrans',
+            'driver' => 'midtrans',
+            'is_active' => true,
+            'config' => PaymentGateway::secureConfigForStorage([
+                'sandbox_server_key' => 'known-secret',
+            ]),
+        ]);
+
+        $this->actingAs($admin)->postJson(
+            route('admin.payment.gateway.credentials.reveal', $gateway),
+            ['key' => 'database_password']
+        )->assertUnprocessable();
+
+        $this->actingAs($user)->postJson(
+            route('admin.payment.gateway.credentials.reveal', $gateway),
+            ['key' => 'sandbox_server_key']
+        )->assertForbidden();
     }
 
 }

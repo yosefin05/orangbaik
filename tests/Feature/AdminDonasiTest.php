@@ -166,4 +166,32 @@ class AdminDonasiTest extends TestCase
         $this->assertStringContainsString('Ahmad Donatur', $content);
         $this->assertStringNotContainsString('Budi Santoso', $content);
     }
+    public function test_csv_export_prefixes_untrusted_formula_cells(): void
+    {
+        $admin = $this->createAdminUser();
+        $campaign = $this->createCampaignWithDonations();
+        $donation = Donasi::where('campaign_id', $campaign->id)->firstOrFail();
+
+        $campaign->update([
+            'judul' => '=HYPERLINK("https://example.test","campaign")',
+        ]);
+        $donation->update([
+            'nama_donatur' => '=1+1',
+            'email' => '+cmd@example.test',
+            'pesan_doa' => '@SUM(1,1)',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.donasi.export'));
+        $response->assertOk();
+
+        ob_start();
+        $response->sendContent();
+        $content = ob_get_clean();
+
+        $this->assertStringContainsString("'=HYPERLINK", $content);
+        $this->assertStringContainsString("'=1+1", $content);
+        $this->assertStringContainsString("'+cmd@example.test", $content);
+        $this->assertStringContainsString("'@SUM(1,1)", $content);
+    }
+
 }

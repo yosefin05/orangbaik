@@ -221,7 +221,7 @@
                             </td>
 
                             <td>
-                                <span class="badge badge-red" title="Dokumen verifikasi hanya dapat diakses oleh pemilik dan admin berwenang">
+                                <span class="badge badge-red" title="Dokumen verifikasi hanya dapat diakses oleh admin berwenang">
                                     <i class="bi bi-lock-fill"></i> Privat
                                 </span>
                             </td>

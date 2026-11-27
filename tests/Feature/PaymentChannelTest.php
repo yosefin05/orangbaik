@@ -328,6 +328,126 @@ class PaymentChannelTest extends TestCase
         $this->assertEquals('pending', $pembayaran->fresh()->transaction_status);
     }
 
+    public function test_flip_webhook_rejects_fractional_rupiah_amount_without_truncating(): void
+    {
+        Config::set('payment.flip.webhook_token', 'test-flip-token');
+
+        $donasi = $this->createDonasi();
+        $channel = PaymentChannel::where('payment_gateway_id', PaymentGateway::where('code', 'flip')->first()->id)->firstOrFail();
+        $flipId = '2502091430251230010';
+        $paymentId = 'PGPWF10117309708599318554';
+        $orderId = 'OB-FLIP-FRACTION-' . uniqid();
+
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'order_id' => $orderId,
+            'transaction_id' => $flipId,
+            'payment_type' => 'va',
+            'transaction_status' => 'pending',
+            'gateway_response' => [
+                'credential_mode' => 'sandbox',
+                'link_id' => $flipId,
+                'flip_payment_id' => $paymentId,
+                'unique_code' => 0,
+            ],
+        ]);
+
+        $result = (new FlipService())->handleWebhook('test-flip-token', [
+            'data' => json_encode([
+                'id' => $paymentId,
+                'bill_link_id' => $flipId,
+                'reference_id' => $orderId,
+                'amount' => '50000.99',
+                'status' => 'SUCCESSFUL',
+            ]),
+        ]);
+
+        $this->assertFalse($result);
+        $this->assertSame('pending', $pembayaran->fresh()->transaction_status);
+        $this->assertNull($pembayaran->fresh()->paid_at);
+    }
+
+    public function test_flip_webhook_rejects_settlement_amount_mismatch(): void
+    {
+        Config::set('payment.flip.webhook_token', 'test-flip-token');
+
+        $donasi = $this->createDonasi();
+        $channel = PaymentChannel::where('payment_gateway_id', PaymentGateway::where('code', 'flip')->first()->id)->firstOrFail();
+        $flipId = '2502091430251230008';
+        $paymentId = 'PGPWF10117309708599318552';
+        $orderId = 'OB-FLIP-AMOUNT-' . uniqid();
+
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'order_id' => $orderId,
+            'transaction_id' => $flipId,
+            'payment_type' => 'va',
+            'transaction_status' => 'pending',
+            'gateway_response' => [
+                'credential_mode' => 'sandbox',
+                'link_id' => $flipId,
+                'flip_payment_id' => $paymentId,
+                'unique_code' => 0,
+            ],
+        ]);
+
+        $result = (new FlipService())->handleWebhook('test-flip-token', [
+            'data' => json_encode([
+                'id' => $paymentId,
+                'bill_link_id' => $flipId,
+                'reference_id' => $orderId,
+                'amount' => 49999,
+                'status' => 'SUCCESSFUL',
+            ]),
+        ]);
+
+        $this->assertFalse($result);
+        $this->assertSame('pending', $pembayaran->fresh()->transaction_status);
+        $this->assertNull($pembayaran->fresh()->paid_at);
+    }
+
+    public function test_flip_webhook_rejects_mismatched_provider_payment_identifier(): void
+    {
+        Config::set('payment.flip.webhook_token', 'test-flip-token');
+
+        $donasi = $this->createDonasi();
+        $channel = PaymentChannel::where('payment_gateway_id', PaymentGateway::where('code', 'flip')->first()->id)->firstOrFail();
+        $flipId = '2502091430251230009';
+        $paymentId = 'PGPWF10117309708599318553';
+        $orderId = 'OB-FLIP-ID-' . uniqid();
+
+        $pembayaran = Pembayaran::create([
+            'donasi_id' => $donasi->id,
+            'payment_channel_id' => $channel->id,
+            'order_id' => $orderId,
+            'transaction_id' => $flipId,
+            'payment_type' => 'va',
+            'transaction_status' => 'pending',
+            'gateway_response' => [
+                'credential_mode' => 'sandbox',
+                'link_id' => $flipId,
+                'flip_payment_id' => $paymentId,
+                'unique_code' => 0,
+            ],
+        ]);
+
+        $result = (new FlipService())->handleWebhook('test-flip-token', [
+            'data' => json_encode([
+                'id' => 'WRONG-PROVIDER-PAYMENT-ID',
+                'bill_link_id' => $flipId,
+                'reference_id' => $orderId,
+                'amount' => 50000,
+                'status' => 'SUCCESSFUL',
+            ]),
+        ]);
+
+        $this->assertFalse($result);
+        $this->assertSame('pending', $pembayaran->fresh()->transaction_status);
+        $this->assertNull($pembayaran->fresh()->paid_at);
+    }
+
     // =========================================================================
     // 4. MANUAL TRANSFER TESTS (Dompet Al Qur'an)
     // =========================================================================
@@ -1076,7 +1196,7 @@ class PaymentChannelTest extends TestCase
                     [
                         'attribute' => 'sender_bank',
                         'code' => 'METHOD_NOT_ENABLED',
-                        'message' => 'Bank method unavailable for test@example.com, contact 08123456789.',
+                        'message' => 'Bank method unavailable for test@example.com, contact 08123456789, account 1234567890123456, token=FLIPSECRET123.',
                     ],
                 ],
             ], 422),
@@ -1102,7 +1222,95 @@ class PaymentChannelTest extends TestCase
                     && str_contains($providerMessage, '[redacted-email]')
                     && str_contains($providerMessage, '[redacted-phone]')
                     && !str_contains($providerMessage, 'test@example.com')
-                    && !str_contains($providerMessage, '08123456789');
+                    && !str_contains($providerMessage, '08123456789')
+                    && str_contains($providerMessage, '[redacted-number]')
+                    && str_contains($providerMessage, 'token=[redacted]')
+                    && !str_contains($providerMessage, '1234567890123456')
+                    && !str_contains($providerMessage, 'FLIPSECRET123');
             });
     }
+
+    public function test_replacing_a_legacy_public_transfer_proof_does_not_delete_historical_file(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+
+        $legacyPath = 'bukti-transfer/legacy-proof.jpg';
+        Storage::disk('public')->put($legacyPath, 'historical-proof-content');
+
+        $payment = (new ManualTransferService())->createTransaction($this->createDonasi(), $manualChannel);
+        $payment->update(['bukti_transfer' => $legacyPath]);
+
+        $newPath = (new ManualTransferService())->saveBuktiTransfer(
+            $payment,
+            UploadedFile::fake()->image('replacement-proof.jpg')
+        );
+
+        Storage::disk('public')->assertExists($legacyPath);
+        Storage::disk('private')->assertExists($newPath);
+        $this->assertSame($newPath, $payment->fresh()->bukti_transfer);
+    }
+
+
+
+    public function test_replacing_a_private_transfer_proof_deletes_old_file_only_after_successful_replacement(): void
+    {
+        Storage::fake('private');
+
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+
+        $oldPath = 'bukti-transfer/previous-private-proof.jpg';
+        Storage::disk('private')->put($oldPath, 'previous-proof-content');
+
+        $payment = (new ManualTransferService())->createTransaction($this->createDonasi(), $manualChannel);
+        $payment->update(['bukti_transfer' => $oldPath]);
+
+        $newPath = (new ManualTransferService())->saveBuktiTransfer(
+            $payment,
+            UploadedFile::fake()->image('replacement-private-proof.jpg')
+        );
+
+        Storage::disk('private')->assertMissing($oldPath);
+        Storage::disk('private')->assertExists($newPath);
+        $this->assertSame($newPath, $payment->fresh()->bukti_transfer);
+    }
+
+    public function test_private_transfer_proof_response_is_not_cacheable_and_has_security_headers(): void
+    {
+        Storage::fake('private');
+
+        $donasi = $this->createDonasi();
+        $manualGateway = PaymentGateway::where('code', 'manual')->firstOrFail();
+        $manualChannel = PaymentChannel::where('payment_gateway_id', $manualGateway->id)
+            ->where('channel_code', 'BSI - NM')
+            ->firstOrFail();
+
+        $service = new ManualTransferService();
+        $payment = $service->createTransaction($donasi, $manualChannel);
+        $service->saveBuktiTransfer($payment, UploadedFile::fake()->image('private-proof.jpg'));
+
+        $response = $this->actingAs($donasi->user)
+            ->get(route('donasi.bayar.bukti_transfer', $payment->id));
+
+        $response->assertOk()
+            ->assertHeader('Pragma', 'no-cache')
+            ->assertHeader('X-Content-Type-Options', 'nosniff')
+            ->assertHeader('X-Frame-Options', 'DENY')
+            ->assertHeader('Referrer-Policy', 'no-referrer');
+
+        $cacheControl = strtolower((string) $response->headers->get('Cache-Control'));
+        $this->assertStringContainsString('private', $cacheControl);
+        $this->assertStringContainsString('no-store', $cacheControl);
+        $this->assertStringNotContainsString('public', $cacheControl);
+    }
+
+
 }

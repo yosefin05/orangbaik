@@ -53,17 +53,15 @@ class ManualTransferService
      */
     public function saveBuktiTransfer(Pembayaran $pembayaran, UploadedFile $file): string
     {
-        return DB::transaction(function () use ($pembayaran, $file): string {
+        $result = DB::transaction(function () use ($pembayaran, $file): array {
             $lockedPayment = $this->lockPendingManualPayment($pembayaran);
 
-            // Hapus file lama jika ada (cek disk private dan public untuk data migrasi)
-            if ($lockedPayment->bukti_transfer) {
-                if (Storage::disk('private')->exists($lockedPayment->bukti_transfer)) {
-                    Storage::disk('private')->delete($lockedPayment->bukti_transfer);
-                } elseif (Storage::disk('public')->exists($lockedPayment->bukti_transfer)) {
-                    Storage::disk('public')->delete($lockedPayment->bukti_transfer);
-                }
-            }
+            // Keep the old proof intact until the replacement file and database
+            // pointer have both been committed successfully.
+            $oldPrivatePath = $lockedPayment->bukti_transfer
+                && Storage::disk('private')->exists($lockedPayment->bukti_transfer)
+                    ? $lockedPayment->bukti_transfer
+                    : null;
 
             // Simpan file baru di private storage (tidak dapat diakses publik langsung)
             $path = $file->store('bukti-transfer', 'private');
@@ -78,8 +76,19 @@ class ManualTransferService
                 'path'     => $path,
             ]);
 
-            return $path;
+            return [
+                'path' => $path,
+                'old_private_path' => $oldPrivatePath,
+            ];
         });
+
+        // Filesystem changes are not rolled back with the SQL transaction.
+        // Delete the superseded private file only after the new DB pointer commits.
+        if ($result['old_private_path'] && $result['old_private_path'] !== $result['path']) {
+            Storage::disk('private')->delete($result['old_private_path']);
+        }
+
+        return $result['path'];
     }
 
     /**

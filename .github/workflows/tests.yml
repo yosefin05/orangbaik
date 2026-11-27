@@ -52,6 +52,13 @@ jobs:
       - name: Prepare isolated test environment
         run: cp .env.example .env
 
+      - name: Verify PHP syntax and Laravel route registration/cache
+        run: |
+          find app routes database tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+          php artisan route:list --except-vendor --json > /tmp/orangbaik-routes.json
+          php artisan route:cache
+          php artisan route:clear
+
       - name: Run complete Laravel test suite
         env:
           APP_ENV: testing

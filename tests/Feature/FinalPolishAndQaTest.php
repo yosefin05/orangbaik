@@ -29,6 +29,7 @@ class FinalPolishAndQaTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public');
+        Storage::fake('private');
 
         $this->user = User::factory()->create([
             'role' => 'user',
@@ -128,7 +129,10 @@ class FinalPolishAndQaTest extends TestCase
             'email'            => 'kontak@peduliumat.org',
             'no_telepon'       => '081234567890',
             'nama_dokumen'     => ['Akta Kemenkumham', 'SK BAZNAS'],
-            'file_dokumen'     => ['https://drive.google.com/doc1', 'https://drive.google.com/doc2'],
+            'dokumen_files'    => [
+                UploadedFile::fake()->create('akta.pdf', 100, 'application/pdf'),
+                UploadedFile::fake()->create('sk.pdf', 100, 'application/pdf'),
+            ],
             'jenis_penggalang' => 'organisasi',
         ];
 
@@ -169,7 +173,6 @@ class FinalPolishAndQaTest extends TestCase
             'email',
             'no_telepon',
             'nama_dokumen.0',
-            'file_dokumen.0',
         ]);
     }
 
@@ -189,7 +192,7 @@ class FinalPolishAndQaTest extends TestCase
             'email'            => 'fulan@gmail.com',
             'no_telepon'       => '085712345678',
             'nama_dokumen'     => ['KTP Relawan'],
-            'file_dokumen'     => ['https://drive.google.com/ktp'],
+            'dokumen_files'    => [UploadedFile::fake()->create('ktp.pdf', 100, 'application/pdf')],
             'jenis_penggalang' => 'individu',
         ];
 

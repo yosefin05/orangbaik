@@ -1,3 +1,5 @@
+> **Catatan historis (19 November 2026):** Matriks ini merekam hasil QA pada tanggal pemeriksaan. Statusnya tidak otomatis berlaku untuk commit audit terbaru. Untuk status terkini, cocokkan dengan CI pada PR audit dan `docs/architecture/CODEBASE_ENGINEERING_AUDIT_2026-11-27.md`; pemeriksaan browser, staging, backup, dan live gateway tetap membutuhkan bukti operasional terbaru.
+
 # QA Matrix — Finalisasi OrangBaik
 
 Tanggal pemeriksaan: 2026-11-19

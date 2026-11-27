@@ -7,11 +7,10 @@ use App\Models\Penggalang_Dana;
 use App\Models\Penggalang_Dana_Dokumen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 
 class PenggalangDanaController extends Controller
 {
@@ -59,22 +58,23 @@ class PenggalangDanaController extends Controller
             'misi'             => 'required',
             'email'            => 'required|email',
             'no_telepon'       => ['required', 'regex:/^62[0-9]{8,13}$/'],
-            'nama_dokumen'     => 'required|array|min:1',
-            'nama_dokumen.0'   => 'required|string',
+            'nama_dokumen'     => 'required|array|min:1|max:3',
+            'nama_dokumen.0'   => 'required|string|max:100',
+            'nama_dokumen.*'   => 'nullable|string|max:100',
+            'dokumen_files'    => 'nullable|array|max:3',
             'dokumen_files.*'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'file_dokumen.*'   => 'nullable|url|max:2048',
-            'file_dokumen.0'   => 'required_without:dokumen_files.0|nullable|url|max:2048',
             'instagram'        => 'nullable|string|max:255',
             'facebook'         => 'nullable|string|max:255',
             'youtube'          => 'nullable|string|max:255',
             'tiktok'           => 'nullable|string|max:255',
         ]);
 
-        // Cek setidaknya ada 1 file atau URL dokumen
-        $hasDoc0 = $request->hasFile('dokumen_files.0') || !empty($request->input('file_dokumen.0'));
+        // Verification documents must be uploaded directly to private storage.
+        // External URLs cannot be controlled for confidentiality or availability.
+        $hasDoc0 = $request->hasFile('dokumen_files.0');
         if (!$hasDoc0) {
             return redirect()->back()->withInput()->withErrors([
-                'file_dokumen.0' => 'Dokumen persyaratan pertama wajib diunggah (PDF, JPG, PNG maks 5MB) atau sertakan link.',
+                'dokumen_files.0' => 'Dokumen persyaratan pertama wajib diunggah (PDF, JPG, PNG maks 5MB). Link eksternal tidak diterima.',
             ]);
         }
 
@@ -132,9 +132,6 @@ class PenggalangDanaController extends Controller
                     $uploadedFile = $request->file("dokumen_files.{$index}");
                     $filePath = $uploadedFile->store("dokumen_penggalang/{$penggalangDana->id}", 'private');
                     $disk = 'private';
-                } elseif (!empty($request->file_dokumen[$index])) {
-                    $filePath = trim($request->file_dokumen[$index]);
-                    $disk = 'private';
                 }
 
                 if ($filePath) {
@@ -154,12 +151,17 @@ class PenggalangDanaController extends Controller
                 ->route('profile.user')
                 ->with('success', 'Pengajuan penggalang dana berhasil dikirim. Tim admin akan memverifikasi dalam 1-3 hari kerja.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('Fundraiser organization submission failed.', [
+                'user_id' => $request->user()?->getAuthIdentifier(),
+                'exception_class' => get_class($e),
+            ]);
+
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat menyimpan pengajuan. Silakan coba lagi atau hubungi admin.');
         }
     }
 
@@ -177,10 +179,10 @@ class PenggalangDanaController extends Controller
             'deskripsi'       => 'nullable',
             'email'           => 'required|email',
             'no_telepon'      => ['required', 'regex:/^62[0-9]{8,13}$/'],
-            'nama_dokumen'    => 'required|array|min:1',
-            'nama_dokumen.0'  => 'required|string',
+            'nama_dokumen'    => 'required|array|min:1|max:1',
+            'nama_dokumen.0'  => 'required|string|max:100',
+            'dokumen_files'   => 'nullable|array|max:1',
             'dokumen_files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'file_dokumen.*'  => 'nullable|url|max:2048',
             'visi'            => 'nullable|string|max:5000',
             'misi'            => 'nullable|string|max:10000',
             'instagram'       => 'nullable',
@@ -189,10 +191,10 @@ class PenggalangDanaController extends Controller
             'tiktok'          => 'nullable',
         ]);
 
-        $hasDoc0 = $request->hasFile('dokumen_files.0') || !empty($request->input('file_dokumen.0'));
+        $hasDoc0 = $request->hasFile('dokumen_files.0');
         if (!$hasDoc0) {
             return redirect()->back()->withInput()->withErrors([
-                'dokumen_files.0' => 'Dokumen identitas KTP wajib diunggah (PDF, JPG, PNG maks 5MB) atau sertakan link.',
+                'dokumen_files.0' => 'Dokumen identitas KTP wajib diunggah (PDF, JPG, PNG maks 5MB). Link eksternal tidak diterima.',
             ]);
         }
 
@@ -237,9 +239,6 @@ class PenggalangDanaController extends Controller
                     $uploadedFile = $request->file("dokumen_files.{$i}");
                     $filePath = $uploadedFile->store("dokumen_penggalang/{$penggalangDana->id}", 'private');
                     $disk = 'private';
-                } elseif (!empty($request->file_dokumen[$i])) {
-                    $filePath = trim($request->file_dokumen[$i]);
-                    $disk = 'private';
                 }
 
                 if ($filePath) {
@@ -259,10 +258,15 @@ class PenggalangDanaController extends Controller
                 ->route('profile.user')
                 ->with('success', 'Pengajuan berhasil dikirim. Tim admin akan memverifikasi dalam 1-3 hari kerja.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('Fundraiser individual submission failed.', [
+                'user_id' => $request->user()?->getAuthIdentifier(),
+                'exception_class' => get_class($e),
+            ]);
+
             return redirect()->back()->withInput()
-                ->with('error', 'Terjadi kesalahan: Gagal menyimpan data: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat menyimpan pengajuan. Silakan coba lagi atau hubungi admin.');
         }
     }
 
@@ -286,23 +290,23 @@ class PenggalangDanaController extends Controller
             abort(404, 'Profil penggalang dana tidak ditemukan atau belum disetujui.');
         }
 
-        // Dokumen handling:
-        // - Owner atau Admin: dapat melihat seluruh dokumen
-        // - Publik: jika organisasi/yayasan/komunitas, hanya dokumen publik. Jika individu, KOSONG (0 dokumen di-load).
-        if ($isOwner || $isAdmin) {
+        // Dokumen verifikasi (termasuk KTP dan legalitas organisasi) hanya
+        // dimuat untuk admin. Owner cukup melihat status verifikasi, bukan nama,
+        // metadata, atau file dokumen yang diunggah.
+        if ($isAdmin) {
             $penggalang->load('penggalangDanaDokumen');
-            // Pemilik/admin perlu melihat campaign pending/rejected untuk memantau workflow.
+        } else {
+            $penggalang->setRelation('penggalangDanaDokumen', collect([]));
+        }
+
+        // Pemilik/admin dapat memantau campaign pending/rejected; publik hanya
+        // melihat campaign yang aktif dan telah disetujui.
+        if ($isOwner || $isAdmin) {
             $penggalang->load('campaign');
-        } elseif ($penggalang->isEntity()) {
+        } else {
             $penggalang->setRelation('campaign', $penggalang->campaign
                 ->filter(fn ($campaign) => $campaign->is_active && $campaign->isApproved())
                 ->values());
-            $penggalang->load(['penggalangDanaDokumen' => function ($q) {
-                $q->publicOnly();
-            }]);
-        } else {
-            // Penggalang individu: dokumen identitas (KTP dsb) 100% PRIVATE, jangan pernah di-load untuk publik
-            $penggalang->setRelation('penggalangDanaDokumen', collect([]));
         }
 
         // Jika owner, tandai notifikasi sudah dibaca
@@ -319,7 +323,6 @@ class PenggalangDanaController extends Controller
     {
         $penggalang = auth()->user()
             ->penggalangDana()
-            ->with('penggalangDanaDokumen')
             ->firstOrFail();
 
         if (!$penggalang->status_read) {
@@ -334,12 +337,19 @@ class PenggalangDanaController extends Controller
      */
     public function edit($id)
     {
-        $penggalang = Penggalang_Dana::with('penggalangDanaDokumen')
+        $penggalang = Penggalang_Dana::query()
             ->where('id', $id)
             ->orWhere('slug', $id)
             ->firstOrFail();
 
         Gate::authorize('update', $penggalang);
+
+        // Verification metadata and file paths are admin-only for both
+        // individuals and organizations. The owner form receives only IDs
+        // needed to associate a replacement upload or deletion request.
+        $penggalang->load(['penggalangDanaDokumen' => function ($query) {
+            $query->select(['id', 'penggalang_dana_id']);
+        }]);
 
         $categories = Penggalang_Dana::getCategoryLabels();
 
@@ -380,7 +390,9 @@ class PenggalangDanaController extends Controller
             'remove_foto_profil' => 'nullable|boolean',
             'remove_thumbnail' => 'nullable|boolean',
             'tahun_berdiri'    => 'nullable',
-            'nama_dokumen'     => 'nullable|array',
+            'nama_dokumen'     => 'nullable|array|max:' . ($penggalang->isIndividu() ? 1 : 3),
+            'nama_dokumen.*'   => 'nullable|string|max:100',
+            'dokumen_files'    => 'nullable|array|max:' . ($penggalang->isIndividu() ? 1 : 3),
             'dokumen_files.*'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'file_dokumen.*'   => 'nullable|url|max:2048',
         ]);
@@ -429,6 +441,31 @@ class PenggalangDanaController extends Controller
             $namaDokumenArr = $request->input('nama_dokumen', []);
             $existingDokumen = $penggalang->penggalangDanaDokumen()->orderBy('id')->get();
 
+            // Validate all legacy URL fields before mutating any document rows.
+            // This prevents a later invalid field from leaving earlier rows partially updated.
+            foreach ($namaDokumenArr as $i => $nama) {
+                $documentId = $request->input("dokumen_ids.{$i}");
+                $document = $documentId
+                    ? $existingDokumen->firstWhere('id', (int) $documentId)
+                    : $existingDokumen->get($i);
+                $candidateUrl = trim((string) $request->input("file_dokumen.{$i}"));
+
+                if ($candidateUrl === '') {
+                    continue;
+                }
+
+                $oldPath = $document?->file_dokumen;
+                $isUnchangedLegacyUrl = $document
+                    && filter_var($oldPath, FILTER_VALIDATE_URL)
+                    && hash_equals((string) $oldPath, $candidateUrl);
+
+                if (!$isUnchangedLegacyUrl) {
+                    return back()->withInput()->withErrors([
+                        "dokumen_files.{$i}" => 'Dokumen baru wajib diunggah langsung. Link eksternal tidak diterima.',
+                    ]);
+                }
+            }
+
             foreach ($namaDokumenArr as $i => $nama) {
                 $nama = trim((string) $nama);
                 if ($nama === '') {
@@ -449,23 +486,36 @@ class PenggalangDanaController extends Controller
                         ->store("dokumen_penggalang/{$penggalang->id}", 'private');
                 } else {
                     $candidateUrl = trim((string) $request->input("file_dokumen.{$i}"));
+
+                    // Existing URL-backed legacy records may remain untouched for compatibility,
+                    // but users cannot add or replace verification documents with external URLs.
                     if ($candidateUrl !== '') {
-                        $newPath = $candidateUrl;
+                        $isUnchangedLegacyUrl = $document
+                            && filter_var($oldPath, FILTER_VALIDATE_URL)
+                            && hash_equals((string) $oldPath, $candidateUrl);
+
+                        if (!$isUnchangedLegacyUrl) {
+                            return back()->withInput()->withErrors([
+                                "dokumen_files.{$i}" => 'Dokumen baru wajib diunggah langsung. Link eksternal tidak diterima.',
+                            ]);
+                        }
                     }
                 }
 
                 if (!$newPath) {
-                    if ($document && $document->nama_dokumen !== $nama) {
-                        $document->update(['nama_dokumen' => $nama]);
-                    }
+                    // Existing verification names and paths are admin-only
+                    // metadata. An owner edit without a replacement file
+                    // must never rewrite the stored document metadata.
                     continue;
                 }
 
                 $pathChanged = !$document || $oldPath !== $newPath || $oldDisk !== $newDisk;
                 $data = [
-                    'nama_dokumen' => $nama,
+                    'nama_dokumen' => $document?->nama_dokumen ?? $nama,
                     'file_dokumen' => $newPath,
-                    'is_public' => $document?->is_public ?? false,
+                    // Verification documents are always private, even
+                    // when replacing a legacy row previously marked public.
+                    'is_public' => false,
                     'storage_disk' => $newDisk,
                 ];
 

@@ -1,3 +1,5 @@
+> **Catatan historis (9 November 2026):** Status dan temuan dalam dokumen ini merekam pemeriksaan pada tanggal tersebut, bukan kondisi branch saat ini. Perbaikan setelah tanggal itu tidak menghapus nilai historis catatan ini. Untuk keputusan terkini, gunakan `docs/architecture/CODEBASE_ENGINEERING_AUDIT_2026-11-27.md`, hasil CI terbaru pada PR audit, serta bukti staging aktual. Jangan gunakan label `VERIFIED`/`FAILED` di bawah sebagai status rilis saat ini tanpa pemeriksaan ulang.
+
 # OrangBaik.id — Final Release Verification
 
 Tanggal: 2026-11-09

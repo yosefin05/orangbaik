@@ -170,6 +170,45 @@ class PreLaunchHardeningTest extends TestCase
         $response->assertSee('Yayasan Kita');
     }
 
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function fundraiser_cannot_join_a_campaign_pending_admin_approval(): void
+    {
+        $pendingCampaign = $this->campaign->replicate();
+        $pendingCampaign->slug = 'pending-fundraiser-' . uniqid();
+        $pendingCampaign->judul = 'Campaign Menunggu Persetujuan';
+        $pendingCampaign->campaign_type = 'emergency';
+        $pendingCampaign->approval_status = 'pending';
+        $pendingCampaign->is_active = true;
+        $pendingCampaign->save();
+
+        $response = $this->actingAs($this->user)
+            ->post(route('fundraiser.store', $pendingCampaign->slug), [
+                'alias' => 'relawan-uji',
+            ]);
+
+        $response->assertNotFound();
+        $this->assertDatabaseMissing('campaign_fundraiser', [
+            'campaign_id' => $pendingCampaign->id,
+            'user_id' => $this->user->id,
+        ]);
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function pending_emergency_campaign_cannot_be_opened_by_direct_public_url(): void
+    {
+        $pendingCampaign = $this->campaign->replicate();
+        $pendingCampaign->slug = 'pending-emergency-' . uniqid();
+        $pendingCampaign->judul = 'Campaign Darurat Menunggu Persetujuan';
+        $pendingCampaign->campaign_type = 'emergency';
+        $pendingCampaign->approval_status = 'pending';
+        $pendingCampaign->is_active = true;
+        $pendingCampaign->save();
+
+        $response = $this->get(route('campaign.show', $pendingCampaign->slug));
+
+        $response->assertNotFound();
+    }
+
     /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_legalitas()
@@ -212,6 +251,31 @@ class PreLaunchHardeningTest extends TestCase
     }
 
     /**  */
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function referral_alias_cannot_activate_a_pending_campaign(): void
+    {
+        $pendingCampaign = $this->campaign->replicate();
+        $pendingCampaign->slug = 'pending-referral-' . uniqid();
+        $pendingCampaign->judul = 'Campaign Referral Menunggu Persetujuan';
+        $pendingCampaign->campaign_type = 'emergency';
+        $pendingCampaign->approval_status = 'pending';
+        $pendingCampaign->is_active = true;
+        $pendingCampaign->save();
+
+        \App\Models\Campaign_Fundraiser::create([
+            'campaign_id' => $pendingCampaign->id,
+            'user_id' => $this->user->id,
+            'referral_code' => 'REF-PENDING-TEST',
+            'alias' => 'relawan-pending-test',
+            'status' => 'active',
+        ]);
+
+        $response = $this->get(route('referral.track', 'relawan-pending-test'));
+
+        $response->assertNotFound();
+        $this->assertFalse(session()->has('campaign_referral.' . $pendingCampaign->id));
+    }
+
     #[\PHPUnit\Framework\Attributes\Test]
     public function approved_penggalang_can_access_penggalang_dashboard()
     {

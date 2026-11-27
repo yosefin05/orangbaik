@@ -104,9 +104,11 @@ php artisan test
 
 Struktur dokumentasi teknis tersedia pada direktori `docs/`:
 - [Arsitektur Aplikasi & Layering](docs/architecture/README.md)
+- [Audit Engineering Codebase (27 November 2026)](docs/architecture/CODEBASE_ENGINEERING_AUDIT_2026-11-27.md)
 - [Database Schema & ERD Rules](docs/database/README.md)
 - [API & Spesifikasi Webhook](docs/api/README.md)
 - [Security Policy & Klasifikasi Data](docs/security/README.md)
+- [Runbook Audit Keamanan Staging (read-only)](docs/deployment/STAGING_SECURITY_AUDIT_RUNBOOK.md)
 - [Standar Koding & Guideline Developer](docs/development/README.md)
 - [Panduan Deployment Production & Gateway Readiness](docs/deployment/README.md)
 - [Log Perubahan & Security Audit](CHANGELOG_AUDIT.md)

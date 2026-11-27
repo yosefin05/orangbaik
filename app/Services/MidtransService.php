@@ -13,6 +13,27 @@ use Illuminate\Support\Facades\DB;
 
 class MidtransService
 {
+    /**
+     * Parse an IDR amount without rounding fractional values. Midtrans may
+     * encode whole rupiah as an integer or a decimal string ending in .00.
+     */
+    private function parseWholeRupiahAmount(mixed $value): ?int
+    {
+        if (!is_scalar($value)) {
+            return null;
+        }
+
+        $amount = trim((string) $value);
+        if (!preg_match('/^\\d+(?:\\.0+)?$/D', $amount)) {
+            return null;
+        }
+
+        $whole = explode('.', $amount, 2)[0];
+        $parsed = filter_var($whole, FILTER_VALIDATE_INT);
+
+        return $parsed === false ? null : $parsed;
+    }
+
     public function __construct()
     {
         Config::$isSanitized = true;
@@ -218,9 +239,9 @@ class MidtransService
          */
         if ($internalStatus === 'settlement') {
             $expectedNominal = (int) ($pembayaran->donasi?->nominal ?? 0);
-            $actualGrossAmount = (int) round((float) $grossAmount);
+            $actualGrossAmount = $this->parseWholeRupiahAmount($grossAmount);
 
-            if ($expectedNominal <= 0 || $actualGrossAmount !== $expectedNominal) {
+            if ($expectedNominal <= 0 || $actualGrossAmount === null || $actualGrossAmount !== $expectedNominal) {
                 Log::error('Midtrans webhook: nominal tidak sesuai (Amount Integrity Mismatch)', [
                     'order_id'        => $orderId,
                     'expected_amount' => $expectedNominal,
@@ -235,11 +256,25 @@ class MidtransService
          * 5. UPDATE PEMBAYARAN
          * =====================================================
          */
+        // Persist only the minimum callback fields needed for reconciliation.
+        // Never store the raw provider payload or its signature in gateway_response.
+        $callbackAudit = [
+            'status_code' => (string) $statusCode,
+            'transaction_status' => (string) $rawStatus,
+            'fraud_status' => $fraudStatus,
+            'payment_type' => $paymentType,
+            'transaction_id' => $transactionId,
+            'gross_amount' => (string) $grossAmount,
+            'received_at' => now()->toIso8601String(),
+        ];
+
         $updateData = [
             'payment_type'       => $paymentType,
             'transaction_id'     => $transactionId,
             'transaction_status' => $internalStatus,
-            'gateway_response'   => array_merge($pembayaran->gateway_response ?? [], $payload), // preserve credential mode and callback audit
+            'gateway_response'   => array_merge($pembayaran->gateway_response ?? [], [
+                'last_midtrans_callback' => $callbackAudit,
+            ]),
         ];
 
         if ($internalStatus === 'settlement') {
@@ -251,11 +286,11 @@ class MidtransService
         return DB::transaction(function () use (
             $pembayaran,
             $updateData,
-            $payload,
             $orderId,
             $rawStatus,
             $paymentType,
-            $transactionId
+            $transactionId,
+            $callbackAudit
         ): bool {
             $locked = Pembayaran::whereKey($pembayaran->id)->lockForUpdate()->first();
 
@@ -275,7 +310,10 @@ class MidtransService
 
             // Preserve the latest internal metadata (credential mode, audit fields)
             // rather than overwriting it with a stale model snapshot.
-            $updateData['gateway_response'] = array_merge($locked->gateway_response ?? [], $payload);
+            $updateData['gateway_response'] = array_merge(
+                $locked->gateway_response ?? [],
+                ['last_midtrans_callback' => $callbackAudit]
+            );
             $locked->update($updateData);
 
             Log::info('Midtrans webhook berhasil diproses', [

@@ -25,6 +25,8 @@ class FundraiserController extends Controller
             ->orWhere('custom_slug', $slug)
             ->firstOrFail();
 
+        abort_unless($campaign->is_active && $campaign->isApproved(), 404);
+
         // Cek apakah user sudah menjadi fundraiser
         if ($campaign->isFundraiser(Auth::id())) {
             return back()->with('error', 'Anda sudah menjadi fundraiser untuk campaign ini.');
@@ -77,6 +79,8 @@ class FundraiserController extends Controller
             ->where('status', 'active')
             ->firstOrFail();
 
+        abort_unless($campaign->is_active && $campaign->isApproved(), 404);
+
         session()->put('campaign_referral.' . $fundraiser->campaign_id, $fundraiser->referral_code);
 
         return app(CampaignController::class)->show($campaign->getRouteSlug());
@@ -111,14 +115,24 @@ class FundraiserController extends Controller
             $fundraiser = $history->fundraiser;
         }
 
-        abort_unless($fundraiser?->status === 'active' && $fundraiser->campaign?->is_active, 404);
+        abort_unless(
+            $fundraiser?->status === 'active'
+                && $fundraiser->campaign?->is_active
+                && $fundraiser->campaign?->isApproved(),
+            404
+        );
 
         return redirect($fundraiser->referral_url);
     }
 
     private function activateReferral(?Campaign_Fundraiser $fundraiser)
     {
-        abort_unless($fundraiser?->status === 'active' && $fundraiser->campaign?->is_active, 404);
+        abort_unless(
+            $fundraiser?->status === 'active'
+                && $fundraiser->campaign?->is_active
+                && $fundraiser->campaign?->isApproved(),
+            404
+        );
         session()->put('campaign_referral.' . $fundraiser->campaign_id, $fundraiser->referral_code);
 
         return redirect($fundraiser->campaign->public_url);
@@ -189,7 +203,10 @@ class FundraiserController extends Controller
 
             $fundraiser->update(['qr_path' => $fileName]);
         } catch (\Exception $e) {
-            Log::error('QR Generation failed: ' . $e->getMessage());
+            Log::error('QR generation failed.', [
+                'fundraiser_id' => $fundraiser->id,
+                'exception_class' => get_class($e),
+            ]);
         }
     }
 }
