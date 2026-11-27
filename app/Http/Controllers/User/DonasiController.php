@@ -402,15 +402,21 @@ return response()->json(array_merge([
         $fullPath = \Illuminate\Support\Facades\Storage::disk($disk)->path($filePath);
         $mimeType = \Illuminate\Support\Facades\Storage::disk($disk)->mimeType($filePath) ?: 'image/jpeg';
 
-        return response()->file($fullPath, [
+        $response = response()->file($fullPath, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="bukti-transfer-' . $pembayaran->order_id . '.' . pathinfo($fullPath, PATHINFO_EXTENSION) . '"',
             'X-Content-Type-Options' => 'nosniff',
             'X-Frame-Options' => 'DENY',
             'Referrer-Policy' => 'no-referrer',
-            'Cache-Control' => 'private, no-store, max-age=0, must-revalidate',
             'Pragma' => 'no-cache',
         ]);
+
+        // BinaryFileResponse may default to public caching; explicitly force
+        // private cache semantics for financial evidence.
+        $response->setPrivate();
+        $response->headers->set('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
+
+        return $response;
     }
 
     /**
