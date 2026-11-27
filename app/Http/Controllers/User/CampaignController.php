@@ -312,6 +312,12 @@ class CampaignController extends Controller
             'filter'
         ])
             ->where('is_active', true)
+            // Direct URLs must enforce the same approval gate as public listings.
+            ->where(function ($query) {
+                $query->where('campaign_type', 'regular')
+                    ->orWhere('approval_status', 'approved')
+                    ->orWhereNull('approval_status');
+            })
             ->where(function ($query) use ($slug) {
                 $query->where('slug', $slug)
                     ->orWhere('custom_slug', $slug);
@@ -356,6 +362,11 @@ class CampaignController extends Controller
             ->where(function ($query) {
                 $query->whereNull('tanggal_berakhir')
                     ->orWhere('tanggal_berakhir', '>=', now());
+            })
+            ->where(function ($query) {
+                $query->where('campaign_type', 'regular')
+                    ->orWhere('approval_status', 'approved')
+                    ->orWhereNull('approval_status');
             })
             ->latest()
             ->take(5)
