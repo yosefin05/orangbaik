@@ -170,6 +170,22 @@ class PreLaunchHardeningTest extends TestCase
         $response->assertSee('Yayasan Kita');
     }
 
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function pending_emergency_campaign_cannot_be_opened_by_direct_public_url(): void
+    {
+        $pendingCampaign = $this->campaign->replicate();
+        $pendingCampaign->slug = 'pending-emergency-' . uniqid();
+        $pendingCampaign->judul = 'Campaign Darurat Menunggu Persetujuan';
+        $pendingCampaign->campaign_type = 'emergency';
+        $pendingCampaign->approval_status = 'pending';
+        $pendingCampaign->is_active = true;
+        $pendingCampaign->save();
+
+        $response = $this->get(route('campaign.show', $pendingCampaign->slug));
+
+        $response->assertNotFound();
+    }
+
     /**  */
     #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_crud_legalitas()
