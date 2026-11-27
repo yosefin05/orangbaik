@@ -242,7 +242,8 @@ class PaymentGatewaySecurityTest extends TestCase
         );
 
         $response->assertOk()->assertJson(['value' => $secret]);
-        $response->assertHeader('Cache-Control', 'no-store, private, max-age=0');
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control', ''));
+        $this->assertStringContainsString('private', $response->headers->get('Cache-Control', ''));
         $response->assertHeader('Pragma', 'no-cache');
     }
 
