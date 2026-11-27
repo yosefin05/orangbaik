@@ -432,6 +432,31 @@ class PenggalangDanaController extends Controller
             $namaDokumenArr = $request->input('nama_dokumen', []);
             $existingDokumen = $penggalang->penggalangDanaDokumen()->orderBy('id')->get();
 
+            // Validate all legacy URL fields before mutating any document rows.
+            // This prevents a later invalid field from leaving earlier rows partially updated.
+            foreach ($namaDokumenArr as $i => $nama) {
+                $documentId = $request->input("dokumen_ids.{$i}");
+                $document = $documentId
+                    ? $existingDokumen->firstWhere('id', (int) $documentId)
+                    : $existingDokumen->get($i);
+                $candidateUrl = trim((string) $request->input("file_dokumen.{$i}"));
+
+                if ($candidateUrl === '') {
+                    continue;
+                }
+
+                $oldPath = $document?->file_dokumen;
+                $isUnchangedLegacyUrl = $document
+                    && filter_var($oldPath, FILTER_VALIDATE_URL)
+                    && hash_equals((string) $oldPath, $candidateUrl);
+
+                if (!$isUnchangedLegacyUrl) {
+                    return back()->withInput()->withErrors([
+                        "dokumen_files.{$i}" => 'Dokumen baru wajib diunggah langsung. Link eksternal tidak diterima.',
+                    ]);
+                }
+            }
+
             foreach ($namaDokumenArr as $i => $nama) {
                 $nama = trim((string) $nama);
                 if ($nama === '') {
