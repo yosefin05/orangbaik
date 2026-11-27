@@ -73,7 +73,7 @@ jobs:
             php "$COMPOSER_PHAR" --version
 
             BUILD_STAGE="/tmp/orangbaik-build-${{ github.sha }}"
-            PREVIOUS_BUILD="storage/app/deploy-build-previous-${{ github.sha }}"
+            PREVIOUS_BUILD="/tmp/orangbaik-build-previous-${{ github.sha }}"
             REPAIR_NAME="__orangbaik_repair_${{ github.sha }}.php"
             REPAIR_SCRIPT="public/$REPAIR_NAME"
             REPAIR_TOKEN="$(php -r 'echo bin2hex(random_bytes(32));')"
@@ -175,7 +175,6 @@ jobs:
             # dev-only Pail, and old package manifests may still reference it.
             php "$COMPOSER_PHAR" install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
 
-            mkdir -p storage/app
             if [ -d public/build ]; then
               mv public/build "$PREVIOUS_BUILD"
             fi
