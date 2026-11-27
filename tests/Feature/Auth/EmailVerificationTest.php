@@ -57,7 +57,7 @@ class EmailVerificationTest extends TestCase
     }
     public function test_registration_sends_verification_and_redirects_to_verification_screen(): void
     {
-        \\Illuminate\\Support\\Facades\\Notification::fake();
+        Notification::fake();
 
         $response = $this->post('/register', [
             'name' => 'Penggalang Baru',
@@ -70,9 +70,9 @@ class EmailVerificationTest extends TestCase
 
         $this->assertFalse($user->hasVerifiedEmail());
         $response->assertRedirect(route('verification.notice'));
-        \\Illuminate\\Support\\Facades\\Notification::assertSentTo(
+        Notification::assertSentTo(
             $user,
-            \\Illuminate\\Auth\\Notifications\\VerifyEmail::class
+            VerifyEmail::class
         );
     }
 
