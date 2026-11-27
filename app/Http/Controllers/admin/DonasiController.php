@@ -65,6 +65,12 @@ class DonasiController extends Controller
         $settlementCount  = (clone $query)->whereHas('pembayaran', function ($q) {
             $q->where('transaction_status', 'settlement');
         })->count();
+
+        // Conversion success: successful donations divided by all donation leads,
+        // including pending, failed, and expired records in the current filter.
+        $paymentSuccessRate = $totalDonasiCount > 0
+            ? round(($settlementCount / $totalDonasiCount) * 100, 1)
+            : 0;
         $pendingCount     = (clone $query)->whereHas('pembayaran', function ($q) {
             $q->where('transaction_status', 'pending');
         })->count();
@@ -83,6 +89,7 @@ class DonasiController extends Controller
             'totalDonasiCount',
             'totalTerkumpul',
             'settlementCount',
+            'paymentSuccessRate',
             'pendingCount',
             'expireCount'
         ));
