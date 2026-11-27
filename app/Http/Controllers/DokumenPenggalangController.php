@@ -66,12 +66,20 @@ class DokumenPenggalangController extends Controller
 
         $mimeType = Storage::disk($disk)->mimeType($filePath) ?: 'application/octet-stream';
 
-        return response()->file($fullPath, [
+        $response = response()->file($fullPath, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
             'X-Content-Type-Options' => 'nosniff',
-            'X-Frame-Options' => 'SAMEORIGIN',
-            'Cache-Control' => 'private, no-cache, no-store, must-revalidate',
+            'X-Frame-Options' => 'DENY',
+            'Referrer-Policy' => 'no-referrer',
+            'Pragma' => 'no-cache',
         ]);
+
+        // BinaryFileResponse may append a public cache directive. Force
+        // private, non-storable semantics after the file response is created.
+        $response->setPrivate();
+        $response->headers->set('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
+
+        return $response;
     }
 }
