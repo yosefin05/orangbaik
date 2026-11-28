@@ -87,7 +87,7 @@ class HomeController extends Controller
             ->where('campaign_type', 'sustainable')
             ->where('approval_status', 'approved')
             ->latest()
-            ->take(4)
+            ->take(12)
             ->get();
 
         // CAMPAIGN TERBARU (2 item untuk grid kecil)
