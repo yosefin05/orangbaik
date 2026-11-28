@@ -409,8 +409,7 @@
                                 </label>
                                 <div class="feature-input">
                                     <input type="text" placeholder="Nama Pekurban"
-                                        value="{{ $campaign->donatur_name_label ?? 'Nama Pekurban' }}"
-                                        name="donatur_name_label">
+                                        value="Nama Pekurban">
                                     <small>Masukkan Atas Nama Pekurban</small>
                                     <i class="bi bi-pencil-fill"></i>
                                 </div>
@@ -425,9 +424,7 @@
                                     <label>Nominal Lainnya</label>
                                     <div class="money-box">
                                         <span>Rp</span>
-                                        <input type="text" placeholder="0" inputmode="numeric" data-money
-                                            value="{{ old('custom_nominal', $campaign->custom_nominal ? number_format($campaign->custom_nominal, 0, ',', '.') : '') }}"
-                                            name="custom_nominal">
+                                        <input type="text" placeholder="0" inputmode="numeric" data-money>
                                     </div>
                                 </div>
                             </div>
