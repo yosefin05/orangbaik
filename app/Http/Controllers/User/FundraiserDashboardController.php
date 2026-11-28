@@ -21,6 +21,7 @@ class FundraiserDashboardController extends Controller
             'fundraisers' => $fundraisers,
             'totalDonatur' => $donations->count(),
             'totalDonasi' => $donations->sum('nominal'),
+            'totalCampaign' => $fundraisers->pluck('campaign_id')->unique()->count(),
         ]);
     }
 }

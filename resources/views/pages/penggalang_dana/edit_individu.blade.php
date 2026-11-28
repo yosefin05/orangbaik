@@ -82,6 +82,7 @@
 
                     @csrf
                     @method('PATCH')
+                    <input type="hidden" name="jenis_penggalang" value="individu">
 
                     @if($isPending)
                         <div class="pending-notice">

@@ -59,8 +59,8 @@
                             <div class="campaign-field">
                                 <label for="judul_campaign">Judul Campaign <span>*</span></label>
                                 <div class="campaign-input-wrap">
-                                    <input type="text" id="judul_campaign" name="judul_campaign"
-                                        value="{{ old('judul_campaign') }}" placeholder="Masukkan judul campaign Anda"
+                                    <input type="text" id="judul_campaign" name="judul"
+                                        value="{{ old('judul') }}" placeholder="Masukkan judul campaign Anda"
                                         required>
                                     <i class="bi bi-pencil-fill"></i>
                                 </div>
@@ -79,8 +79,8 @@
 
                             <div class="campaign-field">
                                 <label for="deskripsi_campaign">Deskripsi Campaign <span>*</span></label>
-                                <x-rich-text-editor name="deskripsi_campaign" id="deskripsi_campaign"
-                                    :value="old('deskripsi_campaign')" />
+                                <x-rich-text-editor name="deskripsi" id="deskripsi_campaign"
+                                    :value="old('deskripsi')" />
                             </div>
                         </section>
 
@@ -104,8 +104,8 @@
                                     <label for="tanggal_akhir">Tanggal Akhir <small>(Opsional, tanpa batas jika
                                             kosong)</small></label>
                                     <div class="campaign-input-wrap">
-                                        <input type="date" id="tanggal_akhir" name="tanggal_akhir"
-                                            value="{{ old('tanggal_akhir') }}">
+                                        <input type="date" id="tanggal_akhir" name="tanggal_berakhir"
+                                            value="{{ old('tanggal_berakhir') }}">
                                         <i class="bi bi-calendar-event-fill"></i>
                                     </div>
                                 </div>
@@ -314,7 +314,7 @@
                                 <!-- Nama Pekurban -->
                                 <div class="feature-input-card">
                                     <label class="feature-check">
-                                        <input type="checkbox" id="toggleDonatur" name="enable_donatur_name">
+                                        <input type="checkbox" id="toggleDonatur" name="enable_nama_donatur">
                                         <span></span>
                                     </label>
                                     <div class="feature-input">

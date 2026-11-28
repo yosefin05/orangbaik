@@ -79,7 +79,7 @@ class CampaignController extends Controller
             ->where('campaign_type', 'emergency')
             ->where('approval_status', 'approved')
             ->latest()
-            ->take(8)
+            ->take(4)
             ->get();
 
         // PEMBERDAYAAN (sustainable + approved + aktif)
@@ -87,7 +87,7 @@ class CampaignController extends Controller
             ->where('campaign_type', 'sustainable')
             ->where('approval_status', 'approved')
             ->latest()
-            ->take(8)
+            ->take(4)
             ->get();
 
         // CAMPAIGN TERBARU (2 item untuk grid kecil)
@@ -95,6 +95,8 @@ class CampaignController extends Controller
             ->latest()
             ->take(2)
             ->get();
+
+        $campaignAktif = (clone $query)->latest()->get();
 
         $campaigns = (clone $query)
             ->where('campaign_type', 'regular')
@@ -112,6 +114,7 @@ class CampaignController extends Controller
             'darurat',
             'pemberdayaan',
             'campaignTerbaru',
+            'campaignAktif',
             'campaigns',
             'selectedJenis',
             'selectedFilterIds'
@@ -141,6 +144,14 @@ class CampaignController extends Controller
         if (!$penggalang || $penggalang->status !== 'approved') {
             return redirect()->route('profile.user')->with('warning', 'Profil Penggalang Dana harus disetujui sebelum membuat campaign.');
         }
+
+        // Normalize shared Create/Edit field names before validation.
+        $request->merge([
+            'judul_campaign' => $request->input('judul', $request->input('judul_campaign')),
+            'deskripsi_campaign' => $request->input('deskripsi', $request->input('deskripsi_campaign')),
+            'tanggal_akhir' => $request->input('tanggal_berakhir', $request->input('tanggal_akhir')),
+            'enable_donatur_name' => $request->boolean('enable_nama_donatur') || $request->boolean('enable_donatur_name'),
+        ]);
 
         // Clean money inputs before validation
         $request->merge([
@@ -474,8 +485,8 @@ class CampaignController extends Controller
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal_mulai' => 'required|date',
-            'tanggal_berakhir' => ['nullable', 'date', 'after:tanggal_mulai'],
-            'target_donasi' => ['required', 'numeric', 'min:0'],
+            'tanggal_berakhir' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+            'target_donasi' => ['required', 'numeric', 'min:1'],
             'minimal_donasi' => ['nullable', 'numeric', 'min:0'],
             'kategori_id' => ['required', 'exists:kategori,id'],
             'campaign_type' => ['required', 'in:regular,emergency,sustainable'],
@@ -483,7 +494,7 @@ class CampaignController extends Controller
             // WEBP SUPPORT
             'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
 
-            'filter' => ['nullable', 'array', 'max:4'],
+            'filter' => ['required', 'array', 'min:1', 'max:4'],
             'filter.*' => ['exists:filter,id'],
 
             'packages' => ['nullable', 'array'],
@@ -559,7 +570,7 @@ class CampaignController extends Controller
                 'campaign_type' => $campaignType,
                 'approval_status' => $approvalStatus,
                 'enable_quantity' => $request->boolean('enable_quantity'),
-                'enable_nama_donatur' => $request->boolean('enable_donatur_name'),
+                'enable_nama_donatur' => $request->boolean('enable_nama_donatur') || $request->boolean('enable_donatur_name'),
                 'enable_custom_nominal' => $request->boolean('enable_custom_nominal'),
                 'custom_slug' => !empty($request->custom_slug)
                     ? Str::slug($request->custom_slug)
