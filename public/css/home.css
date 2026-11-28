@@ -2361,3 +2361,42 @@ body.filter-open .floating-wa-container {
         transform: none !important;
     }
 }
+
+/* =========================================================
+   CAMPAIGN CAROUSEL — horizontal scroll on desktop & mobile
+   The controller already limits each category to four cards.
+========================================================= */
+.main .campaign-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 280px);
+    grid-template-columns: none;
+    gap: var(--space-4);
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 2px var(--space-3);
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 2px;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.main .campaign-grid > * {
+    min-width: 0;
+    scroll-snap-align: start;
+}
+
+@media (max-width: 600px) {
+    .main .campaign-grid {
+        grid-auto-columns: minmax(0, 82vw);
+        gap: var(--space-3);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .main .campaign-grid {
+        scroll-behavior: auto;
+    }
+}
