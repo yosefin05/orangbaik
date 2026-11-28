@@ -2363,9 +2363,9 @@ body.filter-open .floating-wa-container {
 }
 
 /* =========================================================
-   CAMPAIGN CAROUSEL — forced horizontal rail on desktop & mobile
-   Four cards maximum are rendered by the controller; overflow is
-   intentionally horizontal at every viewport width.
+   CAMPAIGN CAROUSEL — four complete cards on desktop, swipeable everywhere
+   Desktop: four full cards per viewport.
+   Mobile: one wide card at a time, with the next card peeking in.
 ========================================================= */
 .main .campaign-grid {
     display: flex !important;
@@ -2375,16 +2375,15 @@ body.filter-open .floating-wa-container {
     max-width: 100%;
     min-width: 0;
     gap: 16px;
-    overflow-x: scroll !important;
+    overflow-x: auto !important;
     overflow-y: hidden !important;
-    padding: 2px 2px 2px;
+    padding: 2px 2px 12px;
     box-sizing: border-box;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: 2px;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    scrollbar-color: transparent transparent;
     touch-action: pan-x pan-y;
     cursor: grab;
 }
@@ -2393,12 +2392,13 @@ body.filter-open .floating-wa-container {
     cursor: grabbing;
 }
 
+/* Empat kartu utuh dalam satu lebar container desktop. */
 .main .campaign-grid > .campaign-card,
 .main .campaign-grid > * {
-    flex: 0 0 320px !important;
-    width: 320px !important;
-    min-width: 320px !important;
-    max-width: 320px !important;
+    flex: 0 0 calc((100% - 48px) / 4) !important;
+    width: calc((100% - 48px) / 4) !important;
+    min-width: 0 !important;
+    max-width: calc((100% - 48px) / 4) !important;
     scroll-snap-align: start;
 }
 
@@ -2408,6 +2408,17 @@ body.filter-open .floating-wa-container {
     height: 0;
 }
 
+/* Tablet: dua kartu utuh per tampilan, tetap bisa digeser. */
+@media (max-width: 900px) and (min-width: 601px) {
+    .main .campaign-grid > .campaign-card,
+    .main .campaign-grid > * {
+        flex-basis: calc((100% - 16px) / 2) !important;
+        width: calc((100% - 16px) / 2) !important;
+        max-width: calc((100% - 16px) / 2) !important;
+    }
+}
+
+/* Mobile: kartu lebar dan bisa swipe ke kartu berikutnya. */
 @media (max-width: 600px) {
     .main .campaign-grid {
         gap: 12px;
@@ -2416,7 +2427,7 @@ body.filter-open .floating-wa-container {
 
     .main .campaign-grid > .campaign-card,
     .main .campaign-grid > * {
-        flex-basis: 82vw !important;
+        flex: 0 0 82vw !important;
         width: 82vw !important;
         min-width: 82vw !important;
         max-width: 82vw !important;
