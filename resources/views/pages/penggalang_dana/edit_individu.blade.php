@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/verify-penggalang.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/penggalang-register.css') }}">\n    <link rel="stylesheet" href="{{ asset('css/verify-penggalang.css') }}">
 </head>
 
 <body>
@@ -23,7 +23,7 @@
         $isApproved = ($status === 'approved');
     @endphp
 
-    <main class="verify-page">
+    <main class="reg-page verify-page">
 
         <section class="verify-hero">
             <div class="container verify-hero-inner">
@@ -78,7 +78,7 @@
                 </form>
 
                 <form action="{{ route('penggalang_dana.update', $penggalang->slug) }}" method="POST"
-                    enctype="multipart/form-data" class="verify-form {{ $isPending ? 'disabled-overlay' : '' }}">
+                    enctype="multipart/form-data" class="reg-form verify-form {{ $isPending ? 'disabled-overlay' : '' }}">
 
                     @csrf
                     @method('PATCH')
@@ -91,8 +91,8 @@
                     @endif
 
                     {{-- PROFIL --}}
-                    <section class="verify-card">
-                        <div class="verify-card-header">
+                    <section class="reg-card verify-card">
+                        <div class="reg-card-head verify-card-header">
                             <h2>Profil Penggalang Dana</h2>
                             <p>Data dasar penggalang dana.</p>
                         </div>
@@ -118,11 +118,11 @@
                             </div>
 
                             <div class="verify-fields">
-                                <label class="verify-field">
+                                <label class="reg-field verify-field">
                                     <span>Jenis Penggalang</span>
                                     <input type="text" value="Individu" readonly>
                                 </label>
-                                <label class="verify-field">
+                                <label class="reg-field verify-field">
                                     <span>Nama Lengkap</span>
                                     <input type="text" name="nama_penggalang"
                                         value="{{ old('nama_penggalang', $penggalang->nama_penggalang) }}"
@@ -134,7 +134,7 @@
                             </div>
                         </div>
 
-                        <label class="verify-field">
+                        <label class="reg-field verify-field">
                             <span>Alamat Domisili</span>
                             <textarea name="alamat" rows="3" {{ $isPending ? 'disabled' : '' }}>{{ old('alamat', $penggalang->alamat) }}</textarea>
                             @error('alamat')
@@ -149,7 +149,7 @@
                             <h2>Informasi Penggalang</h2>
                         </div>
 
-                        <label class="verify-field">
+                        <label class="reg-field verify-field">
                             <span>Deskripsi</span>
                             <textarea name="deskripsi" rows="6" {{ $isPending ? 'disabled' : '' }}>{{ old('deskripsi', $penggalang->deskripsi) }}</textarea>
                             @error('deskripsi')
@@ -157,15 +157,15 @@
                             @enderror
                         </label>
 
-                        <div class="verify-grid-2">
-                            <label class="verify-field">
+                        <div class="reg-grid-2 verify-grid-2">
+                            <label class="reg-field verify-field">
                                 <span>Visi</span>
                                 <textarea name="visi" rows="3" {{ $isPending ? 'disabled' : '' }}>{{ old('visi', $penggalang->visi) }}</textarea>
                                 @error('visi')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </label>
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Misi</span>
                                 <textarea name="misi" rows="4" {{ $isPending ? 'disabled' : '' }}>{{ old('misi', $penggalang->misi) }}</textarea>
                                 @error('misi')
@@ -201,8 +201,8 @@
                             </label>
                         @endif
 
-                        <div class="verify-grid-2">
-                            <label class="verify-field">
+                        <div class="reg-grid-2 verify-grid-2">
+                            <label class="reg-field verify-field">
                                 <span>Nama Dokumen <b>*</b></span>
                                 <input type="hidden" name="dokumen_ids[]" value="{{ $dokumen?->id }}">
                             <input type="text" name="nama_dokumen[]"
@@ -210,7 +210,7 @@
                                     {{ $isPending ? 'disabled' : '' }}
                                     placeholder="Contoh: KTP, NPWP" required>
                             </label>
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Unggah Dokumen Baru</span>
                                 <input type="file" name="dokumen_files[]" accept=".pdf,.jpg,.jpeg,.png"
                                     {{ $isPending ? 'disabled' : '' }}>
@@ -221,8 +221,8 @@
                             <p class="field-help"><i class="bi bi-lock-fill"></i> Dokumen tersimpan dan hanya dapat diperiksa admin. Untuk mengganti dokumen, unggah file baru secara langsung.</p>
                         @endif
                         @if($dokumen && !$isPending && (int) auth()->id() === (int) $penggalang->user_id)
-                            <div class="verify-actions" style="justify-content:flex-end;">
-                                <button type="submit" form="deleteDocumentsForm" class="verify-cancel-button"
+                            <div class="reg-actions verify-actions" style="justify-content:flex-end;">
+                                <button type="submit" form="deleteDocumentsForm" class="reg-btn reg-btn-ghost verify-cancel-button"
                                     style="border:1px solid #dc3545;color:#dc3545;background:#fff;"
                                     onclick="return confirm('Hapus dokumen identitas ini? Tindakan ini tidak dapat dibatalkan.');">
                                     <i class="bi bi-trash"></i> Hapus dokumen
@@ -236,15 +236,15 @@
                         <div class="verify-card-header">
                             <h2>Kontak</h2>
                         </div>
-                        <div class="verify-grid-2">
-                            <label class="verify-field">
+                        <div class="reg-grid-2 verify-grid-2">
+                            <label class="reg-field verify-field">
                                 <span>Email</span>
                                 <input type="email" name="email" value="{{ old('email', $penggalang->email) }}" {{ $isPending ? 'disabled' : '' }}>
                                 @error('email')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </label>
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Nomor Telepon</span>
                                 <input type="text" name="no_telepon"
                                     value="{{ old('no_telepon', $penggalang->no_telepon) }}" {{ $isPending ? 'disabled' : '' }}>
@@ -260,17 +260,17 @@
                         <div class="verify-card-header">
                             <h2>Sosial Media</h2>
                         </div>
-                        <div class="verify-grid-2">
-                            <label class="verify-field">
+                        <div class="reg-grid-2 verify-grid-2">
+                            <label class="reg-field verify-field">
                                 <input type="text" name="instagram" value="{{ old('instagram', ltrim((string) $penggalang->instagram, '@')) }}" placeholder="Username Instagram" {{ $isPending ? 'disabled' : '' }}>
                             </label>
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <input type="text" name="facebook" value="{{ old('facebook', $penggalang->facebook) }}" placeholder="Facebook" {{ $isPending ? 'disabled' : '' }}>
                             </label>
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <input type="text" name="youtube" value="{{ old('youtube', $penggalang->youtube) }}" placeholder="Youtube" {{ $isPending ? 'disabled' : '' }}>
                             </label>
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <input type="text" name="tiktok" value="{{ old('tiktok', ltrim((string) $penggalang->tiktok, '@')) }}" placeholder="Username TikTok" {{ $isPending ? 'disabled' : '' }}>
                             </label>
                         </div>
@@ -279,7 +279,7 @@
                         {{-- ACTION --}}
                         <div class="verify-actions">
                             <a href="{{ route('profile.user') }}" class="verify-cancel-button">Batal</a>
-                            <button type="submit" class="verify-submit-button" {{ $isPending ? 'disabled' : '' }}>
+                            <button type="submit" class="reg-btn reg-btn-primary verify-submit-button" {{ $isPending ? 'disabled' : '' }}>
                                 Simpan Perubahan
                             </button>
                         </div>
