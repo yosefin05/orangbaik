@@ -159,13 +159,13 @@
                             </div>
 
                             <div class="verify-fields">
-                                <label class="verify-field">
+                                <label class="reg-field verify-field">
                                     <span>Jenis Penggalang Dana</span>
                                     <input type="text" value="{{ $penggalang->jenis_penggalang_label }}" readonly>
                                     <input type="hidden" name="jenis_penggalang" value="{{ $penggalang->jenis_penggalang }}">
                                 </label>
 
-                                <label class="verify-field">
+                                <label class="reg-field verify-field">
                                     <span>Nama Organisasi <b>*</b></span>
                                     <input type="text" name="nama_penggalang"
                                         value="{{ old('nama_penggalang', $penggalang->nama_penggalang) }}"
@@ -178,7 +178,7 @@
                         </div>
 
                         <div class="verify-grid-2 verify-grid-single">
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Tahun Berdiri <b>*</b></span>
                                 <select name="tahun_berdiri" required {{ $isPending ? 'disabled' : '' }}>
                                     <option value="">Pilih tahun berdiri</option>
@@ -196,7 +196,7 @@
 
                         </div>
 
-                        <label class="verify-field">
+                        <label class="reg-field verify-field">
                             <span>Alamat Kantor <b>*</b></span>
                             <textarea name="alamat" rows="3"
                                 placeholder="Masukkan alamat kantor organisasi" {{ $isPending ? 'disabled' : '' }}>{{ old('alamat', $penggalang->alamat) }}</textarea>
@@ -213,7 +213,7 @@
                             <p>Perbarui profil, visi, dan misi organisasi sebagai penggalang dana.</p>
                         </div>
 
-                        <label class="verify-field">
+                        <label class="reg-field verify-field">
                             <span>Deskripsi Penggalang Dana <b>*</b></span>
                             <textarea name="deskripsi" rows="6"
                                 placeholder="Masukkan deskripsi organisasi" {{ $isPending ? 'disabled' : '' }}>{{ old('deskripsi', $penggalang->deskripsi) }}</textarea>
@@ -222,8 +222,8 @@
                             @enderror
                         </label>
 
-                        <div class="verify-grid-2">
-                            <label class="verify-field">
+                        <div class="reg-grid-2 verify-grid-2">
+                            <label class="reg-field verify-field">
                                 <span>Visi <b>*</b></span>
                                 <textarea name="visi" rows="3"
                                     placeholder="Masukkan visi organisasi" {{ $isPending ? 'disabled' : '' }}>{{ old('visi', $penggalang->visi) }}</textarea>
@@ -232,7 +232,7 @@
                                 @enderror
                             </label>
 
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Misi <b>*</b></span>
                                 <textarea name="misi" rows="4"
                                     placeholder="Masukkan misi organisasi, satu poin per baris" {{ $isPending ? 'disabled' : '' }}>{{ old('misi', $penggalang->misi) }}</textarea>
@@ -289,9 +289,9 @@
                                         @endif
                                     </div>
 
-                                    <div class="verify-grid-2">
+                                    <div class="reg-grid-2 verify-grid-2">
 
-                                        <label class="verify-field">
+                                        <label class="reg-field verify-field">
                                                 <span>Nama Dokumen {{ $i === 1 ? '*' : '' }}</span>
                                             <input type="hidden" name="dokumen_ids[]" value="{{ $dokumen?->id }}">
                                             <input
@@ -302,7 +302,7 @@
                                                 {{ $isPending ? 'disabled' : '' }}>
                                         </label>
 
-                                        <label class="verify-field">
+                                        <label class="reg-field verify-field">
                                             <span>Unggah Dokumen {{ $i === 1 ? '*' : '' }}</span>
                                             <input type="file" name="dokumen_files[]" accept=".pdf,.jpg,.jpeg,.png"
                                                 {{ $isPending ? 'disabled' : '' }}>
@@ -336,9 +336,9 @@
                             <p>Informasi kontak untuk verifikasi dan komunikasi.</p>
                         </div>
 
-                        <div class="verify-grid-2">
+                        <div class="reg-grid-2 verify-grid-2">
 
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Email <b>*</b></span>
                                 <input type="email" name="email"
                                     value="{{ old('email', $penggalang->email) }}"
@@ -348,7 +348,7 @@
                                 @enderror
                             </label>
 
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Nomor Hotline <b>*</b></span>
                                 <input type="text" name="no_telepon"
                                     value="{{ old('no_telepon', $penggalang->no_telepon) }}"
@@ -368,30 +368,30 @@
                             <p>Opsional, untuk meningkatkan kepercayaan donatur.</p>
                         </div>
 
-                        <div class="verify-grid-2">
+                        <div class="reg-grid-2 verify-grid-2">
 
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Instagram</span>
                                 <input type="text" name="instagram"
                                     value="{{ old('instagram', ltrim((string) $penggalang->instagram, '@')) }}"
                                     placeholder="Username Instagram" {{ $isPending ? 'disabled' : '' }}>
                             </label>
 
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Facebook</span>
                                 <input type="text" name="facebook"
                                     value="{{ old('facebook', $penggalang->facebook) }}"
                                     placeholder="Username Facebook" {{ $isPending ? 'disabled' : '' }}>
                             </label>
 
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>Youtube</span>
                                 <input type="text" name="youtube"
                                     value="{{ old('youtube', $penggalang->youtube) }}"
                                     placeholder="Username Youtube" {{ $isPending ? 'disabled' : '' }}>
                             </label>
 
-                            <label class="verify-field">
+                            <label class="reg-field verify-field">
                                 <span>TikTok</span>
                                 <input type="text" name="tiktok"
                                     value="{{ old('tiktok', ltrim((string) $penggalang->tiktok, '@')) }}"
