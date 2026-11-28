@@ -161,8 +161,8 @@
                             <div class="verify-fields">
                                 <label class="verify-field">
                                     <span>Jenis Penggalang Dana</span>
-                                    <input type="text" value="Organisasi" readonly>
-                                    <input type="hidden" name="jenis_penggalang" value="organisasi">
+                                    <input type="text" value="{{ $penggalang->jenis_penggalang_label }}" readonly>
+                                    <input type="hidden" name="jenis_penggalang" value="{{ $penggalang->jenis_penggalang }}">
                                 </label>
 
                                 <label class="verify-field">
