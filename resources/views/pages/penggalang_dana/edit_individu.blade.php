@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/verify-penggalang.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/penggalang-register.css') }}">\n    <link rel="stylesheet" href="{{ asset('css/verify-penggalang.css') }}">
 </head>
 
 <body>
@@ -23,7 +23,7 @@
         $isApproved = ($status === 'approved');
     @endphp
 
-    <main class="verify-page">
+    <main class="reg-page verify-page">
 
         <section class="verify-hero">
             <div class="container verify-hero-inner">
@@ -78,7 +78,7 @@
                 </form>
 
                 <form action="{{ route('penggalang_dana.update', $penggalang->slug) }}" method="POST"
-                    enctype="multipart/form-data" class="verify-form {{ $isPending ? 'disabled-overlay' : '' }}">
+                    enctype="multipart/form-data" class="reg-form verify-form {{ $isPending ? 'disabled-overlay' : '' }}">
 
                     @csrf
                     @method('PATCH')
@@ -91,8 +91,8 @@
                     @endif
 
                     {{-- PROFIL --}}
-                    <section class="verify-card">
-                        <div class="verify-card-header">
+                    <section class="reg-card verify-card">
+                        <div class="reg-card-head verify-card-header">
                             <h2>Profil Penggalang Dana</h2>
                             <p>Data dasar penggalang dana.</p>
                         </div>
@@ -221,8 +221,8 @@
                             <p class="field-help"><i class="bi bi-lock-fill"></i> Dokumen tersimpan dan hanya dapat diperiksa admin. Untuk mengganti dokumen, unggah file baru secara langsung.</p>
                         @endif
                         @if($dokumen && !$isPending && (int) auth()->id() === (int) $penggalang->user_id)
-                            <div class="verify-actions" style="justify-content:flex-end;">
-                                <button type="submit" form="deleteDocumentsForm" class="verify-cancel-button"
+                            <div class="reg-actions verify-actions" style="justify-content:flex-end;">
+                                <button type="submit" form="deleteDocumentsForm" class="reg-btn reg-btn-ghost verify-cancel-button"
                                     style="border:1px solid #dc3545;color:#dc3545;background:#fff;"
                                     onclick="return confirm('Hapus dokumen identitas ini? Tindakan ini tidak dapat dibatalkan.');">
                                     <i class="bi bi-trash"></i> Hapus dokumen
@@ -279,7 +279,7 @@
                         {{-- ACTION --}}
                         <div class="verify-actions">
                             <a href="{{ route('profile.user') }}" class="verify-cancel-button">Batal</a>
-                            <button type="submit" class="verify-submit-button" {{ $isPending ? 'disabled' : '' }}>
+                            <button type="submit" class="reg-btn reg-btn-primary verify-submit-button" {{ $isPending ? 'disabled' : '' }}>
                                 Simpan Perubahan
                             </button>
                         </div>
