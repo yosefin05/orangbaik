@@ -6,6 +6,7 @@
     <div class="row g-3 my-4">
         <div class="col-md-6"><div class="card p-4"><strong>{{ $totalDonatur }}</strong><span>Transaksi donasi berhasil</span></div></div>
         <div class="col-md-6"><div class="card p-4"><strong>Rp {{ number_format($totalDonasi, 0, ',', '.') }}</strong><span>Total donasi (settlement)</span></div></div>
+        <div class="col-md-6"><div class="card p-4"><strong>{{ $totalCampaign }}</strong><span>Campaign yang diikuti</span></div></div>
     </div>
     <div class="card p-4">
         <h2>Campaign yang Diikuti</h2>

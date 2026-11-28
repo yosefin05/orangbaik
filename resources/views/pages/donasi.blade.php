@@ -635,6 +635,28 @@
             </div>
         </section>
 
+
+        <section class="section section-tone tone-primary donasi-campaign-section">
+            <div class="container">
+                <h2 class="section-title">Campaign Aktif</h2>
+                @if ($campaignAktif->isNotEmpty())
+                    <div class="list-campaign">
+                        @foreach ($campaignAktif as $campaign)
+                            <x-campaign-card :campaign="$campaign" variant="list" />
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <h3 class="empty-state-title">Belum ada campaign aktif</h3>
+                        <p class="empty-state-text">{{ $adaFilter ? 'Tidak ada hasil untuk filter yang dipilih.' : 'Campaign aktif akan muncul di sini.' }}</p>
+                        @if ($adaFilter)
+                            <div class="empty-state-action"><a href="{{ route('donasi') }}" class="btn btn-outline btn-sm">Hapus filter</a></div>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </section>
+
     </main>
 
 

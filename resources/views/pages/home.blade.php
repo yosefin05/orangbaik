@@ -336,7 +336,7 @@
         {{-- KATEGORI FAVORIT --}}
         <section class="section tone-primary" id="kategori-favorit">
             <div class="container">
-                <h2 class="section-title">Pilih Kategori Favoritmu</h2>
+                <h2 class="section-title">Campaign Aktif</h2>
 
                 <div class="category-grid category-grid-small">
                     @foreach ($kategori as $item)
@@ -359,10 +359,10 @@
                     </a>
                 </div>
 
-                @if (count($campaigns) > 0)
+                @if (count($campaignAktif) > 0)
 
                     <div class="list-campaign">
-                        @foreach ($campaigns as $campaign)
+                        @foreach ($campaignAktif as $campaign)
                             <x-campaign-card :campaign="$campaign" variant="list" />
                         @endforeach
                     </div>
@@ -379,7 +379,7 @@
                         <p class="empty-state-text">
                             {{ request()->filled('kategori')
                                 ? 'Belum ada campaign pada kategori ini.'
-                                : 'Campaign yang sedang berjalan akan muncul di sini.' }}
+                                : 'Semua campaign yang sedang aktif akan muncul di sini.' }}
                         </p>
                     </div>
 

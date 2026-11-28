@@ -79,7 +79,7 @@ class CampaignController extends Controller
             ->where('campaign_type', 'emergency')
             ->where('approval_status', 'approved')
             ->latest()
-            ->take(8)
+            ->take(4)
             ->get();
 
         // PEMBERDAYAAN (sustainable + approved + aktif)
@@ -87,7 +87,7 @@ class CampaignController extends Controller
             ->where('campaign_type', 'sustainable')
             ->where('approval_status', 'approved')
             ->latest()
-            ->take(8)
+            ->take(4)
             ->get();
 
         // CAMPAIGN TERBARU (2 item untuk grid kecil)
@@ -95,6 +95,8 @@ class CampaignController extends Controller
             ->latest()
             ->take(2)
             ->get();
+
+        $campaignAktif = (clone $query)->latest()->get();
 
         $campaigns = (clone $query)
             ->where('campaign_type', 'regular')
@@ -112,6 +114,7 @@ class CampaignController extends Controller
             'darurat',
             'pemberdayaan',
             'campaignTerbaru',
+            'campaignAktif',
             'campaigns',
             'selectedJenis',
             'selectedFilterIds'

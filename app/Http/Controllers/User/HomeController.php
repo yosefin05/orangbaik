@@ -79,7 +79,7 @@ class HomeController extends Controller
             ->where('campaign_type', 'emergency')
             ->where('approval_status', 'approved')
             ->latest()
-            ->take(8)
+            ->take(4)
             ->get();
 
         // PEMBERDAYAAN (sustainable + approved + aktif)
@@ -87,7 +87,7 @@ class HomeController extends Controller
             ->where('campaign_type', 'sustainable')
             ->where('approval_status', 'approved')
             ->latest()
-            ->take(8)
+            ->take(4)
             ->get();
 
         // CAMPAIGN TERBARU (2 item untuk grid kecil)
@@ -99,6 +99,8 @@ class HomeController extends Controller
         if ($request->filled('kategori')) {
             $query->where('kategori_id', $request->kategori);
         }
+
+        $campaignAktif = (clone $query)->latest()->get();
 
         $campaigns = (clone $query)
             ->where('campaign_type', 'regular')
@@ -115,6 +117,7 @@ class HomeController extends Controller
             'darurat',
             'pemberdayaan',
             'campaignTerbaru',
+            'campaignAktif',
             'campaigns'
         ));
     }

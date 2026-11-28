@@ -58,6 +58,7 @@
     $namaPenggalang = $penggalang?->nama_penggalang ?? 'OrangBaik';
     $fotoPenggalang = $penggalang?->foto_profil;
     $inisialPenggalang = mb_strtoupper(mb_substr($namaPenggalang, 0, 1));
+    $penggalangTerverifikasi = $penggalang && $penggalang->verified && $penggalang->isEntity();
 
     // ========================================
     // URL & VARIANT
@@ -127,7 +128,12 @@ default = card vertikal, list = card horizontal (.is-list) --}}
                     @endif
                 </span>
 
-                <span class="campaign-org-name">{{ $namaPenggalang }}</span>
+                <span class="campaign-org-name">
+                    {{ $namaPenggalang }}
+                    @if ($penggalangTerverifikasi)
+                        <i class="bi bi-patch-check-fill" style="color: #2563eb;" title="Penggalang dana terverifikasi" aria-label="Terverifikasi"></i>
+                    @endif
+                </span>
             </span>
         </div>
     </div>
