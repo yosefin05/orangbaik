@@ -2363,35 +2363,71 @@ body.filter-open .floating-wa-container {
 }
 
 /* =========================================================
-   CAMPAIGN CAROUSEL — horizontal scroll on desktop & mobile
-   The controller already limits each category to four cards.
+   CAMPAIGN CAROUSEL — forced horizontal rail on desktop & mobile
+   Four cards maximum are rendered by the controller; overflow is
+   intentionally horizontal at every viewport width.
 ========================================================= */
 .main .campaign-grid {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(320px, 320px);
-    grid-template-columns: none;
-    gap: var(--space-4);
+    display: flex !important;
+    flex-flow: row nowrap !important;
+    align-items: stretch;
+    width: 100%;
     max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 2px 2px var(--space-3);
+    min-width: 0;
+    gap: 16px;
+    overflow-x: scroll !important;
+    overflow-y: hidden !important;
+    padding: 2px 2px 14px;
+    box-sizing: border-box;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: 2px;
-    overscroll-behavior-inline: contain;
+    overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+    scrollbar-width: auto;
+    scrollbar-color: #8b9bb2 #e8edf4;
+    touch-action: pan-x pan-y;
+    cursor: grab;
 }
 
+.main .campaign-grid:active {
+    cursor: grabbing;
+}
+
+.main .campaign-grid > .campaign-card,
 .main .campaign-grid > * {
-    min-width: 0;
+    flex: 0 0 320px !important;
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
     scroll-snap-align: start;
+}
+
+.main .campaign-grid::-webkit-scrollbar {
+    height: 10px;
+}
+
+.main .campaign-grid::-webkit-scrollbar-track {
+    background: #e8edf4;
+    border-radius: 999px;
+}
+
+.main .campaign-grid::-webkit-scrollbar-thumb {
+    background: #8b9bb2;
+    border-radius: 999px;
 }
 
 @media (max-width: 600px) {
     .main .campaign-grid {
-        grid-auto-columns: minmax(0, 82vw);
-        gap: var(--space-3);
+        gap: 12px;
+        padding-bottom: 12px;
+    }
+
+    .main .campaign-grid > .campaign-card,
+    .main .campaign-grid > * {
+        flex-basis: 82vw !important;
+        width: 82vw !important;
+        min-width: 82vw !important;
+        max-width: 82vw !important;
     }
 }
 
