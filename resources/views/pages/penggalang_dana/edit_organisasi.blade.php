@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header-footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/verify-penggalang.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/penggalang-register.css') }}">\n    <link rel="stylesheet" href="{{ asset('css/verify-penggalang.css') }}">
 </head>
 
 <body>
@@ -22,7 +22,7 @@
         $isRejected = ($status === 'rejected');
     @endphp
 
-    <main class="verify-page">
+    <main class="reg-page verify-page">
 
         <section class="verify-hero">
             <div class="container">
@@ -43,7 +43,7 @@
 
                 {{-- STATUS BADGE & PERINGATAN --}}
                 @if($penggalang)
-                    <div class="verify-card" style="margin-bottom: var(--space-5);">
+                    <div class="reg-card verify-card" style="margin-bottom: var(--space-5);">
                         <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
                             <span style="font-weight: var(--fw-semibold);">Status Penggalang:</span>
                             <span class="status-badge {{ $status }}">
@@ -79,7 +79,7 @@
                     @method('DELETE')
                 </form>
 
-                <form class="verify-form {{ $isPending ? 'disabled-overlay' : '' }}"
+                <form class="reg-form verify-form {{ $isPending ? 'disabled-overlay' : '' }}"
                     action="{{ route('penggalang_dana.update', $penggalang->slug) }}"
                     method="POST" enctype="multipart/form-data" novalidate>
 
@@ -96,7 +96,7 @@
 
                     {{-- BANNER --}}
                     <section class="verify-card">
-                        <div class="verify-card-header">
+                        <div class="reg-card-head verify-card-header">
                             <h2>Banner Organisasi</h2>
                             <p>Upload banner organisasi yang akan ditampilkan pada profil penggalang dana.</p>
                         </div>
@@ -319,8 +319,8 @@
 
                         </div>
                         @if(!$isPending && $penggalang->penggalangDanaDokumen->isNotEmpty() && (int) auth()->id() === (int) $penggalang->user_id)
-                            <div class="verify-actions" style="justify-content:flex-end;">
-                                <button type="submit" form="deleteDocumentsForm" class="verify-cancel-button"
+                            <div class="reg-actions verify-actions" style="justify-content:flex-end;">
+                                <button type="submit" form="deleteDocumentsForm" class="reg-btn reg-btn-ghost verify-cancel-button"
                                     style="border:1px solid #dc3545;color:#dc3545;background:#fff;"
                                     onclick="return confirm('Hapus dokumen yang dipilih? Tindakan ini tidak dapat dibatalkan.');">
                                     <i class="bi bi-trash"></i> Hapus dokumen terpilih
@@ -404,7 +404,7 @@
                     {{-- ACTION BUTTONS --}}
                     <div class="verify-actions">
                         <a href="{{ route('profile.user') }}" class="verify-cancel-button">Batal</a>
-                        <button type="submit" class="verify-submit-button" {{ $isPending ? 'disabled' : '' }}>
+                        <button type="submit" class="reg-btn reg-btn-primary verify-submit-button" {{ $isPending ? 'disabled' : '' }}>
                             {{ $isRejected ? 'Kirim Ulang' : 'Perbarui Verifikasi' }}
                         </button>
                     </div>
