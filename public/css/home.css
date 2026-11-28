@@ -2363,9 +2363,9 @@ body.filter-open .floating-wa-container {
 }
 
 /* =========================================================
-   CAMPAIGN CAROUSEL — four complete cards on desktop, swipeable everywhere
-   Desktop: four full cards per viewport.
-   Mobile: one wide card at a time, with the next card peeking in.
+   CAMPAIGN CAROUSEL — ukuran kartu lama, scroll horizontal semua layar
+   Desktop & tablet: ukuran asli 320px.
+   Mobile: kartu lebar mengikuti viewport.
 ========================================================= */
 .main .campaign-grid {
     display: flex !important;
@@ -2392,13 +2392,13 @@ body.filter-open .floating-wa-container {
     cursor: grabbing;
 }
 
-/* Empat kartu utuh dalam satu lebar container desktop. */
+/* Kembalikan ukuran kartu persis seperti sebelum diperkecil. */
 .main .campaign-grid > .campaign-card,
 .main .campaign-grid > * {
-    flex: 0 0 calc((100% - 48px) / 4) !important;
-    width: calc((100% - 48px) / 4) !important;
-    min-width: 0 !important;
-    max-width: calc((100% - 48px) / 4) !important;
+    flex: 0 0 320px !important;
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
     scroll-snap-align: start;
 }
 
@@ -2408,17 +2408,7 @@ body.filter-open .floating-wa-container {
     height: 0;
 }
 
-/* Tablet: dua kartu utuh per tampilan, tetap bisa digeser. */
-@media (max-width: 900px) and (min-width: 601px) {
-    .main .campaign-grid > .campaign-card,
-    .main .campaign-grid > * {
-        flex-basis: calc((100% - 16px) / 2) !important;
-        width: calc((100% - 16px) / 2) !important;
-        max-width: calc((100% - 16px) / 2) !important;
-    }
-}
-
-/* Mobile: kartu lebar dan bisa swipe ke kartu berikutnya. */
+/* Mobile tetap swipe dengan ukuran responsif. */
 @media (max-width: 600px) {
     .main .campaign-grid {
         gap: 12px;
