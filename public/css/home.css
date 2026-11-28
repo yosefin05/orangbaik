@@ -2369,7 +2369,7 @@ body.filter-open .floating-wa-container {
 .main .campaign-grid {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: minmax(240px, 280px);
+    grid-auto-columns: minmax(320px, 320px);
     grid-template-columns: none;
     gap: var(--space-4);
     max-width: 100%;
