@@ -79,7 +79,7 @@ class HomeController extends Controller
             ->where('campaign_type', 'emergency')
             ->where('approval_status', 'approved')
             ->latest()
-            ->take(4)
+            ->take(12)
             ->get();
 
         // PEMBERDAYAAN (sustainable + approved + aktif)
